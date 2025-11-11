@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>parts - Attendance Management System</title>
+        <link rel="stylesheet" th:href="@{/css/parts.css}">
+    </head>
+
+    <body>
+        <div th:fragment="backButton(url)">
+            <a th:href="@{${url}}" class="button button-secondary">戻る</a>
+        </div>
+    </body>
+
+</html>
