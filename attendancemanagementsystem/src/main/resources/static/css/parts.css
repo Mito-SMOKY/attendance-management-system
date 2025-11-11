@@ -1,0 +1,29 @@
+.button-secondary{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 250px;
+    margin:0 auto;
+    padding: .9em 2em;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 3px rgb(0 0 0 / 25%), 0 2px 3px -2px rgb(0 0 0 / 15%);
+    background-color: #ffffff;
+    color: #00bdca;
+    font-weight: 600;
+    font-size: 1em;
+}
+
+.button-secondary {
+    transform: rotate(45deg);
+    width: 5px;
+    height: 5px;
+    margin-left: 10px;
+    border-top: 2px solid #fff;
+    border-right: 2px solid #fff;
+    content: '';
+}
+
+.button-secondary:hover{
+    background-color: #00bdca;
+}
