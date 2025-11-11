@@ -2,6 +2,7 @@ package com.example.attendancemanagementsystem.user.loginandprofile.service;
 
 import java.util.Collections;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,6 +13,7 @@ import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 
 @Service
+@Profile("!dummy")
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UsersRepository usersRepository;

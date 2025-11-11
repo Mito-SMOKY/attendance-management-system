@@ -53,6 +53,12 @@
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 
+		<!-- 追加: Thymeleaf Spring Security extras -->
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
+		</dependency>
+
 		<!-- 追加: H2 データベース（runtime） -->
 		<dependency>
 			<groupId>com.h2database</groupId>
