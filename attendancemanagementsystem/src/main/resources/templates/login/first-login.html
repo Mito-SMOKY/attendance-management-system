@@ -11,13 +11,16 @@
 
 <body>
     
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+    
+    
     <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url='/login')}"></div>
     </div>
 
-    <div class="login-container">
-
-
+    <div class="firstLogin-container">
 
         <h2 class="title">新規登録</h2>
 
