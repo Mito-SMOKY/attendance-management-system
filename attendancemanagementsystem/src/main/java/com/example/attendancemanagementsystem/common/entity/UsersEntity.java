@@ -15,8 +15,11 @@ public class UsersEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "User_ID")
+    @Column(name = "UserID")
     private Integer userId;
+
+    @Column(name = "LoginID", nullable = false, unique = true)
+    private String loginId;
 
     @Column(name = "UserTypeID", nullable = false)
     private Integer userTypeId;
@@ -46,6 +49,14 @@ public class UsersEntity {
 
     public void setUserTypeId(Integer userTypeId) {
         this.userTypeId = userTypeId;
+    }
+
+    public String getLoginId() {
+        return loginId;
+    }
+
+    public void setLoginId(String loginId) {
+        this.loginId = loginId;
     }
 
     public String getName() {
