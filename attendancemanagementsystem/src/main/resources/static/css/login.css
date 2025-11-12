@@ -4,7 +4,7 @@
     align-items: center;
     width: 100%;
     height: auto;
-    margin: 100px auto;
+    margin-bottom: 50px auto;
     padding: 30px;
   
 }
@@ -86,11 +86,16 @@ input::placeholder{
     margin-bottom: 20px;
 }
 
-.backButton-container {
+.backbutton-container{
     position: absolute;
-    top: 20px;
-    left: 20px;
-    width: 30px;
-    height: 30px;
+    margin-top: 100px;
+    margin-left: 30px;
+    margin-bottom: 30px;
     cursor: pointer;
+}
+
+.error{
+    color: rgb(159, 0, 0);
+    text-align: center;
+    margin-top: 10px;
 }

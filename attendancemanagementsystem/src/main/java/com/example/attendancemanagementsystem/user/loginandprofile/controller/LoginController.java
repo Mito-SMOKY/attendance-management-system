@@ -11,7 +11,7 @@ public class LoginController {
         return "login/login";
     }
 
-        @GetMapping("/first-login")
+    @GetMapping("/first-login")
     public String showFirstLoginForm() {
         return "login/first-login";
     }

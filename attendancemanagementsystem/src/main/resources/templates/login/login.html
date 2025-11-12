@@ -23,6 +23,10 @@
                 <label class="label" for="password">パスワード</label>
                 <input class="form" type="password" id="password" name="password" required placeholder="例）password1234">
             </div>
+  
+            <div th:if="${param.error}">
+                <p class="error">ユーザーIDまたはパスワードが正しくありません。</p>
+            </div>
 
             <a class="forget-password" href="#">
                 <p class="message">パスワードをお忘れですか？</p>
@@ -32,9 +36,7 @@
 
         </form>
 
-        <div th:if="${param.error}">
-            <p class="error">ユーザーIDまたはパスワードが正しくありません。</p>
-        </div>
+
 
         
 
