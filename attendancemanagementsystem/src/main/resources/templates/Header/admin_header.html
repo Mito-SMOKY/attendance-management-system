@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title th:text="${pageTitle}">ヘッダーのサンプル</title>
+
+    <link rel="stylesheet" th:href="@{/css/admin_header.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-left">
+            <span th:text="${userName}">〇〇××さん</span>
+        </div>
+        
+        <nav class="header-nav">
+            <ul>
+                <li><a th:href="@{/date}">日付</a></li>
+                <li><a th:href="@{/subject}">教科</a></li>
+                <li><a th:href="@{/student}">生徒</a></li>
+                <li><a th:href="@{/other}">その他</a></li>
+            </ul>
+        </nav>
+        
+        <div class="header-right">
+            <a th:href="@{/user/profile}" class="icon-link">
+                <i class="fas fa-user"></i>
+            </a>
+            <a th:href="@{/notifications}" class="icon-link notification">
+                <i class="fas fa-bell"></i>
+                <span th:if="${hasNotification}" class="notification-dot"></span> 
+            </a>
+        </div>
+    </header>
+
+</body>
+</html>

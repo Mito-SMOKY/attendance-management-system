@@ -1,0 +1,111 @@
+/* 基本設定（余白リセットとフォント） */
+body {
+    margin: 0;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    background-color: #f9f9f9; /* ページの背景色 */
+}
+
+a {
+    text-decoration: none; /* リンクの下線を消す */
+    color: inherit; /* 親要素の色を継承 */
+}
+
+/*
+ * ヘッダー全体
+ * (★ここを修正しました)
+ */
+.main-header {
+    /* background-color: #7BCBD9;  <-- この行を削除 */
+    
+    /* ↓この2行を追加 */
+    background-image: linear-gradient(to right, #5BBEB9, #7BCBD9); /* グラデーション背景 */
+    color: white; /* ヘッダー内の基本文字色を白に */
+    
+    padding: 12px 25px; /* 上下の余白12px、左右の余白25px */
+    display: flex;
+    justify-content: space-between; /* 両端に寄せ、間は均等配置 */
+    align-items: center; /* 上下中央揃え */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 左側：ユーザー名 */
+.header-left {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+/* 中央：ナビゲーション */
+.header-nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+}
+
+.header-nav li {
+    margin: 0 20px;
+}
+
+.header-nav a {
+    font-size: 16px;
+    padding: 8px 0;
+    transition: opacity 0.3s;
+}
+
+.header-nav a:hover {
+    opacity: 0.7; /* ホバー時に少し薄くする（白が少し透明になる） */
+}
+
+/* 右側：アイコン */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* アイコンのリンク全体（背景を持つ要素） */
+.icon-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    width: 40px;
+    height: 40px;
+    background-color: white; /* 背景は白 */
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    
+    font-size: 22px;
+    
+    /* ★ アイコン自体の色は、背景が白なので水色を維持します */
+    color: #7BCBD9; 
+    
+    position: relative;
+    transition: all 0.2s ease-in-out;
+}
+
+.icon-link:hover {
+    background-color: #f0f8ff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+
+/* 通知アイコンの赤い点 */
+.notification-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    background-color: #E63946; /* 赤色 */
+    border-radius: 50%;
+    
+    /* ★ 縁取りの色もグラデーションの右端の色に合わせます */
+    border: 2px solid #7BCBD9; 
+}
+
+
+/* メインコンテンツ（ダミー）のスタイル */
+main {
+    padding: 20px;
+}
