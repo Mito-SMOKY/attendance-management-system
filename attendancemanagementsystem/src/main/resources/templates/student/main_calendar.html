@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Attendance Management System</title>
+    <link rel="stylesheet" th:href="@{/css/student.css}">
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
+</head>
+
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='生徒メイン')}"></div>
+    </div>
+
+    <div id="calendar-wrapper"></div>
+
+ 
+
+    <div class="calendar-container">
+        
+        <div id="calendar" class="calendar-wrap"></div>
+    </div>
+
+    <script th:src="@{/js/calendar.js}"></script>
+
+</body>
+</html>

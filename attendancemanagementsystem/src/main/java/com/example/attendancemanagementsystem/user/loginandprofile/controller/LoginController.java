@@ -15,4 +15,9 @@ public class LoginController {
     public String showFirstLoginForm() {
         return "login/first-login";
     }
+
+    @GetMapping("/main-calendar")
+    public String showMainCalendar() {
+        return "student/main_calendar";
+    }
 }

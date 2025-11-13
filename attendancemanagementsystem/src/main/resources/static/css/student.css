@@ -1,0 +1,162 @@
+/* カレンダーのCSS */
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 24px;
+  padding: 8px 12px;
+}
+
+.calendar thead{
+    background-color: #00bdca;
+}
+
+.calendar-ym {
+  font-size: 24px;
+  font-weight: 700;
+  color:#008b95;
+}
+
+.calendar-container {
+  position: relative;
+  padding-top: 150px;
+  display: flex;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+.calendar-wrap {
+  margin: 0 auto;
+  max-width: 1000px;
+  width: 100%;
+  display: block;
+  gap: 20px;
+}
+
+@media (max-width: 767.98px) {
+  .calendar-wrap {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+}
+.calendar {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 16px;
+}
+
+.calendar th,
+.calendar td {
+  border: 1px solid #000;
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  vertical-align: middle;
+  height: 50px;
+}
+.calendar th {
+  padding: 6px 10px;
+}
+
+@media (max-width: 767.98px) {
+  .calendar th,
+  .calendar td {
+    padding: 6px;
+    font-size: 12px;
+  }
+  .calendar th {
+    padding: 3px 6px;
+  }
+}
+
+.calendar .sun {
+  color: #e17f7e;
+  background-color: #f8e4e2;
+}
+.calendar .sat {
+  color: #7ab6f3;
+  background-color: #e7f6fd;
+}
+.calendar .mute {
+  color: #aaa;
+}
+.calendar .today {
+  background-color: #eeffde;
+}
+.calendar .off {
+  background-color: #fadcdb;
+}
+
+/* 強制的に土日カラーを当てる */
+.calendar tr th:nth-child(1),
+.calendar tr td:nth-child(1),
+.calendar th.sun,
+.calendar td.sun,
+.calendar .sun {
+  color: #e17f7e !important;
+  background-color: #f8e4e2 !important;
+}
+
+.calendar tr th:nth-child(7),
+.calendar tr td:nth-child(7),
+.calendar th.sat,
+.calendar td.sat,
+.calendar .sat {
+  color: #1e88e5 !important;
+  background-color: #e7f6fd !important;
+}
+
+.calendar .today.sat,
+.calendar td.today.sat {
+  background-color: #e7f6fd !important;
+  color: #1e88e5 !important;
+}
+
+.calendar thead th.sun,
+.calendar thead th.sat {
+  background-color: #00bdca; 
+  color: #333;
+}
+
+/* トグルボタン */
+
+.toggle-button {
+    display: inline-block;
+    position: relative;
+    width: 100px;
+    height: 50px;
+    border-radius: 50px;
+    border: 3px solid #4defed;
+    box-sizing: content-box;
+    cursor: pointer;
+    transition: border-color .4s;
+}
+
+.toggle-button:has(:checked) {
+    border-color: #2ee2e5;
+}
+
+.toggle-button::after {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: #4defed;
+    content: '';
+    transition: left .4s;
+}
+
+.toggle-button:has(:checked)::after {
+    left: 50px;
+    background-color: #2ee2e5;
+}
+
+.toggle-button input {
+    display: none;
+}
