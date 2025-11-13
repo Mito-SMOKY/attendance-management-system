@@ -8,6 +8,16 @@ public class LoginController {
 
     @GetMapping("/login")
     public String showLoginForm() {
-        return "login";
+        return "login/login";
+    }
+
+    @GetMapping("/first-login")
+    public String showFirstLoginForm() {
+        return "login/first-login";
+    }
+
+    @GetMapping("/main-calendar")
+    public String showMainCalendar() {
+        return "student/main_calendar";
     }
 }

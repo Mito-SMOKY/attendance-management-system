@@ -1,0 +1,9 @@
+<link rel="stylesheet" th:href="@{/css/parts.css}">
+
+<header class="header" th:fragment="header(title)">
+    <h1 th:text="${title}"></h1>
+</header>
+
+<div th:fragment="backButton(url)">
+    <a th:href="@{${url}}" class="backbutton">戻る</a>
+</div>

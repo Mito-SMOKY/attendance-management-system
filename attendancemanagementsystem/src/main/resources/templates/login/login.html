@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Attendance Management System</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
+</head>
+
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+
+    <div class="login-container">
+
+        <h2 class="title">出欠管理システム</h2>
+
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label class="label" for="username">ユーザーID または メールアドレス</label>
+                <input class="form" type="text" id="username" name="username" required placeholder="例）Miyu.k1234@gmail.com">
+            </div>
+
+            <div class="form-group">
+                <label class="label" for="password">パスワード</label>
+                <input class="form" type="password" id="password" name="password" required placeholder="例）password1234">
+            </div>
+  
+            <div th:if="${param.error}">
+                <p class="error">ユーザーIDまたはパスワードが正しくありません。</p>
+            </div>
+
+            <a class="forget-password" href="#">
+                <p class="message">パスワードをお忘れですか？</p>
+            </a>
+
+            <button type="submit" class="button">ログイン</button>
+
+        </form>
+
+
+
+        
+
+    </div>
+</body>
