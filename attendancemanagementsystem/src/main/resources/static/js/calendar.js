@@ -12,10 +12,11 @@ function createCalendar(month, year = date.getFullYear()) {
         <div class="calendar-header">
     
             <div class="calendar-ym">${year}年 ${month + 1}月</div>
-    
+                <p>予定表</p>
                 <label class="toggle-button">
                 <input type="checkbox"/>
                 </label>
+                <p>出欠</p>
     
         </div>
     `;
