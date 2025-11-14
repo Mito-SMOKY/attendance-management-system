@@ -1,9 +1,31 @@
 <link rel="stylesheet" th:href="@{/css/parts.css}">
 
-<header class="header" th:fragment="header(title)">
-    <h1 th:text="${title}"></h1>
-</header>
-
 <div th:fragment="backButton(url)">
     <a th:href="@{${url}}" class="backbutton">戻る</a>
+</div>
+
+
+<div th:fragment="header-container">
+    <header class="main-header">
+        <div class="header-left">
+            <span>〇〇××さん</span>
+        </div>
+        <nav class="header-nav">
+            <ul>
+                <li><a href="#">日付</a></li>
+                <li><a href="#">教科</a></li>
+                <li><a href="#">生徒</a></li>
+                <li><a href="#">その他</a></li>
+            </ul>
+        </nav>
+        <div class="header-right">
+            <a href="#" class="icon-link">
+                <i class="fas fa-user"></i>
+            </a>
+            <a href="#" class="icon-link notification">
+                <i class="fas fa-bell"></i>
+                <span class="notification-dot"></span>
+            </a>
+        </div>
+    </header>
 </div>
