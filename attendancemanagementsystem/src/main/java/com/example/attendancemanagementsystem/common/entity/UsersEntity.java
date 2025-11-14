@@ -2,44 +2,61 @@ package com.example.attendancemanagementsystem.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+// import lombok.Data; // Lombokは使わないので削除 (またはコメントアウト)
 
+// @Data // Lombokは使わないので削除
 @Entity
-@Table(name = "users") // データベースのテーブル名を指定
+@Table(name = "Users")
 public class UsersEntity {
 
-    @Id // これはプライマリキーです
-    @Column(name = "user_id") // DBのカラム名を指定
-    private String userId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "UserID")
+    private Integer userId;
 
-    @Column(name = "user_type")
-    private String userType;
+    @Column(name = "LoginID", nullable = false, unique = true)
+    private String loginId;
 
+    @Column(name = "UserTypeID", nullable = false)
+    private Integer userTypeId;
+
+    @Column(name = "Name", nullable = false)
     private String name;
 
-    @Column(unique = true) // 重複を許可しない
+    @Column(name = "Email", unique = true)
     private String email;
 
+    @Column(name = "Password", nullable = false)
     private String password;
 
-    // --- ここから下はゲッターとセッター ---
-    // (IDEの機能で自動生成できます)
+    // --- ここから下は手動で追加したGetter/Setter ---
 
-    public String getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public String getUserType() {
-        return userType;
+    public Integer getUserTypeId() {
+        return userTypeId;
     }
 
-    public void setUserType(String userType) {
-        this.userType = userType;
+    public void setUserTypeId(Integer userTypeId) {
+        this.userTypeId = userTypeId;
+    }
+
+    public String getLoginId() {
+        return loginId;
+    }
+
+    public void setLoginId(String loginId) {
+        this.loginId = loginId;
     }
 
     public String getName() {

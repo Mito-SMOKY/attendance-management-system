@@ -7,8 +7,11 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UsersRepository extends JpaRepository<UsersEntity, String> {
+public interface UsersRepository extends JpaRepository<UsersEntity, Integer> {
 
     // emailをキーにしてusersテーブルから1件検索するメソッド
     Optional<UsersEntity> findByEmail(String email);
+
+    // LoginIDをキーにしてusersテーブルから1件検索するメソッド
+    Optional<UsersEntity> findByLoginId(String loginId);
 }

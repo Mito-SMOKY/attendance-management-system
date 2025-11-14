@@ -8,10 +8,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-// この設定は、本物のDB（MySQL）を使うときに使われます。
-
 @Configuration
-@Profile("!dummy")//dummyじゃないときに有効になる。
+@Profile("!dummy") // dummyじゃないときに有効になる。
 public class SecurityConfig {
 
     @Bean
@@ -23,7 +21,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/login", "/css/**", "/js/**", "/h2-console/**").permitAll()
+                        // H2コンソールへのアクセス許可を削除
+                        .requestMatchers("/login", "/css/**", "/js/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -33,9 +32,9 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login")
-                )
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
-                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+                );
+                // H2コンソール用のCSRF設定とFrameOptions設定を削除
+                // (CSRFはデフォルトで有効になります)
 
         return http.build();
     }

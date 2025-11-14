@@ -1,17 +1,31 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" th:href="@{/css/parts.css}">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>parts - Attendance Management System</title>
-        <link rel="stylesheet" th:href="@{/css/parts.css}">
-    </head>
+<div th:fragment="backButton(url)">
+    <a th:href="@{${url}}" class="backbutton">戻る</a>
+</div>
 
-    <body>
-        <div th:fragment="backButton(url)">
-            <a th:href="@{${url}}" class="button button-secondary">戻る</a>
+
+<div th:fragment="header-container">
+    <header class="main-header">
+        <div class="header-left">
+            <span>〇〇××さん</span>
         </div>
-    </body>
-
-</html>
+        <nav class="header-nav">
+            <ul>
+                <li><a href="#">日付</a></li>
+                <li><a href="#">教科</a></li>
+                <li><a href="#">生徒</a></li>
+                <li><a href="#">その他</a></li>
+            </ul>
+        </nav>
+        <div class="header-right">
+            <a href="#" class="icon-link">
+                <i class="fas fa-user"></i>
+            </a>
+            <a href="#" class="icon-link notification">
+                <i class="fas fa-bell"></i>
+                <span class="notification-dot"></span>
+            </a>
+        </div>
+    </header>
+</div>
