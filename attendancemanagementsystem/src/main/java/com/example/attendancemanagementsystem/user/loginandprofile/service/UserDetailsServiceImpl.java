@@ -23,12 +23,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UsersEntity user = usersRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("ユーザーが見つかりません: " + email));
+    public UserDetails loadUserByUsername(String loginIdOrEmail) throws UsernameNotFoundException {
+
+        // 1. まずLoginIDで検索を試みる
+        UsersEntity user = usersRepository.findByLoginId(loginIdOrEmail)
+                // 2. もしLoginIDで見つからなければ、次にEmailで検索を試みる
+                .or(() -> usersRepository.findByEmail(loginIdOrEmail))
+                // 3. どちらでも見つからなければ例外をスローする
+                .orElseThrow(() -> new UsernameNotFoundException("ユーザーが見つかりません: " + loginIdOrEmail));
 
         return new User(
-                user.getEmail(),
+                user.getLoginId(), 
                 user.getPassword(),
                 Collections.emptyList()
         );
