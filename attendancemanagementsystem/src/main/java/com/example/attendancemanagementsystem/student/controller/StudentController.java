@@ -50,13 +50,14 @@ public class StudentController {
         // 3. サービスを呼び出してデータを取得
         Map<String, Object> homeData = studentService.getStudentHomeData(loginId, targetMonth);
 
-        // 4. 取得したデータを Model に詰めて View (HTML) に渡す
+        // --- 4. データを Model に詰める ---
         model.addAttribute("studentName", homeData.get("studentName"));
         model.addAttribute("calendarEvents", homeData.get("calendarEvents"));
         model.addAttribute("attendanceRecords", homeData.get("attendanceRecords"));
+        model.addAttribute("displayMonth", targetMonth.getYear() + "年 " + targetMonth.getMonthValue() + "月");
 
         // カレンダー表示に必要な月の情報も渡す
-        model.addAttribute("displayMonth", targetMonth.getYear() + "年 " + targetMonth.getMonthValue() + "月");
+        model.addAttribute("targetMonthDate", targetMonth.toString());
         
         return "student/main_calendar"; // src/main/resources/templates/student/main_calendar.html を参照
     }

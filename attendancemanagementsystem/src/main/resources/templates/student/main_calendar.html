@@ -79,8 +79,20 @@
             </form>
         </div>
     </div>
+    <script th:inline="javascript">
+        /* Thymeleaf で Java オブジェクトを JS 変数に変換 */
+        /* "const" ではなく "window." を使い、グローバル変数として定義する */
+        
+        // (1) 予定リスト (List<CalendarEntity>)
+        window.calendarEventsData = /*[[${calendarEvents}]]*/ [];
+        
+        // (2) 出欠リスト (List<AttendanceEntity>)
+        window.attendanceRecordsData = /*[[${attendanceRecords}]]*/ [];
+        
+        // (3) 表示対象の月 (LocalDate)
+        window.serverTargetMonthString = /*[[${targetMonthDate}]]*/ "2025-11-01"; 
+    </script>
     <script th:src="@{/js/calendar.js}" type="module"></script>
-    <script th:src="@{/js/calendar.js}"></script>
 </body>
 
 </html>
