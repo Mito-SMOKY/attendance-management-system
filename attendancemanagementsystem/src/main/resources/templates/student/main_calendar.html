@@ -57,6 +57,29 @@
         <div id="calendar-table-container" class="calendar-table-container"></div>
     </div>
 
+    <div id="scheduleModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modalTitle">予定の追加</h3>
+            <p id="modalDate"></p> 
+            
+            <form id="scheduleForm">
+                <div>
+                    <label for="scheduleTitle">件名:</label>
+                    <input type="text" id="scheduleTitle" required>
+                </div>
+                <div>
+                    <label for="scheduleTime">時間:</label>
+                    <input type="time" id="scheduleTime">
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" id="saveButton">保存</button>
+                    <button type="button" id="closeButton">閉じる</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
     <script th:src="@{/js/calendar.js}"></script>
 </body>
 

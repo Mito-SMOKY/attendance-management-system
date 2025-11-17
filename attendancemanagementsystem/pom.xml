@@ -65,7 +65,6 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
-        L
 
         <dependency>
             <groupId>com.h2database</groupId>
