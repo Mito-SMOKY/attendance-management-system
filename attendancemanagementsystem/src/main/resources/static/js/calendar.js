@@ -6,32 +6,18 @@ const currentYear = date.getFullYear();
 function createCalendar(month, year = date.getFullYear()) {
 
     const monthDays = ["日", "月", "火", "水", "木", "金", "土"];
-    // 年月表示
-
-    let calendarHTML =`
-        <div class="calendar-header">
     
-            <div class="calendar-ym">${year}年 ${month + 1}月</div>
-                <p>予定表</p>
-                <label class="toggle-button">
-                <input type="checkbox"/>
-                </label>
-                <p>出欠</p>
-    
-        </div>
-    `;
-
-    calendarHTML += '<table class="calendar"><thead><tr>';
+    let tableHTML = '<table class="calendar"><thead><tr>';
 
     for (let i = 0; i < 7; i++) {
         if (i === 0 || i === 6) {
-            calendarHTML += `<th class="sun">${monthDays[i]}</th>`;
+            tableHTML += `<th class="sun">${monthDays[i]}</th>`;
         } else {
-            calendarHTML += `<th>${monthDays[i]}</th>`;
+            tableHTML += `<th>${monthDays[i]}</th>`;
         }
     }
 
-    calendarHTML += '</tr></thead><tbody>';
+    tableHTML += '</tr></thead><tbody>';
 
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDay = new Date(year, month, 1).getDay();
@@ -41,48 +27,86 @@ function createCalendar(month, year = date.getFullYear()) {
     let prevDayCount = daysInPrevMonth - firstDay + 1;
 
     for (let i = 0; i < 6; i++) {
-        calendarHTML += '<tr>';
+        tableHTML += '<tr>';
 
         for (let j = 0; j < 7; j++) {
             if (i === 0 && j < firstDay) {
-                calendarHTML += `<td class="mute">${prevDayCount}</td>`;
+                tableHTML += `<td class="mute">${prevDayCount}</td>`;
                 prevDayCount++;
             } else if (dayCount > daysInMonth) {
                 let nextMonthDayCount = dayCount - daysInMonth;
-                calendarHTML += `<td class="mute">${nextMonthDayCount}</td>`;
+                tableHTML += `<td class="mute">${nextMonthDayCount}</td>`;
                 dayCount++;
             } else {
-                // 今日の日付に class を付ける（currentYear を参照）
+                // 今日の日付に class を付ける
                 if (dayCount === today && month === currentMonth && year === currentYear) {
-                    calendarHTML += `<td class="today">${dayCount}</td>`;
+                    tableHTML += `<td class="today">${dayCount}</td>`;
                 } else if (j === 0) {
-                    calendarHTML += `<td class="sun">${dayCount}</td>`;
+                    tableHTML += `<td class="sun">${dayCount}</td>`;
                 } else if (j === 6) {
-                    calendarHTML += `<td class="sat">${dayCount}</td>`;
+                    tableHTML += `<td class="sat">${dayCount}</td>`;
                 } else {
-                    calendarHTML += `<td>${dayCount}</td>`;
+                    tableHTML += `<td>${dayCount}</td>`;
                 }
                 dayCount++;
             }
         }
 
-        calendarHTML += '</tr>';
-        // 月の全日が表示されたらループを終了
+        tableHTML += '</tr>';
         if (dayCount > daysInMonth && i >= 4) {
             break;
         }
     }
 
-    calendarHTML += '</tbody></table>';
+    tableHTML += '</tbody></table>';
 
-    return calendarHTML;
+    // 
+    return tableHTML; 
 }
 
-const calEl = document.getElementById('calendar');
-if (calEl) {
-    calEl.innerHTML = createCalendar(currentMonth, currentYear);
+const yearInput = document.getElementById('yearInput');
+const monthInput = document.getElementById('monthInput');
+const jumpButton = document.getElementById('jumpButton');
+const calendarYmEl = document.getElementById('calendar-ym'); // 年月表示エリア
+const calendarTableContainerEl = document.getElementById('calendar-table-container'); // 表のコンテナ
+
+/*
+ * (指定された年月で表とタイトルを更新する)
+ * @param {number} month (0-11)
+ * @param {number} year 
+ */
+
+function renderCalendar(month, year) {
+    if (!calendarYmEl || !calendarTableContainerEl) {
+        console.error('カレンダーの描画に必要なHTML要素が見つかりません。');
+        return;
+    }
+
+    calendarYmEl.textContent = `${year}年 ${month + 1}月`;
+
+    const tableHtml = createCalendar(month, year);
+    calendarTableContainerEl.innerHTML = tableHtml;
+}
+
+if (yearInput && monthInput && jumpButton) {
+    
+    yearInput.value = currentYear;
+    monthInput.value = currentMonth;
+
+    jumpButton.addEventListener('click', () => {
+        const selectedYear = parseInt(yearInput.value, 10);
+        const selectedMonth = parseInt(monthInput.value, 10);
+
+        if (!isNaN(selectedYear) && !isNaN(selectedMonth)) {
+            renderCalendar(selectedMonth, selectedYear); // 指定された年月で再描画
+        } else {
+            alert("有効な年月を入力してください。");
+        }
+    });
+
+    // C. 初回のカレンダーを描画
+    renderCalendar(currentMonth, currentYear);
+
 } else {
-    console.error('Element with id="calendar" not found.');
+    console.error('カレンダーのコントロール要素が見つかりません。');
 }
-
-document.getElementById('calendar').innerHTML = createCalendar(currentMonth);

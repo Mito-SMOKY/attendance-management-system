@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Attendance Management System</title>
+    <title>利用者メイン</title>
     <link rel="stylesheet" th:href="@{/css/student.css}">
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
@@ -12,19 +12,52 @@
 <body>
 
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: main-header}"></div>
+        <div th:replace="~{fragments/_parts :: header}"></div>
     </div>
 
-    <div id="calendar-wrapper"></div>
-
- 
-
-    <div class="calendar-container">
+    <div id="calendar" class="calendar">
         
-        <div id="calendar" class="calendar-wrap"></div>
+        <div id="calendar-ym" class="calendar-ym"></div> 
+        
+        <div class="calendar-header">
+            
+            
+
+            <div class="calendar-controls">
+                <input type="number" id="yearInput" class="input">
+                <label for="yearInput">年</label>
+                <select id="monthInput" class="input">
+                    <option value="0">1月</option>
+                    <option value="1">2月</option>
+                    <option value="2">3月</option>
+                    <option value="3">4月</option>
+                    <option value="4">5月</option>
+                    <option value="5">6月</option>
+                    <option value="6">7月</option>
+                    <option value="7">8月</option>
+                    <option value="8">9月</option>
+                    <option value="9">10月</option>
+                    <option value="10">11月</option>
+                    <option value="11">12月</option>
+                </select>
+                <label for="monthInput">月</label>
+                    
+                <button id="jumpButton" class="jumpButton">表示</button>
+            </div>
+            
+            <div class="calendar-toggle" style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+                予定表
+                <label class="toggle-button">
+                    <input type="checkbox"/>
+                </label>
+                出欠
+            </div>
+        </div>
+
+        <div id="calendar-table-container" class="calendar-table-container"></div>
     </div>
 
     <script th:src="@{/js/calendar.js}"></script>
-
 </body>
+
 </html>
