@@ -1,4 +1,4 @@
-/* ヘッダーのCSS　*/
+/* ヘッダーのCSS */
 a {
     text-decoration: none; 
     color: inherit;
@@ -6,20 +6,33 @@ a {
 
 .main-header {
     position: absolute;
+    
+    /* ↓↓ ここを修正しました ↓↓ */
+    top: 0;
+    left: 0;
+    
     width: 100%;
     height: 80px;
-    background-image: linear-gradient(to right, #3bb2c2,#5BBEB9, #7BCBD9); /* グラデーション背景 */
+    background-image: linear-gradient(to right, #3bb2c2,#5BBEB9, #7BCBD9);
     color: white; 
     padding: 12px 25px;
     display: flex;
-    justify-content: space-between; /* 両端に寄せ、間は均等配置 */
+    justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    
+    /* 他の要素が重ならないよう z-index を指定
+      (position: absolute を使うため)
+    */
+    z-index: 100;
 }
 
 .header-left {
     font-weight: bold;
     font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 15px; /* 「2-AA」と名前の間の隙間 */
 }
 
 .header-nav ul {
@@ -36,13 +49,20 @@ a {
 
 .header-nav a {
     font-size: 25px;
-    padding: 8px 0;
+    padding: 8px 4px; /* 下線のために少し調整 */
     transition: opacity 0.3s;
+    border-bottom: 2px solid transparent; /* 下線スペース確保 */
 }
 
 .header-nav a:hover {
     opacity: 0.7; 
 }
+
+/* 「その他」の下線を引くためのスタイル */
+.header-nav a.active {
+    border-bottom: 2px solid white;
+}
+
 
 .header-right {
     display: flex;
@@ -54,7 +74,6 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-    
     width: 40px;
     height: 40px;
     background-color: white;
@@ -86,12 +105,11 @@ a {
 
 
 /* 戻るボタンのCSS */
-
-
 .backbutton{
-    position: relative;
-    top: 150px;
-    width: 250px;
+    position: absolute;
+    top: 110px; /* ヘッダー(80px) + 余白(30px) */
+    
+    width: auto; /* 幅は自動に */
     padding: 10px 20px;
     border: 1px solid #00bdca;
     border-radius: 5px;
@@ -100,13 +118,12 @@ a {
     font-size: 20px;
     text-decoration: none;
     margin-left: 50px;
-    margin-bottom: 30px;
     cursor: pointer;
+    z-index: 50;
 }
 
 .backbutton::before{
     display: inline-block; 
-    transform: rotate(45deg);
     width: 6px;
     height: 6px;
     border-top: 2px solid #00bdca;
