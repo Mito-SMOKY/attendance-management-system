@@ -37,18 +37,20 @@ function createCalendar(month, year = date.getFullYear()) {
                 let nextMonthDayCount = dayCount - daysInMonth;
                 tableHTML += `<td class="mute">${nextMonthDayCount}</td>`;
                 dayCount++;
-            } else {
-                // 今日の日付に class を付ける
-                if (dayCount === today && month === currentMonth && year === currentYear) {
-                    tableHTML += `<td class="today">${dayCount}</td>`;
-                } else if (j === 0) {
-                    tableHTML += `<td class="sun">${dayCount}</td>`;
-                } else if (j === 6) {
-                    tableHTML += `<td class="sat">${dayCount}</td>`;
-                } else {
-                    tableHTML += `<td>${dayCount}</td>`;
-                }
-                dayCount++;
+            }else {
+                    const dataDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayCount).padStart(2, '0')}`;
+
+                    // 今日の日付に class を付ける
+                    if (dayCount === today && month === currentMonth && year === currentYear) {
+                        tableHTML += `<td class="today" data-date="${dataDate}">${dayCount}</td>`;
+                    } else if (j === 0) {
+                        tableHTML += `<td class="sun" data-date="${dataDate}">${dayCount}</td>`;
+                    } else if (j === 6) {
+                        tableHTML += `<td class="sat" data-date="${dataDate}">${dayCount}</td>`;
+                    } else {
+                        tableHTML += `<td data-date="${dataDate}">${dayCount}</td>`;
+                    }
+                    dayCount++;
             }
         }
 
@@ -98,15 +100,82 @@ if (yearInput && monthInput && jumpButton) {
         const selectedMonth = parseInt(monthInput.value, 10);
 
         if (!isNaN(selectedYear) && !isNaN(selectedMonth)) {
-            renderCalendar(selectedMonth, selectedYear); // 指定された年月で再描画
+            renderCalendar(selectedMonth, selectedYear);
         } else {
             alert("有効な年月を入力してください。");
         }
     });
 
-    // C. 初回のカレンダーを描画
+    // 初回のカレンダーを描画
     renderCalendar(currentMonth, currentYear);
 
 } else {
     console.error('カレンダーのコントロール要素が見つかりません。');
+}
+
+const modal = document.getElementById('scheduleModal');
+const closeButton = document.getElementById('closeButton');
+const scheduleForm = document.getElementById('scheduleForm');
+const modalTitle = document.getElementById('modalTitle');
+const modalDateEl = document.getElementById('modalDate');
+
+// 3. モーダルを開く関数
+function openModal(dateStr) {
+    const dateObj = new Date(dateStr + 'T00:00:00'); // タイムゾーンずれ対策
+    const year = dateObj.getFullYear();
+    const month = dateObj.getMonth() + 1;
+    const day = dateObj.getDate();
+
+    modalDateEl.textContent = `${year}年 ${month}月 ${day}日`;
+
+    scheduleForm.reset(); 
+    
+    modal.style.display = 'flex'; 
+}
+
+
+function closeModal() {
+    modal.style.display = 'none';
+}
+
+if (calendarTableContainerEl) {
+    calendarTableContainerEl.addEventListener('click', (event) => {
+        const targetCell = event.target.closest('td[data-date]');
+        
+        if (targetCell) {
+            const dateStr = targetCell.dataset.date;
+            openModal(dateStr);
+        }
+    });
+}
+
+// モーダルの「閉じる」ボタンのイベント
+if (closeButton) {
+    closeButton.addEventListener('click', closeModal);
+}
+
+// モーダルの背景をクリックした時のイベント
+if (modal) {
+    modal.addEventListener('click', (event) => {
+
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+}
+
+
+if (scheduleForm) {
+    scheduleForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const title = document.getElementById('scheduleTitle').value;
+        const time = document.getElementById('scheduleTime').value;
+        const date = modalDateEl.textContent; 
+        
+        console.log("保存するデータ:", { date, title, time });
+        
+        alert("保存しました (仮)");
+        closeModal();
+    });
 }
