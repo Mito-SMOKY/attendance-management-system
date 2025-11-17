@@ -2,7 +2,7 @@ package com.example.attendancemanagementsystem.student.controller;
 
 import java.time.LocalDate; 
 import java.util.Map; 
-
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam; // @RequestParam をインポート
+import org.springframework.web.bind.annotation.RequestParam;
 
 // Service パスからインポート
 import com.example.attendancemanagementsystem.student.service.StudentService;
@@ -30,12 +30,9 @@ public class StudentController {
      * 生徒用メインメニュー（/student/home）を表示
      * * @param month "2025-11" のような形式で月の指定を受け取る (オプション)
      */
-    @GetMapping("/main_calendar")
+    @GetMapping("/main_calendar") // (ここは /home から変更されていましたね)
     public String home(Model model, @AuthenticationPrincipal UserDetails userDetails,
-                       @RequestParam(required = false) String month) {
-        
-        // --- ▼▼▼ デバッグログ追加 ▼▼▼ ---
-        // System.out.println("--- StudentController.home() が呼ばれました ---");
+                           @RequestParam(required = false) String month) {
         
         // 1. Spring Security からログイン中のユーザーID (LoginID) を取得
         String loginId = userDetails.getUsername();
@@ -61,6 +58,28 @@ public class StudentController {
         // カレンダー表示に必要な月の情報も渡す
         model.addAttribute("displayMonth", targetMonth.getYear() + "年 " + targetMonth.getMonthValue() + "月");
         
-        return "student/main_calendar"; // src/main/resources/templates/student/home.html を参照
+        return "student/main_calendar"; // src/main/resources/templates/student/main_calendar.html を参照
     }
+
+    /**
+     * 新しいカレンダー予定を追加する (JSから fetch で呼ばれる)
+     * * @param title フォームから送られた "title"
+     * @param date  フォームから送られた "date" (YYYY-MM-DD形式)
+     */
+    @PostMapping("/calendar/add")
+    public String addCalendarEvent(@RequestParam String title,
+                                   @RequestParam LocalDate date,
+                                   @AuthenticationPrincipal UserDetails userDetails) {
+        
+        // 1. ログイン中のユーザーIDを取得
+        String loginId = userDetails.getUsername();
+
+        // 2. サービスを呼び出してDBに保存
+        studentService.addCalendarEvent(loginId, title, date);
+
+        // 3. 処理が終わったら、メインメニューにリダイレクトする
+        // (JS側は、このリダイレクト指示(response.ok)を受けてページをリロードします)
+        return "redirect:/student/main_calendar";
+    }
+    
 }

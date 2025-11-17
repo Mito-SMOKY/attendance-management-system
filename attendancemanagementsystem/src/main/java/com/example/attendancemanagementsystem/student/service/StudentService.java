@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.web.PageableDefault;
+// import org.springframework.data.repository.query.Param; // (未使用のため削除)
+// import org.springframework.data.web.PageableDefault; // (未使用のため削除)
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // トランザクションを追加
+import org.springframework.transaction.annotation.Transactional;
 
 //common パスからインポート
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
@@ -51,67 +51,74 @@ public class StudentService {
         this.calendarRepository = calendarRepository;
     }
 
-/**
+    /**
      * 生徒のメインメニュー（カレンダー）に必要なデータを取得する
      * * @param loginId ログイン中のユーザーID
      * @param month   表示対象の月 (例: 2025-11-01)
      * @return 画面に表示するためのデータマップ
      */
     public Map<String, Object> getStudentHomeData(String loginId, LocalDate month) {
-        System.out.println("--- StudentService.getStudentHomeData() が呼ばれました ---");
-        System.out.println("受け取った loginId: " + loginId);
-        System.out.println("受け取った month: " + month);
         
         Map<String, Object> data = new HashMap<>();
 
         // 1. ログインIDから UsersEntity を取得
         Optional<UsersEntity> usersOpt = usersRepository.findByLoginId(loginId);
         if (usersOpt.isEmpty()) {
-            System.out.println("★エラー: usersRepository.findByLoginId でユーザーが見つかりません");
+            // ユーザーが見つからなければ空のマップを返す
             return data; 
         }
         UsersEntity currentUser = usersOpt.get();
         data.put("studentName", currentUser.getName());
-        System.out.println("取得したユーザー名: " + currentUser.getName());
-        System.out.println("取得した UserID: " + currentUser.getUserId());
 
-        // 3. カレンダー表示のための日付範囲を計算 (先に移動)
+        // 3. カレンダー表示のための日付範囲を計算
         LocalDate startDate = month.withDayOfMonth(1);
         LocalDate endDate = month.withDayOfMonth(month.lengthOfMonth());
-        System.out.println("検索する日付範囲 (startDate): " + startDate);
-        System.out.println("検索する日付範囲 (endDate): " + endDate);
 
-        // 4. 【予定】データを取得 (先に移動)
+        // 4. 【予定】データを取得
         // (student がいなくても、calendar は取得できるようにする)
         List<CalendarEntity> calendarEvents = calendarRepository.findByUsersAndDateBetween(currentUser, startDate, endDate);
-        
-        System.out.println("calendarRepository.findByUsersAndDateBetween が実行されました");
-        if (calendarEvents.isEmpty()) {
-            System.out.println("★結果: 予定は見つかりませんでした (リストは空です)");
-        } else {
-            System.out.println("★成功: " + calendarEvents.size() + " 件の予定が見つかりました！");
-        }
         data.put("calendarEvents", calendarEvents);
 
 
-        // 2. UsersEntity から StudentEntity を取得 (ロジックを後ろに移動)
+        // 2. UsersEntity から StudentEntity を取得
         Optional<StudentEntity> studentOpt = studentRepository.findByUsers(currentUser);
-        if (studentOpt.isEmpty()) {
-
-            // ★★★ デバッグログを追加 ★★★
-            // System.out.println("★注意: studentRepository.findByUsers で生徒情報が見つかりません");
-            // student が見つからなくても、カレンダーは表示したいので、ここでは return しない
-            
-        } else {
+        
+        if (studentOpt.isPresent()) {
             // student が見つかった場合のみ、出欠データを取得
             StudentEntity currentStudent = studentOpt.get();
-            System.out.println("StudentEntity が見つかりました。出欠データを取得します。");
 
             // 5. 【出欠】データを取得
             List<AttendanceEntity> attendances = attendanceRepository.findByStudent(currentStudent);
             data.put("attendanceRecords", attendances);
         }
+        // (student が見つからなくても、カレンダーは表示したいので else は不要)
 
         return data;
+    }
+
+    /**
+     * カレンダーに新しい予定を追加する
+     * * @param loginId ログイン中のユーザーID
+     * @param title   予定のタイトル
+     * @param date    予定の日付
+     */
+    @Transactional // (readOnly = false) を明示的に設定。これによりデータの変更が可能に。
+    public void addCalendarEvent(String loginId, String title, LocalDate date) {
+        
+        // 1. ログインIDから UsersEntity を検索
+        //orElseThrow で、もしユーザーが見つからなければ例外を発生させる
+        UsersEntity user = usersRepository.findByLoginId(loginId)
+                            .orElseThrow(() -> new RuntimeException("User not found for loginId: " + loginId));
+        
+        // 2. 新しい予定エンティティ (CalendarEntity) を作成
+        CalendarEntity newEvent = new CalendarEntity();
+        
+        // 3. データをセット
+        newEvent.setUsers(user);  // 誰の予定か
+        newEvent.setTitle(title); // タイトル
+        newEvent.setDate(date);   // 日付
+
+        // 4. DBに保存 (INSERT)
+        calendarRepository.save(newEvent);
     }
 }
