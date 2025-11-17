@@ -1,11 +1,50 @@
 /* カレンダーのCSS */
 
+
 .calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 24px;
-  padding: 8px 12px;
+    width: 80%;
+    align-items: center;
+    margin-left: 50px;
+    margin-right: 50px;
+    /* margin-top: 200px; */
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    font-size: 20px;
+    color: #001f22;
+    flex-wrap: wrap; 
+    gap: 15px;
+}
+
+.input{
+  width: 100px;
+  height: 50px;
+  padding: 10px 15px;
+  border: #00bdca 2px solid;
+  border-radius: 25px;
+  font-size: 1rem;
+}
+
+.jumpButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70px;
+    height: 50px;
+    margin:0 auto;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 3px rgb(0 0 0 / 25%), 0 2px 3px -2px rgb(0 0 0 / 15%);
+    background-color: #00bdca;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.8em;
+}
+
+.button-3:hover {
+    background-color: #1579c0;
 }
 
 .calendar thead{
@@ -13,81 +52,70 @@
 }
 
 .calendar-ym {
-  font-size: 24px;
-  font-weight: 700;
-  color:#008b95;
+    margin-left: 150px;
+    padding-bottom: 20px;
+    padding-top: 150px;
+    font-size: 3rem;
+    font-weight: 700;
+    color:#008b95;
+    flex-shrink: 0; /* 縮まないようにする */
 }
 
-.calendar-container {
-  position: relative;
-  padding-top: 150px;
-  display: flex;
-  margin: 0 auto;
-  max-width: 1200px;
-}
 
-.calendar-wrap {
-  margin: 0 auto;
-  max-width: 1000px;
-  width: 100%;
-  display: block;
-  gap: 20px;
-}
-
-@media (max-width: 767.98px) {
-  .calendar-wrap {
-    max-width: 100%;
-    padding: 0 12px;
-  }
-}
 .calendar {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 16px;
+    max-width: 1200px;
+    max-height: 3000px;
+    margin: auto;
+    align-items: center;
+    /* margin-left: 30px;
+    margin-right: 30px; */
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 1rem;
 }
 
 .calendar th,
 .calendar td {
-  border: 1px solid #000;
-  text-align: center;
-  padding: 10px;
-  font-size: 14px;
-  font-weight: bold;
-  vertical-align: middle;
-  height: 50px;
+    border: 1px solid #000;
+    text-align: center;
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    vertical-align: middle;
+    height: 50px;
 }
 .calendar th {
-  padding: 6px 10px;
+    padding: 6px 10px;
 }
 
 @media (max-width: 767.98px) {
-  .calendar th,
-  .calendar td {
-    padding: 6px;
-    font-size: 12px;
-  }
-  .calendar th {
-    padding: 3px 6px;
-  }
+    .calendar th,
+    .calendar td {
+        padding: 6px;
+        font-size: 12px;
+    }
+    .calendar th {
+        padding: 3px 6px;
+    }
 }
 
 .calendar .sun {
-  color: #e17f7e;
-  background-color: #f8e4e2;
+    color: #e17f7e;
+    background-color: #f8e4e2;
 }
 .calendar .sat {
-  color: #7ab6f3;
-  background-color: #e7f6fd;
+    color: #7ab6f3;
+    background-color: #e7f6fd;
 }
 .calendar .mute {
-  color: #aaa;
+    color: #aaa;
 }
 .calendar .today {
-  background-color: #eeffde;
+    background-color: #eeffde;
 }
 .calendar .off {
-  background-color: #fadcdb;
+    background-color: #fadcdb;
 }
 
 /* 強制的に土日カラーを当てる */
@@ -96,8 +124,8 @@
 .calendar th.sun,
 .calendar td.sun,
 .calendar .sun {
-  color: #e17f7e !important;
-  background-color: #f8e4e2 !important;
+    color: #e17f7e !important;
+    background-color: #f8e4e2 !important;
 }
 
 .calendar tr th:nth-child(7),
@@ -105,30 +133,52 @@
 .calendar th.sat,
 .calendar td.sat,
 .calendar .sat {
-  color: #1e88e5 !important;
-  background-color: #e7f6fd !important;
+    color: #1e88e5 !important;
+    background-color: #e7f6fd !important;
 }
 
 .calendar .today.sat,
 .calendar td.today.sat {
-  background-color: #e7f6fd !important;
-  color: #1e88e5 !important;
+    background-color: #e7f6fd !important;
+    color: #1e88e5 !important;
 }
 
 .calendar thead th.sun,
 .calendar thead th.sat {
-  background-color: #00bdca; 
-  color: #333;
+    background-color: #00bdca; 
+    color: #333;
 }
 
-/* トグルボタン */
+.calendar-controls {
+    display: flex;
+    align-items: center; /* 垂直中央揃え */
+    margin: 0 auto;
+    gap: 10px; 
+    box-sizing: border-box;
+    flex-wrap: wrap;
+}
 
+.calendar-toggle {
+    flex-shrink: 0; 
+}
+
+.calendar-table-container {
+    margin: auto;
+    align-items: center;
+    width: 70%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* トグルボタン */
 .toggle-button {
     display: inline-block;
     position: relative;
-    width: 100px;
-    height: 50px;
-    border-radius: 50px;
+    width: 50px;
+    height: 25px;
+    border-radius: 25px;
     border: 3px solid #4defed;
     box-sizing: content-box;
     cursor: pointer;
@@ -144,8 +194,8 @@
     top: 50%;
     left: 5px;
     transform: translateY(-50%);
-    width: 45px;
-    height: 45px;
+    width: 23px;
+    height: 23px;
     border-radius: 50%;
     background-color: #4defed;
     content: '';
@@ -153,10 +203,51 @@
 }
 
 .toggle-button:has(:checked)::after {
-    left: 50px;
+    left: 25px;
     background-color: #2ee2e5;
 }
 
 .toggle-button input {
     display: none;
+}
+
+
+/* 予定追加モーダルのCSS */
+
+.modal-overlay {
+    display: none; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.modal-content {
+    background-color: white;
+    padding: 20px 30px;
+    border-radius: 8px;
+    min-width: 300px;
+}
+
+.modal-content form div {
+    margin-bottom: 15px;
+}
+.modal-content label {
+    display: block;
+    margin-bottom: 5px;
+}
+.modal-content input[type="text"] {
+    width: 100%;
+    padding: 8px;
+}
+
+.modal-actions {
+    text-align: right;
+    margin-top: 20px;
 }

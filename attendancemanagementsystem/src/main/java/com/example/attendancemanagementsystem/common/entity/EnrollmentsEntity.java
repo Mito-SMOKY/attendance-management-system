@@ -2,9 +2,12 @@ package com.example.attendancemanagementsystem.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -16,69 +19,78 @@ public class EnrollmentsEntity {
     @Column(name = "EnrollmentsID")
     private Integer enrollmentsId;
 
-    @Column(name = "UserID", nullable = false)
-    private Integer userId;
-
-    @Column(name = "DepartmentID", nullable = false)
-    private Integer departmentId;
-
-    @Column(name = "AcademicYear", nullable = false)
+    @Column(name = "AcademicYear")
     private Integer academicYear;
 
-    @Column(name = "Grade", nullable = false)
+    @Column(name = "Grade")
     private Integer grade;
 
-    @Column(name = "IsActive", nullable = false)
+    @Column(name = "IsActive")
     private boolean isActive;
 
-   // --- Getter ---
+    // --- 関連定義 ---
+
+    // Enrollments(多) 対 Student(1)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UserID") // DBのFKカラム名
+    private StudentEntity student;
+
+    // Enrollments(多) 対 Department(1)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DepartmentID") // DBのFKカラム名
+    private DepartmentEntity department;
+
+    // --- コンストラクタ ---
+    public EnrollmentsEntity() {
+    }
+
+    // --- ゲッター・セッター ---
     public Integer getEnrollmentsId() {
         return enrollmentsId;
     }
 
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public Integer getDepartmentId() {
-        return departmentId;
+    public void setEnrollmentsId(Integer enrollmentsId) {
+        this.enrollmentsId = enrollmentsId;
     }
 
     public Integer getAcademicYear() {
         return academicYear;
     }
 
-    public Integer getGrade() {
-        return grade;
-    }
-
-    // boolean型のGetterは isXxx() が慣習
-    public boolean isActive() {
-        return isActive;
-    }
-
-    // --- Setter ---
-    public void setEnrollmentsId(Integer enrollmentsId) {
-        this.enrollmentsId = enrollmentsId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public void setDepartmentId(Integer departmentId) {
-        this.departmentId = departmentId;
-    }
-
     public void setAcademicYear(Integer academicYear) {
         this.academicYear = academicYear;
+    }
+
+    public Integer getGrade() {
+        return grade;
     }
 
     public void setGrade(Integer grade) {
         this.grade = grade;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
     public void setActive(boolean isActive) {
         this.isActive = isActive;
+    }
+
+    // 関連のゲッター・セッター
+    public StudentEntity getStudent() {
+        return student;
+    }
+
+    public void setStudent(StudentEntity student) {
+        this.student = student;
+    }
+
+    public DepartmentEntity getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(DepartmentEntity department) {
+        this.department = department;
     }
 }
