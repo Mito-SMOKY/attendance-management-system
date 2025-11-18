@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>リスト詳細</title>
+    <style>
+      body {
+        padding: 20px;
+        font-family: sans-serif;
+      }
+      .info-box {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border: 1px solid #eee;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #007bff;
+        color: white;
+      }
+      tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+      .btn {
+        padding: 8px 15px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+      }
+      .btn:hover {
+        background-color: #5a6268;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>リスト詳細確認</h1>
+
+    <div class="info-box">
+      <p>
+        <strong>リストID:</strong>
+        <span th:text="${datalist.dataListId}"></span>
+      </p>
+      <p>
+        <strong>リスト名:</strong>
+        <span th:text="${datalist.dataListName}"></span>
+      </p>
+      <p>
+        <strong>作成日時:</strong> <span th:text="${datalist.createdAt}"></span>
+      </p>
+    </div>
+
+    <h3>登録メンバー一覧</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 50px">No.</th>
+          <th>ログインID</th>
+          <th>氏名</th>
+          <th>ステータスID</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="student, stat : ${datalist.students}">
+          <td th:text="${stat.count}">1</td>
+          <td th:text="${student.user.loginId}">ST001</td>
+          <td th:text="${student.user.name}">山田 太郎</td>
+          <td th:text="${student.studentStatusId}">1</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <br /><br />
+    <a th:href="@{/admin/creation-history}" class="btn">← 履歴一覧に戻る</a>
+  </body>
+</html>

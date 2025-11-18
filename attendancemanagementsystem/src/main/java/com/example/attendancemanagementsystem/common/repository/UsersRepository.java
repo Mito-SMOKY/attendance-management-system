@@ -1,17 +1,21 @@
 package com.example.attendancemanagementsystem.common.repository;
 
-import com.example.attendancemanagementsystem.common.entity.UsersEntity;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.example.attendancemanagementsystem.common.entity.Users;
 
 @Repository
-public interface UsersRepository extends JpaRepository<UsersEntity, Integer> {
+public interface UsersRepository extends JpaRepository<Users, Integer> {
 
     // emailをキーにしてusersテーブルから1件検索するメソッド
-    Optional<UsersEntity> findByEmail(String email);
+    Optional<Users> findByEmail(String email);
 
     // LoginIDをキーにしてusersテーブルから1件検索するメソッド
-    Optional<UsersEntity> findByLoginId(String loginId);
+    Optional<Users> findByLoginId(String loginId);
+
+    boolean existsByLoginId(String loginId);
+    
 }

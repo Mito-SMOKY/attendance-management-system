@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>読み込み結果確認</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .btn-save {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>読み込み結果確認</h1>
+    <p>以下の内容で仮登録を行いますか？</p>
+
+    <form
+      th:action="@{/admin/save-temp-accounts}"
+      th:object="${datalistForm}"
+      method="post"
+    >
+      <label><strong>リスト名:</strong></label>
+      <input type="text" th:field="*{datalistName}" required />
+
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>ログインID (旧学籍番号)</th>
+            <th>氏名</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="acc, stat : *{tempAccounts}">
+            <td th:text="${stat.count}"></td>
+            <td th:text="${acc.loginId}"></td>
+            <td th:text="${acc.name}"></td>
+
+            <input
+              type="hidden"
+              th:field="*{tempAccounts[__${stat.index}__].loginId}"
+            />
+            <input
+              type="hidden"
+              th:field="*{tempAccounts[__${stat.index}__].name}"
+            />
+          </tr>
+        </tbody>
+      </table>
+
+      <br />
+      <button type="submit" class="btn-save">登録実行</button>
+    </form>
+  </body>
+</html>

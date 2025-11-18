@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>作成履歴</title>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+      }
+      th {
+        background-color: #f8f9fa;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>作成履歴一覧</h1>
+    <p>登録完了しました。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>リスト名</th>
+          <th>作成日時</th>
+          <th>詳細</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="item : ${datalists}">
+          <td th:text="${item.dataListId}"></td>
+          <td th:text="${item.dataListName}"></td>
+          <td th:text="${item.createdAt}"></td>
+          <td>
+            <a
+              th:href="@{/admin/temp-account-list/{id}(id=${item.dataListId})}"
+              style="text-decoration: underline; color: blue; cursor: pointer"
+              >詳細確認</a
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <br />
+    <a th:href="@{/admin/tmpAccount}">メニューに戻る</a>
+  </body>
+</html>
