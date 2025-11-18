@@ -1,12 +1,13 @@
+// currentViewMode 変数を追加
+let currentViewMode = 'schedule'; // 'schedule' または 'attendance'
+
 /**
  * 指定された年月のカレンダーHTMLを生成する
- * (この関数は、HTMLで定義された 'calendarEventsData' グローバル変数を参照します)
  */
 function createCalendar(month, year) {
-
+    // ( ... 既存の tableHTML, 日付計算ロジック ... )
     const monthDays = ["日", "月", "火", "水", "木", "金", "土"];
     let tableHTML = '<table class="calendar"><thead><tr>';
-
     for (let i = 0; i < 7; i++) {
         if (i === 0 || i === 6) {
             tableHTML += `<th class="sun">${monthDays[i]}</th>`;
@@ -14,21 +15,17 @@ function createCalendar(month, year) {
             tableHTML += `<th>${monthDays[i]}</th>`;
         }
     }
-
     tableHTML += '</tr></thead><tbody>';
-
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDay = new Date(year, month, 1).getDay();
     const daysInPrevMonth = new Date(year, month, 0).getDate();
-
     let dayCount = 1;
     let prevDayCount = daysInPrevMonth - firstDay + 1;
-
-    // --- 今日の日付情報を取得 (todayクラス用) ---
     const dateObj = new Date();
     const today = dateObj.getDate();
     const currentMonth = dateObj.getMonth();
     const currentYear = dateObj.getFullYear();
+    // ( ... ロジックここまで ... )
 
     for (let i = 0; i < 6; i++) {
         tableHTML += '<tr>';
@@ -42,28 +39,42 @@ function createCalendar(month, year) {
                 tableHTML += `<td class="mute">${nextMonthDayCount}</td>`;
                 dayCount++;
             } else {
-                // --- ▼▼▼【修正点 1: DBデータ(予定)の表示ロジック】▼▼▼ ---
                 
-                // (1) このマスの日付文字列 (YYYY-MM-DD) を作成
                 const dataDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayCount).padStart(2, '0')}`;
 
-                // (2) グローバル変数 'calendarEventsData' から、この日付の予定を探す
+                //currentViewMode によって描画内容を分岐　
                 let eventsHtml = '';
-                if (typeof calendarEventsData !== 'undefined' && Array.isArray(calendarEventsData)) {
-                    // event.date が "YYYY-MM-DD" 形式である前提
+                if (currentViewMode === 'schedule') {
+                    // 予定表モード
                     const dailyEvents = calendarEventsData.filter(event => event.date === dataDate);
-                    
                     if (dailyEvents.length > 0) {
-                        eventsHtml = '<div class="schedule-list">'; // (CSSは別途必要)
+                        eventsHtml = '<div class="schedule-list">';
                         dailyEvents.forEach(event => {
-                            // (CSSは別途必要)
                             eventsHtml += `<div class="schedule-item">${event.title}</div>`; 
                         });
                         eventsHtml += '</div>';
                     }
+                } else {
+
+                    // attendanceRecordsData が null や undefined でないか確認 
+                    if (Array.isArray(attendanceRecordsData)) {
+                        
+                        const attendanceRecord = attendanceRecordsData.find(record => record.date === dataDate);
+                        
+                        if (attendanceRecord) {
+                            let attendanceMark = '';
+                            if (attendanceRecord.status === '出席') {
+                                attendanceMark = '<span class="attendance-present">〇</span>'; 
+                            } else if (attendanceRecord.status === '欠席') {
+                                attendanceMark = '<span class="attendance-absent">✕</span>'; 
+                            }
+                            if(attendanceMark) {
+                               eventsHtml = `<div class="attendance-list">${attendanceMark}</div>`;
+                            }
+                        }
+                    }
                 }
 
-                // (3) セルのCSSクラスを決定
                 let cellClass = '';
                 if (dayCount === today && month === currentMonth && year === currentYear) {
                     cellClass = 'today';
@@ -73,12 +84,10 @@ function createCalendar(month, year) {
                     cellClass = 'sat';
                 }
 
-                // (4) <td> を生成 (日付(dayCount) と 予定(eventsHtml) を両方入れる)
                 tableHTML += `<td class="${cellClass}" data-date="${dataDate}">
                                 <div class="day-number">${dayCount}</div>
                                 ${eventsHtml}
-                             </td>`;
-                // --- ▲▲▲【修正完了】▲▲▲ ---
+                                </td>`;
                 
                 dayCount++;
             }
@@ -101,128 +110,180 @@ document.addEventListener('DOMContentLoaded', () => {
     const yearInput = document.getElementById('yearInput');
     const monthInput = document.getElementById('monthInput');
     const jumpButton = document.getElementById('jumpButton');
-    const calendarYmEl = document.getElementById('calendar-ym'); // 年月表示エリア
-    const calendarTableContainerEl = document.getElementById('calendar-table-container'); // 表のコンテナ
+    const calendarYmEl = document.getElementById('calendar-ym'); 
+    const calendarTableContainerEl = document.getElementById('calendar-table-container'); 
 
-    /**
-     * (指定された年月で表とタイトルを更新する)
-     */
+    //トグルボタンの要素を取得
+    const viewToggleCheckbox = document.getElementById('viewToggleCheckbox');
+
+    // ( ... renderCalendar, サーバー日付での初回描画, jumpButton のリスナー ... )
+
     function renderCalendar(month, year) {
         if (!calendarYmEl || !calendarTableContainerEl) {
             console.error('カレンダーの描画に必要なHTML要素が見つかりません。');
             return;
         }
-        // 年月タイトルを更新
         calendarYmEl.textContent = `${year}年 ${month + 1}月`;
-        // カレンダーの表HTMLを生成して挿入
         const tableHtml = createCalendar(month, year);
         calendarTableContainerEl.innerHTML = tableHtml;
     }
 
-    // --- ▼▼▼【修正点 2: サーバー(Java)から渡された月で初回描画する】▼▼▼ ---
+    let serverMonth, serverYear;
     if (typeof serverTargetMonthString === 'undefined') {
-        // (HTMLの <script> タグが失敗した場合のフォールバック)
         console.error("HTML側に 'serverTargetMonthString' が定義されていません！");
         const fallbackDate = new Date();
-        renderCalendar(fallbackDate.getMonth(), fallbackDate.getFullYear());
+        serverMonth = fallbackDate.getMonth();
+        serverYear = fallbackDate.getFullYear();
+        renderCalendar(serverMonth, serverYear);
     } else {
-        // サーバーから指定された月 (例: "2025-11-01") でカレンダーを描画
-        const serverDate = new Date(serverTargetMonthString + "T00:00:00"); // タイムゾーン対策
-        const serverMonth = serverDate.getMonth(); // 0-11
-        const serverYear = serverDate.getFullYear();
-
-        // 年/月ジャンプの <input> にもサーバーの月を初期値として設定
+        const serverDate = new Date(serverTargetMonthString + "T00:00:00"); 
+        serverMonth = serverDate.getMonth(); 
+        serverYear = serverDate.getFullYear();
         if (yearInput) yearInput.value = serverYear;
-        if (monthInput) monthInput.value = serverMonth; // (value="0"～"11")
-
-        // ★初回のカレンダーを描画
+        if (monthInput) monthInput.value = serverMonth; 
         renderCalendar(serverMonth, serverYear);
     }
     
-    // --- 「表示」ボタンのロジック ---
-    // (注意: このボタンはJSだけでカレンダーを再描画するため、DBの予定は反映されません)
-    // (本当にDBの予定を再取得したい場合は、ページをリロードさせる必要があります)
     if (jumpButton) {
         jumpButton.addEventListener('click', () => {
             const selectedYear = parseInt(yearInput.value, 10);
             const selectedMonth = parseInt(monthInput.value, 10);
-
             if (!isNaN(selectedYear) && !isNaN(selectedMonth)) {
-                // (★改善案★: 本当はここでページをリロードさせるのが望ましい)
-                // location.href = `/student/home?month=${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`;
-                
-                // 現在の実装: JSだけでカレンダーを再描画 (DBデータは反映されない)
-                renderCalendar(selectedMonth, selectedYear);
+                location.href = `/student/main_calendar?month=${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`;
             } else {
                 alert("有効な年月を入力してください。");
             }
         });
     }
-    // --- ▲▲▲【修正完了】▲▲▲ ---
 
+    //トグルボタンのイベントリスナーを追加　
+    if (viewToggleCheckbox) {
+        viewToggleCheckbox.addEventListener('change', () => {
+            if (viewToggleCheckbox.checked) {
+                currentViewMode = 'attendance'; 
+            } else {
+                currentViewMode = 'schedule'; 
+            }
+            const currentSelectedYear = parseInt(yearInput.value, 10);
+            const currentSelectedMonth = parseInt(monthInput.value, 10);
+            if (!isNaN(currentSelectedYear) && !isNaN(currentSelectedMonth)) {
+                 renderCalendar(currentSelectedMonth, currentSelectedYear);
+            }
+        });
+    }
 
-    // --- モーダル関連の要素取得 ---
     const modal = document.getElementById('scheduleModal');
     const closeButton = document.getElementById('closeButton');
     const scheduleForm = document.getElementById('scheduleForm');
     const modalTitle = document.getElementById('modalTitle');
     const modalDateEl = document.getElementById('modalDate');
 
-    // モーダルを開く関数
     function openModal(dateStr) {
-        const dateObj = new Date(dateStr + 'T00:00:00'); // タイムゾーンずれ対策
+        const dateObj = new Date(dateStr + 'T00:00:00'); 
         const year = dateObj.getFullYear();
         const month = dateObj.getMonth() + 1;
         const day = dateObj.getDate();
-
-        // モーダルの日付タイトルを設定 (例: 2025年 11月 20日)
         modalDateEl.textContent = `${year}年 ${month}月 ${day}日`;
-        scheduleForm.reset(); // フォームの中身をリセット
-        modal.style.display = 'flex'; // モーダルを表示
+        const existingListEl = document.getElementById('existing-events-list');
+        if (existingListEl) {
+            existingListEl.innerHTML = ''; 
+            const dailyEvents = calendarEventsData.filter(event => event.date === dateStr);
+            if (dailyEvents.length > 0) {
+                dailyEvents.forEach(event => {
+                    const itemHtml = `
+                        <div class="existing-item">
+                            <button class="delete-schedule-btn" data-id="${event.id}">×</button>
+                            <span>${event.title}</span>
+                        </div>
+                    `;
+                    existingListEl.innerHTML += itemHtml;
+                });
+            } else {
+                existingListEl.innerHTML = '<p>登録済みの予定はありません。</p>';
+            }
+        }
+        scheduleForm.reset(); 
+        modal.style.display = 'flex'; 
     }
 
-    // モーダルを閉じる関数
     function closeModal() {
         modal.style.display = 'none';
     }
 
-    // カレンダーのセル（<td>）がクリックされたらモーダルを開く
     if (calendarTableContainerEl) {
         calendarTableContainerEl.addEventListener('click', (event) => {
-            // クリックされた要素、またはその親要素が 'td[data-date]' かどうか
+            //出欠モード時はモーダルを開かない
+            if (currentViewMode === 'attendance') {
+                return; 
+            }
+            // ▲▲▲
+
             const targetCell = event.target.closest('td[data-date]');
-            
             if (targetCell) {
-                const dateStr = targetCell.dataset.date; // "YYYY-MM-DD"
+                const dateStr = targetCell.dataset.date; 
                 openModal(dateStr);
             }
         });
     }
 
-    // 閉じるボタン
+    function handleDeleteSchedule(button) {
+        const scheduleId = button.dataset.id;
+        
+        if (!confirm('この予定を削除してもよろしいですか？')) {
+            return; 
+        }
+
+        fetch(`/student/calendar/delete/${scheduleId}`, {
+            method: 'DELETE',
+ 
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('予定を削除しました。');
+                button.closest('.existing-item').remove();
+
+                const index = calendarEventsData.findIndex(event => event.id == scheduleId); 
+                if (index > -1) {
+                    calendarEventsData.splice(index, 1);
+                }
+                const dateText = modalDateEl.textContent; 
+                const parts = dateText.match(/(\d+)年 (\d+)月/);
+                if (parts) {
+                   const year = parseInt(parts[1], 10);
+                   const month = parseInt(parts[2], 10) - 1;
+                   renderCalendar(month, year);
+                }
+            } else {
+                alert('削除に失敗しました。サーバーエラーが発生しました。');
+            }
+        })
+        .catch(error => {
+            console.error('削除処理で通信エラー:', error);
+            alert('削除中に通信エラーが発生しました。');
+        });
+    }
+
     if (closeButton) {
         closeButton.addEventListener('click', closeModal);
     }
-
-    // 背景クリックで閉じる
     if (modal) {
         modal.addEventListener('click', (event) => {
+            const deleteButton = event.target.closest('.delete-schedule-btn');
+            if (deleteButton) {
+                event.stopPropagation(); 
+                handleDeleteSchedule(deleteButton); 
+                return;
+            }
             if (event.target === modal) {
                 closeModal();
             }
         });
     }
 
-    // --- ▼▼▼【修正点 3: フォーム送信(submit)で、/student/calendar/add に POST する】▼▼▼ ---
     if (scheduleForm) {
         scheduleForm.addEventListener('submit', (event) => {
-            event.preventDefault(); // 本来のフォーム送信（ページリロード）をキャンセル
-
-            // 1. フォームからデータを取得
+            event.preventDefault(); 
             const title = document.getElementById('scheduleTitle').value;
-            // const time = document.getElementById('scheduleTime').value; // (DBにtimeカラムないので一旦保留)
-            
-            // 2. モーダルの日付 (例: "2025年 11月 20日") を "YYYY-MM-DD" 形式に変換
             const dateText = modalDateEl.textContent; 
             const parts = dateText.match(/(\d+)年 (\d+)月 (\d+)日/);
             
@@ -233,11 +294,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             const year = parts[1];
-            const month = parts[2].padStart(2, '0'); // "11"
-            const day = parts[3].padStart(2, '0'); // "20"
-            const date = `${year}-${month}-${day}`; // "2025-11-20"
+            const month = parts[2].padStart(2, '0');
+            const day = parts[3].padStart(2, '0');
+            const date = `${year}-${month}-${day}`; 
 
-            // 3. Controller の @RequestParam ("title", "date") に合わせたデータを作成
             const formData = new URLSearchParams();
             formData.append('title', title);
             formData.append('date', date);
