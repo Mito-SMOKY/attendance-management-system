@@ -81,6 +81,7 @@ function createCalendar(month, year) {
                 // --- ▲▲▲【修正完了】▲▲▲ ---
                 
                 dayCount++;
+            }
         }
         tableHTML += '</tr>';
         if (dayCount > daysInMonth && i >= 4) {
@@ -242,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('date', date);
 
             // 4. Spring Boot (Controller) に POST リクエストを送信
-            fetchWithCSRF('/student/calendar/add', {
+            fetch('/student/calendar/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -264,4 +265,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-}

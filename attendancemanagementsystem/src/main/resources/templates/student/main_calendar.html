@@ -1,12 +1,14 @@
-<!-- メインカレンダー -->
- 
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
     <title>利用者メイン</title>
-    <link rel="stylesheet" th:href="@{/css/student.css}">
+    <link rel="stylesheet" th:href="@{/css/main_calendar.css}">
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
 </head>
@@ -61,45 +63,34 @@
 
     <div id="scheduleModal" class="modal-overlay">
         <div class="modal-content">
-            <h1 id="modalTitle"
-            style="color: #00bdca;"
-            >予定の追加</h1>
-
+            <h3 id="modalTitle">予定の追加</h3>
             <p id="modalDate"></p> 
             
             <form id="scheduleForm">
                 <div>
-                    <label  for="scheduleTitle" 
-                    style="font-size: 1.5em;"
-                    class="label">ラベルの例</label>
-                    <textarea class="textbox" placeholder="テキストエリアの例"></textarea>
+                    <label for="scheduleTitle">件名:</label>
+                    <input type="text" id="scheduleTitle" required>
+                </div>
                 <div>
-                    <label for="scheduleTime"
-                    style="font-size: 1.5em;"
-                    class="label">時間</label>
-                    <input type="time" id="scheduleTime" class="timebox">
+                    <label for="scheduleTime">時間:</label>
+                    <input type="time" id="scheduleTime">
                 </div>
                 <div class="modal-actions">
-                    <button type="submit" id="saveButton" class="modal-actions">保存</button>
-                    <button type="button" id="closeButton" class="modal-actions">閉じる</button>
+                    <button type="submit" id="saveButton">保存</button>
+                    <button type="button" id="closeButton">閉じる</button>
                 </div>
             </form>
         </div>
     </div>
+
     <script th:inline="javascript">
-        /* Thymeleaf で Java オブジェクトを JS 変数に変換 */
-        /* "const" ではなく "window." を使い、グローバル変数として定義する */
-        
-        // (1) 予定リスト (List<CalendarEntity>)
-        window.calendarEventsData = /*[[${calendarEvents}]]*/ [];
-        
-        // (2) 出欠リスト (List<AttendanceEntity>)
-        window.attendanceRecordsData = /*[[${attendanceRecords}]]*/ [];
-        
-        // (3) 表示対象の月 (LocalDate)
-        window.serverTargetMonthString = /*[[${targetMonthDate}]]*/ "2025-11-01"; 
+        const calendarEventsData = /*[[${calendarEvents}]]*/ [];
+        const attendanceRecordsData = /*[[${attendanceRecords}]]*/ [];
+        const serverTargetMonthString = /*[[${targetMonthDate}]]*/ "2025-11-01";
     </script>
-    <script th:src="@{/js/calendar.js}" type="module"></script>
+
+    <script th:src="@{/js/calendar.js}"></script>
+    
 </body>
 
 </html>
