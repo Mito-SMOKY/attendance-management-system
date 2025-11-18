@@ -1,14 +1,3 @@
-
-//CSRF対策用ヘルパーをインポート 
-import { fetchWithCSRF } from './csrf_helper.js';
-
-// HTMLのグローバル変数(window.)から、このファイルで使うための変数を定義する
-const calendarEventsData = window.calendarEventsData || [];
-const serverTargetMonthString = window.serverTargetMonthString;
-// (出欠データも同様に読み込む)
-const attendanceRecordsData = window.attendanceRecordsData || []; 
-// ▲▲▲
-
 /**
  * 指定された年月のカレンダーHTMLを生成する
  * (この関数は、HTMLで定義された 'calendarEventsData' グローバル変数を参照します)
