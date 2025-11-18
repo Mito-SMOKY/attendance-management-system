@@ -1,4 +1,4 @@
-package com.example.attendancemanagementsystem.admin.controller; // パッケージ名は適宜修正
+package com.example.attendancemanagementsystem.user.admin.controller; // パッケージ名は適宜修正
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
