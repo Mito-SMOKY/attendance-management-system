@@ -1,4 +1,4 @@
-package com.example.attendancemanagementsystem.student.controller;
+package com.example.attendancemanagementsystem.user.calendar.controller;
 
 import java.time.LocalDate; 
 import java.util.Map; 
@@ -11,9 +11,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
+
 
 // Service パスからインポート
-import com.example.attendancemanagementsystem.student.service.StudentService;
+import com.example.attendancemanagementsystem.user.calendar.service.StudentService;
 
 @Controller
 @RequestMapping("/student")
@@ -82,5 +86,21 @@ public class StudentController {
         // (JS側は、このリダイレクト指示(response.ok)を受けてページをリロードします)
         return "redirect:/student/main_calendar";
     }
+    /**
+     * カレンダー予定を削除する（JSからの DELETEリクエストを受け付ける）
+     * JS側: fetch('/student/calendar/delete/${id}', { method: 'DELETE' })
+     * @param calendarId 削除対象の予定ID (URLのパスから取得)
+     */
+    @DeleteMapping("/calendar/delete/{calendarId}") //@DeleteMapping を使用
+    public ResponseEntity<Void> deleteCalendarEvent(@PathVariable Integer calendarId) {
+        
+        // サービスを呼び出してDBから削除を実行
+        studentService.deleteCalendarEvent(calendarId);
+
+        // 削除成功
+        // JS側はこれを受け取って画面をリロードする想定です。
+        return ResponseEntity.noContent().build();
+    }
+
     
 }

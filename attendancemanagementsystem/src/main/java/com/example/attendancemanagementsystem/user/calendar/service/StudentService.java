@@ -1,4 +1,4 @@
-package com.example.attendancemanagementsystem.student.service;
+package com.example.attendancemanagementsystem.user.calendar.service;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -121,4 +121,15 @@ public class StudentService {
         // 4. DBに保存 (INSERT)
         calendarRepository.save(newEvent);
     }
+
+    /**
+     * 【書き込み系】カレンダー予定を削除する
+     * @param calendarId 削除対象の予定ID
+     */
+    @Transactional // (readOnly = false) を明示的に設定。これによりデータの変更が可能に。
+    public void deleteCalendarEvent(Integer calendarId) {
+        // IDを指定して予定を削除する
+        calendarRepository.deleteById(calendarId);
+    }
+
 }
