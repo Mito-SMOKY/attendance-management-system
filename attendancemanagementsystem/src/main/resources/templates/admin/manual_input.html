@@ -25,7 +25,7 @@
       }
       label {
         font-weight: bold;
-        width: 80px;
+        width: 100px;
       }
       input {
         padding: 5px;
@@ -97,11 +97,12 @@
             />
           </div>
           <div class="input-row">
-            <label>Email</label>
+            <label>パスワード</label>
             <input
-              type="email"
-              name="accounts[0].email"
-              placeholder="taro@example.com"
+              type="text"
+              name="accounts[0].password"
+              placeholder="初期パスワード"
+              required
             />
           </div>
         </div>
@@ -124,7 +125,7 @@
     <script>
       function addAccount() {
         const container = document.getElementById("account-container");
-        const count = container.children.length; // 現在の件数 (0始まりのインデックスに使う)
+        const count = container.children.length; // 現在の件数 (インデックス用)
 
         // 新しい入力グループを作成
         const newGroup = document.createElement("div");
@@ -140,8 +141,8 @@
                     <input type="text" name="accounts[${count}].name" required>
                 </div>
                 <div class="input-row">
-                    <label>Email</label>
-                    <input type="email" name="accounts[${count}].email">
+                    <label>パスワード</label>
+                    <input type="text" name="accounts[${count}].password" required>
                 </div>
             `;
 

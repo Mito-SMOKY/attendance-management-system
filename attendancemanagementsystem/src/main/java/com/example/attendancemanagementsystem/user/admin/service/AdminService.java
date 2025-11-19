@@ -1,12 +1,17 @@
 package com.example.attendancemanagementsystem.user.admin.service;
 
+
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,20 +34,27 @@ public class AdminService {
 
     @Autowired
     private UsersRepository usersRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    // --- 1. 作成履歴取得 (Datalist一覧) ---
+    // 1. 全履歴取得
+    public List<Datalist> getAllDatalists() {
+        return datalistRepository.findAllWithCreator();
+    }
+    
+    // 2. 自分の履歴のみ取得
     public List<Datalist> getDatalistsByCreator(Integer creatorId) {
         return datalistRepository.findByCreatorId(creatorId);
     }
 
-    // --- 2. 詳細取得 (Datalist ID指定) ---
+    // 3. 詳細取得
     public Datalist getDatalistById(Integer id) {
-        // 変更: 標準のfindByIdではなく、まとめて取得するカスタムメソッドを使う
         return datalistRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new RuntimeException("Datalist not found with ID: " + id));
     }
 
-    // --- 3. ファイル読み込み結果の保存 (DatalistForm -> DB) ---
+    // 4. CSV保存
     @Transactional
     public List<String> saveDatalist(DatalistForm form, Integer creatorId) {
         Datalist datalist = new Datalist();
@@ -50,26 +62,25 @@ public class AdminService {
         datalist.setCreatorId(creatorId);
 
         List<Student> students = new ArrayList<>();
-        List<String> skippedIds = new ArrayList<>(); // 重複ID記録用
+        List<String> skippedIds = new ArrayList<>();
 
         if (form.getTempAccounts() != null) {
             for (TempAccountData acc : form.getTempAccounts()) {
-
-                // 重複チェック
                 if (usersRepository.existsByLoginId(acc.getLoginId())) {
-                    // スキップリストに追加して処理をスキップ
                     skippedIds.add(acc.getLoginId());
                     continue;
                 }
 
-                // Users作成
                 Users user = new Users();
                 user.setName(acc.getName());
                 user.setLoginId(acc.getLoginId());
-                user.setPassword("password");
+                String rawPassword = acc.getPassword();
+                if (rawPassword == null || rawPassword.trim().isEmpty()) {
+                    rawPassword = "password"; 
+                }
+                user.setPassword(passwordEncoder.encode(rawPassword));
                 user.setUserTypeId(1);
 
-                // Student作成
                 Student student = new Student();
                 student.setStudentStatusId(1);
                 student.setDatalist(datalist);
@@ -79,17 +90,15 @@ public class AdminService {
             }
         }
 
-        // 1件でも登録できるデータがあればDBに保存
         if (!students.isEmpty()) {
             datalist.setStudents(students);
             datalistRepository.save(datalist);
         }
 
-        // スキップされたIDのリストを返す
         return skippedIds;
     }
 
-    // --- 4. 手動入力データの保存 (ManualAccountForm -> DB) ---
+    // 5. 手動登録保存
     @Transactional
     public Datalist saveDatalistFromForm(ManualAccountForm form, Integer creatorId) {
         Datalist datalist = new Datalist();
@@ -97,51 +106,59 @@ public class AdminService {
         datalist.setCreatorId(creatorId);
 
         List<Student> students = new ArrayList<>();
+        Set<String> seenIds = new HashSet<>();
 
         if (form.getAccounts() != null) {
             for (ManualAccountData acc : form.getAccounts()) {
-                // 1. Users作成
+                if (acc.getStudentNumber() == null || acc.getStudentNumber().trim().isEmpty()) {
+                    continue;
+                }
+
+                String loginId = acc.getStudentNumber().trim();
+                if (seenIds.contains(loginId) || usersRepository.existsByLoginId(loginId)) {
+                    continue;
+                }
+                seenIds.add(loginId);
+
                 Users user = new Users();
                 user.setName(acc.getName());
-                // フォーム側のフィールド名がstudentNumberのままの場合は、ここでLoginIdにマッピング
-                user.setLoginId(acc.getStudentNumber()); 
-                user.setEmail(acc.getEmail());
-                user.setPassword("password");
-                user.setUserTypeId(1); // 1: Student
+                user.setLoginId(loginId);
+                user.setPassword(passwordEncoder.encode(acc.getPassword()));
+                user.setUserTypeId(1); 
 
-                // 2. Student作成
                 Student student = new Student();
-                student.setStudentStatusId(1); // 仮登録
+                student.setStudentStatusId(1);
                 student.setDatalist(datalist);
-                student.setUser(user); // Usersと紐付け
+                student.setUser(user);
 
                 students.add(student);
             }
         }
+        
+        if (students.isEmpty()) { return null; }
 
         datalist.setStudents(students);
         return datalistRepository.save(datalist);
     }
 
-    // --- 5. ファイル解析処理 (CSV -> DatalistForm) ---
-    // ※簡易的なCSVパーサーの実装です
+    // 6. CSV解析
     public DatalistForm parseAccountFile(MultipartFile file) {
         DatalistForm form = new DatalistForm();
         List<TempAccountData> tempList = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
-            // ヘッダー行がある前提で1行読み飛ばすならコメントアウトを解除
-            // br.readLine(); 
-
             while ((line = br.readLine()) != null) {
-                // カンマ区切りで分割
                 String[] values = line.split(",");
                 if (values.length >= 2) {
                     TempAccountData data = new TempAccountData();
-                    // CSVの1列目をID、2列目を名前として扱う例
-                    data.setLoginId(values[0].trim()); 
+                    data.setLoginId(values[0].trim());
                     data.setName(values[1].trim());
+                    if (values.length >= 3) {
+                        data.setPassword(values[2].trim());
+                    } else {
+                        data.setPassword("");
+                    }
                     tempList.add(data);
                 }
             }
@@ -150,14 +167,49 @@ public class AdminService {
         }
 
         form.setTempAccounts(tempList);
-        // ファイル名をデフォルトのリスト名にする
         form.setDatalistName(file.getOriginalFilename());
         return form;
     }
 
-    // --- 6. ダウンロード用ファイル生成 (プレースホルダー) ---
-    public Object createDownloadFile(Integer datalistId) {
-        // 必要であれば実装（CSV生成ロジックなど）
-        return null;
+    // 7. CSVファイル生成 (ダウンロード用) ★追加機能
+    public byte[] createCsvFile(Integer datalistId) {
+        Datalist datalist = getDatalistById(datalistId);
+        StringBuilder sb = new StringBuilder();
+
+        // ★修正: BOM (Byte Order Mark) を追加して、Excelでの文字化けを防ぐ
+        sb.append("\uFEFF");
+
+        for (Student student : datalist.getStudents()) {
+            if (student.getUser() == null) continue;
+
+            sb.append(student.getUser().getLoginId()).append(",");
+            sb.append(student.getUser().getName()).append(",");
+            // ハッシュ化されたパスワードを出力
+            sb.append(student.getUser().getPassword());
+            sb.append("\r\n");
+        }
+
+        return sb.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    public byte[] createCsvFromForm(ManualAccountForm form) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\uFEFF"); // BOM (文字化け防止)
+
+        if (form.getAccounts() != null) {
+            for (ManualAccountData acc : form.getAccounts()) {
+                // 入力がない行はスキップ
+                if (acc.getStudentNumber() == null || acc.getStudentNumber().trim().isEmpty()) {
+                    continue;
+                }
+                
+                sb.append(acc.getStudentNumber()).append(",");
+                sb.append(acc.getName()).append(",");
+                // ★ポイント: ここはフォームの入力値を使うので「平文」のままです
+                sb.append(acc.getPassword()); 
+                sb.append("\r\n");
+            }
+        }
+        return sb.toString().getBytes(StandardCharsets.UTF_8);
     }
 }

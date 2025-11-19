@@ -15,7 +15,12 @@ public interface DatalistRepository extends JpaRepository<Datalist, Integer> {
     
     List<Datalist> findByCreatorId(Integer creatorId);
 
-    // ★追加: 学生(students)と、そのユーザー情報(user)もまとめて一気に取得する専用メソッド
-    @Query("SELECT d FROM Datalist d LEFT JOIN FETCH d.students s LEFT JOIN FETCH s.user WHERE d.dataListId = :id")
+    
+    // ★修正: d.creatorUser も一緒に取得するように "LEFT JOIN FETCH d.creatorUser" を追加
+    @Query("SELECT d FROM Datalist d LEFT JOIN FETCH d.creatorUser LEFT JOIN FETCH d.students s LEFT JOIN FETCH s.user WHERE d.dataListId = :id")
     Optional<Datalist> findByIdWithDetails(@Param("id") Integer id);
+
+    // ★追加: 全件取得（作成者情報付き）
+    @Query("SELECT d FROM Datalist d LEFT JOIN FETCH d.creatorUser ORDER BY d.createdAt DESC")
+    List<Datalist> findAllWithCreator();
 }

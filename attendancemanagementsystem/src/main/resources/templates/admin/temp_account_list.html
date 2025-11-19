@@ -43,6 +43,12 @@
       .btn:hover {
         background-color: #5a6268;
       }
+      /* パスワード列が長くなるので折り返し設定 */
+      .password-col {
+        word-break: break-all;
+        font-size: 0.9em;
+        color: #666;
+      }
     </style>
   </head>
   <body>
@@ -57,6 +63,13 @@
         <strong>リスト名:</strong>
         <span th:text="${datalist.dataListName}"></span>
       </p>
+
+      <p>
+        <strong>作成者:</strong>
+        <span th:text="${datalist.creatorUser.name}"></span>
+        (<span th:text="${datalist.creatorUser.loginId}"></span>)
+      </p>
+
       <p>
         <strong>作成日時:</strong> <span th:text="${datalist.createdAt}"></span>
       </p>
@@ -69,6 +82,7 @@
           <th style="width: 50px">No.</th>
           <th>ログインID</th>
           <th>氏名</th>
+          <th>パスワード (ハッシュ値)</th>
           <th>ステータスID</th>
         </tr>
       </thead>
@@ -77,6 +91,9 @@
           <td th:text="${stat.count}">1</td>
           <td th:text="${student.user.loginId}">ST001</td>
           <td th:text="${student.user.name}">山田 太郎</td>
+
+          <td class="password-col" th:text="${student.user.password}"></td>
+
           <td th:text="${student.studentStatusId}">1</td>
         </tr>
       </tbody>

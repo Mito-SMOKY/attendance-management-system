@@ -1,8 +1,17 @@
 package com.example.attendancemanagementsystem.user.admin.controller;
 
+// 必要なクラスをインポート
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +23,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.attendancemanagementsystem.common.entity.Datalist;
 import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
 import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm;
 import com.example.attendancemanagementsystem.user.admin.service.AdminService;
+import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
 @Controller
 @RequestMapping("/admin")
@@ -25,35 +36,33 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
-    // ログイン中の管理者ID
-    // ★先ほどDBに作った「999」を指定します
     private Integer getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            return userDetails.getUserId();
+        }
         return 3; 
     }
 
-    // --- 1. メインメニュー ---
     @GetMapping("/home")
     public String home() {
         return "admin/home";
     }
 
-    // --- 2. 仮アカウント管理メニュー ---
     @GetMapping("/tmpAccount")
     public String showTmpAccountMenu() {
         return "admin/tmpAccount";
     }
 
-    // --- 3. ファイルアップロード画面表示 ---
     @GetMapping("/upload")
     public String showFileUploadPage() {
         return "admin/upload";
     }
 
-    // --- 4. ファイル読み込み処理 (確認画面へ) ---
     @PostMapping("/upload-file")
     public String handleFileUpload(@RequestParam("file") MultipartFile file, Model model) {
         try {
-            // ServiceでCSVを解析してフォームオブジェクトを受け取る
             DatalistForm form = adminService.parseAccountFile(file);
             model.addAttribute("datalistForm", form);
             return "admin/file_read_result";
@@ -63,56 +72,109 @@ public class AdminController {
         }
     }
 
-    // --- 5. データ保存処理 (修正版) ---
     @PostMapping("/save-temp-accounts")
     public String saveTempAccounts(@ModelAttribute DatalistForm form, RedirectAttributes redirectAttributes) {
-        // Serviceから「重複してスキップされたIDリスト」を受け取る
+        
         List<String> skippedIds = adminService.saveDatalist(form, getCurrentUserId());
-
-        // 重複があれば警告メッセージを渡す、なければ成功メッセージ
-        if (skippedIds != null && !skippedIds.isEmpty()) {
+        
+        if (!skippedIds.isEmpty()) {
             String message = "以下のIDは重複しているため登録されませんでした: " + String.join(", ", skippedIds);
             redirectAttributes.addFlashAttribute("warningMessage", message);
         } else {
             redirectAttributes.addFlashAttribute("successMessage", "すべてのデータが正常に登録されました。");
         }
-
+        
         return "redirect:/admin/creation-history";
     }
 
-    // --- 6. 作成履歴一覧表示 ---
     @GetMapping("/creation-history")
     public String showCreationHistory(Model model) {
-        model.addAttribute("datalists", adminService.getDatalistsByCreator(getCurrentUserId()));
+        model.addAttribute("datalists", adminService.getAllDatalists());
         return "admin/creation_history";
     }
 
-    // --- 7. 手動入力画面表示 ---
     @GetMapping("/manual-input")
     public String showManualAccountPage() {
         return "admin/manual_input";
     }
 
-    // --- 8. 手動入力データの保存処理 (★ここが追加箇所) ---
-    @PostMapping("/save-manual-accounts")
-    public String saveManualAccounts(@ModelAttribute ManualAccountForm form) {
-        // Serviceを呼び出して保存
-        adminService.saveDatalistFromForm(form, getCurrentUserId());
+    // @PostMapping("/save-manual-accounts")
+    // public String saveManualAccounts(@ModelAttribute ManualAccountForm form, RedirectAttributes redirectAttributes) {
+    //     adminService.saveDatalistFromForm(form, getCurrentUserId());
         
-        // 保存後は履歴一覧へリダイレクト
-        return "redirect:/admin/creation-history";
-    }
+    //     redirectAttributes.addFlashAttribute("successMessage", "手動登録が完了しました。");
+    //     return "redirect:/admin/creation-history";
+    // }
 
-    // --- 9. 詳細画面表示 (作成履歴から遷移) ---
     @GetMapping("/temp-account-list/{id}")
     public String showTempAccountList(@PathVariable("id") Integer id, Model model) {
-        if (id == null) {
-            throw new IllegalArgumentException("id cannot be null");
-        }
-        // IDを使ってリスト情報を取得し、画面に渡す
-        com.example.attendancemanagementsystem.common.entity.Datalist datalist = adminService.getDatalistById(id);
+        // ★修正: common.entity.Datalist -> Datalist
+        Datalist datalist = adminService.getDatalistById(id);
         model.addAttribute("datalist", datalist);
-
         return "admin/temp_account_list";
     }
+
+    @GetMapping("/download-temp-file/{id}")
+    public ResponseEntity<byte[]> downloadTempAccountFile(@PathVariable("id") Integer id) {
+        
+        byte[] csvData = adminService.createCsvFile(id);
+        
+        // ★修正: common.entity.Datalist -> Datalist
+        Datalist datalist = adminService.getDatalistById(id);
+        String fileName = datalist.getDataListName() + ".csv";
+        
+        String encodedFileName;
+        try {
+            encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replace("+", "%20");
+        } catch (Exception e) {
+            encodedFileName = "download.csv";
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("text/csv; charset=UTF-8"));
+        headers.setContentDispositionFormData("attachment", encodedFileName);
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+
+        return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
+    }
+
+    
+    // ... (既存のコード) ...
+
+    // --- 8. 手動入力データの保存 (★修正: 完了画面へ遷移) ---
+    @PostMapping("/save-manual-accounts")
+    public String saveManualAccounts(@ModelAttribute ManualAccountForm form, Model model) {
+        // 1. DBへはハッシュ化して保存
+        adminService.saveDatalistFromForm(form, getCurrentUserId());
+        
+        // 2. 完了画面にフォームデータ（平文パスワード入り）を渡す
+        model.addAttribute("manualForm", form);
+        
+        return "admin/manual_result"; // 新しい画面へ
+    }
+
+    // --- 11. 手動登録完了後のCSVダウンロード (★新規追加) ---
+    @PostMapping("/download-manual-csv")
+    public ResponseEntity<byte[]> downloadManualCsv(@ModelAttribute ManualAccountForm form) {
+        
+        // 平文パスワード入りのCSVを生成
+        byte[] csvData = adminService.createCsvFromForm(form);
+        
+        String fileName = form.getDatalistName() + ".csv";
+        String encodedFileName;
+        try {
+            encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replace("+", "%20");
+        } catch (Exception e) {
+            encodedFileName = "download.csv";
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("text/csv; charset=UTF-8"));
+        headers.setContentDispositionFormData("attachment", encodedFileName);
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+
+        return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
+    }
+    
+    // ... (他のメソッドはそのまま) ...
 }

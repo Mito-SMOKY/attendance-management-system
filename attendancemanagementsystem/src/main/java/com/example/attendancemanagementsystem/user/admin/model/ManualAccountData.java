@@ -1,11 +1,14 @@
 package com.example.attendancemanagementsystem.user.admin.model;
 
 
-public class ManualAccountData {
-    private String studentNumber;
-    private String name;
-    private String email;
 
+public class ManualAccountData {
+    private String studentNumber; // ログインID
+    private String name;          // 氏名
+    private String password;      // ★変更箇所: Email -> Password
+
+    // --- Getter / Setter ---
+    
     public String getStudentNumber() {
         return studentNumber;
     }
@@ -22,11 +25,11 @@ public class ManualAccountData {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
+    public String getPassword() {
+        return password;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

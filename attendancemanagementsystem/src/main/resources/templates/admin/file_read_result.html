@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <title>読み込み結果確認</title>
     <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
       table {
         width: 100%;
         border-collapse: collapse;
@@ -37,22 +41,31 @@
       th:object="${datalistForm}"
       method="post"
     >
-      <label><strong>リスト名:</strong></label>
-      <input type="text" th:field="*{datalistName}" required />
+      <div style="margin-bottom: 15px">
+        <label><strong>リスト名:</strong></label>
+        <input
+          type="text"
+          th:field="*{datalistName}"
+          required
+          style="padding: 5px; width: 300px"
+        />
+      </div>
 
       <table>
         <thead>
           <tr>
-            <th>No.</th>
-            <th>ログインID (旧学籍番号)</th>
+            <th style="width: 50px">No.</th>
+            <th>ログインID</th>
             <th>氏名</th>
+            <th>パスワード</th>
           </tr>
         </thead>
         <tbody>
           <tr th:each="acc, stat : *{tempAccounts}">
-            <td th:text="${stat.count}"></td>
-            <td th:text="${acc.loginId}"></td>
-            <td th:text="${acc.name}"></td>
+            <td th:text="${stat.count}">1</td>
+            <td th:text="${acc.loginId}">ST001</td>
+            <td th:text="${acc.name}">山田 太郎</td>
+            <td th:text="${acc.password}">password123</td>
 
             <input
               type="hidden"
@@ -61,6 +74,10 @@
             <input
               type="hidden"
               th:field="*{tempAccounts[__${stat.index}__].name}"
+            />
+            <input
+              type="hidden"
+              th:field="*{tempAccounts[__${stat.index}__].password}"
             />
           </tr>
         </tbody>
