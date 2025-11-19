@@ -16,6 +16,42 @@
 //         return "login/first-login";
 //     }
 
+    @GetMapping("/main-calendar")
+    public String showMainCalendar() {
+        return "student/main_calendar";
+    }
+
+    @GetMapping("/sessionMenu")
+    public String showsessionMenu() {
+        return "admin/sessionMenu";
+    }
+
+    @GetMapping("/timetable")
+    public String showtimetable() {
+        return "admin/timetable";
+    }
+
+    @GetMapping("/attendance-information")
+    public String showattendanceinformation() {
+        return "admin/attendance-information";
+    }
+    @GetMapping("/classList")
+    public String showclassList() {
+        return "admin/classList";
+    }
+    @GetMapping("/classInfo")
+    public String showclassInfo() {
+        return "admin/classInfo";
+    }
+    @GetMapping("/studentList")
+    public String showstudentList() {
+        return "admin/studentList";
+    }
+    @GetMapping("/studentInfo")
+    public String showstudentInfo() {
+        return "admin/studentInfo";
+    }
+}
 //     @GetMapping("/main_calendar")
 //     public String showMainCalendar() {
 //         return "student/main_calendar";

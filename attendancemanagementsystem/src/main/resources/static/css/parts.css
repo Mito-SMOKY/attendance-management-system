@@ -1,3 +1,8 @@
+@charset "UTF-8";
+
+/* =========================================
+   共通設定
+   ========================================= */
 /* 共通パーツ */
 
 /* 基本スタイル */
@@ -21,6 +26,9 @@ a {
     color: inherit;
 }
 
+/* =========================================
+   ヘッダー設定
+   ========================================= */
 .main-header {
     z-index: 1000;
     top: 0;
@@ -32,9 +40,10 @@ a {
     color: white; 
     padding: 12px 25px;
     display: flex;
-    justify-content: space-between; /* 両端に寄せ、間は均等配置 */
+    justify-content: space-between; /* 両端寄せ */
     align-items: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* 他の要素より前面に表示 */
 }
 
 .header-left {
@@ -42,6 +51,7 @@ a {
     font-size: 1.1em;
 }
 
+/* --- ナビゲーション --- */
 .header-nav ul {
     margin: 0;
     padding: 0;
@@ -57,13 +67,17 @@ a {
 .header-nav a {
     font-size: 25px;
     padding: 8px 0;
-    transition: opacity 0.3s;
+    border-bottom: 2px solid transparent; 
+    transition: opacity 0.3s, border-bottom-color 0.3s;
 }
 
 .header-nav a:hover {
-    opacity: 0.7; 
+    opacity: 0.8; 
+    border-bottom: 2px solid white; 
+    cursor: pointer;
 }
 
+/* --- 右側のアイコン群 --- */
 .header-right {
     display: flex;
     align-items: center;
@@ -103,6 +117,17 @@ a {
     border: 2px solid #7BCBD9; 
 }
 
+/* =========================================
+   戻るボタン設定
+   ========================================= */
+.backbutton {
+    position: relative;
+    top: 150px;
+    /* ▼▼▼ ここを修正 ▼▼▼ */
+    /* width を削除し、padding で左右の余白を調整 */
+    padding: 10px 20px; /* 左右の余白で幅が決まる */
+    /* ▲▲▲ ここを修正 ▲▲▲ */
+    
 
 
 /* 戻るボタンのCSS */
@@ -130,9 +155,11 @@ a {
     margin-left: 50px;
     margin-bottom: 30px;
     cursor: pointer;
+    display: inline-block;
+    white-space: nowrap; /* テキストが途中で改行されないようにする */
 }
 
-.backbutton::before{
+.backbutton::before {
     display: inline-block; 
     transform: rotate(45deg);
     width: 6px;
@@ -143,4 +170,5 @@ a {
     margin-right: 6px;
     content: '';
     vertical-align: middle;
+    margin-bottom: 2px;
 }
