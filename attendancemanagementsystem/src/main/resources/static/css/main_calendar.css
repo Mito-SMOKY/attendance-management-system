@@ -63,12 +63,10 @@
 
 
 .calendar {
-    max-width: 1200px;
+    max-width: 2000px;
     max-height: 3000px;
     margin: auto;
     align-items: center;
-    /* margin-left: 30px;
-    margin-right: 30px; */
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
@@ -79,12 +77,13 @@
 .calendar td {
     border: 1px solid #000;
     text-align: center;
-    padding: 10px;
+    padding: 6px 10px;
     font-size: 1rem;
     font-weight: bold;
     vertical-align: middle;
     height: 50px;
 }
+
 .calendar th {
     padding: 6px 10px;
 }
@@ -214,6 +213,14 @@
 
 /* 予定追加モーダルのCSS */
 
+#existing-events-list {
+    max-height: 150px; 
+    overflow-y: auto;
+    border: 1px solid #eee;
+    padding: 10px;
+    border-radius: 4px;
+}
+
 .modal-overlay {
     display: none; 
     position: fixed;
@@ -230,7 +237,7 @@
 
 .modal-content {
     width: 500px;
-    height: 500px;
+    height: 400px;
     background-color: white;
     padding: 20px 30px;
     border-radius: 8px;
@@ -250,23 +257,32 @@
     border-color: #00bdca;
 }
 
+.model-actions-container {
+    display: flex;
+    gap: 20px;
+    justify-content: right;
+}
+
 .modal-actions {
-    text-align: right;
+    justify-content: center;
+    align-items: center;
+    width: 70px;
+    height: 50px;
+    margin:0 auto;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 3px rgb(0 0 0 / 25%), 0 2px 3px -2px rgb(0 0 0 / 15%);
+    background-color: #00bdca;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.8em;
+    text-align: center;
     margin-top: 20px;
 }
 
-.textbox {
+.text-box {
     width: 100%;
-    padding: 8px 10px;
-    height: 100px;
-    border: 1px solid #969da3;
-    border-radius: 3px;
-    font-size: 1em;
-    line-height: 1.5;
-}
-
-.timebox{
-    width: 40%;
     padding: 8px 10px;
     height: 50px;
     border: 1px solid #969da3;
@@ -277,4 +293,65 @@
 
 .label{
     padding: 10px;
+}
+
+.Title{
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #00bdca;
+}
+
+/* (JSで生成される) 予定リストのコンテナ */
+.schedule-list {
+    margin-top: 4px; 
+}
+
+/* (JSで生成される) 個別の予定アイテム */
+.schedule-item {
+    font-size: 12px;      
+    font-weight: normal;  
+    color: #333;    
+    border-radius: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: left;
+    width: 100%;
+    display: block;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f4f4f4; /* 背景色 */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+}
+
+.modal-section h4 {
+    border-bottom: 2px solid #00bdca; /* 線の色（ヘッダーの色に合わせる例） */
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+.modal-section {
+    margin-bottom: 20px;
+}
+
+.modal-date-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.delete-schedule-btn {
+    background-color: #ff6f65; /* (赤) */
+    border : none;
+    border-radius: 4px;
+    color: white;
+    font-size: 1rem;
+    min-width: auto;
+    padding: 2px 4px; 
+}
+.delete-schedule-btn:hover {
+    background-color: #cc6464;
 }

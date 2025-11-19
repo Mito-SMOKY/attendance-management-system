@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+#ローカル開発用のテストcontroller
+TestController.java

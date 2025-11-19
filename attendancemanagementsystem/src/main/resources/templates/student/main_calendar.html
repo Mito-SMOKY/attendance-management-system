@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>利用者メイン</title>
-    <link rel="stylesheet" th:href="@{/css/student.css}">
+    <link rel="stylesheet" th:href="@{/css/main_calendar.css}">
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
 </head>
@@ -21,9 +22,6 @@
         <div id="calendar-ym" class="calendar-ym"></div> 
         
         <div class="calendar-header">
-            
-            
-
             <div class="calendar-controls">
                 <input type="number" id="yearInput" class="input">
                 <label for="yearInput">年</label>
@@ -49,7 +47,7 @@
             <div class="calendar-toggle" style="display: flex; justify-content: center; align-items: center; gap: 8px;">
                 予定表
                 <label class="toggle-button">
-                    <input type="checkbox"/>
+                    <input type="checkbox" id="viewToggleCheckbox"/>
                 </label>
                 出欠
             </div>
@@ -59,24 +57,25 @@
     </div>
 
     <div id="scheduleModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 id="modalTitle">予定の追加</h3>
-            <p id="modalDate"></p> 
-            
-            <form id="scheduleForm">
-                <div>
-                    <label for="scheduleTitle">件名:</label>
-                    <input type="text" id="scheduleTitle" required>
+                <div class="modal-content">
+                    
+                    <p id="modalDate" style="font-weight: bold; font-size: 1.2rem;"></p>
+                    
+                    <hr> <h4 class="Title">登録済みの予定</h4>
+                        <div id="existing-events-list"></div>
+                    <hr> <h4 class="Title">予定の追加</h4>
+                    <form id="scheduleForm">
+                        <label for="scheduleTitle">件名:</label>
+                        <input type="text" id="scheduleTitle" required>
+
+                    <div class="modal-actions-container">
+                            <button type="submit" class="modal-actions">追加</button>
+                            <button type="button" id="closeButton" class="modal-actions">閉じる</button>
+                        </div>
+                    </form>
                 </div>
-                <div>
-                    <label for="scheduleTime">時間:</label>
-                    <input type="time" id="scheduleTime">
-                </div>
-                <div class="modal-actions">
-                    <button type="submit" id="saveButton">保存</button>
-                    <button type="button" id="closeButton">閉じる</button>
-                </div>
-            </form>
+            </div>
+
         </div>
     </div>
 
