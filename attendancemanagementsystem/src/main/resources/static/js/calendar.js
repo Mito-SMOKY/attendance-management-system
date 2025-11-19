@@ -46,6 +46,7 @@ function createCalendar(month, year) {
                 let eventsHtml = '';
                 if (currentViewMode === 'schedule') {
                     // 予定表モード
+                    if (Array.isArray(calendarEventsData)) {
                     const dailyEvents = calendarEventsData.filter(event => event.date === dataDate);
                     if (dailyEvents.length > 0) {
                         eventsHtml = '<div class="schedule-list">';
@@ -54,6 +55,7 @@ function createCalendar(month, year) {
                         });
                         eventsHtml += '</div>';
                     }
+                }
                 } else {
 
                     // attendanceRecordsData が null や undefined でないか確認 
@@ -69,7 +71,7 @@ function createCalendar(month, year) {
                                 attendanceMark = '<span class="attendance-absent">✕</span>'; 
                             }
                             if(attendanceMark) {
-                               eventsHtml = `<div class="attendance-list">${attendanceMark}</div>`;
+                                eventsHtml = `<div class="attendance-list">${attendanceMark}</div>`;
                             }
                         }
                     }
@@ -102,53 +104,85 @@ function createCalendar(month, year) {
 }
 
 // ===================================================================
-// メインの実行処理 (DOM読み込み後に実行)
+// カレンダー描画関数 (メイン)
 // ===================================================================
-document.addEventListener('DOMContentLoaded', () => {
 
-    // --- HTMLから要素を取得 ---
+function renderCalendar(month, year) {
+    const calendarYmEl = document.getElementById('calendar-ym'); 
+    const calendarTableContainerEl = document.getElementById('calendar-table-container'); 
+    const yearInput = document.getElementById('yearInput');
+    const monthInput = document.getElementById('monthInput');
+
+    if (!calendarYmEl || !calendarTableContainerEl) {
+        // カレンダーの描画に必要なHTML要素が見つからない場合はエラー
+        return;
+    }
+    calendarYmEl.textContent = `${year}年 ${month + 1}月`;
+    const tableHtml = createCalendar(month, year);
+    calendarTableContainerEl.innerHTML = tableHtml;
+
+    // inputの値も更新
+    if (yearInput) yearInput.value = year;
+    if (monthInput) monthInput.value = month; 
+}
+
+
+// ===================================================================
+// ページ初期化処理 (pageshow/DOMContentLoadedで実行)
+// ===================================================================
+
+function initializeCalendar() {
     const yearInput = document.getElementById('yearInput');
     const monthInput = document.getElementById('monthInput');
     const jumpButton = document.getElementById('jumpButton');
-    const calendarYmEl = document.getElementById('calendar-ym'); 
-    const calendarTableContainerEl = document.getElementById('calendar-table-container'); 
-
-    //トグルボタンの要素を取得
     const viewToggleCheckbox = document.getElementById('viewToggleCheckbox');
 
-    // ( ... renderCalendar, サーバー日付での初回描画, jumpButton のリスナー ... )
-
-    function renderCalendar(month, year) {
-        if (!calendarYmEl || !calendarTableContainerEl) {
-            console.error('カレンダーの描画に必要なHTML要素が見つかりません。');
-            return;
-        }
-        calendarYmEl.textContent = `${year}年 ${month + 1}月`;
-        const tableHtml = createCalendar(month, year);
-        calendarTableContainerEl.innerHTML = tableHtml;
-    }
-
     let serverMonth, serverYear;
-    if (typeof serverTargetMonthString === 'undefined') {
-        console.error("HTML側に 'serverTargetMonthString' が定義されていません！");
+    
+    // serverTargetMonthString が定義されているかチェック (main_calendar.htmlのみ)
+    if (typeof serverTargetMonthString === 'undefined' || !serverTargetMonthString) {
+        // 定義されていない、または空の場合は現在日付をフォールバックとして使用
         const fallbackDate = new Date();
         serverMonth = fallbackDate.getMonth();
         serverYear = fallbackDate.getFullYear();
-        renderCalendar(serverMonth, serverYear);
     } else {
+        // サーバーから渡された日付を使用
         const serverDate = new Date(serverTargetMonthString + "T00:00:00"); 
         serverMonth = serverDate.getMonth(); 
         serverYear = serverDate.getFullYear();
-        if (yearInput) yearInput.value = serverYear;
-        if (monthInput) monthInput.value = serverMonth; 
-        renderCalendar(serverMonth, serverYear);
     }
+
+    // カレンダーを初期描画
+    renderCalendar(serverMonth, serverYear);
     
+    // jumpButton のイベントリスナーは DOMContentLoaded で設定済み、ここでは初期値の再設定のみ
+
+
+    // --- イベントリスナーの設定はDOMContentLoadedで一度だけ行う ---
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    const yearInput = document.getElementById('yearInput');
+    const monthInput = document.getElementById('monthInput');
+    const jumpButton = document.getElementById('jumpButton');
+    const viewToggleCheckbox = document.getElementById('viewToggleCheckbox');
+    const calendarTableContainerEl = document.getElementById('calendar-table-container'); 
+
+    // BFcache 対策として、カレンダーの初期描画は pageshow に任せるが、
+    // ここで要素にイベントリスナーを一度だけ設定する。
+
+    // 初期化関数をDOMContentLoadedとpageshowの両方で呼び出す
+    initializeCalendar();
+
+
     if (jumpButton) {
         jumpButton.addEventListener('click', () => {
             const selectedYear = parseInt(yearInput.value, 10);
             const selectedMonth = parseInt(monthInput.value, 10);
             if (!isNaN(selectedYear) && !isNaN(selectedMonth)) {
+                // 月は1ベースで渡すため +1
                 location.href = `/student/main_calendar?month=${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`;
             } else {
                 alert("有効な年月を入力してください。");
@@ -156,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    //トグルボタンのイベントリスナーを追加　
+    //トグルボタンのイベントリスナー
     if (viewToggleCheckbox) {
         viewToggleCheckbox.addEventListener('change', () => {
             if (viewToggleCheckbox.checked) {
@@ -171,11 +205,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    
+    // モーダル関連のイベントリスナー (変更なし)
 
     const modal = document.getElementById('scheduleModal');
     const closeButton = document.getElementById('closeButton');
     const scheduleForm = document.getElementById('scheduleForm');
-    const modalTitle = document.getElementById('modalTitle');
     const modalDateEl = document.getElementById('modalDate');
 
     function openModal(dateStr) {
@@ -216,8 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentViewMode === 'attendance') {
                 return; 
             }
-            // ▲▲▲
-
             const targetCell = event.target.closest('td[data-date]');
             if (targetCell) {
                 const dateStr = targetCell.dataset.date; 
@@ -235,7 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         fetch(`/student/calendar/delete/${scheduleId}`, {
             method: 'DELETE',
- 
         })
         .then(response => {
             if (response.ok) {
@@ -302,7 +334,6 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('title', title);
             formData.append('date', date);
 
-            // 4. Spring Boot (Controller) に POST リクエストを送信
             fetch('/student/calendar/add', {
                 method: 'POST',
                 headers: {
@@ -323,5 +354,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("保存中に通信エラーが発生しました。");
             });
         });
+    }
+});
+
+// BFcache対策として、pageshowでも初期化を実行
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        // キャッシュから復元された場合は強制的に再初期化
+        initializeCalendar();
     }
 });
