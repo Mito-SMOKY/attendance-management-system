@@ -12,45 +12,105 @@
 </head>
 <body>
 
-     <div class="header-container">
+    <div class="header-container">
         <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
     </div>
 
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/login')}"></div>
+    </div>
+    
     <div class="info-container">
         
         <h1 class="page-title">授業情報</h1>
 
         <div class="controls-area">
-            <a href="#" class="backbutton">戻る</a>
-            
+        
             <button class="edit-btn">編集</button>
         </div>
 
-        <div class="table-wrapper">
-            <table class="info-table">
-                <tbody>
-                    <tr>
-                        <th>科目名</th>
-                        <td>プログラミング演習</td>
-                    </tr>
-                    <tr>
-                        <th>教室</th>
-                        <td>231教室</td>
-                    </tr>
-                    <tr>
-                        <th>時限</th>
-                        <td>1限目</td>
-                    </tr>
-                    <tr>
-                        <th>クラス</th>
-                        <td>2年 AAクラス</td>
-                    </tr>
-                    <tr>
-                        <th>担当教員</th>
-                        <td>大原 太郎</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="top-info-section">
+            
+            <div class="info-table-wrapper">
+                <table class="detail-table">
+                    <tbody>
+                        <tr>
+                            <th>教科名</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>担当教員</th>
+                            <td>鈴木千太郎</td>
+                        </tr>
+                        <tr>
+                            <th>コース</th>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-table-wrapper">
+                <table class="detail-table">
+                    <tbody>
+                        <tr>
+                            <th>教室</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>授業時間</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>日付</th>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="student-list-section">
+            <div class="section-subtitle">受講生徒一覧</div>
+            <div class="student-table-wrapper">
+                <table class="student-table">
+                    <colgroup>
+                        <col style="width: 15%;"> <col style="width: 10%;"> <col style="width: 15%;"> <col style="width: 30%;"> <col style="width: 30%;"> </colgroup>
+                    <thead>
+                        <tr>
+                            <th>学籍番号</th>
+                            <th>学年</th>
+                            <th>クラス</th>
+                            <th>氏名</th>
+                            <th>出欠状況</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="status-present"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="status-absent"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="status-present"></td>
+                        </tr>
+                        </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="footer-action">

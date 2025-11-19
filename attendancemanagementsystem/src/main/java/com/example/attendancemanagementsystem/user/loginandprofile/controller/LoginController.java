@@ -39,8 +39,16 @@ public class LoginController {
     public String showclassList() {
         return "admin/classList";
     }
-     @GetMapping("/classInfo")
+    @GetMapping("/classInfo")
     public String showclassInfo() {
         return "admin/classInfo";
+    }
+    @GetMapping("/studentList")
+    public String showstudentList() {
+        return "admin/studentList";
+    }
+    @GetMapping("/studentInfo")
+    public String showstudentInfo() {
+        return "admin/studentInfo";
     }
 }

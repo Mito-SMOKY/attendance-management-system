@@ -23,9 +23,8 @@ body {
    ========================================= */
 .info-container {
     width: 95%;
-    max-width: 800px; /* テーブル幅に合わせて調整 */
+    max-width: 1000px; /* 情報量が増えたため幅を広げました */
     margin: 0 auto;
-    /* ヘッダー高さ(約80px) + 余白 */
     padding-top: 120px; 
     padding-bottom: 50px;
 }
@@ -43,49 +42,18 @@ body {
 }
 
 /* =========================================
-   コントロールエリア (戻るボタン & 編集ボタン)
+   コントロールエリア (戻る & 編集)
    ========================================= */
 .controls-area {
     display: flex;
-    justify-content: space-between; /* 左右の端に配置 */
-    align-items: flex-end; /* 下揃え */
-    margin-bottom: 15px;
-    padding: 0 5px;
-}
-
-/* --- 戻るボタン (parts.cssのスタイルを上書きして配置) --- */
-a.backbutton {
-    /* 強制的に絶対配置を解除してフレックスアイテムにする */
-    position: static !important;
-    top: auto !important;
-    margin: 0 !important;
-    
-    display: inline-flex !important;
+    justify-content: right;
     align-items: center;
-    justify-content: center;
-    
-    /* サイズ調整 */
-    width: auto !important;
-    min-width: 100px;
-    height: 40px;
-    padding: 0 20px !important;
-    
-    /* デザイン調整 */
-    border: 1px solid #00bdca !important;
-    border-radius: 5px !important;
-    background-color: #fff !important;
-    color: #00bdca !important;
-    font-size: 1rem !important;
-    text-decoration: none !important;
-    cursor: pointer !important;
-    font-weight: normal !important;
-}
-a.backbutton::before {
-    content: ''; /* parts.cssの矢印を利用 */
-    margin-right: 8px;
+    margin-bottom: 20px;
 }
 
-/* --- 編集ボタン --- */
+
+
+/* 編集ボタン */
 .edit-btn {
     height: 40px;
     padding: 0 25px;
@@ -95,53 +63,110 @@ a.backbutton::before {
     color: #333;
     font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.3s;
-}
-.edit-btn:hover {
-    background-color: #f0f0f0;
 }
 
 /* =========================================
-   情報テーブル
+   上部情報エリア (2つのテーブルを横並び)
    ========================================= */
-.table-wrapper {
-    width: 100%;
-    border: 1px solid #999;
+.top-info-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
     margin-bottom: 40px;
+    flex-wrap: wrap; /* 画面が狭い場合は縦並び */
+}
+
+.info-table-wrapper {
+    flex: 1; /* 均等割り */
+    min-width: 300px;
+    border: 1px solid #999;
     background-color: white;
 }
 
-.info-table {
+.detail-table {
     width: 100%;
     border-collapse: collapse;
+}
+
+.detail-table th,
+.detail-table td {
+    border: 1px solid #999;
+    padding: 12px 15px;
+    vertical-align: middle;
+}
+
+/* ヘッダー列 (青緑) */
+.detail-table th {
+    background-color: #539DA4;
+    color: white;
+    width: 35%;
+    font-weight: normal;
     text-align: left;
 }
 
-.info-table th,
-.info-table td {
-    border: 1px solid #999;
-    padding: 15px 20px;
-    vertical-align: middle;
-    font-size: 1.1rem;
-}
-
-/* 左側のヘッダー列 (画像の色：青緑) */
-.info-table th {
-    background-color: #5aaeb6; 
-    color: white;
-    width: 30%;
-    font-weight: normal;
-}
-
-/* 右側のデータ列 (白背景) */
-.info-table td {
-    background-color: #FFFFFF;
+/* データ列 */
+.detail-table td {
+    background-color: #fff;
     color: #333;
     font-weight: bold;
 }
 
 /* =========================================
-   下部アクションボタン (セッションを開始)
+   下部エリア：生徒リスト (学籍番号など)
+   ========================================= */
+.student-list-section {
+    margin-bottom: 40px;
+}
+
+.section-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    border-left: 5px solid #539DA4;
+    padding-left: 10px;
+    color: #333;
+}
+
+.student-table-wrapper {
+    width: 100%;
+    border: 1px solid #999;
+    background-color: white;
+    overflow-x: auto;
+}
+
+.student-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    min-width: 700px;
+}
+
+.student-table th,
+.student-table td {
+    border: 1px solid #999;
+    padding: 10px;
+    vertical-align: middle;
+}
+
+/* リストヘッダー */
+.student-table th {
+    background-color: #539DA4;
+    color: white;
+    font-weight: normal;
+    padding: 12px 0;
+}
+
+/* リストデータ */
+.student-table td {
+    background-color: #fff;
+    color: #333;
+}
+
+/* 出欠ステータスの色分け例 */
+.status-present { color: #28a745; font-weight: bold; }
+.status-absent { color: #dc3545; font-weight: bold; }
+
+/* =========================================
+   フッターアクション
    ========================================= */
 .footer-action {
     text-align: center;
@@ -150,16 +175,15 @@ a.backbutton::before {
 
 .start-session-btn {
     background-color: white;
-    color: #5aaeb6; /* テーマカラー */
-    border: 2px solid #5aaeb6;
+    color: #539DA4;
+    border: 2px solid #539DA4;
     padding: 15px 60px;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: bold;
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
-
 .start-session-btn:hover {
     background-color: #f0fcfd;
 }
