@@ -1,20 +1,20 @@
-package com.example.attendancemanagementsystem.user.loginandprofile.controller;
+// package com.example.attendancemanagementsystem.user.loginandprofile.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+// import org.springframework.stereotype.Controller;
+// import org.springframework.web.bind.annotation.GetMapping;
 
-@Controller
-public class LoginController {
+// @Controller
+// public class LoginController {
 
-    @GetMapping("/login")
-    public String showLoginForm() {
-        return "login/login";
-    }
+//     @GetMapping("/login")
+//     public String showLoginForm() {
+//         return "login/login";
+//     }
 
-    @GetMapping("/first-login")
-    public String showFirstLoginForm() {
-        return "login/first-login";
-    }
+//     @GetMapping("/first-login")
+//     public String showFirstLoginForm() {
+//         return "login/first-login";
+//     }
 
     @GetMapping("/main-calendar")
     public String showMainCalendar() {
@@ -52,3 +52,8 @@ public class LoginController {
         return "admin/studentInfo";
     }
 }
+//     @GetMapping("/main_calendar")
+//     public String showMainCalendar() {
+//         return "student/main_calendar";
+//     }
+// }

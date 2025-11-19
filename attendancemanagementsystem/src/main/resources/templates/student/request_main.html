@@ -17,15 +17,15 @@
         <div th:replace="~{fragments/_parts :: header}"></div>
     </div>
 
-    <div th:replace="~{fragments/_parts :: backButton(url=@{/})}"></div>
-    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url=@{/main_calendar})}"></div>
+    </div>
+
     <div class="content-wrapper">
-    
         <div class="action-buttons">
-            <button class="ghost-button">公欠申請</button>
-            <button class="ghost-button">申請履歴</button>
+            <a th:href="@{/request_form}"  class="ghost-button">公欠申請</a>
+            <a th:href="@{url}"  class="ghost-button">申請履歴</a>
         </div>
-        
     </div>
 
 </body>
