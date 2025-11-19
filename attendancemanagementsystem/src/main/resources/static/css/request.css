@@ -1,0 +1,184 @@
+/*
+ * =========================================
+ * 共通スタイル
+ * =========================================
+ */
+
+/* bodyの基本設定
+  parts.css のヘッダー(80px, position: absolute)が
+  隠れないように余白を設定します。
+*/
+body {
+    margin: 0;
+    padding-top: 80px; /* ヘッダーの高さ分 */
+    background-color: #f9f9f9;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+}
+
+/*
+ * メインコンテンツの共通ラッパー
+ * (★ クラス名を .page-wrapper から .content-wrapper に修正)
+ */
+.content-wrapper {
+    padding-top: 120px; /* 戻るボタン(top: 110px)との余白 */
+    
+    padding-left: 50px;
+    padding-right: 50px;
+    
+    /* コンテンツが少ない場合でもフッターが下にくるように
+      最低限の高さを設定 (ヘッダーとpadding分を引く)
+    */
+    min-height: calc(100vh - 80px - 120px); 
+}
+
+
+/*
+ * =========================================
+ * application.html (ボタン画面) 用のスタイル
+ * =========================================
+ */
+
+/* 申請ボタンのコンテナ (変更なし) */
+.action-buttons {
+    display: flex;
+    flex-direction: column; /* 縦に並べる */
+    align-items: center; /* 中央揃え */
+    gap: 20px; /* ボタン間の隙間 */
+    width: 100%;
+}
+
+/*
+ * 申請ボタン（ゴーストボタン）
+ * (★ サイズを大きくする修正を反映済み)
+ */
+.ghost-button {
+    background-color: white;
+    border: 1px solid #777;
+    border-radius: 8px;
+    color: #00bdca;
+    
+    padding: 26px 29px; /* ボタンを大きくする */
+    
+    width: 300px; /* ボタンの幅を固定 */
+    max-width: 100%; 
+    text-align: center;
+    
+    font-size: 1.5em; /* 文字も大きくする */
+    
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none; /* aタグにしたため下線消去 */
+}
+
+.ghost-button:hover {
+    background-color: #f9f9f9;
+    border-color: #333;
+}
+
+
+/*
+ * =========================================
+ * request_form.html (フォーム画面) 用のスタイル
+ * =========================================
+ */
+ 
+/* フォーム全体（テーブルと確定ボタン）のコンテナ */
+.form-container {
+    width: 100%;
+    max-width: 900px; /* フォームの最大幅 */
+    
+    /* ★ フォーム自体を中央揃えにするため margin を追加 */
+    margin: 0 auto;
+}
+
+/* 申請フォームテーブル */
+.request-form-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #aaa;
+    background-color: white;
+}
+
+.request-form-table th,
+.request-form-table td {
+    border: 1px solid #aaa;
+    padding: 16px;
+    vertical-align: top;
+}
+
+.request-form-table th {
+    background-color: #5BBEB9;
+    color: white;
+    font-weight: bold;
+    width: 180px;
+    text-align: left;
+}
+
+/* 日付選択 */
+.date-selection .date-select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.date-selection span {
+    margin: 0 10px;
+}
+
+/* 時間選択 (チェックボックス) */
+.time-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 15px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+.checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+/* 理由入力欄 */
+.reason-textarea {
+    width: 98%;
+    height: 100px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 1em;
+    font-family: inherit;
+    resize: vertical;
+}
+
+/* 確定ボタン */
+.confirm-button-wrapper {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+/*
+ * 確定ボタン
+ * (★ サイズを大きくする修正を反映済み)
+ */
+.confirm-button {
+    background-color: white;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    
+    padding: 12px 50px; /* 上下・左右の余白を増やしました */
+    
+    font-size: 1.1em; /* 文字を少し大きくしました */
+    
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.confirm-button:hover {
+    background-color: #f5f5f5;
+}

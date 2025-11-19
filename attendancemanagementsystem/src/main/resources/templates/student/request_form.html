@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公欠申請フォーム</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    
+    <link rel="stylesheet" th:href="@{/css/request.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header}"></div>
+    </div>
+
+    <div th:replace="~{fragments/_parts :: backButton(url=@{/application})}"></div>
+    
+    <main class="content-wrapper">
+    
+        <div class="form-container">
+            <table class="request-form-table">
+                <tr>
+                    <th>公欠申請日</th>
+                    <td>
+                        <div class="date-selection">
+                            <select class="date-select"><option>12</option></select> 月
+                            <select class="date-select"><option>1</option></select> 日
+                            <span>～</span>
+                            <select class="date-select"><option>12</option></select> 月
+                            <select class="date-select"><option>1</option></select> 日
+                        </div>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th>公欠申請時間</th>
+                    <td>
+                        <div class="time-checkboxes">
+                            <label class="checkbox-item"><input type="checkbox"> 全て</label>
+                            <label class="checkbox-item"><input type="checkbox"> 1限目</label>
+                            <label class="checkbox-item"><input type="checkbox"> 2限目</label>
+                            <label class="checkbox-item"><input type="checkbox"> 3限目</label>
+                            <label class="checkbox-item"><input type="checkbox"> 4限目</label>
+                            <label class="checkbox-item"><input type="checkbox"> 5限目</label>
+                        </div>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th>公欠理由</th>
+                    <td>
+                        <textarea class="reason-textarea" placeholder="例）〇〇株式会社へ会社見学に行きます。"></textarea>
+                    </td>
+                </tr>
+            </table>
+            
+            <div class="confirm-button-wrapper">
+                <button class="confirm-button">確定</button>
+            </div>
+        </div>
+        
+    </main>
+
+</body>
+</html>
