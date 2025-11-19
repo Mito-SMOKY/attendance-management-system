@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>授業情報</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admininfo.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+     <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+
+    <div class="info-container">
+        
+        <h1 class="page-title">授業情報</h1>
+
+        <div class="controls-area">
+            <a href="#" class="backbutton">戻る</a>
+            
+            <button class="edit-btn">編集</button>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="info-table">
+                <tbody>
+                    <tr>
+                        <th>科目名</th>
+                        <td>プログラミング演習</td>
+                    </tr>
+                    <tr>
+                        <th>教室</th>
+                        <td>231教室</td>
+                    </tr>
+                    <tr>
+                        <th>時限</th>
+                        <td>1限目</td>
+                    </tr>
+                    <tr>
+                        <th>クラス</th>
+                        <td>2年 AAクラス</td>
+                    </tr>
+                    <tr>
+                        <th>担当教員</th>
+                        <td>大原 太郎</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer-action">
+            <button class="start-session-btn">セッションを開始</button>
+        </div>
+
+    </div>
+
+</body>
+</html>

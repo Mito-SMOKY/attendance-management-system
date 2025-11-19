@@ -1,9 +1,16 @@
-/* ヘッダーのCSS　*/
+@charset "UTF-8";
+
+/* =========================================
+   共通設定
+   ========================================= */
 a {
     text-decoration: none; 
     color: inherit;
 }
 
+/* =========================================
+   ヘッダー設定
+   ========================================= */
 .main-header {
     position: absolute;
     width: 100%;
@@ -12,9 +19,10 @@ a {
     color: white; 
     padding: 12px 25px;
     display: flex;
-    justify-content: space-between; /* 両端に寄せ、間は均等配置 */
+    justify-content: space-between; /* 両端寄せ */
     align-items: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* 他の要素より前面に表示 */
 }
 
 .header-left {
@@ -22,6 +30,7 @@ a {
     font-size: 1.1em;
 }
 
+/* --- ナビゲーション --- */
 .header-nav ul {
     margin: 0;
     padding: 0;
@@ -37,13 +46,23 @@ a {
 .header-nav a {
     font-size: 25px;
     padding: 8px 0;
-    transition: opacity 0.3s;
+    
+    /* ▼▼▼ 下線アニメーション設定 ▼▼▼ */
+    /* 最初は透明な線を引いておき、レイアウトずれを防ぐ */
+    border-bottom: 2px solid transparent;
+    /* 透明度と下線の色を0.3秒かけて変化させる */
+    transition: opacity 0.3s, border-bottom-color 0.3s;
 }
 
 .header-nav a:hover {
-    opacity: 0.7; 
+    opacity: 0.8; /* 少し薄く */
+    
+    /* ▼▼▼ ホバー時に線を白くする ▼▼▼ */
+    border-bottom: 2px solid white; 
+    cursor: pointer;
 }
 
+/* --- 右側のアイコン群 --- */
 .header-right {
     display: flex;
     align-items: center;
@@ -83,14 +102,16 @@ a {
     border: 2px solid #7BCBD9; 
 }
 
-
-
-/* 戻るボタンのCSS */
-
-
-.backbutton{
-    position: relative;
-    top: 150px;
+/* =========================================
+   戻るボタン設定
+   ========================================= */
+.backbutton {
+    /* 絶対配置ではなく、各ページで配置を制御しやすいように調整 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* デフォルトのデザイン */
     width: 250px;
     padding: 10px 20px;
     border: 1px solid #00bdca;
@@ -99,20 +120,23 @@ a {
     color: #00bdca;
     font-size: 20px;
     text-decoration: none;
-    margin-left: 50px;
-    margin-bottom: 30px;
     cursor: pointer;
+    
+    /* 必要に応じて各ページのCSSで上書き可能なように設定 */
+    position: relative; 
+    /* top: 150px;  <-- 汎用性を高めるため、ここでの固定位置指定は削除推奨ですが、元のコードを尊重する場合は残してください */
+    /* 今回の修正ではコメントアウトしておきます。各ページ(classList.htmlなど)のCSSで配置制御しています。 */
 }
 
-.backbutton::before{
+.backbutton::before {
     display: inline-block; 
-    transform: rotate(45deg);
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-top: 2px solid #00bdca;
     border-left: 2px solid #00bdca;
     transform: rotate(-45deg);
-    margin-right: 6px;
+    margin-right: 10px;
     content: '';
     vertical-align: middle;
+    margin-bottom: 2px; /* 微調整 */
 }

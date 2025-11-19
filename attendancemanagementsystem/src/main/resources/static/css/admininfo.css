@@ -1,0 +1,165 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px; 
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* =========================================
+   レイアウトコンテナ
+   ========================================= */
+.info-container {
+    width: 95%;
+    max-width: 800px; /* テーブル幅に合わせて調整 */
+    margin: 0 auto;
+    /* ヘッダー高さ(約80px) + 余白 */
+    padding-top: 120px; 
+    padding-bottom: 50px;
+}
+
+/* =========================================
+   ページタイトル
+   ========================================= */
+.page-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: normal;
+    margin-bottom: 30px;
+    color: #333;
+    letter-spacing: 2px;
+}
+
+/* =========================================
+   コントロールエリア (戻るボタン & 編集ボタン)
+   ========================================= */
+.controls-area {
+    display: flex;
+    justify-content: space-between; /* 左右の端に配置 */
+    align-items: flex-end; /* 下揃え */
+    margin-bottom: 15px;
+    padding: 0 5px;
+}
+
+/* --- 戻るボタン (parts.cssのスタイルを上書きして配置) --- */
+a.backbutton {
+    /* 強制的に絶対配置を解除してフレックスアイテムにする */
+    position: static !important;
+    top: auto !important;
+    margin: 0 !important;
+    
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    
+    /* サイズ調整 */
+    width: auto !important;
+    min-width: 100px;
+    height: 40px;
+    padding: 0 20px !important;
+    
+    /* デザイン調整 */
+    border: 1px solid #00bdca !important;
+    border-radius: 5px !important;
+    background-color: #fff !important;
+    color: #00bdca !important;
+    font-size: 1rem !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    font-weight: normal !important;
+}
+a.backbutton::before {
+    content: ''; /* parts.cssの矢印を利用 */
+    margin-right: 8px;
+}
+
+/* --- 編集ボタン --- */
+.edit-btn {
+    height: 40px;
+    padding: 0 25px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.edit-btn:hover {
+    background-color: #f0f0f0;
+}
+
+/* =========================================
+   情報テーブル
+   ========================================= */
+.table-wrapper {
+    width: 100%;
+    border: 1px solid #999;
+    margin-bottom: 40px;
+    background-color: white;
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.info-table th,
+.info-table td {
+    border: 1px solid #999;
+    padding: 15px 20px;
+    vertical-align: middle;
+    font-size: 1.1rem;
+}
+
+/* 左側のヘッダー列 (画像の色：青緑) */
+.info-table th {
+    background-color: #5aaeb6; 
+    color: white;
+    width: 30%;
+    font-weight: normal;
+}
+
+/* 右側のデータ列 (白背景) */
+.info-table td {
+    background-color: #FFFFFF;
+    color: #333;
+    font-weight: bold;
+}
+
+/* =========================================
+   下部アクションボタン (セッションを開始)
+   ========================================= */
+.footer-action {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.start-session-btn {
+    background-color: white;
+    color: #5aaeb6; /* テーマカラー */
+    border: 2px solid #5aaeb6;
+    padding: 15px 60px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.start-session-btn:hover {
+    background-color: #f0fcfd;
+}
