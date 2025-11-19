@@ -28,7 +28,7 @@ public class AdminController {
     // ログイン中の管理者ID
     // ★先ほどDBに作った「999」を指定します
     private Integer getCurrentUserId() {
-        return 999; 
+        return 3; 
     }
 
     // --- 1. メインメニュー ---
