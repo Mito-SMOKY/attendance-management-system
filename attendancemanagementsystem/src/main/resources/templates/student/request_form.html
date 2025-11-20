@@ -18,7 +18,7 @@
         <div th:replace="~{fragments/_parts :: header}"></div>
     </div>
 
-    <div th:replace="~{fragments/_parts :: backButton(url=@{/application})}"></div>
+    <div th:replace="~{fragments/_parts :: backButton(url=@{/request_main})}"></div>
     
     <main class="content-wrapper">
     
@@ -27,12 +27,50 @@
                 <tr>
                     <th>公欠申請日</th>
                     <td>
+                        <!-- controllerから日付リストをモデルで受け取る -->
                         <div class="date-selection">
-                            <select class="date-select"><option>12</option></select> 月
-                            <select class="date-select"><option>1</option></select> 日
-                            <span>～</span>
-                            <select class="date-select"><option>12</option></select> 月
-                            <select class="date-select"><option>1</option></select> 日
+                             <select class="date-select" id="startYear" name="startYear">
+                                <option th:each="year : ${years}" 
+                                        th:value="${year}" 
+                                        th:text="${year}">
+                                </option>
+                            </select> 年
+                                
+                            <select class="date-select" id="startMonth" name="startMonth">
+                                <option th:each="month : ${months}" 
+                                        th:value="${month}" 
+                                        th:text="${month}">
+                                </option>
+                            </select> 月
+                                
+                            <select class="date-select" id="startDay" name="startDay">
+                                <option th:each="day : ${days}" 
+                                        th:value="${day}" 
+                                        th:text="${day}">
+                                </option>
+                            </select> 日  ~ 
+
+                            <select class="date-select" id="endYear" name="endYear">
+                                <option th:each="year : ${years}" 
+                                        th:value="${year}" 
+                                        th:text="${year}">
+                                </option>
+                            </select> 年
+                                
+                            <select class="date-select" id="endMonth" name="endMonth">
+                                <option th:each="month : ${months}" 
+                                        th:value="${month}" 
+                                        th:text="${month}">
+                                </option>
+                            </select> 月
+                                
+                            <select class="date-select" id="endDay" name="endDay">
+                                <option th:each="day : ${days}" 
+                                        th:value="${day}" 
+                                        th:text="${day}">
+                                </option>
+                            </select> 日
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -67,4 +105,59 @@
     </main>
 
 </body>
+
+
+<!-- 申請日のイベント管理script -->
+
+<script src="/js/request_form.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    
+    const startYear = document.getElementById('startYear');
+    const startMonth = document.getElementById('startMonth');
+    const startDay = document.getElementById('startDay'); // 初期の日の値を保持
+    
+    // 初期表示時に一度、最大日数を設定する
+    updateDayOptions('startYear', 'startMonth', 'startDay');
+
+    // 年と月が変更されたときに、日のドロップダウンを更新するイベントを設定
+    if (startYear && startMonth) {
+        startYear.addEventListener('change', () => {
+            updateDayOptions('startYear', 'startMonth', 'startDay');
+        });
+
+        startMonth.addEventListener('change', () => {
+            updateDayOptions('startYear', 'startMonth', 'startDay');
+        });
+    }
+});
+
+    const startYear = document.getElementById('startYear');
+    const startMonth = document.getElementById('startMonth');
+    if (startYear && startMonth) {
+        updateDayOptions('startYear', 'startMonth', 'startDay'); // 初期化
+        startYear.addEventListener('change', () => { updateDayOptions('startYear', 'startMonth', 'startDay'); });
+        startMonth.addEventListener('change', () => { updateDayOptions('startYear', 'startMonth', 'startDay'); });
+    }
+    
+    // --- 終了日用のイベントリスナー 
+    const endYear = document.getElementById('endYear');
+    const endMonth = document.getElementById('endMonth');
+    
+    if (endYear && endMonth) {
+        // 初期表示時に一度、最大日数を設定する
+        updateDayOptions('endYear', 'endMonth', 'endDay'); 
+
+        // 年が変更されたときに、日のドロップダウンを更新
+        endYear.addEventListener('change', () => {
+            updateDayOptions('endYear', 'endMonth', 'endDay');
+        });
+
+        // 月が変更されたときに、日のドロップダウンを更新
+        endMonth.addEventListener('change', () => {
+            updateDayOptions('endYear', 'endMonth', 'endDay');
+        });
+    }
+</script>
+
 </html>

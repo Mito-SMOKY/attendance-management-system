@@ -1,13 +1,4 @@
-/*
- * =========================================
- * 共通スタイル
- * =========================================
- */
 
-/* bodyの基本設定
-  parts.css のヘッダー(80px, position: absolute)が
-  隠れないように余白を設定します。
-*/
 body {
     margin: 0;
     padding-top: 80px; /* ヘッダーの高さ分 */
@@ -15,20 +6,15 @@ body {
     font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
 }
 
-/*
- * メインコンテンツの共通ラッパー
- * (★ クラス名を .page-wrapper から .content-wrapper に修正)
- */
+
+ /* メインコンテンツの共通ラッパー */
+
 .content-wrapper {
-    padding-top: 120px; /* 戻るボタン(top: 110px)との余白 */
-    
+    padding-top: 200px;
     padding-left: 50px;
     padding-right: 50px;
-    
-    /* コンテンツが少ない場合でもフッターが下にくるように
-      最低限の高さを設定 (ヘッダーとpadding分を引く)
-    */
     min-height: calc(100vh - 80px - 120px); 
+    gap: 50px;
 }
 
 
@@ -86,9 +72,9 @@ body {
 /* フォーム全体（テーブルと確定ボタン）のコンテナ */
 .form-container {
     width: 100%;
-    max-width: 900px; /* フォームの最大幅 */
-    
-    /* ★ フォーム自体を中央揃えにするため margin を追加 */
+    height: 100%;
+    max-width: 1200px; /* フォームの最大幅 */
+    max-height: 2000px;
     margin: 0 auto;
 }
 
