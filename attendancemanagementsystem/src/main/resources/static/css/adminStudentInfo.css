@@ -23,74 +23,210 @@ body {
    ========================================= */
 .info-container {
     width: 95%;
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
-    /* ヘッダー固定分(約80px) + 余白 */
+    /* ヘッダー(約80px) + 余白 */
     padding-top: 120px; 
     padding-bottom: 50px;
 }
 
 /* =========================================
-   ページタイトル
+   ページヘッダーエリア (戻るボタンとタイトルを格納)
    ========================================= */
-.page-title {
-    text-align: center;
-    font-size: 2rem;
-    font-weight: normal;
-    margin-bottom: 30px;
-    color: #333;
-    letter-spacing: 2px;
-}
-
-/* =========================================
-   コントロールエリア (戻る & 編集)
-   ========================================= */
-.controls-area {
+.page-header-wrapper {
+    position: relative; /* 子要素配置の基準 */
     display: flex;
-    justify-content: space-between; /* 左右端に配置 */
-    align-items: center;
-    margin-bottom: 30px;
-    height: 40px;
+    justify-content: center; /* タイトルを中央に */
+    align-items: center;     /* 垂直中央 */
+    height: 50px;
+    margin-bottom: 30px;     /* 下のコンテンツとの間隔 */
+    width: 100%;
 }
 
-/* --- 戻るボタン (parts.cssのスタイルを調整) --- */
+/* --- タイトル --- */
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    border-bottom: 3px solid #539DA4;
+    padding-bottom: 5px;
+    line-height: 1.2;
+}
+
+/* --- 戻るボタン (parts.cssの影響を完全に打ち消して配置) --- */
 a.backbutton {
-    /* 強制的に配置をリセットしてFlex内に収める */
-    position: static !important;
-    top: auto !important;
+    /* 配置：ヘッダーエリアの左端に絶対配置 */
+    position: absolute !important;
+    left: 0 !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important; /* 垂直中央補正 */
     margin: 0 !important;
     
+    /* 見た目：ボタン形状に整える */
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
-    
     height: 40px !important;
     width: auto !important;
     min-width: 90px;
     padding: 0 20px !important;
     
-    border: 1px solid #333 !important;
+    border: 1px solid #00bdca !important;
     border-radius: 5px !important;
     background-color: #fff !important;
-    color: #333 !important;
+    color: #00bdca !important;
     font-size: 1rem !important;
     text-decoration: none !important;
     font-weight: bold !important;
     cursor: pointer !important;
+    box-shadow: none !important;
+    z-index: 10; /* 他の要素より手前に */
 }
 a.backbutton::before {
     content: '＜';
     margin-right: 5px;
+    display: inline-block;
 }
 a.backbutton:hover {
     background-color: #f0f0f0 !important;
 }
 
-/* --- 編集ボタン --- */
+
+/* =========================================
+   メインコンテンツエリア (左：サイドバー / 右：詳細)
+   ========================================= */
+.main-content-area {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+/* --- 左側エリア (生徒名・検索・教科リスト) --- */
+.left-sidebar-area {
+    flex: 0 0 280px; /* 固定幅 */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 生徒名表示 */
+.student-name-display {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    padding: 15px;
+    border-left: 6px solid #539DA4;
+    background-color: #fff;
+    border-radius: 0 4px 4px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* サイドバー検索フォーム */
+.sidebar-search-form {
+    display: flex;
+    gap: 5px;
+}
+
+.sidebar-search-input {
+    flex: 1;
+    height: 40px;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.sidebar-search-btn {
+    height: 40px;
+    width: 40px;
+    padding: 0;
+    background-color: #539DA4;
+    border: 1px solid #539DA4;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.sidebar-search-btn:hover {
+    opacity: 0.9;
+}
+
+/* 受講教科リストボックス */
+.subject-list-box {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.sidebar-title {
+    background-color: #539DA4;
+    color: white;
+    font-size: 1.1rem;
+    padding: 12px 15px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #539DA4;
+}
+
+.subject-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.subject-list li {
+    border-bottom: 1px solid #eee;
+}
+
+.subject-list a {
+    display: block;
+    padding: 12px 15px;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.subject-list a:hover {
+    background-color: #f0f8f9;
+    color: #539DA4;
+}
+
+
+/* --- 右側エリア (出欠情報・テーブル) --- */
+.attendance-detail-main {
+    flex: 1;
+    min-width: 600px;
+}
+
+/* コントロール (月選択・編集) */
+.attendance-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.month-select {
+    height: 40px;
+    padding: 5px 10px;
+    border: 1px solid #707070;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: #fff;
+    min-width: 120px;
+}
+
 .edit-btn {
     height: 40px;
     padding: 0 30px;
-    border: 1px solid #333;
+    border: 1px solid #707070;
     border-radius: 4px;
     background-color: #fff;
     color: #333;
@@ -103,114 +239,36 @@ a.backbutton:hover {
     background-color: #f0f0f0;
 }
 
-/* =========================================
-   上部：基本情報エリア
-   ========================================= */
-.basic-info-section {
-    display: flex;
-    gap: 30px;
-    margin-bottom: 40px;
-    align-items: flex-start;
-    flex-wrap: wrap;
-}
-
-/* --- 左ブロック：写真と氏名 --- */
-.profile-block {
-    flex: 1;
-    min-width: 350px;
-    display: flex;
-    gap: 20px;
-    background-color: white;
-    padding: 20px;
-    border: 1px solid #999;
-    border-radius: 4px;
-}
-
-/* 顔写真プレースホルダー */
-.profile-image-placeholder {
-    width: 100px;
-    height: 120px;
-    background-color: #e0e0e0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #999;
-    font-size: 3rem;
-    border: 1px solid #ccc;
-}
-/* 実際の画像を使う場合はこちら */
-.profile-image {
-    width: 100px;
-    height: 120px;
-    object-fit: cover;
-    border: 1px solid #ccc;
-}
-
-/* 氏名テーブル */
-.name-table {
-    flex: 1;
-    border-collapse: collapse;
-}
-.name-table th, .name-table td {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-    text-align: left;
-}
-.name-table th {
-    width: 80px;
-    color: #539DA4;
-    font-weight: normal;
-}
-.name-table td {
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
-/* --- 右ブロック：所属情報 --- */
-.academic-block {
-    flex: 1;
-    min-width: 300px;
-    background-color: white;
-    padding: 20px;
-    border: 1px solid #999;
-    border-radius: 4px;
-}
-
-.academic-table {
+/* 出欠状況サマリーテーブル */
+.status-summary-table {
     width: 100%;
     border-collapse: collapse;
+    margin-bottom: 20px;
+    text-align: center;
+    background-color: white;
 }
-.academic-table th, .academic-table td {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-    text-align: left;
+
+.status-summary-table th,
+.status-summary-table td {
+    border: 1px solid #999;
+    padding: 12px 5px;
+    vertical-align: middle;
 }
-.academic-table th {
-    width: 100px;
-    color: #539DA4;
+
+.status-summary-table thead th {
+    background-color: #539DA4;
+    color: white;
     font-weight: normal;
+    font-size: 0.95rem;
 }
-.academic-table td {
+
+.status-summary-table tbody td {
     font-weight: bold;
     font-size: 1.1rem;
-}
-
-/* =========================================
-   下部：出席情報テーブル
-   ========================================= */
-.attendance-section {
-    margin-bottom: 50px;
-}
-
-.section-title {
-    font-size: 1.3rem;
-    margin-bottom: 15px;
-    border-left: 6px solid #539DA4;
-    padding-left: 10px;
     color: #333;
-    font-weight: bold;
 }
 
+/* 時間割テーブル */
 .table-wrapper {
     width: 100%;
     border: 1px solid #999;
@@ -218,36 +276,62 @@ a.backbutton:hover {
     overflow-x: auto;
 }
 
-.attendance-table {
+.schedule-table {
     width: 100%;
     border-collapse: collapse;
     text-align: center;
     min-width: 700px;
 }
 
-.attendance-table th,
-.attendance-table td {
+.schedule-table th,
+.schedule-table td {
     border: 1px solid #999;
-    padding: 12px 10px;
+    padding: 10px 5px;
     vertical-align: middle;
 }
 
-/* ヘッダー */
-.attendance-table thead th {
-    background-color: #539DA4; /* テーマカラー */
+.schedule-table thead th {
+    background-color: #539DA4;
     color: white;
     font-weight: normal;
     padding: 12px 0;
-}
-
-/* データ行 */
-.attendance-table tbody td {
     font-size: 1rem;
-    color: #333;
 }
 
-/* ステータス色分け */
-.status-present { color: #28a745; font-weight: bold; }
-.status-absent { color: #dc3545; font-weight: bold; }
-.status-late { color: #ffc107; font-weight: bold; }
-.status-public { color: #6c757d; font-weight: bold; }
+.schedule-table tbody td {
+    font-size: 0.9rem;
+    color: #333;
+    height: 70px;
+}
+
+.cell-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.subject-name {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.status-tag {
+    display: inline-block;
+    font-size: 0.8rem;
+    padding: 3px 12px;
+    border-radius: 15px;
+    color: white;
+    font-weight: normal;
+    min-width: 60px;
+}
+
+/* ステータス色 */
+.bg-present { background-color: #66BB6A; }
+.bg-sick { background-color: #EF5350; }
+.bg-late { background-color: #FFCA28; color: #333; }
+.bg-early { background-color: #FFA726; }
+.bg-suspend { background-color: #78909C; }
+.bg-public { background-color: #42A5F5; }
+.bg-other { background-color: #AB47BC; }

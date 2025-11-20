@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教科一覧</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/adminSubjectList.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/timetable')}"></div>
+    </div>
+
+    <div class="subject-list-container">
+        
+        <div class="page-header-wrapper">
+            <h1 class="page-title">教科一覧</h1>
+        </div>
+
+        <div class="search-filter-area">
+            
+            <form action="#" method="get" class="search-form">
+                <input type="text" class="search-input" placeholder="教科名を検索">
+            </form>
+
+            <button type="submit" class="tool-btn">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+
+            <button class="tool-btn">
+                <i class="fa-solid fa-sliders"></i>
+            </button>
+            
+        </div>
+
+        <div class="table-wrapper">
+            <table class="subject-table">
+                <colgroup>
+                    <col style="width: 100%;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>教科名</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -99,14 +99,19 @@ a {
 /* =========================================
    戻るボタン設定
    ========================================= */
-.backbutton {
-    position: relative;
+.backbutton-container{
+    position: fixed; 
+    top: 100px;
+    left: 30px;  
+    z-index: 1000;   
+}
+
+
+.backbutton{
+    /* position: relative; */
     top: 150px;
-    /* ▼▼▼ ここを修正 ▼▼▼ */
-    /* width を削除し、padding で左右の余白を調整 */
-    padding: 10px 20px; /* 左右の余白で幅が決まる */
-    /* ▲▲▲ ここを修正 ▲▲▲ */
-    
+    /* width: 250px; */
+    padding: 10px 20px;
     border: 1px solid #00bdca;
     border-radius: 5px;
     background-color: #fff;
@@ -119,6 +124,7 @@ a {
     display: inline-block;
     white-space: nowrap; /* テキストが途中で改行されないようにする */
 }
+
 
 .backbutton::before {
     display: inline-block; 

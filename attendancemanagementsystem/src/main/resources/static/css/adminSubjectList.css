@@ -1,0 +1,165 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px; 
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* =========================================
+   レイアウトコンテナ
+   ========================================= */
+.subject-list-container {
+    width: 95%;
+    max-width: 1000px; /* テーブル幅に合わせて調整 */
+    margin: 0 auto;
+    /* ヘッダー(約80px) + 余白 */
+    padding-top: 120px; 
+    padding-bottom: 50px;
+}
+
+/* =========================================
+   ページヘッダー (戻るボタン & タイトル)
+   ========================================= */
+.page-header-wrapper {
+    position: relative; /* 子要素配置の基準 */
+    display: flex;
+    justify-content: center; /* タイトルを中央に */
+    align-items: center;
+    height: 50px;
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+/* タイトル */
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    border-bottom: 3px solid #539DA4;
+    padding-bottom: 5px;
+}
+
+/* 戻るボタン (parts.cssのスタイルを継承しつつ配置固定) */
+
+.backbutton:hover {
+    background-color: #f0f0f0 !important;
+}
+
+/* =========================================
+   検索・フィルターエリア
+   ========================================= */
+.search-filter-area {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* ボタン間の隙間 */
+    margin-bottom: 20px;
+    justify-content: flex-start; /* 左寄せ */
+}
+
+/* 入力フォーム */
+.search-form {
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    height: 40px;
+    width: 300px;
+    padding: 5px 10px;
+    border: 1px solid #707070;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    background-color: white;
+}
+
+/* ツールボタン共通 (検索・フィルター) */
+.tool-btn {
+    height: 40px;
+    min-width: 45px;
+    padding: 0 15px;
+    background-color: white;
+    border: 1px solid #707070;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #539DA4; /* テーマカラー */
+    font-size: 1.2rem;
+    transition: background-color 0.3s;
+}
+.tool-btn:hover {
+    background-color: #f0f0f0;
+}
+
+/* =========================================
+   教科一覧テーブル
+   ========================================= */
+.table-wrapper {
+    width: 100%;
+    border: 1px solid #999;
+    margin-bottom: 30px;
+    background-color: white;
+    overflow-x: auto;
+}
+
+.subject-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    min-width: 700px;
+}
+
+.subject-table th,
+.subject-table td {
+    border: 1px solid #999;
+    padding: 12px 10px;
+    vertical-align: middle;
+}
+
+/* ヘッダー行 */
+.subject-table thead th {
+    background-color: #539DA4;
+    color: white;
+    font-weight: normal;
+    padding: 15px 0;
+    font-size: 1rem;
+}
+
+/* データ行 */
+.subject-table tbody td {
+    font-size: 1rem;
+    color: #333;
+}
+
+/* 詳細ボタン */
+.detail-btn {
+    display: inline-block;
+    padding: 6px 20px;
+    border: 1px solid #539DA4;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #539DA4;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+.detail-btn:hover {
+    background-color: #f0fcfd;
+}
