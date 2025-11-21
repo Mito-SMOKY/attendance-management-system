@@ -37,6 +37,14 @@ public class StudentController {
     @GetMapping("/main_calendar") // (ここは /home から変更されていましたね)
     public String home(Model model, @AuthenticationPrincipal UserDetails userDetails,
                            @RequestParam(required = false) String month) {
+
+        int currentYear = java.time.YearMonth.now().getYear();
+        int currentMonth = java.time.YearMonth.now().getMonthValue();
+
+        // 💡 2. モデルに属性名 'year' と 'month' で設定
+        model.addAttribute("year", currentYear);
+        model.addAttribute("month", currentMonth);
+
         
         // 1. Spring Security からログイン中のユーザーID (LoginID) を取得
         String loginId = userDetails.getUsername();

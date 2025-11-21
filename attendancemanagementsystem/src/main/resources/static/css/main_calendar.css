@@ -52,9 +52,9 @@
 }
 
 .calendar-ym {
-    margin-left: 150px;
+    margin-left: 200px;
     padding-bottom: 20px;
-    padding-top: 150px;
+    padding-top: 80px;
     font-size: 3rem;
     font-weight: 700;
     color:#008b95;
@@ -354,4 +354,27 @@
 }
 .delete-schedule-btn:hover {
     background-color: #cc6464;
+}
+
+/* ▼▼▼ ここから追加：出席状態のスタイル ▼▼▼ */
+
+/* 全出席 (〇) */
+.attendance-present {
+    color: #00bdca; /* 緑/青系 */
+    font-weight: bold;
+    font-size: 1.5rem; /* 少し大きく */
+}
+
+/* 全欠席 (✕) */
+.attendance-absent {
+    color: #ff6f65; /* 赤 */
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* 遅刻・早退・一部欠席 (△) */
+.attendance-late {
+    color: #f39c12; /* オレンジ/黄色系 */
+    font-weight: bold;
+    font-size: 1.5rem;
 }
