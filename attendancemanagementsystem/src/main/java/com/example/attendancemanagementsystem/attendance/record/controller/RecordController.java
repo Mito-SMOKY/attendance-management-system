@@ -24,6 +24,7 @@ public class RecordController {
         System.out.println("---- 受信テスト: NFCから送信されたJSON ----");
             System.out.println("card_id = " + recordDTO.getCardId());
             System.out.println("userId = " + recordDTO.getUserId());
+            System.out.println("readTime" + recordDTO.getReadTime());
             System.out.println("reader_id = " + recordDTO.getReaderId());
             System.out.println("---------------------------------------------");
 

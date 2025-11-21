@@ -28,10 +28,10 @@ public class RecordService {
         // 2. ログに出力 (DTOの各Getterを使用)
         System.out.println("==================================");
         System.out.println("NFCデータ 出欠記録 (復号成功)");
-        System.out.println("  カードUID: " + recordDTO.getCardId()); 
+        System.out.println("  カードID: " + recordDTO.getCardId()); 
+        System.out.println("  ユーザID: " + originalUserId);
+        System.out.println("  出席時間: " + recordDTO.getReadTime());
         System.out.println("  リーダーID: " + recordDTO.getReaderId()); 
-        System.out.println("  タイムスタンプ: " + recordDTO.getReadTime());
-        System.out.println("  復号済みID: " + originalUserId); 
         System.out.println("==================================");
     }
 
