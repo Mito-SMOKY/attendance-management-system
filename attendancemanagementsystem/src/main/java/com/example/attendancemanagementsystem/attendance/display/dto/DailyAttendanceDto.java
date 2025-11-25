@@ -1,34 +1,29 @@
-package com.example.attendancemanagementsystem.attendance.display.dto; // パッケージは適宜調整してください
-
-import java.time.LocalDate;
+package com.example.attendancemanagementsystem.attendance.display.dto;
 
 public class DailyAttendanceDto {
-    // 1. フィールド（データを入れる箱）
-    private String date;
-    private String status;
+    private Integer slotId;       // 時限 (1, 2...)
+    private String subjectName;   // 科目名 (Linux基礎)
+    private String classroomName; // 教室名 (231)
+    private String status;        // 出席状況 (〇, ×, 空白)
 
-    // 2. コンストラクタ（データをセットするためのメソッド）
-    // Service側で new AttendanceDto(日付, "出席") と書けるように
-    public DailyAttendanceDto(LocalDate date, String status) {
-        this.date = date.toString(); // LocalDateを文字列("2025-11-21")に変換して保存
+    // コンストラクタ
+    public DailyAttendanceDto(Integer slotId, String subjectName, String classroomName, String status) {
+        this.slotId = slotId;
+        this.subjectName = subjectName;
+        this.classroomName = classroomName;
         this.status = status;
     }
 
-    // 3. Getter メソッド（重要）
-    public String getDate() {
-        return date;
-    }
+    // Getter / Setter (Lombokなし)
+    public Integer getSlotId() { return slotId; }
+    public void setSlotId(Integer slotId) { this.slotId = slotId; }
 
-    public String getStatus() {
-        return status;
-    }
+    public String getSubjectName() { return subjectName; }
+    public void setSubjectName(String subjectName) { this.subjectName = subjectName; }
 
-    // 4. Setter メソッド
-    public void setDate(String date) {
-        this.date = date;
-    }
+    public String getClassroomName() { return classroomName; }
+    public void setClassroomName(String classroomName) { this.classroomName = classroomName; }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
