@@ -16,7 +16,7 @@ public class RecordDTO {
     @JsonProperty("reader_id")
     private String readerId;
 
-    // cardUid
+    // カードID
     public String getCardId() {
         return cardId;
     }
@@ -24,7 +24,7 @@ public class RecordDTO {
         this.cardId = cardId;
     }
 
-    // encryptedUserId
+    // ユーザID
     public String getUserId() {
         return userId;
     }
@@ -32,7 +32,7 @@ public class RecordDTO {
         this.userId = userId;
     }
 
-    // timestamp
+    // 読み込み時刻
     public String getReadTime() {
         return readTime;
     }
@@ -40,7 +40,7 @@ public class RecordDTO {
         this.readTime = readTime;
     }
 
-    // readerId
+    // ラズパイの識別番号
     public String getReaderId() {
         return readerId;
     }
