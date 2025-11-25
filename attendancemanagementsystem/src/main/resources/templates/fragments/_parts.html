@@ -20,6 +20,9 @@
     </button>
 </div>
 
+
+<!-- 画面ができ次第ヘッダーのリンクを追加する -->
+
 <!-- 共通ヘッダー -->
 <div th:fragment="main-header">
     <header class="main-header"></header>
@@ -60,10 +63,10 @@
         </div>
         <nav class="header-nav">
             <ul>
-                <li><a th:href="@{/student/main_calendar}">日付</a></li>
+                <li><a th:href="@{/admin/timetable}">日付</a></li>
                 <li><a href="#">教科</a></li>
                 <li><a href="#">生徒</a></li>
-                <li><a th:href="@{/student/request_main}">その他</a></li>
+                <li><a href="#">その他</a></li>
             </ul>
         </nav>
         <div class="header-right">
