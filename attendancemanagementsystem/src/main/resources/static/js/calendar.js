@@ -24,6 +24,7 @@ function createCalendar(month, year) {
     const today = dateObj.getDate();
     const currentMonth = dateObj.getMonth();
     const currentYear = dateObj.getFullYear();
+    // ( ... ロジックここまで ... )
 
     for (let i = 0; i < 6; i++) {
         tableHTML += '<tr>';
@@ -88,6 +89,25 @@ function createCalendar(month, year) {
 
                             if (displayMark) {
                                 eventsHtml = `<div class="attendance-list"><span class="${displayClass}">${displayMark}</span></div>`;
+                            }
+                        }
+                    }
+                } else {
+
+                    // attendanceRecordsData が null や undefined でないか確認 
+                    if (Array.isArray(attendanceRecordsData)) {
+                        
+                        const attendanceRecord = attendanceRecordsData.find(record => record.date === dataDate);
+                        
+                        if (attendanceRecord) {
+                            let attendanceMark = '';
+                            if (attendanceRecord.status === '出席') {
+                                attendanceMark = '<span class="attendance-present">〇</span>'; 
+                            } else if (attendanceRecord.status === '欠席') {
+                                attendanceMark = '<span class="attendance-absent">✕</span>'; 
+                            }
+                            if(attendanceMark) {
+                               eventsHtml = `<div class="attendance-list">${attendanceMark}</div>`;
                             }
                         }
                     }
