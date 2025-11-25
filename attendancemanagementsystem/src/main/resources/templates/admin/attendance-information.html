@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生徒出席情報</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    
+    <link rel="stylesheet" th:href="@{/css/adminattendance.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+    
+
+    <div class="attendance-container">
+        
+        <div class="top-info-bar">
+            <div class="timer-section">
+                <div class="timer-display">00:00</div>
+            </div>
+            
+            <div class="center-title">
+                <h1>生徒出席情報</h1>
+                <p>12月 13日 1限目 231教室</p>
+            </div>
+            
+            <div class="tool-area">
+                <button class="tool-btn filter-btn">
+                    <i class="fa-solid fa-filter"></i>
+                </button>
+                
+                <button class="tool-btn bulk-btn">
+                    一括選択
+                </button>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="attendance-table">
+                <colgroup>
+                    <col style="width: 8%;">  <col style="width: 8%;">  <col style="width: 25%;"> <col style="width: 15%;"> <col style="width: 34%;"> <col style="width: 10%;"> </colgroup>
+                <thead>
+                    <tr>
+                        <th>学年</th>
+                        <th>クラス</th>
+                        <th>氏名</th>
+                        <th>認証時間</th>
+                        <th>ステータス</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="row-absent">
+                        <td>2</td>
+                        <td>AA</td>
+                        <td>川島 未裕</td>
+                        <td>-</td>
+                        <td class="status-cell-absent">欠席</td>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                    </tr>
+                    <tr class="row-absent">
+                        <td>2</td>
+                        <td>AA</td>
+                        <td>XXXX XXXX</td>
+                        <td>-</td>
+                        <td class="status-cell-absent">欠席</td>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                    </tr>
+                    <tr class="row-present">
+                        <td>2</td>
+                        <td>AA</td>
+                        <td>XXXX XXXX</td>
+                        <td>09:51</td>
+                        <td class="status-cell-present">出席(変更済)</td>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                    </tr>
+                    <tr class="row-present">
+                        <td>2</td>
+                        <td>AA</td>
+                        <td>XXXX XXXX</td>
+                        <td>09:39</td>
+                        <td class="status-cell-present">出席</td>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                    </tr>
+                    <tr class="row-present">
+                        <td>2</td>
+                        <td>AA</td>
+                        <td>XXXX XXXX</td>
+                        <td>09:35</td>
+                        <td class="status-cell-present">出席</td>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                    </tr>
+                    <tr class="row-present">
+                        <td>2</td>
+                        <td>AA</td>
+                        <td>XXXX XXXX</td>
+                        <td>09:39</td>
+                        <td class="status-cell-present">出席</td>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                    </tr>
+                    <tr class="row-present">
+                        <td>2</td>
+                        <td>AA</td>
+                        <td>XXXX XXXX</td>
+                        <td>09:40</td>
+                        <td class="status-cell-present">出席</td>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                    </tr>
+                    <tr class="row-public">
+                        <td>2</td>
+                        <td>AA</td>
+                        <td>XXXX XXXX</td>
+                        <td>-</td>
+                        <td class="status-cell-public">公欠候補</td>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                    </tr>
+                    <tr class="row-absent">
+                        <td>2</td>
+                        <td>AA</td>
+                        <td>XXXX XXXX</td>
+                        <td>-</td>
+                        <td class="status-cell-absent">欠席</td>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer-action">
+            <button class="close-session-btn">セッションを閉じる</button>
+        </div>
+
+    </div>
+
+</body>
+</html>

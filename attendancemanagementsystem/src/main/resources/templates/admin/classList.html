@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>授業一覧</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/adminlist.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+ <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/login')}"></div>
+    </div>
+
+    <div class="list-container">
+        
+        <h1 class="page-title">授業一覧</h1>
+
+        <div class="controls-area">
+            
+
+            <div class="search-section">
+                <form action="#" method="get" class="search-form-row">
+                    <input type="text" name="searchDate" class="search-input" value="20240814">
+                    <button type="submit" class="search-btn">
+                        検索 <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </form>
+                
+                <div class="error-message">日付が正しくない又は未定です</div>
+            </div>
+            
+        </div>
+
+        <div class="date-header">2024/11/14(木)</div>
+
+        <div class="table-wrapper">
+            <table class="class-list-table">
+                <colgroup>
+                    <col class="col-period">
+                    <col class="col-subject">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>時限</th>
+                        <th>教科名/教室名</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="period-cell">1</td>
+                        <td class="subject-cell">
+                            <a href="#" class="subject-link"></a>
+                            <span class="room-name"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="period-cell">2</td>
+                        <td class="subject-cell">
+                            <a href="#" class="subject-link"></a>
+                            <span class="room-name"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="period-cell">3</td>
+                        <td class="subject-cell">
+                            <a href="#" class="subject-link"></a>
+                            <span class="room-name"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="period-cell">4</td>
+                        <td class="subject-cell">
+                            <a href="#" class="subject-link"></a>
+                            <span class="room-name"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="period-cell">5</td>
+                        <td class="subject-cell">
+                            <a href="#" class="subject-link"></a>
+                            <span class="room-name"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,193 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px; 
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* =========================================
+   スケジュール画面レイアウト
+   ========================================= */
+.schedule-container {
+    width: 98%; 
+    max-width: none; 
+    margin: 0 auto;
+    /* ヘッダー(約80px)分の余白 */
+    padding-top: 100px; 
+    padding-bottom: 30px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* --- 上段エリア：プルダウンとカレンダー --- */
+.controls-top-row {
+    display: flex;
+    justify-content: space-between; /* 左右端に配置 */
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 5px;
+}
+
+/* 左側：ユーザー選択プルダウン */
+.user-select {
+    padding: 5px 10px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: white;
+    min-width: 150px;
+    cursor: pointer;
+}
+
+/* 右側：カレンダーリンク */
+.calendar-link {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+.calendar-link i {
+    font-size: 1.3rem;
+}
+
+/* --- 下段エリア：週ナビゲーションと退出ボタン --- */
+.controls-bottom-row {
+    position: relative;
+    display: flex;
+    justify-content: center; /* 中央揃え */
+    align-items: center;
+    margin-bottom: 15px;
+    min-height: 40px;
+}
+
+/* 週ナビゲーション (中央) */
+.week-navigation {
+    display: flex;
+    align-items: baseline;
+    gap: 15px;
+}
+
+.nav-arrow {
+    background: none;
+    border: none;
+    color: #5aaeb6;
+    font-size: 1.8rem;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0 5px;
+}
+
+.week-info {
+    font-weight: bold;
+    color: #333;
+    font-size: 1.2rem;
+}
+.week-num {
+    font-size: 1.6rem;
+    margin-right: 5px;
+}
+.triangle {
+    font-size: 0.8rem;
+    color: #5aaeb6;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+/* 退出ボタン (右端) */
+.exit-icon-container {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.exit-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #5aaeb6; /* 水色の枠線 */
+    border-radius: 5px;
+    color: #5aaeb6;
+    font-size: 1.4rem;
+    text-decoration: none;
+    background-color: white;
+    transition: background-color 0.3s;
+}
+.exit-btn:hover {
+    background-color: #f0fcfd;
+}
+
+
+/* =========================================
+   スケジュールテーブル設定
+   ========================================= */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto; 
+    background-color: #fff;
+    border: 1px solid #999;
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    table-layout: fixed;
+    min-width: 900px;
+}
+
+/* 列幅定義 */
+.col-time { width: 100px; }
+.col-day { width: calc((100% - 100px) / 7); }
+
+/* セル共通設定 */
+.schedule-table th,
+.schedule-table td {
+    border: 1px solid #999;
+    padding: 5px;
+    vertical-align: middle;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* ヘッダー行 */
+.schedule-table thead th {
+    background-color: #5aaeb6; /* 画像の水色 */
+    color: white;
+    font-weight: normal;
+    padding: 10px 0;
+    font-size: 1rem;
+}
+
+/* 時間列セル (左端) */
+.schedule-table tbody .time-cell {
+    background-color: #d0dfe2; /* 薄いグレー/水色 */
+    color: #333;
+    font-weight: bold;
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
+/* 通常セル */
+.schedule-table tbody td {
+    height: 60px;
+    color: #333;
+}
