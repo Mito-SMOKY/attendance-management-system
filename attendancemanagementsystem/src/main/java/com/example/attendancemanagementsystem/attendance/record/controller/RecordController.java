@@ -40,6 +40,4 @@ public class RecordController {
             return ResponseEntity.status(500).body("Error processing attendance data");
         }
     }
-
-    
 }

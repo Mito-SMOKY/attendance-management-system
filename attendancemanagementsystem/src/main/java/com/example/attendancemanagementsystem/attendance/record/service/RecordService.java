@@ -1,65 +1,72 @@
 package com.example.attendancemanagementsystem.attendance.record.service;
-import com.example.attendancemanagementsystem.attendance.record.dto.RecordDTO; 
-import org.springframework.beans.factory.annotation.Value;
+
+import com.example.attendancemanagementsystem.attendance.record.dto.RecordDTO;
+import com.example.attendancemanagementsystem.common.entity.CardsEntity;
+import com.example.attendancemanagementsystem.common.repository.CardsRepository;
 import org.springframework.stereotype.Service;
-import java.nio.charset.StandardCharsets;
+
+import java.util.Optional;
 
 @Service
 public class RecordService {
 
-    private final byte[] xorKey;
+    private final CardsRepository cardsRepository;
+    private final DecryptionService decryptionService;
 
-    // application.properties から復号キーを読み込む
-    public RecordService(@Value("${nfc.security.xor-key}") String xorKeyString) {
-        this.xorKey = xorKeyString.getBytes(StandardCharsets.UTF_8);
+    public RecordService(
+        CardsRepository cardsRepository,
+        DecryptionService decryptionService
+    ) {
+        this.cardsRepository = cardsRepository;
+        this.decryptionService = decryptionService;
     }
 
-    /**
-     * メイン処理 (Controllerから呼ばれる)
-     */
-    public void processAttendanceScan(RecordDTO recordDTO) { // (DTOのクラス名を使用)
+    public void processAttendanceScan(RecordDTO recordDTO) {
         
-        // DTOの 'getUserId()' メソッドを使って暗号化IDを取得
+        // --- 1. 復号処理 ---
         String encryptedHex = recordDTO.getUserId(); 
+        String originalUserIdString = decryptionService.decryptUserId(encryptedHex);
         
-        // 1. 復号処理
-        String originalUserId = decryptUserId(encryptedHex);
+        Integer originalUserId;
+        try {
+            originalUserId = Integer.parseInt(originalUserIdString);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("復号されたユーザーIDが不正な形式です: " + originalUserIdString);
+        }
 
-        // 2. ログに出力 (DTOの各Getterを使用)
+        // --- 2. カードIDの取得 (修正箇所) ---
+        // ★ Integerへの変換を廃止し、そのまま文字列として使用
+        String cardId = recordDTO.getCardId(); 
+
+        if (cardId == null || cardId.isEmpty()) {
+             throw new IllegalArgumentException("カードIDが空です。");
+        }
+
+        // --- 3. データベース検証 ---
+        
+        // ★ String型のまま検索
+        Optional<CardsEntity> cardOptional = cardsRepository.findByCardId(cardId);
+        
+        if (!cardOptional.isPresent()) {
+            throw new IllegalArgumentException("指定されたカードID(" + cardId + ")が見つかりません。");
+        }
+        
+        CardsEntity card = cardOptional.get();
+
+        if (!card.getIsActive()) {
+            throw new IllegalStateException("カードID(" + cardId + ")は無効化されています。");
+        }
+        
+        if (!card.getUserId().equals(originalUserId)) {
+            throw new IllegalStateException("カードに紐づくユーザーIDと復号されたユーザーID(" + originalUserId + ")が一致しません。");
+        }
+
+        // --- 4. ログ出力 ---
         System.out.println("==================================");
-        System.out.println("NFCデータ 出欠記録 (復号成功)");
-        System.out.println("  カードID: " + recordDTO.getCardId()); 
+        System.out.println("NFCデータ 検証完了");
+        System.out.println("  カードID: " + cardId); 
         System.out.println("  ユーザID: " + originalUserId);
-        System.out.println("  出席時間: " + recordDTO.getReadTime());
-        System.out.println("  リーダーID: " + recordDTO.getReaderId()); 
+        System.out.println("  読取日時: " + recordDTO.getReadTime());
         System.out.println("==================================");
-    }
-
-    // --- 復号ロジック ---
-    private String decryptUserId(String encryptedHex) {
-        if (encryptedHex == null || encryptedHex.isEmpty()) {
-            throw new IllegalArgumentException("Encrypted User ID is null or empty.");
-        }
-        byte[] encryptedData = hexStringToByteArray(encryptedHex);
-        byte[] decryptedData = new byte[encryptedData.length];
-        
-        for (int i = 0; i < encryptedData.length; i++) {
-            decryptedData[i] = (byte) (encryptedData[i] ^ xorKey[i % xorKey.length]);
-        }
-        return new String(decryptedData, StandardCharsets.UTF_8).trim();
-    }
-
-    // --- 16進文字列 -> byte[] 変換 ---
-    private byte[] hexStringToByteArray(String hex) {
-        int len = hex.length();
-        if (len % 2 != 0) {
-            throw new IllegalArgumentException("Hex string must have an even length.");
-        }
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
-                                 + Character.digit(hex.charAt(i + 1), 16));
-        }
-        return data;
     }
 }
