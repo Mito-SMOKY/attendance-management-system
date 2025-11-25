@@ -319,9 +319,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const dateText = modalDateEl.textContent; 
             const parts = dateText.match(/(\d+)年 (\d+)月 (\d+)日/);
             
-            if (!parts) {
-                console.error("モーダルの日付が不正です:", dateText);
-                alert("日付が読み取れませんでした。");
+            if (!date) {
+                console.error("日付データが見つかりません。");
+                alert("日付エラーが発生しました。");
                 return;
             }
             

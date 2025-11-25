@@ -127,7 +127,11 @@ a {
     /* width を削除し、padding で左右の余白を調整 */
     padding: 10px 20px; /* 左右の余白で幅が決まる */
     /* ▲▲▲ ここを修正 ▲▲▲ */
+<<<<<<< develop
+}
+=======
     
+>>>>>>> feat/studentmain-front/#37
 
 
 /* 戻るボタンのCSS */

@@ -1,6 +1,6 @@
 package com.example.attendancemanagementsystem.common.entity;
 
-import java.time.LocalDateTime; // LocalDateTime をインポート
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,26 +22,32 @@ public class AttendanceEntity {
     @Column(name = "AttendanceID")
     private Integer attendanceId;
 
-    @Column(name = "StatusID")
-    private Integer statusId; // ※本来は AttendanceStatusEntity への @ManyToOne
+    // AttendanceStatus との紐づけ
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "StatusID", nullable = false)
+    private AttendanceStatusEntity status;
 
-    @Column(name = "CreatedAt")
+    @Column(name = "CreatedAt", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // --- 関連定義 ---
-
-    // Attendance(多) 対 Timetable(1)
+    // 変数名を 'timeTable' にすることで getTimeTable() が生成されます
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TimeTableID") // DBのFKカラム名
-    private TimetableEntity timetable;
+    @JoinColumn(name = "TimeTableID", nullable = false) 
+    private TimetableEntity timeTable;
 
-    // Attendance(多) 対 Student(1)
+    // UserID (Student) との紐づけ
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserID") // DBのFKカラム名
+    @JoinColumn(name = "UserID", nullable = false) 
     private StudentEntity student;
 
     // --- コンストラクタ ---
     public AttendanceEntity() {
+    }
+
+    // --- 保存時に日時を自動セット ---
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 
     // --- ゲッター・セッター ---
@@ -52,12 +59,13 @@ public class AttendanceEntity {
         this.attendanceId = attendanceId;
     }
 
-    public Integer getStatusId() {
-        return statusId;
+    
+    public AttendanceStatusEntity getStatus() {
+        return status;
     }
 
-    public void setStatusId(Integer statusId) {
-        this.statusId = statusId;
+    public void setStatus(AttendanceStatusEntity status) {
+        this.status = status;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -68,13 +76,12 @@ public class AttendanceEntity {
         this.createdAt = createdAt;
     }
 
-    // 関連のゲッター・セッター
-    public TimetableEntity getTimetable() {
-        return timetable;
+    public TimetableEntity getTimeTable() {
+        return timeTable;
     }
 
-    public void setTimetable(TimetableEntity timetable) {
-        this.timetable = timetable;
+    public void setTimeTable(TimetableEntity timeTable) {
+        this.timeTable = timeTable;
     }
 
     public StudentEntity getStudent() {

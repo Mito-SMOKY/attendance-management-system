@@ -1,4 +1,4 @@
-package com.example.attendancemanagementsystem.student.service;
+package com.example.attendancemanagementsystem.user.calendar.service;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.data.repository.query.Param; // (未使用のため削除)
-// import org.springframework.data.web.PageableDefault; // (未使用のため削除)
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.attendancemanagementsystem.attendance.display.dto.DailyAttendanceDto;
+import java.util.stream.Collectors;
 
 //common パスからインポート
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
@@ -82,14 +82,23 @@ public class StudentService {
 
         // 2. UsersEntity から StudentEntity を取得
         Optional<StudentEntity> studentOpt = studentRepository.findByUsers(currentUser);
-        
+            
         if (studentOpt.isPresent()) {
-            // student が見つかった場合のみ、出欠データを取得
             StudentEntity currentStudent = studentOpt.get();
 
-            // 5. 【出欠】データを取得
-            List<AttendanceEntity> attendances = attendanceRepository.findByStudent(currentStudent);
-            data.put("attendanceRecords", attendances);
+            // ★ ここを修正: 全件取得ではなく、期間指定で取得する
+            List<AttendanceEntity> attendanceEntities = 
+                attendanceRepository.findByStudentAndDateRange(currentStudent, startDate, endDate);
+
+            // Entity -> DTO に変換
+            List<DailyAttendanceDto> attendanceDtos = attendanceEntities.stream()
+                .map(a -> new DailyAttendanceDto(
+                    a.getTimeTable().getDate(),          // TimeTable経由で日付を取得
+                    a.getStatus().getStatusName()        // Status経由で名称("出席"など)を取得
+                ))
+                .collect(Collectors.toList());
+
+            data.put("attendanceRecords", attendanceDtos);
         }
         // (student が見つからなくても、カレンダーは表示したいので else は不要)
 
@@ -121,4 +130,15 @@ public class StudentService {
         // 4. DBに保存 (INSERT)
         calendarRepository.save(newEvent);
     }
+
+    /**
+     * 【書き込み系】カレンダー予定を削除する
+     * @param calendarId 削除対象の予定ID
+     */
+    @Transactional // (readOnly = false) を明示的に設定。これによりデータの変更が可能に。
+    public void deleteCalendarEvent(Integer calendarId) {
+        // IDを指定して予定を削除する
+        calendarRepository.deleteById(calendarId);
+    }
+
 }
