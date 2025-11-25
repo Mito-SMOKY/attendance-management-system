@@ -1,9 +1,27 @@
 <link rel="stylesheet" th:href="@{/css/parts.css}">
 
-<div th:fragment="backButton(url)">
+<!-- <div th:fragment="backButton(url)">
     <a th:href="@{${url}}" class="backbutton">戻る</a>
+</div> -->
+
+<!-- 前画面に戻るだけ -->
+<div th:fragment="historyBackButton">
+    <button type="button" 
+            onclick="history.back()" 
+            class="backbutton">戻る
+    </button>
 </div>
 
+<!-- 遷移先URLを保持して戻る -->
+<div th:fragment="backButton(url)">
+    <button type="button" 
+            th:onclick="'location.href=\'' + @{${url}} + '\''" 
+             class="backbutton">戻る
+    </button>
+</div>
+
+
+<!-- 生徒用ヘッダー -->
 <div th:fragment="header-container">
     <header class="main-header">
         
@@ -12,10 +30,10 @@
         </div>
         <nav class="header-nav">
             <ul>
-                <li><a href="#">日付</a></li>
+                <li><a th:href="@{/main_calendar}">日付</a></li>
                 <li><a href="#">教科</a></li>
                 <li><a href="#">生徒</a></li>
-                <li><a href="#">その他</a></li>
+                <li><a th:href="@{/request_main}">その他</a></li>
             </ul>
         </nav>
         <div class="header-right">
