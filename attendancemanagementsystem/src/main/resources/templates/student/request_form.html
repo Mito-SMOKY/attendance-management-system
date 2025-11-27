@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公欠申請フォーム</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    
+    <link rel="stylesheet" th:href="@{/css/request.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header}"></div>
+    </div>
+
+    <div th:replace="~{fragments/_parts :: backButton(url=@{/request_main})}"></div>
+    
+    <main class="content-wrapper">
+    
+        <div class="form-container">
+            <table class="request-form-table">
+                <tr>
+                    <th>公欠申請日</th>
+                    <td>
+                        <!-- controllerから日付リストをモデルで受け取る -->
+                        <div class="date-selection">
+                             <select class="date-select" id="startYear" name="startYear">
+                                <option th:each="year : ${years}" 
+                                        th:value="${year}" 
+                                        th:text="${year}">
+                                </option>
+                            </select> 年
+                                
+                            <select class="date-select" id="startMonth" name="startMonth">
+                                <option th:each="month : ${months}" 
+                                        th:value="${month}" 
+                                        th:text="${month}">
+                                </option>
+                            </select> 月
+                                
+                            <select class="date-select" id="startDay" name="startDay">
+                                <option th:each="day : ${days}" 
+                                        th:value="${day}" 
+                                        th:text="${day}">
+                                </option>
+                            </select> 日  ~ 
+
+                            <select class="date-select" id="endYear" name="endYear">
+                                <option th:each="year : ${years}" 
+                                        th:value="${year}" 
+                                        th:text="${year}">
+                                </option>
+                            </select> 年
+                                
+                            <select class="date-select" id="endMonth" name="endMonth">
+                                <option th:each="month : ${months}" 
+                                        th:value="${month}" 
+                                        th:text="${month}">
+                                </option>
+                            </select> 月
+                                
+                            <select class="date-select" id="endDay" name="endDay">
+                                <option th:each="day : ${days}" 
+                                        th:value="${day}" 
+                                        th:text="${day}">
+                                </option>
+                            </select> 日
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th>公欠申請時間</th>
+                    <td>
+                        <div class="time-checkboxes">
+                            <label class="checkbox-item"><input type="checkbox"> 全て</label>
+                            <label class="checkbox-item"><input type="checkbox"> 1限目</label>
+                            <label class="checkbox-item"><input type="checkbox"> 2限目</label>
+                            <label class="checkbox-item"><input type="checkbox"> 3限目</label>
+                            <label class="checkbox-item"><input type="checkbox"> 4限目</label>
+                            <label class="checkbox-item"><input type="checkbox"> 5限目</label>
+                        </div>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th>公欠理由</th>
+                    <td>
+                        <textarea class="reason-textarea" placeholder="例）〇〇株式会社へ会社見学に行きます。"></textarea>
+                    </td>
+                </tr>
+            </table>
+            
+            <div class="confirm-button-wrapper">
+                <button class="confirm-button">確定</button>
+            </div>
+        </div>
+        
+    </main>
+
+</body>
+
+
+<!-- 申請日のイベント管理script -->
+
+<script src="/js/request_form.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    
+    const startYear = document.getElementById('startYear');
+    const startMonth = document.getElementById('startMonth');
+    const startDay = document.getElementById('startDay'); // 初期の日の値を保持
+    
+    // 初期表示時に一度、最大日数を設定する
+    updateDayOptions('startYear', 'startMonth', 'startDay');
+
+    // 年と月が変更されたときに、日のドロップダウンを更新するイベントを設定
+    if (startYear && startMonth) {
+        startYear.addEventListener('change', () => {
+            updateDayOptions('startYear', 'startMonth', 'startDay');
+        });
+
+        startMonth.addEventListener('change', () => {
+            updateDayOptions('startYear', 'startMonth', 'startDay');
+        });
+    }
+});
+
+    const startYear = document.getElementById('startYear');
+    const startMonth = document.getElementById('startMonth');
+    if (startYear && startMonth) {
+        updateDayOptions('startYear', 'startMonth', 'startDay'); // 初期化
+        startYear.addEventListener('change', () => { updateDayOptions('startYear', 'startMonth', 'startDay'); });
+        startMonth.addEventListener('change', () => { updateDayOptions('startYear', 'startMonth', 'startDay'); });
+    }
+    
+    // --- 終了日用のイベントリスナー 
+    const endYear = document.getElementById('endYear');
+    const endMonth = document.getElementById('endMonth');
+    
+    if (endYear && endMonth) {
+        // 初期表示時に一度、最大日数を設定する
+        updateDayOptions('endYear', 'endMonth', 'endDay'); 
+
+        // 年が変更されたときに、日のドロップダウンを更新
+        endYear.addEventListener('change', () => {
+            updateDayOptions('endYear', 'endMonth', 'endDay');
+        });
+
+        // 月が変更されたときに、日のドロップダウンを更新
+        endMonth.addEventListener('change', () => {
+            updateDayOptions('endYear', 'endMonth', 'endDay');
+        });
+    }
+</script>
+
+</html>

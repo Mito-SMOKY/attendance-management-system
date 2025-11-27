@@ -49,7 +49,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 break;
             } else if (role.equals("ROLE_STUDENT")) {
                 // 生徒（UserTypeID=1）用のメインメニュー
-                targetUrl = "/student/home"; 
+                targetUrl = "/student/main_calendar"; 
                 break;
             }
         }
