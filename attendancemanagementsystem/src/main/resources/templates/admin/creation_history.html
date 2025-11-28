@@ -66,19 +66,6 @@
         background-color: #0056b3;
       }
 
-      /* CSV保存ボタン (緑) */
-      .btn-csv {
-        color: #fff;
-        background-color: #28a745;
-        padding: 5px 10px;
-        border-radius: 4px;
-        margin-left: 10px;
-        font-size: 0.9em;
-      }
-      .btn-csv:hover {
-        background-color: #1e7e34;
-      }
-
       .back-link {
         display: inline-block;
         margin-top: 20px;
@@ -99,20 +86,19 @@
     <table>
       <thead>
         <tr>
-          <th style="width: 50px">ID</th>
           <th>リスト名</th>
           <th>作成者</th>
           <th>作成日時</th>
-          <th style="width: 200px">操作</th>
+          <th style="width: 100px">操作</th>
         </tr>
       </thead>
       <tbody>
         <tr th:if="${#lists.isEmpty(datalists)}">
-          <td colspan="5" style="text-align: center">履歴はありません。</td>
+          <td colspan="4" style="text-align: center">履歴はありません。</td>
         </tr>
 
         <tr th:each="item : ${datalists}">
-          <td th:text="${item.dataListId}"></td>
+          <td th:text="${item.dataListId}" style="display: none"></td>
           <td th:text="${item.dataListName}"></td>
 
           <td>
@@ -127,12 +113,6 @@
               th:href="@{/admin/temp-account-list/{id}(id=${item.dataListId})}"
               class="btn-detail"
               >詳細確認</a
-            >
-
-            <a
-              th:href="@{/admin/download-temp-file/{id}(id=${item.dataListId})}"
-              class="btn-csv"
-              >CSV保存</a
             >
           </td>
         </tr>

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +23,7 @@ import com.example.attendancemanagementsystem.common.repository.StudentRepositor
 import com.example.attendancemanagementsystem.common.repository.TimetableRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 
+
 @Service
 @Transactional(readOnly = true)
 public class StudentService {
@@ -30,12 +31,12 @@ public class StudentService {
     // --- 6つのリポジトリを注入 ---
     private final UsersRepository usersRepository;
     private final StudentRepository studentRepository;
-    private final EnrollmentsRepository enrollmentsRepository;
-    private final TimetableRepository timetableRepository;
+    // private final EnrollmentsRepository enrollmentsRepository;
+    // private final TimetableRepository timetableRepository;
     private final AttendanceRepository attendanceRepository;
     private final CalendarRepository calendarRepository;
 
-    @Autowired
+    
     public StudentService(UsersRepository usersRepository,
                           StudentRepository studentRepository,
                           EnrollmentsRepository enrollmentsRepository,
@@ -44,8 +45,8 @@ public class StudentService {
                           CalendarRepository calendarRepository) {
         this.usersRepository = usersRepository;
         this.studentRepository = studentRepository;
-        this.enrollmentsRepository = enrollmentsRepository;
-        this.timetableRepository = timetableRepository;
+        // this.enrollmentsRepository = enrollmentsRepository;
+        // this.timetableRepository = timetableRepository;
         this.attendanceRepository = attendanceRepository;
         this.calendarRepository = calendarRepository;
     }
@@ -135,7 +136,7 @@ public class StudentService {
      * @param calendarId 削除対象の予定ID
      */
     @Transactional // (readOnly = false) を明示的に設定。これによりデータの変更が可能に。
-    public void deleteCalendarEvent(Integer calendarId) {
+    public void deleteCalendarEvent(@NonNull Integer calendarId) {
         // IDを指定して予定を削除する
         calendarRepository.deleteById(calendarId);
     }
