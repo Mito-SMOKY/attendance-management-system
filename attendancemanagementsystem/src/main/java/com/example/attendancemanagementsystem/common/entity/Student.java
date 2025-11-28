@@ -39,7 +39,7 @@ public class Student {
     @OneToOne(cascade = CascadeType.ALL)
     @MapsId // StudentのIDはUsersのIDと同じものを使う設定
     @JoinColumn(name = "UserID") 
-    private Users user;
+    private UsersEntity user;
 
     // --- Getter / Setter ---
     public Integer getUserId() { return userId; }
@@ -56,6 +56,6 @@ public class Student {
     public boolean isDeleteFlag() { return deleteFlag; }
     public void setDeleteFlag(boolean deleteFlag) { this.deleteFlag = deleteFlag; }
 
-    public Users getUser() { return user; }
-    public void setUser(Users user) { this.user = user; }
+    public UsersEntity getUser() { return user; }
+    public void setUser(UsersEntity user) { this.user = user; }
 }

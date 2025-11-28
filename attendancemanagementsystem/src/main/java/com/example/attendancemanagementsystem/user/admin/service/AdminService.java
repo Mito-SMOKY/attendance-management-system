@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.attendancemanagementsystem.common.entity.Datalist;
 import com.example.attendancemanagementsystem.common.entity.Student;
-import com.example.attendancemanagementsystem.common.entity.Users;
+import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.DatalistRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
@@ -71,7 +71,7 @@ public class AdminService {
                     continue;
                 }
 
-                Users user = new Users();
+                UsersEntity user = new UsersEntity();
                 user.setName(acc.getName());
                 user.setLoginId(acc.getLoginId());
                 String rawPassword = acc.getPassword();
@@ -120,7 +120,7 @@ public class AdminService {
                 }
                 seenIds.add(loginId);
 
-                Users user = new Users();
+                UsersEntity user = new UsersEntity();
                 user.setName(acc.getName());
                 user.setLoginId(loginId);
                 user.setPassword(passwordEncoder.encode(acc.getPassword()));

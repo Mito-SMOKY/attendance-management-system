@@ -39,7 +39,7 @@ public class Datalist {
 
     @ManyToOne
     @JoinColumn(name = "Creator", insertable = false, updatable = false)
-    private Users creatorUser;
+    private UsersEntity creatorUser;
 
     // --- Getter / Setter ---
 
@@ -83,11 +83,11 @@ public class Datalist {
         this.students = students;
     }
 
-    public Users getCreatorUser() {
+    public UsersEntity getCreatorUser() {
         return creatorUser;
     }
 
-    public void setCreatorUser(Users creatorUser) {
+    public void setCreatorUser(UsersEntity creatorUser) {
         this.creatorUser = creatorUser;
     }
 

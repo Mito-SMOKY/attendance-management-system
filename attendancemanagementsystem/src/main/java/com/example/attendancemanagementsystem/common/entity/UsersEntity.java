@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 // @Data // Lombokは使わないので削除
 @Entity
 @Table(name = "Users")
-public class Users {
+public class UsersEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

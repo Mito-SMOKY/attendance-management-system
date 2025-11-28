@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.example.attendancemanagementsystem.common.entity.Users;
+import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 
 @Service
@@ -28,7 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String loginIdOrEmail) throws UsernameNotFoundException {
 
         // 1. まずLoginIDで検索を試みる
-        Users user = usersRepository.findByLoginId(loginIdOrEmail)
+        UsersEntity user = usersRepository.findByLoginId(loginIdOrEmail)
                 // 2. もしLoginIDで見つからなければ、次にEmailで検索を試みる
                 .or(() -> usersRepository.findByEmail(loginIdOrEmail))
                 // 3. どちらでも見つからなければ例外をスローする
