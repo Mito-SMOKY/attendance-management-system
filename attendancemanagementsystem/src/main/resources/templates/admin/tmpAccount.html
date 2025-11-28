@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>仮アカウント管理</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
+      .container {
+        display: flex;
+        gap: 20px;
+      }
+      .card {
+        border: 1px solid #ccc;
+        padding: 20px;
+        width: 250px;
+        text-align: center;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .card h3 {
+        margin-top: 0;
+        color: #333;
+      }
+      .btn {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+      }
+      .btn:hover {
+        background-color: #218838;
+      }
+      .back-link {
+        display: inline-block;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>仮アカウント管理メニュー</h1>
+    <p>行いたい操作を選択してください。</p>
+
+    <div class="container">
+      <div class="card">
+        <h3>ファイル一括登録</h3>
+        <p>CSVファイルを読み込んで<br />一括登録します。</p>
+        <a th:href="@{/admin/upload}" class="btn">ファイル読込</a>
+      </div>
+
+      <div class="card">
+        <h3>手動登録</h3>
+        <p>画面上で一人ずつ<br />入力して登録します。</p>
+        <a th:href="@{/admin/manual-input}" class="btn">手動入力</a>
+      </div>
+
+      <div class="card">
+        <h3>作成履歴</h3>
+        <p>過去に作成したリストの<br />確認・詳細表示を行います。</p>
+        <a th:href="@{/admin/creation-history}" class="btn">履歴を見る</a>
+      </div>
+    </div>
+
+    <br />
+    <a th:href="@{/admin/home}" class="back-link">← 管理者ホームへ戻る</a>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ファイルアップロード</title>
+  </head>
+  <body>
+    <h1>ファイル一括登録</h1>
+
+    <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red"></p>
+
+    <form
+      th:action="@{/admin/upload-file}"
+      method="post"
+      enctype="multipart/form-data"
+    >
+      <label>CSVファイルを選択:</label>
+      <input type="file" name="file" accept=".csv" required />
+      <br /><br />
+      <button type="submit">読み込み</button>
+    </form>
+
+    <br />
+    <a th:href="@{/admin/tmpAccount}">戻る</a>
+  </body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>作成履歴</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
+
+      /* メッセージ表示エリアのスタイル */
+      .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+      }
+      .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+      }
+      .alert-warning {
+        color: #856404;
+        background-color: #fff3cd;
+        border-color: #ffeeba;
+      }
+
+      /* テーブルのスタイル */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        white-space: nowrap;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      /* リンク・ボタンのスタイル */
+      a {
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      /* 詳細確認ボタン (青) */
+      .btn-detail {
+        color: #fff;
+        background-color: #007bff;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      .btn-detail:hover {
+        background-color: #0056b3;
+      }
+
+      /* CSV保存ボタン (緑) */
+      .btn-csv {
+        color: #fff;
+        background-color: #28a745;
+        padding: 5px 10px;
+        border-radius: 4px;
+        margin-left: 10px;
+        font-size: 0.9em;
+      }
+      .btn-csv:hover {
+        background-color: #1e7e34;
+      }
+
+      .back-link {
+        display: inline-block;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>作成履歴一覧</h1>
+    <p>システムに登録された仮アカウントリストの一覧です。</p>
+
+    <div th:if="${successMessage}" class="alert alert-success">
+      <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${warningMessage}" class="alert alert-warning">
+      <span th:text="${warningMessage}"></span>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 50px">ID</th>
+          <th>リスト名</th>
+          <th>作成者</th>
+          <th>作成日時</th>
+          <th style="width: 200px">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:if="${#lists.isEmpty(datalists)}">
+          <td colspan="5" style="text-align: center">履歴はありません。</td>
+        </tr>
+
+        <tr th:each="item : ${datalists}">
+          <td th:text="${item.dataListId}"></td>
+          <td th:text="${item.dataListName}"></td>
+
+          <td>
+            <span th:text="${item.creatorUser.name}"></span>
+            (<span th:text="${item.creatorUser.loginId}"></span>)
+          </td>
+
+          <td th:text="${item.createdAt}"></td>
+
+          <td>
+            <a
+              th:href="@{/admin/temp-account-list/{id}(id=${item.dataListId})}"
+              class="btn-detail"
+              >詳細確認</a
+            >
+
+            <a
+              th:href="@{/admin/download-temp-file/{id}(id=${item.dataListId})}"
+              class="btn-csv"
+              >CSV保存</a
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <a th:href="@{/admin/tmpAccount}" class="back-link">← メニューに戻る</a>
+  </body>
+</html>
