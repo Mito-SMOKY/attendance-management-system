@@ -14,16 +14,16 @@
 <body>
 
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: header}"></div>
+        <div th:replace="~{fragments/_parts :: student-header}"></div>
     </div>
 
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url=@{/main_calendar})}"></div>
+        <div th:replace="~{fragments/_parts :: backButton(url=@{/student/main_calendar})}"></div>
     </div>
 
     <div class="content-wrapper">
         <div class="action-buttons">
-            <a th:href="@{/request_form}"  class="ghost-button">公欠申請</a>
+            <a th:href="@{/student/request_form}"  class="ghost-button">公欠申請</a>
             <a th:href="@{url}"  class="ghost-button">申請履歴</a>
         </div>
     </div>

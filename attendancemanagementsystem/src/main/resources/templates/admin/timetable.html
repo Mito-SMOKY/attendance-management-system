@@ -13,7 +13,7 @@
 <body>
 
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
 
     <div class="schedule-container">
@@ -31,14 +31,15 @@
         </div>
 
         <div class="controls-bottom-row">
+            <!-- カレンダーのヘッダー -->
             <div class="week-navigation">
-                <button class="nav-arrow">＜</button>
+                <span id="prevWeekButton" class="nav-arrow">＜</span>
                 <div class="week-info">
                     <span class="week-num">2週</span>
                     11/2024
                     <span class="triangle">▼</span>
                 </div>
-                <button class="nav-arrow">＞</button>
+                <span id="nextWeekButton" class="nav-arrow">＞</span>
             </div>
             
             <div class="exit-icon-container">

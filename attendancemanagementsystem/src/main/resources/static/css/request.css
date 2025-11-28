@@ -1,12 +1,4 @@
 
-body {
-    margin: 0;
-    padding-top: 80px; /* ヘッダーの高さ分 */
-    background-color: #f9f9f9;
-    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-}
-
-
  /* メインコンテンツの共通ラッパー */
 
 .content-wrapper {
