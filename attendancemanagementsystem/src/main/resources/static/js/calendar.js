@@ -5,7 +5,6 @@ let currentViewMode = 'schedule'; // 'schedule' または 'attendance'
  * 指定された年月のカレンダーHTMLを生成する
  */
 function createCalendar(month, year) {
-    // ( ... 既存の tableHTML, 日付計算ロジック ... )
     const monthDays = ["日", "月", "火", "水", "木", "金", "土"];
     let tableHTML = '<table class="calendar"><thead><tr>';
     for (let i = 0; i < 7; i++) {
@@ -25,7 +24,6 @@ function createCalendar(month, year) {
     const today = dateObj.getDate();
     const currentMonth = dateObj.getMonth();
     const currentYear = dateObj.getFullYear();
-    // ( ... ロジックここまで ... )
 
     for (let i = 0; i < 6; i++) {
         tableHTML += '<tr>';
@@ -42,36 +40,54 @@ function createCalendar(month, year) {
                 
                 const dataDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayCount).padStart(2, '0')}`;
 
-                //currentViewMode によって描画内容を分岐　
+                // currentViewMode によって描画内容を分岐
                 let eventsHtml = '';
                 if (currentViewMode === 'schedule') {
-                    // 予定表モード
+                    // === 予定表モード ===
                     if (Array.isArray(calendarEventsData)) {
-                    const dailyEvents = calendarEventsData.filter(event => event.date === dataDate);
-                    if (dailyEvents.length > 0) {
-                        eventsHtml = '<div class="schedule-list">';
-                        dailyEvents.forEach(event => {
-                            eventsHtml += `<div class="schedule-item">${event.title}</div>`; 
-                        });
-                        eventsHtml += '</div>';
+                        const dailyEvents = calendarEventsData.filter(event => event.date === dataDate);
+                        if (dailyEvents.length > 0) {
+                            eventsHtml = '<div class="schedule-list">';
+                            dailyEvents.forEach(event => {
+                                eventsHtml += `<div class="schedule-item">${event.title}</div>`; 
+                            });
+                            eventsHtml += '</div>';
+                        }
                     }
-                }
                 } else {
+                    // === 出欠モード (修正箇所) ===
+                    if (typeof attendanceRecordsData !== 'undefined' && Array.isArray(attendanceRecordsData)) {
+                        
+                        // その日のデータを全て取得
+                        const dailyRecords = attendanceRecordsData.filter(record => record.date === dataDate);
+                        
+                        if (dailyRecords.length > 0) {
+                            let displayMark = '';
+                            let displayClass = '';
 
-                    // attendanceRecordsData が null や undefined でないか確認 
-                    if (Array.isArray(attendanceRecordsData)) {
-                        
-                        const attendanceRecord = attendanceRecordsData.find(record => record.date === dataDate);
-                        
-                        if (attendanceRecord) {
-                            let attendanceMark = '';
-                            if (attendanceRecord.status === '出席') {
-                                attendanceMark = '<span class="attendance-present">〇</span>'; 
-                            } else if (attendanceRecord.status === '欠席') {
-                                attendanceMark = '<span class="attendance-absent">✕</span>'; 
+                            // 総合判定ロジック
+                            // 1. 全てのコマが「出席」なら 〇
+                            const isAllPresent = dailyRecords.every(r => r.status === '出席');
+                            
+                            // 2. 全てのコマが「欠席」なら ✕
+                            const isAllAbsent = dailyRecords.every(r => r.status === '欠席');
+
+                            if (isAllPresent) {
+                                // 完全出席
+                                displayMark = '〇';
+                                displayClass = 'attendance-present';
+                            } else if (isAllAbsent) {
+                                // 全欠席
+                                displayMark = '✕';
+                                displayClass = 'attendance-absent';
+                            } else {
+                                // それ以外（遅刻がある、早退がある、中抜け欠席があるなど）は全て △
+                                displayMark = '△';
+                                displayClass = 'attendance-late';
                             }
-                            if(attendanceMark) {
-                                eventsHtml = `<div class="attendance-list">${attendanceMark}</div>`;
+
+                            if (displayMark) {
+                                eventsHtml = `<div class="attendance-list"><span class="${displayClass}">${displayMark}</span></div>`;
                             }
                         }
                     }
@@ -154,11 +170,6 @@ function initializeCalendar() {
 
     // カレンダーを初期描画
     renderCalendar(serverMonth, serverYear);
-    
-    // jumpButton のイベントリスナーは DOMContentLoaded で設定済み、ここでは初期値の再設定のみ
-
-
-    // --- イベントリスナーの設定はDOMContentLoadedで一度だけ行う ---
 }
 
 
@@ -206,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // モーダル関連のイベントリスナー (変更なし)
+    // モーダル関連のイベントリスナー
 
     const modal = document.getElementById('scheduleModal');
     const closeButton = document.getElementById('closeButton');
@@ -218,16 +229,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const year = dateObj.getFullYear();
         const month = dateObj.getMonth() + 1;
         const day = dateObj.getDate();
+        
         modalDateEl.textContent = `${year}年 ${month}月 ${day}日`;
+        // 日付解析を確実にするため、datasetに生の値を保存しておく
+        modalDateEl.dataset.rawDate = dateStr; 
+
         const existingListEl = document.getElementById('existing-events-list');
         if (existingListEl) {
             existingListEl.innerHTML = ''; 
             const dailyEvents = calendarEventsData.filter(event => event.date === dateStr);
             if (dailyEvents.length > 0) {
                 dailyEvents.forEach(event => {
+                    // DTOのフィールド名(calendarId)に合わせてIDを取得
                     const itemHtml = `
                         <div class="existing-item">
-                            <button class="delete-schedule-btn" data-id="${event.id}">×</button>
+                            <button class="delete-schedule-btn" type="button" data-id="${event.calendarId}">×</button>
                             <span>${event.title}</span>
                         </div>
                     `;
@@ -245,19 +261,31 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.style.display = 'none';
     }
 
+    // calendar.js (329行目付近)
+
     if (calendarTableContainerEl) {
         calendarTableContainerEl.addEventListener('click', (event) => {
-            //出欠モード時はモーダルを開かない
-            if (currentViewMode === 'attendance') {
-                return; 
-            }
+            
             const targetCell = event.target.closest('td[data-date]');
-            if (targetCell) {
-                const dateStr = targetCell.dataset.date; 
-                openModal(dateStr);
+            if (!targetCell) return; // クリック対象が日付セルでなければ何もしない
+
+            const dateStr = targetCell.dataset.date; // YYYY-MM-DD 形式
+            
+            if (currentViewMode === 'attendance') {
+                // **出欠モードの場合：詳細画面へ遷移**
+                // 遷移先のURLに日付パラメータを付与 (例: /student/periodAttendance?date=2025-11-25)
+                const url = `/student/dailyAttendance?date=${dateStr}`; 
+                window.location.href = url;
+                return; // 遷移したら以降のモーダル処理はスキップ
             }
+
+            // 予定表モード (schedule) の場合は、モーダルを開く
+            // (既存のモーダル表示ロジック)
+            openModal(dateStr);
         });
     }
+
+// ... 続くコード ...
 
     function handleDeleteSchedule(button) {
         const scheduleId = button.dataset.id;
@@ -274,12 +302,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('予定を削除しました。');
                 button.closest('.existing-item').remove();
 
-                const index = calendarEventsData.findIndex(event => event.id == scheduleId); 
+                const index = calendarEventsData.findIndex(event => event.calendarId == scheduleId); 
                 if (index > -1) {
                     calendarEventsData.splice(index, 1);
                 }
-                const dateText = modalDateEl.textContent; 
-                const parts = dateText.match(/(\d+)年 (\d+)月/);
+                // カレンダー再描画
+                const parts = modalDateEl.textContent.match(/(\d+)年 (\d+)月/);
                 if (parts) {
                    const year = parseInt(parts[1], 10);
                    const month = parseInt(parts[2], 10) - 1;
@@ -316,8 +344,9 @@ document.addEventListener('DOMContentLoaded', () => {
         scheduleForm.addEventListener('submit', (event) => {
             event.preventDefault(); 
             const title = document.getElementById('scheduleTitle').value;
-            const dateText = modalDateEl.textContent; 
-            const parts = dateText.match(/(\d+)年 (\d+)月 (\d+)日/);
+            
+            // datasetから日付を取得
+            const date = modalDateEl.dataset.rawDate;
             
             if (!date) {
                 console.error("日付データが見つかりません。");
@@ -325,11 +354,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
-            const year = parts[1];
-            const month = parts[2].padStart(2, '0');
-            const day = parts[3].padStart(2, '0');
-            const date = `${year}-${month}-${day}`; 
-
             const formData = new URLSearchParams();
             formData.append('title', title);
             formData.append('date', date);
