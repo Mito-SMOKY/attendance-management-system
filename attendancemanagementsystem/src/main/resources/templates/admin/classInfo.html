@@ -6,7 +6,7 @@
     <title>授業情報</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/admininfo.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/admininfo.css}">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -17,7 +17,7 @@
     </div>
 
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/login')}"></div>
+        <div th:replace="~{fragments/_parts :: backButton(url='/classList')}"></div>
     </div>
     
     <div class="info-container">
@@ -25,7 +25,6 @@
         <h1 class="page-title">授業情報</h1>
 
         <div class="controls-area">
-        
             <button class="edit-btn">編集</button>
         </div>
 
@@ -76,7 +75,12 @@
             <div class="student-table-wrapper">
                 <table class="student-table">
                     <colgroup>
-                        <col style="width: 15%;"> <col style="width: 10%;"> <col style="width: 15%;"> <col style="width: 30%;"> <col style="width: 30%;"> </colgroup>
+                        <col style="width: 15%;"> 
+                        <col style="width: 10%;"> 
+                        <col style="width: 15%;"> 
+                        <col style="width: 30%;"> 
+                        <col style="width: 30%;"> 
+                    </colgroup>
                     <thead>
                         <tr>
                             <th>学籍番号</th>
@@ -88,27 +92,17 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td class="status-present"></td>
+                            <td></td><td></td><td></td><td></td><td class="status-present"></td>
                         </tr>
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td class="status-absent"></td>
+                            <td></td><td></td><td></td><td></td><td class="status-absent"></td>
                         </tr>
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td class="status-present"></td>
+                            <td></td><td></td><td></td><td></td><td class="status-present"></td>
                         </tr>
-                        </tbody>
+                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>

@@ -3,69 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>教科一覧</title>
+    <title>時間割一覧</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/admin/adminSubjectList.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminTimetableList2.css}">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <div class="header-container">
+<div class="header-container">
         <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
     </div>
     
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/timetable')}"></div>
+        <div th:replace="~{fragments/_parts :: backButton(url='/')}"></div>
     </div>
-
-    <div class="subject-list-container">
+    
+    <div class="timetable-container">
         
         <div class="page-header-wrapper">
-            <h1 class="page-title">教科一覧</h1>
+            <h1 class="page-title">時間割一覧</h1>
         </div>
 
-        <div class="search-filter-area">
-            
-            <form action="#" method="get" class="search-form">
-                <input type="text" class="search-input" placeholder="教科名を検索">
-            </form>
-
-            <button type="submit" class="tool-btn">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-
-            <button class="tool-btn">
-                <i class="fa-solid fa-sliders"></i>
-            </button>
-            
-        </div>
+        <form action="#" method="get" class="filter-area">
+            <select class="filter-select term-select">
+                <option>2024年度 前期</option>
+                <option>2024年度 後期</option>
+            </select>
+        </form>
 
         <div class="table-wrapper">
-            <table class="subject-table">
+            <table class="timetable-table">
                 <colgroup>
-                    <col style="width: 100%;">
-                </colgroup>
+                    <col style="width: 40%;"> <col style="width: 40%;"> <col style="width: 20%;"> </colgroup>
                 <thead>
                     <tr>
-                        <th>教科名</th>
+                        <th>学科</th>
+                        <th>コース</th>
+                        <th>学年</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
+                        <td></td> <td></td> <td></td> </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
                         <td></td>
                     </tr>
                     <tr>
                         <td></td>
-                    </tr>
-                    <tr>
+                        <td></td>
                         <td></td>
                     </tr>
                     <tr>
                         <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
                     <tr>
+                        <td></td>
+                        <td></td>
                         <td></td>
                     </tr>
                 </tbody>

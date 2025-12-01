@@ -1,0 +1,263 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px; 
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* =========================================
+   レイアウトコンテナ
+   ========================================= */
+.subject-master-container {
+    width: 95%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-top: 120px; 
+    padding-bottom: 50px;
+}
+
+/* =========================================
+   ページタイトル
+   ========================================= */
+.page-header-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    border-bottom: 3px solid #539DA4;
+    padding-bottom: 5px;
+}
+
+.backbutton-wrapper {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* =========================================
+   メインコンテンツ (左右分割)
+   ========================================= */
+.main-content-area {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* --- 左側パネル (検索 & 一覧) --- */
+.left-pane {
+    width: 350px;
+    flex-shrink: 0;
+}
+
+/* 検索エリア */
+.search-area {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;
+    gap: 5px;
+}
+
+.search-input {
+    height: 38px;
+    width: 200px;
+    padding: 5px 10px;
+    border: 1px solid #707070;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    background-color: #fff;
+}
+
+.search-btn {
+    height: 38px;
+    padding: 0 15px;
+    background-color: #539DA4;
+    border: 1px solid #539DA4;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+.search-btn:hover {
+    opacity: 0.9;
+}
+
+/* 左テーブル */
+.left-table-wrapper {
+    width: 100%;
+    border: 1px solid #999;
+    background-color: white;
+    height: auto;
+    min-height: 0;
+}
+
+.left-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.left-table th, .left-table td {
+    border: 1px solid #999;
+    padding: 12px;
+    vertical-align: middle;
+}
+
+.left-table th {
+    background-color: #539DA4;
+    color: white;
+    font-weight: normal;
+}
+
+
+/* --- 右側パネル (詳細テーブル) --- */
+.right-pane {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 右側ヘッダー */
+.right-header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 15px;
+}
+
+.grade-filter {
+    height: 38px;
+    padding: 5px 10px;
+    border: 1px solid #707070;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: #fff;
+    min-width: 120px;
+}
+
+/* 編集ボタン */
+.edit-btn {
+    height: 38px;
+    padding: 0 15px;
+    background-color: #fff;
+    border: 2px solid #539DA4;
+    border-radius: 4px;
+    color: #539DA4;
+    font-weight: bold;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    min-width: 80px;
+    width: auto;
+    white-space: nowrap;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.edit-btn:hover {
+    background-color: #539DA4;
+    color: white;
+}
+
+body.editing-mode .edit-btn {
+    background-color: #539DA4;
+    color: white;
+}
+
+/* 右テーブル (マトリックス) */
+.right-table-wrapper {
+    width: 100%;
+    border: 1px solid #999;
+    background-color: white;
+    overflow-x: auto;
+    display: block; 
+    height: auto;
+    min-height: 0; 
+}
+
+.right-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    min-width: 800px;
+}
+
+.right-table th, .right-table td {
+    border: 1px solid #999;
+    padding: 0;
+    width: 60px;
+    height: 50px;
+    vertical-align: middle;
+}
+
+.right-table th {
+    background-color: #539DA4;
+    color: white;
+    font-weight: normal;
+    padding: 10px 5px;
+}
+
+.col-subject-name {
+    width: 200px !important;
+    text-align: left;
+    padding: 0 10px !important;
+}
+
+/* ▼▼▼ 丸（マーク）と背景色のスタイル ▼▼▼ */
+.check-mark {
+    font-size: 1.5rem;
+    color: #333;
+    font-weight: bold;
+    display: none; /* デフォルトは非表示 */
+    pointer-events: none;
+}
+
+/* チェックされたセル (.checked) */
+td.checked {
+    background-color: #e0f2f1; /* 薄い青緑の背景色 */
+}
+
+td.checked .check-mark {
+    display: inline-block; /* 丸を表示 */
+}
+
+/* 編集モード時のセル操作 */
+body.editing-mode .right-table tbody td:not(.col-subject-name) {
+    cursor: pointer; /* 指カーソル */
+}
+
+/* 編集モード時にホバーしたら少し濃くする */
+body.editing-mode .right-table tbody td:not(.col-subject-name):hover {
+    background-color: #b2dfdb; /* ホバー時の色 */
+}

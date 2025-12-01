@@ -51,6 +51,38 @@ public class LoginController {
     public String showstudentInfo() {
         return "admin/studentInfo";
     }
+    @GetMapping("/home")
+    public String showadminHome() {
+        return "admin/home";
+    }
+    @GetMapping("/timeTableList2")
+    public String showtimeTableList2() {
+        return "admin/timeTableList2";
+    }
+    @GetMapping("/subjectList")
+    public String showsubjectList() {
+        return "admin/subjectList";
+    }
+    @GetMapping("/subjectInfo")
+    public String showsubjectInfo() {
+        return "admin/subjectInfo";
+    }
+    @GetMapping("/timeTableEdit")
+    public String showtimeTableEdit() {
+        return "admin/timeTableEdit";
+    }
+    @GetMapping("/mdClassroom")
+    public String showmdClassroom() {
+        return "admin/mdClassroom";
+    }
+    @GetMapping("/mdSubject")
+    public String showmdSubject() {
+        return "admin/mdSubject";
+    }
+    @GetMapping("/nfc_writer")
+    public String shownfc_riter() {
+        return "nfc/nfc_writer";
+    }
 }
 //     @GetMapping("/main_calendar")
 //     public String showMainCalendar() {
