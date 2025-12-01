@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>手動登録</title>
+    <style>
+      body {
+        padding: 20px;
+        font-family: sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .input-group {
+        margin-bottom: 15px;
+        border: 1px solid #eee;
+        padding: 15px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+      }
+      .input-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 10px;
+        align-items: center;
+      }
+      label {
+        font-weight: bold;
+        width: 100px;
+      }
+      input {
+        padding: 5px;
+        width: 200px;
+      }
+
+      /* ボタンのスタイル */
+      .btn {
+        padding: 10px 20px;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+        margin-right: 10px;
+      }
+      .btn-add {
+        background-color: #17a2b8;
+      } /* 青緑 */
+      .btn-remove {
+        background-color: #dc3545;
+      } /* 赤 */
+      .btn-save {
+        background-color: #28a745;
+        font-size: 16px;
+        margin-top: 20px;
+      } /* 緑 */
+
+      h3 {
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>手動でのアカウント登録</h1>
+    <p>登録したい学生の情報を入力してください。</p>
+
+    <form th:action="@{/admin/save-manual-accounts}" method="post">
+      <div style="margin-bottom: 20px">
+        <label style="width: auto">リスト名:</label>
+        <input
+          type="text"
+          name="datalistName"
+          placeholder="例: 2025年度新入生"
+          required
+          style="width: 300px"
+        />
+      </div>
+
+      <div id="account-container">
+        <div class="input-group">
+          <h3>No.1</h3>
+          <div class="input-row">
+            <label>ログインID</label>
+            <input
+              type="text"
+              name="accounts[0].studentNumber"
+              placeholder="ST001"
+              required
+            />
+          </div>
+          <div class="input-row">
+            <label>氏名</label>
+            <input
+              type="text"
+              name="accounts[0].name"
+              placeholder="山田 太郎"
+              required
+            />
+          </div>
+          <div class="input-row">
+            <label>パスワード</label>
+            <input
+              type="text"
+              name="accounts[0].password"
+              placeholder="初期パスワード"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-add" onclick="addAccount()">
+        ＋ 枠を追加
+      </button>
+      <button type="button" class="btn btn-remove" onclick="removeAccount()">
+        － 最後の枠を削除
+      </button>
+
+      <br /><br />
+      <button type="submit" class="btn btn-save">登録実行</button>
+    </form>
+
+    <br />
+    <a th:href="@{/admin/tmpAccount}">メニューに戻る</a>
+
+    <script>
+      function addAccount() {
+        const container = document.getElementById("account-container");
+        const count = container.children.length; // 現在の件数 (インデックス用)
+
+        // 新しい入力グループを作成
+        const newGroup = document.createElement("div");
+        newGroup.className = "input-group";
+        newGroup.innerHTML = `
+                <h3>No.${count + 1}</h3>
+                <div class="input-row">
+                    <label>ログインID</label>
+                    <input type="text" name="accounts[${count}].studentNumber" required>
+                </div>
+                <div class="input-row">
+                    <label>氏名</label>
+                    <input type="text" name="accounts[${count}].name" required>
+                </div>
+                <div class="input-row">
+                    <label>パスワード</label>
+                    <input type="text" name="accounts[${count}].password" required>
+                </div>
+            `;
+
+        container.appendChild(newGroup);
+      }
+
+      function removeAccount() {
+        const container = document.getElementById("account-container");
+        // 1件目は消さないようにする
+        if (container.children.length > 1) {
+          container.removeChild(container.lastElementChild);
+        } else {
+          alert("これ以上削除できません");
+        }
+      }
+    </script>
+  </body>
+</html>

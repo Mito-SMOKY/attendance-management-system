@@ -1,22 +1,20 @@
 package com.example.attendancemanagementsystem.user.calendar.controller;
 
-import java.time.LocalDate; 
-import java.util.Map; 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.time.LocalDate;
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.http.ResponseEntity;
 
-
-// Service パスからインポート
 import com.example.attendancemanagementsystem.user.calendar.service.StudentService;
 
 @Controller
@@ -25,7 +23,6 @@ public class StudentController {
 
     private final StudentService studentService;
 
-    @Autowired
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
     }
@@ -94,21 +91,27 @@ public class StudentController {
         // (JS側は、このリダイレクト指示(response.ok)を受けてページをリロードします)
         return "redirect:/student/main_calendar";
     }
+    // ... (中略)
+
     /**
-     * カレンダー予定を削除する（JSからの DELETEリクエストを受け付ける）
-     * JS側: fetch('/student/calendar/delete/${id}', { method: 'DELETE' })
-     * @param calendarId 削除対象の予定ID (URLのパスから取得)
-     */
-    @DeleteMapping("/calendar/delete/{calendarId}") //@DeleteMapping を使用
-    public ResponseEntity<Void> deleteCalendarEvent(@PathVariable Integer calendarId) {
+    * カレンダー予定を削除する（JSからの DELETEリクエストを受け付ける）
+    * @param calendarId 削除対象の予定ID (URLのパスから取得)
+    */
+    @DeleteMapping("/calendar/delete/{calendarId}")
+    public ResponseEntity<Void> deleteCalendarEvent(@PathVariable(required = false) Integer calendarId) {
         
-        // サービスを呼び出してDBから削除を実行
+        // 【修正点】 calendarId が null でないかチェック
+        // @PathVariable は通常 null にならないが、安全のためチェックし、
+        // null の場合は Bad Request (400) を返す
+        if (calendarId == null) {
+            return ResponseEntity.badRequest().build(); // 400 Bad Request
+        }
+        
+         // サービスを呼び出してDBから削除を実行
         studentService.deleteCalendarEvent(calendarId);
 
-        // 削除成功
-        // JS側はこれを受け取って画面をリロードする想定です。
+         // 削除成功 (204 No Content)
         return ResponseEntity.noContent().build();
     }
 
-    
 }
