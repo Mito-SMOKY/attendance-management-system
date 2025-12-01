@@ -350,26 +350,32 @@
     height: 60%; /* セルの中央付近に配置 */
 }
 
-/* 全出席 (〇) */
+/* 共通設定 */
+.attendance-present, 
+.attendance-absent, 
+.attendance-late,
+.attendance-public { /* ←ここに追加 */
+    font-size: 2.5rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* 出席 (〇) - 青緑 */
 .attendance-present {
-    color: #00bdca; /* 緑/青系 */
-    font-weight: bold;
-    font-size: 2.5rem; /* マークを大きく */
-    line-height: 1;
+    color: #00bdca; 
 }
 
-/* 全欠席 (✕) */
+/* 欠席 (×) - 赤 */
 .attendance-absent {
-    color: #ff6f65; /* 赤 */
-    font-weight: bold;
-    font-size: 2.5rem;
-    line-height: 1;
+    color: #ff6f65; 
 }
 
-/* 遅刻・早退・一部欠席 (△) */
+/* 遅刻・早退 (△) - オレンジ */
 .attendance-late {
-    color: #f39c12; /* オレンジ/黄色系 */
-    font-weight: bold;
-    font-size: 2.5rem;
-    line-height: 1;
+    color: #f39c12; 
+}
+
+/* 公欠 (〇) - 緑 */
+.attendance-public {
+    color: #28a745; /* くっきりした緑 */
 }

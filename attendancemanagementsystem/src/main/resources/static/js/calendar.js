@@ -58,30 +58,26 @@ function createCalendar(month, year) {
                     // === 出欠モード ===
                     if (typeof attendanceRecordsData !== 'undefined' && Array.isArray(attendanceRecordsData)) {
                         
-                        // その日のデータを全て取得
                         const dailyRecords = attendanceRecordsData.filter(record => record.date === dataDate);
                         
                         if (dailyRecords.length > 0) {
                             let displayMark = '';
                             let displayClass = '';
 
-                            // 総合判定ロジック
-                            // 1. 全てのコマが「出席」なら 〇
                             const isAllPresent = dailyRecords.every(r => r.status === '出席');
-                            
-                            // 2. 全てのコマが「欠席」なら ✕
                             const isAllAbsent = dailyRecords.every(r => r.status === '欠席');
+                            const isAllPublic = dailyRecords.every(r => r.status === '公欠');
 
                             if (isAllPresent) {
-                                // 完全出席
                                 displayMark = '〇';
                                 displayClass = 'attendance-present';
                             } else if (isAllAbsent) {
-                                // 全欠席
                                 displayMark = '✕';
                                 displayClass = 'attendance-absent';
+                            } else if (isAllPublic) {
+                                displayMark = '〇';
+                                displayClass = 'attendance-public';
                             } else {
-                                // それ以外（遅刻がある、早退がある、中抜け欠席があるなど）は全て △
                                 displayMark = '△';
                                 displayClass = 'attendance-late';
                             }
@@ -119,10 +115,6 @@ function createCalendar(month, year) {
     return tableHTML;
 }
 
-// ===================================================================
-// カレンダー描画関数 (メイン)
-// ===================================================================
-
 function renderCalendar(month, year) {
     const calendarYmEl = document.getElementById('calendar-ym'); 
     const calendarTableContainerEl = document.getElementById('calendar-table-container'); 
@@ -142,12 +134,31 @@ function renderCalendar(month, year) {
 
 
 // ===================================================================
-// ページ初期化処理 (pageshow/DOMContentLoadedで実行)
+// ページ初期化処理 (修正箇所)
 // ===================================================================
 
 function initializeCalendar() {
+    const viewToggleCheckbox = document.getElementById('viewToggleCheckbox');
     let serverMonth, serverYear;
     
+    // 1. URLからパラメータを取得 (?date=...&mode=...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const modeParam = urlParams.get('mode');
+
+    // 2. モードの復元処理
+    if (modeParam === 'attendance') {
+        currentViewMode = 'attendance';
+        if (viewToggleCheckbox) {
+            viewToggleCheckbox.checked = true; // トグルボタンをONにする
+        }
+    } else {
+        currentViewMode = 'schedule';
+        if (viewToggleCheckbox) {
+            viewToggleCheckbox.checked = false;
+        }
+    }
+
+    // 3. 日付の復元処理
     if (typeof serverTargetMonthString === 'undefined' || !serverTargetMonthString) {
         const fallbackDate = new Date();
         serverMonth = fallbackDate.getMonth();
@@ -172,13 +183,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initializeCalendar();
 
-
+    //表示ボタンのクリックイベント
     if (jumpButton) {
         jumpButton.addEventListener('click', () => {
             const selectedYear = parseInt(yearInput.value, 10);
             const selectedMonth = parseInt(monthInput.value, 10);
+            
+            // 現在のモードを取得
+            const currentMode = viewToggleCheckbox && viewToggleCheckbox.checked ? 'attendance' : 'schedule';
+
             if (!isNaN(selectedYear) && !isNaN(selectedMonth)) {
-                location.href = `/student/main_calendar?month=${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`;
+                // URLに &mode=... を追加して遷移
+                location.href = `/student/main_calendar?month=${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}&mode=${currentMode}`;
             } else {
                 alert("有効な年月を入力してください。");
             }
@@ -201,9 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // ========================================================
     // モーダル関連 & 画面遷移ロジック
-    // ========================================================
 
     const modal = document.getElementById('scheduleModal');
     const closeButton = document.getElementById('closeButton');
@@ -217,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const day = dateObj.getDate();
         
         modalDateEl.textContent = `${year}年 ${month}月 ${day}日`;
-        // 日付解析を確実にするため、datasetに生の値を保存しておく
         modalDateEl.dataset.rawDate = dateStr; 
 
         const existingListEl = document.getElementById('existing-events-list');
@@ -252,8 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (targetCell) {
                 const dateStr = targetCell.dataset.date;
                 
-                // ★ここが修正ポイント★
-                // 出欠モードなら詳細画面へ遷移、予定表モードならモーダルを開く
                 if (currentViewMode === 'attendance') {
                     window.location.href = `/student/attendance/date?date=${dateStr}`;
                 } else {
@@ -320,7 +331,6 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault(); 
             const title = document.getElementById('scheduleTitle').value;
             
-            // ★修正: datasetから日付を取得
             const date = modalDateEl.dataset.rawDate; 
             
             if (!date) {
