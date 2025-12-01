@@ -29,7 +29,10 @@ a {
 /* =========================================
    ヘッダー設定
    ========================================= */
-.main-header {
+
+.main-header,
+.main-header-student,
+.main-header-admin {
     z-index: 1000;
     top: 0;
     left: 0;
@@ -116,23 +119,6 @@ a {
     border-radius: 50%;
     border: 2px solid #7BCBD9; 
 }
-
-/* =========================================
-   戻るボタン設定
-   ========================================= */
-.backbutton {
-    position: relative;
-    top: 150px;
-    /* ▼▼▼ ここを修正 ▼▼▼ */
-    /* width を削除し、padding で左右の余白を調整 */
-    padding: 10px 20px; /* 左右の余白で幅が決まる */
-    /* ▲▲▲ ここを修正 ▲▲▲ */
-<<<<<<< develop
-}
-=======
-    
->>>>>>> feat/studentmain-front/#37
-
 
 /* 戻るボタンのCSS */
 
