@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教科マスタ</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminMdSubject.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='')}"></div>
+    </div>
+    
+    <div class="subject-master-container">
+        
+        <div class="page-header-wrapper">
+
+            <h1 class="page-title">教科マスタ</h1>
+        </div>
+
+        <div class="main-content-area">
+            
+            <div class="left-pane">
+                <form action="#" method="get" class="search-area">
+                    <input type="text" class="search-input" placeholder="キーワード">
+                    <button type="submit" class="search-btn">
+                        検索 <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </form>
+
+                <div class="left-table-wrapper">
+                    <table class="left-table">
+                        <thead>
+                            <tr>
+                                <th>受講教科一覧</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="subject : ${subjectList}">
+                                <td th:text="${subject.name}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="right-pane">
+                <div class="right-header-controls">
+                    <select class="grade-filter">
+                        <option value="">学年を選択</option>
+                        <option value="1">1年生</option>
+                        <option value="2">2年生</option>
+                        <option value="3">3年生</option>
+                    </select>
+
+                    <button type="button" class="edit-btn" onclick="toggleEditMode()">編集</button>
+                </div>
+
+                <div class="right-table-wrapper">
+                    <table class="right-table">
+                        <colgroup>
+                            <col style="width: 200px;"> <col style="width: auto;"> 
+                            <col style="width: auto;"> 
+                            <col style="width: auto;"> 
+                            <col style="width: auto;"> 
+                            <col style="width: auto;"> 
+                            <col style="width: auto;"> 
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>教科</th>
+                                <th>xxx</th>
+                                <th>xxx</th>
+                                <th>xxx</th>
+                                <th>xxx</th>
+                                <th>xxx</th>
+                                <th>xxx</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col-subject-name">ぺいそん</td>
+                                <td onclick="toggleMark(this)" class="checked"><span class="check-mark">○</span></td>
+                                <td onclick="toggleMark(this)"><span class="check-mark">○</span></td>
+                                <td onclick="toggleMark(this)" class="checked"><span class="check-mark">○</span></td>
+                                <td onclick="toggleMark(this)"><span class="check-mark">○</span></td>
+                                <td onclick="toggleMark(this)"><span class="check-mark">○</span></td>
+                                <td onclick="toggleMark(this)"><span class="check-mark">○</span></td>
+                            </tr>
+                            <tr>
+                                <td class="col-subject-name">ばいそん</td>
+                                <td onclick="toggleMark(this)"><span class="check-mark">○</span></td>
+                                <td onclick="toggleMark(this)" class="checked"><span class="check-mark">○</span></td>
+                                <td onclick="toggleMark(this)"><span class="check-mark">○</span></td>
+                                <td onclick="toggleMark(this)" class="checked"><span class="check-mark">○</span></td>
+                                <td onclick="toggleMark(this)"><span class="check-mark">○</span></td>
+                                <td onclick="toggleMark(this)"><span class="check-mark">○</span></td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // 編集モード切り替え
+        function toggleEditMode() {
+            const body = document.body;
+            const btn = document.querySelector('.edit-btn');
+            
+            if (body.classList.contains('editing-mode')) {
+                // 適用ボタン押下時（保存処理などをここに入れる想定）
+                body.classList.remove('editing-mode');
+                btn.textContent = '編集';
+            } else {
+                // 編集ボタン押下時
+                body.classList.add('editing-mode');
+                btn.textContent = '適用';
+            }
+        }
+
+        // セルクリック時の丸トグル処理
+        function toggleMark(cell) {
+            // bodyに 'editing-mode' クラスがある時だけ反応する
+            if (document.body.classList.contains('editing-mode')) {
+                cell.classList.toggle('checked');
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,244 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px; 
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* =========================================
+   レイアウトコンテナ
+   ========================================= */
+.timetable-edit-container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 120px; 
+    padding-bottom: 50px;
+}
+
+/* =========================================
+   ページタイトル
+   ========================================= */
+.page-title-wrapper {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    display: inline-block;
+    border-bottom: 3px solid #539DA4;
+    padding-bottom: 5px;
+}
+
+/* =========================================
+   検索・フィルターエリア
+   ========================================= */
+.filter-area {
+    background-color: white;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between; 
+    align-items: flex-end;
+}
+
+.filter-inputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+    flex: 1; 
+}
+
+.filter-select {
+    height: 45px;
+    padding: 5px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: #fff;
+    min-width: 160px;
+    cursor: pointer;
+}
+
+.term-select {
+    min-width: 200px;
+    background-color: #f9f9f9;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 30px;
+    min-width: 120px;
+}
+
+/* 編集ボタン */
+.edit-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    background-color: #fff;
+    border: 2px solid #539DA4;
+    border-radius: 5px;
+    color: #539DA4;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.edit-btn:hover {
+    background-color: #f0fcfd;
+}
+
+/* 編集モード中のボタン（押されている状態） */
+body.editing-mode .edit-btn {
+    background-color: #539DA4;
+    color: white;
+}
+
+/* 決定ボタン */
+.confirm-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    background-color: #539DA4;
+    border: 2px solid #539DA4;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+.confirm-btn:hover {
+    opacity: 0.8;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* =========================================
+   編集用 時間割テーブル
+   ========================================= */
+.table-wrapper {
+    width: 100%;
+    border: 1px solid #999;
+    background-color: white;
+    overflow-x: auto;
+    margin-bottom: 30px;
+    border-radius: 5px;
+}
+
+.edit-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    min-width: 1000px;
+    table-layout: fixed;
+}
+
+.edit-table th,
+.edit-table td {
+    border: 1px solid #999;
+    padding: 5px; /* セルの余白を少し詰める */
+    vertical-align: middle;
+}
+
+/* ヘッダー行 */
+.edit-table thead th {
+    background-color: #539DA4;
+    color: white;
+    font-weight: normal;
+    padding: 15px 0;
+    font-size: 1.1rem;
+}
+
+/* 1列目 (時限) */
+.col-period {
+    background-color: #e0f2f1;
+    color: #333;
+    width: 140px; 
+    line-height: 1.4;
+}
+
+.period-number {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.period-time {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: normal;
+    white-space: nowrap;
+}
+
+/* データセル */
+.edit-table tbody td {
+    height: 80px; 
+    background-color: #fff;
+    position: relative;
+}
+
+/* ▼▼▼ セル内のプルダウン (授業選択用) ▼▼▼ */
+.cell-select {
+    width: 100%;
+    height: 100%;
+    border: none;           /* 通常時は枠線を消す */
+    background-color: transparent;
+    font-size: 1rem;
+    color: #333;
+    text-align: center;
+    text-align-last: center;
+    cursor: default;
+    outline: none;
+    
+    /* 通常時は矢印を消して、クリック不可にする（テキストっぽく見せる） */
+    appearance: none; 
+    -webkit-appearance: none; 
+    pointer-events: none; 
+}
+
+/* --- 編集モード時のスタイル (bodyに.editing-modeがついた時) --- */
+body.editing-mode .cell-select {
+    border: 2px solid #539DA4; /* 枠線を表示 */
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    pointer-events: auto;      /* クリック可能にする */
+    
+    /* 矢印を復活させる */
+    appearance: auto;
+    -webkit-appearance: auto;
+    
+    padding: 5px;
+}
+
+/* 編集モード時のセル背景を少し変える（任意） */
+body.editing-mode .edit-table tbody td {
+    background-color: #f9f9f9;
+}

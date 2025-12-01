@@ -84,6 +84,9 @@ public class SecurityConfig {
     @Order(2) // APIフィルタチェーンの後に処理されるように順序を明示
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                //CSRF 無効化
+                .csrf(csrf -> csrf.disable())
+
                 .authorizeHttpRequests(authorize -> authorize
                         // /api/へのアクセスは全てAPIフィルタチェーンに任せる
                         .requestMatchers("/api/**").denyAll() 

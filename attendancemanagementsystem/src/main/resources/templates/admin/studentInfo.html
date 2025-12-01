@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生徒情報</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminStudentInfo.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+    
+    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/studentList')}"></div>
+    </div> 
+
+    <div class="info-container">
+        
+        <div class="page-header-wrapper">
+
+            <h1 class="page-title">生徒情報</h1>
+        </div>
+
+        <div class="main-content-area">
+            
+            <div class="left-sidebar-area">
+                
+                <div class="student-name-display">
+                    ○○ ×× さん
+                </div>
+
+                <form class="sidebar-search-form">
+                    <input type="text" class="sidebar-search-input" placeholder="教科名を検索">
+                    <button type="submit" class="sidebar-search-btn">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </form>
+
+                <div class="subject-list-box">
+                    <div class="sidebar-title">受講教科一覧</div>
+                    <ul class="subject-list">
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="attendance-detail-main">
+                
+                <div class="attendance-controls">
+                    <select class="month-select">
+                        <option value=""></option>
+                        <option value=""></option>
+                        <option value=""></option>
+                    </select>
+                    <button class="edit-btn">編集</button>
+                </div>
+
+                <table class="status-summary-table">
+                    <thead>
+                        <tr>
+                            <th>出欠状況</th>
+                            <th>出席</th>
+                            <th>病欠</th>
+                            <th>遅刻</th>
+                            <th>早退</th>
+                            <th>出停</th>
+                            <th>公欠</th>
+                            <th>その他</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>日数</td>
+                            <td>日</td>
+                            <td>日</td>
+                            <td>日</td>
+                            <td>日</td>
+                            <td>日</td>
+                            <td>日</td>
+                            <td>日</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="table-wrapper">
+                    <table class="schedule-table">
+                        <colgroup>
+                            <col style="width: 15%;"> 
+                            <col style="width: 17%;"> 
+                            <col style="width: 17%;"> 
+                            <col style="width: 17%;"> 
+                            <col style="width: 17%;"> 
+                            <col style="width: 17%;"> 
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>日付</th>
+                                <th>1限目</th>
+                                <th>2限目</th>
+                                <th>3限目</th>
+                                <th>4限目</th>
+                                <th>5限目</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <span class="subject-name"></span>
+                                        <span class="status-tag bg-present"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

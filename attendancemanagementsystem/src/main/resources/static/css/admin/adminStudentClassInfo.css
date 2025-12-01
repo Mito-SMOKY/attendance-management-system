@@ -1,0 +1,210 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px; 
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* =========================================
+   レイアウトコンテナ
+   ========================================= */
+.info-container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 0 auto;
+    /* ヘッダー(約80px) + 余白 */
+    padding-top: 120px; 
+    padding-bottom: 50px;
+}
+
+/* =========================================
+   ページタイトル
+   ========================================= */
+.page-title-area {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    display: inline-block;
+    border-bottom: 3px solid #539DA4;
+    padding-bottom: 5px;
+}
+
+/* =========================================
+   メインコンテンツ (左右分割)
+   ========================================= */
+.main-content {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+/* --- 左側パネル：生徒・教科詳細 --- */
+.left-panel {
+    flex: 0 0 350px; /* 固定幅 */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 生徒名 */
+.student-name-display {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    padding: 15px;
+    background-color: #fff;
+    border-left: 8px solid #539DA4;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* 詳細情報テーブル */
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border: 1px solid #999;
+}
+
+.info-table th,
+.info-table td {
+    padding: 15px 10px;
+    border: 1px solid #999;
+    vertical-align: middle;
+}
+
+.info-table th {
+    background-color: #539DA4; /* テーマカラー */
+    color: white;
+    font-weight: normal;
+    width: 45%;
+    text-align: left;
+}
+
+.info-table td {
+    color: #333;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+
+/* --- 右側パネル：出欠・時間割 --- */
+.right-panel {
+    flex: 1;
+    min-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* 上部：出欠サマリーと編集ボタンのエリア */
+.status-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* 垂直中央揃え */
+    gap: 20px;
+}
+
+/* サマリーテーブル */
+.summary-table {
+    flex: 1;
+    border-collapse: collapse;
+    background-color: white;
+    text-align: center;
+}
+
+.summary-table th,
+.summary-table td {
+    border: 1px solid #999;
+    padding: 10px;
+}
+
+.summary-table th {
+    background-color: #539DA4;
+    color: white;
+    font-weight: normal;
+    font-size: 0.95rem;
+}
+
+.summary-table td {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+/* 編集ボタン */
+.edit-btn {
+    height: 45px; /* サマリーテーブルの高さに合わせる */
+    padding: 0 25px;
+    border: 1px solid #707070;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.3s;
+}
+.edit-btn:hover {
+    background-color: #f0f0f0;
+}
+
+/* 下部：時間割テーブルエリア */
+.schedule-wrapper {
+    width: 100%;
+    border: 1px solid #999;
+    background-color: white;
+    max-height: 500px; /* スクロール用高さ制限 */
+    overflow-y: auto;
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: separate; /* stickyヘッダー用 */
+    border-spacing: 0;
+    text-align: center;
+    min-width: 600px;
+}
+
+.schedule-table th,
+.schedule-table td {
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+    padding: 10px;
+    height: 50px;
+    vertical-align: middle;
+}
+/* 枠線調整 */
+.schedule-table th { border-top: 1px solid #999; }
+.schedule-table th:last-child, .schedule-table td:last-child { border-right: none; }
+
+/* テーブルヘッダー (固定) */
+.schedule-table th {
+    background-color: #539DA4;
+    color: white;
+    font-weight: normal;
+    padding: 12px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
