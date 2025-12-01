@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const existingListEl = document.getElementById('existing-events-list');
         if (existingListEl) {
             existingListEl.innerHTML = ''; 
-            const dailyEvents = calendarEventsData.filter(event => event.date === dateStr);
+            const dailyEvents = (calendarEventsData || []).filter(event => event.date === dateStr);
             if (dailyEvents.length > 0) {
                 dailyEvents.forEach(event => {
                     // DTOのフィールド名(calendarId)に合わせてIDを取得

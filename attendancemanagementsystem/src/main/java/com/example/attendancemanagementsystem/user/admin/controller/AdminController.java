@@ -11,8 +11,8 @@ public class AdminController {
     /**
      * 管理者用メインメニュー（/admin/home）を表示
      */
-    @GetMapping("/home")
+    @GetMapping("/admin/timetable")
     public String home() {
-        return "admin/home"; //src/main/resources/templates/admin/home.html を参照
+        return "admin/timetable"; //src/main/resources/templates/admin/home.html を参照
     }
 }
