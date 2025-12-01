@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +32,7 @@ public class AttendanceDisplayService {
     private final SubjectRepository subjectRepository;
     private final ClassroomRepository classroomRepository;
 
-    @Autowired
+    // @Autowired
     public AttendanceDisplayService(
             UsersRepository usersRepository,
             StudentRepository studentRepository,

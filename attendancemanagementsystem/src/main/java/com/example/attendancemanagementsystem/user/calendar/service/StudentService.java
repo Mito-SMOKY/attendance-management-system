@@ -16,7 +16,7 @@ import com.example.attendancemanagementsystem.user.calendar.dto.AttendanceDto;
 import com.example.attendancemanagementsystem.user.calendar.dto.CalendarDto;
 
 // Entityのインポート
-import com.example.attendancemanagementsystem.attendance.display.dto.DailyAttendanceDto;
+// import com.example.attendancemanagementsystem.attendance.display.dto.DailyAttendanceDto;
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
 import com.example.attendancemanagementsystem.common.entity.CalendarEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
@@ -126,8 +126,6 @@ public class StudentService {
     /**
      * カレンダー予定を削除する
      */
-    @Transactional
-    public void deleteCalendarEvent(Integer calendarId) {
     @Transactional // (readOnly = false) を明示的に設定。これによりデータの変更が可能に。
     public void deleteCalendarEvent(@NonNull Integer calendarId) {
         // IDを指定して予定を削除する
