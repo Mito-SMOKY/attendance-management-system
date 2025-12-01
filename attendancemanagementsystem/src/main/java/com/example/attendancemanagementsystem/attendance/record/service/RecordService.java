@@ -23,7 +23,7 @@ public class RecordService {
 
     public void processAttendanceScan(RecordDTO recordDTO) {
         
-        // --- 1. 復号処理 ---
+        // --- 復号処理 ---
         String encryptedHex = recordDTO.getUserId(); 
         String originalUserIdString = decryptionService.decryptUserId(encryptedHex);
         
@@ -34,17 +34,15 @@ public class RecordService {
             throw new IllegalArgumentException("復号されたユーザーIDが不正な形式です: " + originalUserIdString);
         }
 
-        // --- 2. カードIDの取得 (修正箇所) ---
-        // ★ Integerへの変換を廃止し、そのまま文字列として使用
+        // --- カードIDの取得 ---
         String cardId = recordDTO.getCardId(); 
 
         if (cardId == null || cardId.isEmpty()) {
-             throw new IllegalArgumentException("カードIDが空です。");
+            throw new IllegalArgumentException("カードIDが空です。");
         }
 
-        // --- 3. データベース検証 ---
+        // --- データベース検証 ---
         
-        // ★ String型のまま検索
         Optional<CardsEntity> cardOptional = cardsRepository.findByCardId(cardId);
         
         if (!cardOptional.isPresent()) {
