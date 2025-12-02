@@ -1,0 +1,122 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px; 
+    background-color: #ffffff; /* 背景は白 */
+    color: #333;
+}
+
+/* =========================================
+   レイアウトコンテナ
+   ========================================= */
+.writer-container {
+    width: 90%;
+    max-width: 600px; /* 入力欄の幅に合わせて調整 */
+    margin: 0 auto;
+    padding-top: 120px; /* ヘッダー分 */
+    padding-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* =========================================
+   ページタイトル (案内文)
+   ========================================= */
+.instruction-text {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 40px;
+    line-height: 1.5;
+}
+
+/* =========================================
+   入力フォームエリア
+   ========================================= */
+.form-area {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* 入力グループ */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ラベル (カードID, 学籍番号) */
+.input-label {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #2c5468; /* 画像のような少し濃い青緑色 */
+    margin-left: 5px;
+}
+
+/* 入力フィールド */
+.text-input {
+    width: 100%;
+    height: 55px;
+    padding: 10px 20px;
+    border: 1px solid #707070;
+    border-radius: 12px; /* 角丸を強めに */
+    font-size: 1.2rem;
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.text-input:focus {
+    border-color: #539DA4;
+}
+
+/* プレースホルダーの色 */
+.text-input::placeholder {
+    color: #ccc;
+}
+
+/* =========================================
+   アクションエリア (ボタン)
+   ========================================= */
+.action-area {
+    margin-top: 40px;
+    display: flex;
+    justify-content: flex-end; /* 右寄せ */
+}
+
+/* 確定して認証ボタン */
+.auth-btn {
+    background-color: #fff;
+    border: 2px solid #539DA4; /* テーマカラーの枠線 */
+    border-radius: 8px;
+    color: #539DA4; /* 文字色もテーマカラー */
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 10px 25px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.3;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.auth-btn:hover {
+    background-color: #539DA4;
+    color: white;
+}

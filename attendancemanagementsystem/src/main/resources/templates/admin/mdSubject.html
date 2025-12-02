@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教科マスタ</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminMdSubject.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='')}"></div>
+    </div>
+    
+    <div class="subject-master-container">
+        
+        <div class="page-header-wrapper">
+
+            <h1 class="page-title">教科マスタ</h1>
+        </div>
+
+        <div class="controls-area">
+            
+            <div class="search-group">
+                <input type="text" class="search-input" id="searchInput" placeholder="教科名を検索">
+                <button type="button" class="search-btn" id="searchBtn" onclick="filterRows()">
+                    検索 <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+
+            <div class="filter-action-group">
+                <form id="gradeForm">
+                    <select class="grade-filter" id="gradeFilter" onchange="filterRows()">
+                        <option value="">全学年</option>
+                        <option value="1">1年生</option>
+                        <option value="2">2年生</option>
+                        <option value="3">3年生</option>
+                    </select>
+
+                    <select class="department-filter" id="departmentFilter">
+                        <option value="">学科を選択</option>
+                    </select>
+                </form>
+
+                <button type="button" class="edit-btn" onclick="toggleEditMode()">編集</button>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="subject-table" id="subjectTable">
+                <colgroup>
+                    <col style="width: 250px;"> <col style="width: auto;" th:each="cls : ${classList}">
+                </colgroup>
+                
+                <thead>
+                    <tr>
+                        <th>教科</th>
+                        <th th:each="cls : ${classList}" th:text="${cls}">クラス名</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    <tr th:each="detail : ${subjectDetailList}" class="data-row" th:data-grade="${detail.grade}">
+                        
+                        <td class="col-subject-name">
+                            <span class="subject-text" th:text="${detail.subjectName}"></span>
+                            <button type="button" class="delete-btn" onclick="deleteRow(this)">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                        
+                        <td th:each="cls : ${classList}"
+                            onclick="toggleMark(this)"
+                            th:classappend="${detail.statusMap != null and detail.statusMap.get(cls)} ? 'checked'">
+                            <span class="check-mark">○</span>
+                        </td>
+                        
+                    </tr>
+                    
+                    <tr th:if="${subjectDetailList == null or subjectDetailList.size() == 0}" id="noDataRow">
+                        <td th:colspan="${classList != null ? classList.size() + 1 : 7}" style="padding:20px; color:#777;">
+                            データがありません。
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleEditMode() {
+            const body = document.body;
+            const btn = document.querySelector('.edit-btn');
+            
+            if (body.classList.contains('editing-mode')) {
+                body.classList.remove('editing-mode');
+                btn.textContent = '編集';
+            } else {
+                body.classList.add('editing-mode');
+                btn.textContent = '適用';
+            }
+        }
+
+        function toggleMark(cell) {
+            if (document.body.classList.contains('editing-mode')) {
+                cell.classList.toggle('checked');
+            }
+        }
+
+        function filterRows() {
+            const selectedGrade = document.getElementById('gradeFilter').value;
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('.data-row');
+
+            rows.forEach(row => {
+                const rowGrade = row.getAttribute('data-grade');
+                
+                let subjectName = "";
+                const textElem = row.querySelector('.subject-text');
+                
+                if (textElem) {
+                    subjectName = textElem.innerText.toLowerCase();
+                }
+
+                const isGradeMatch = (selectedGrade === "" || rowGrade == selectedGrade);
+                const isKeywordMatch = (keyword === "" || subjectName.indexOf(keyword) > -1);
+
+                if (isGradeMatch && isKeywordMatch) {
+                    row.style.display = ""; 
+                } else {
+                    row.style.display = "none"; 
+                }
+            });
+        }
+
+        function deleteRow(btn) {
+            if (confirm('この行を削除しますか？')) {
+                const row = btn.closest('tr');
+                row.remove();
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); 
+                document.getElementById('searchBtn').click(); 
+            }
+        });
+    </script>
+
+</body>
+</html>

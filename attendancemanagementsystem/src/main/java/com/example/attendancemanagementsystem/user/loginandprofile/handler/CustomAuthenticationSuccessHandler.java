@@ -45,7 +45,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             // UserDetailsServiceImplで設定したロールと比較
             if (role.equals("ROLE_ADMIN")) {
                 // 管理者（UserTypeID=2）用のメインメニュー
-                targetUrl = "/admin/home"; 
+                targetUrl = "/admin/timetable"; 
                 break;
             } else if (role.equals("ROLE_STUDENT")) {
                 // 生徒（UserTypeID=1）用のメインメニュー
