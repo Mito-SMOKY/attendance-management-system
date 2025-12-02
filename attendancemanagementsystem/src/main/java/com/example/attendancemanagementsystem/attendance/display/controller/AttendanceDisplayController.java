@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -23,7 +22,7 @@ public class AttendanceDisplayController {
 
     private final AttendanceDisplayService attendanceDisplayService;
 
-    @Autowired
+    // @Autowired
     public AttendanceDisplayController(AttendanceDisplayService attendanceDisplayService) {
         this.attendanceDisplayService = attendanceDisplayService;
     }
