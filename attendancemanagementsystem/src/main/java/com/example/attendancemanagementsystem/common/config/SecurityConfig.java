@@ -32,7 +32,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(authorize -> authorize
                         // ログイン、CSS、JSは全員許可
-                        .requestMatchers("/login", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/login", "/css/**", "/js/**","/image/**").permitAll()
                         
                         // ★ 必須の修正点: ロール（権限）に基づいたアクセス許可を追加
                         // /admin/で始まるURLにはROLE_ADMINが必要

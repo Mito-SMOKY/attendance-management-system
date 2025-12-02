@@ -83,6 +83,14 @@ public class LoginController {
     public String shownfc_riter() {
         return "nfc/nfc_writer";
     }
+    @GetMapping("/mdList")
+    public String showmdList() {
+        return "admin/mdList";
+    }
+    @GetMapping("/mdSubjectInformation")
+    public String showmdSubjectInformation() {
+        return "admin/mdSubjectInformation";
+    }
 }
 //     @GetMapping("/main_calendar")
 //     public String showMainCalendar() {
