@@ -9,17 +9,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.example.attendancemanagementsystem.attendance.display.dto.SubjectAttendanceDto; // 名前変更
-import com.example.attendancemanagementsystem.attendance.display.service.SubjectAttendanceService; // 名前変更
+import com.example.attendancemanagementsystem.attendance.display.dto.SubjectListDto; // 名前変更
+import com.example.attendancemanagementsystem.attendance.display.service.SubjectListService; // 名前変更
 
 @Controller
 @RequestMapping("/student")
-public class SubjectAttendanceController {
+public class SubjectListController {
 
-    private final SubjectAttendanceService subjectAttendanceService;
+    private final SubjectListService subjectAttendanceService;
 
     // @Autowired
-    public SubjectAttendanceController(SubjectAttendanceService subjectAttendanceService) {
+    public SubjectListController(SubjectListService subjectAttendanceService) {
         this.subjectAttendanceService = subjectAttendanceService;
     }
 
@@ -32,7 +32,7 @@ public class SubjectAttendanceController {
         
         String loginId = userDetails.getUsername();
 
-        List<SubjectAttendanceDto> subjectList = subjectAttendanceService.getSubjectList(loginId);
+        List<SubjectListDto> subjectList = subjectAttendanceService.getSubjectList(loginId);
 
         model.addAttribute("subjectList", subjectList);
 
