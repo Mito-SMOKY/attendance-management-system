@@ -1,7 +1,7 @@
 package com.example.attendancemanagementsystem;
 
-import com.example.attendancemanagementsystem.DummyModel.AttendanceData;
-import com.example.attendancemanagementsystem.DummyModel.DailyAttendance;
+import com.example.attendancemanagementsystem.Dummymodel.AttendanceData;
+import com.example.attendancemanagementsystem.Dummymodel.DailyAttendance;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
