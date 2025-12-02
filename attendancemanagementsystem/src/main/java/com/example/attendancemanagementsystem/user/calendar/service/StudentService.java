@@ -11,22 +11,16 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// ★修正: 正しいDTOをインポート
-import com.example.attendancemanagementsystem.user.calendar.dto.AttendanceDto;
-import com.example.attendancemanagementsystem.user.calendar.dto.CalendarDto;
-
-// Entityのインポート
-// import com.example.attendancemanagementsystem.attendance.display.dto.DailyAttendanceDto;
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
 import com.example.attendancemanagementsystem.common.entity.CalendarEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
-
-// Repositoryのインポート
 import com.example.attendancemanagementsystem.common.repository.AttendanceRepository;
 import com.example.attendancemanagementsystem.common.repository.CalendarRepository;
 import com.example.attendancemanagementsystem.common.repository.StudentRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
+import com.example.attendancemanagementsystem.user.calendar.dto.AttendanceDto;
+import com.example.attendancemanagementsystem.user.calendar.dto.CalendarDto;
 
 
 @Service
@@ -126,6 +120,8 @@ public class StudentService {
     /**
      * カレンダー予定を削除する
      */
+    // @Transactional
+    // public void deleteCalendarEvent(Integer calendarId) {
     @Transactional // (readOnly = false) を明示的に設定。これによりデータの変更が可能に。
     public void deleteCalendarEvent(@NonNull Integer calendarId) {
         // IDを指定して予定を削除する

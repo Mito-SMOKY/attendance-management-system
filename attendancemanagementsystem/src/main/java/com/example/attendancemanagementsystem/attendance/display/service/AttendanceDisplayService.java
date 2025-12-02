@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-// import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,6 +87,7 @@ public class AttendanceDisplayService {
                 else if ("欠席".equals(statusName)) statusSymbol = "×";
                 else if ("遅刻".equals(statusName)) statusSymbol = "△";
                 else statusSymbol = statusName; 
+
             }
 
             // DTOに追加
