@@ -176,5 +176,29 @@ public class AdminController {
         return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
     }
     
-    // ... (他のメソッドはそのまま) ...
+    // ... (既存のメソッド) ...
+
+    // ... (前略) ...
+
+    // --- 11. マスタデータ管理メニュー画面 ---
+    @GetMapping("/master-data")
+    public String showMasterDataMenu() {
+        // ファイル名: masterDataMenu.html に合わせる
+        return "admin/masterDataMenu"; 
+    }
+
+    // --- 12. 教科マスタ詳細画面 ---
+    @GetMapping("/master/subject")
+    public String showSubjectMaster() {
+        // ファイル名: subjectMaster.html に合わせる
+        return "admin/subjectMaster";
+    }
+
+    // --- 13. 教室マスタ詳細画面 ---
+    @GetMapping("/master/classroom")
+    public String showClassroomMaster() {
+        // ファイル名: classroomMaster.html に合わせる
+        return "admin/classroomMaster";
+    }
+
 }
