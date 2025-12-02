@@ -34,3 +34,5 @@ build/
 
 #ローカル開発用のテストcontroller
 TestController.java
+DummyDataGeneretor.java
+DummyModel
