@@ -1,6 +1,6 @@
 package com.example.attendancemanagementsystem.attendance.display.dto;
 
-public class SubjectAttendanceDto {
+public class SubjectListDto {
     private Integer subjectId;
     private String courseName;      // コース名
     private String subjectName;     // 教科名
@@ -11,7 +11,7 @@ public class SubjectAttendanceDto {
     private double attendanceRate;  // 出席率 (0.0 ~ 1.0)
 
     // コンストラクタ
-    public SubjectAttendanceDto(Integer subjectId, String courseName, String subjectName, String teacherName) {
+    public SubjectListDto(Integer subjectId, String courseName, String subjectName, String teacherName) {
         this.subjectId = subjectId;
         this.courseName = courseName;
         this.subjectName = subjectName;

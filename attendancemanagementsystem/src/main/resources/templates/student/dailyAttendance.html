@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>授業一覧</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/adminlist.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+     <div class="header-container">
+        <div th:replace="~{fragments/_parts :: student-header}"></div>
+    </div>
+
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/login')}"></div>
+    </div>
+
+    <div class="list-container">
+
+        <div class="controls-area">
+           <div class="search-section">
+                <form th:action="@{/student/dailyAttendance}" method="get" class="search-form-row">
+                <input type="text" name="date" class="search-input" th:value="${targetDate}">
+                <button type="submit" class="search-btn">
+                検索 <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                </form>
+            </div>
+
+            <div th:if="${param.error}">
+                <p class="error">日付が正しくない または未定です</p>
+            </div>
+            
+        </div>
+
+        <!-- <div class="date-header" th:text="${#dates.format(#dates.create(#strings.replace(targetDate, '-', '/')), 'yyyy/MM/dd (EEE)')}"> -->
+        <!-- <div class="date-header" th:text="${targetDate}">2025-11-25</div> -->
+         <div class="date-header" 
+            th:text="${#temporals.format(
+            #temporals.createDate(targetDate), 
+            'yyyy/MM/dd (E)')}">
+        </div>
+
+        <div class="table-wrapper">
+            <table class="class-list-table">
+                <colgroup>
+                    <col class="col-period">
+                    <col class="col-subject">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>時限</th>
+                        <th>教科名</th>
+                        <th>出席</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="record : ${dailyAttendance}">
+
+                        <td class="period-cell" th:text="${record.period}">1</td>
+                        <td class="subject-cell" th:text="${record.subject}"></td>
+                        <td class="status-cell" th:text="${record.status}"></td>
+
+                    </tr>
+
+                    <tr th:if="${dailyAttendance.isEmpty()}">
+                        <td colspan="4" class="no-data-cell">該当日に授業はありません。</td>
+                     </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>

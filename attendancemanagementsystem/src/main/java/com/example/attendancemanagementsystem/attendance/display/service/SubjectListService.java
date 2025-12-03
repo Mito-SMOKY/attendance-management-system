@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.attendancemanagementsystem.attendance.display.dto.SubjectAttendanceDto;
+import com.example.attendancemanagementsystem.attendance.display.dto.SubjectListDto;
 import com.example.attendancemanagementsystem.common.entity.TimetableEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.AttendanceRepository;
@@ -19,7 +19,7 @@ import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 
 @Service
 @Transactional(readOnly = true)
-public class SubjectAttendanceService {
+public class SubjectListService {
 
     private final UsersRepository usersRepository;
     private final EnrollmentsRepository enrollmentsRepository;
@@ -28,7 +28,7 @@ public class SubjectAttendanceService {
     private final SubjectRepository subjectRepository;
 
     // @Autowired
-    public SubjectAttendanceService(
+    public SubjectListService(
             UsersRepository usersRepository,
             EnrollmentsRepository enrollmentsRepository,
             TimetableRepository timetableRepository,
@@ -42,8 +42,8 @@ public class SubjectAttendanceService {
     }
 
     // 科目別出席情報一覧を取得
-    public List<SubjectAttendanceDto> getSubjectList(String loginId) {
-        List<SubjectAttendanceDto> dtoList = new ArrayList<>();
+    public List<SubjectListDto> getSubjectList(String loginId) {
+        List<SubjectListDto> dtoList = new ArrayList<>();
 
         UsersEntity user = usersRepository.findByLoginId(loginId).orElseThrow();
 
@@ -72,7 +72,7 @@ public class SubjectAttendanceService {
             String teacherName = usersRepository.findById(tt.getUserId())
                     .map(u -> u.getName()).orElse("未定");
 
-            SubjectAttendanceDto dto = new SubjectAttendanceDto(subjectId, courseName, subjectName, teacherName);
+            SubjectListDto dto = new SubjectListDto(subjectId, courseName, subjectName, teacherName);
 
             
             // 1. 全授業数
