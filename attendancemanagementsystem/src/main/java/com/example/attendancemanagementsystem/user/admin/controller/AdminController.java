@@ -45,6 +45,12 @@ public class AdminController {
         return 3; 
     }
 
+    
+    @GetMapping("/timetable")
+    public String showTimetablePage() {
+        return "admin/timetable";
+    }
+
     @GetMapping("/home")
     public String home() {
         return "admin/home";
@@ -184,21 +190,21 @@ public class AdminController {
     @GetMapping("/master-data")
     public String showMasterDataMenu() {
         // ファイル名: masterDataMenu.html に合わせる
-        return "admin/masterDataMenu"; 
+        return "admin/mdList"; 
     }
 
     // --- 12. 教科マスタ詳細画面 ---
     @GetMapping("/master/subject")
     public String showSubjectMaster() {
         // ファイル名: subjectMaster.html に合わせる
-        return "admin/subjectMaster";
+        return "admin/mdSubject";
     }
 
     // --- 13. 教室マスタ詳細画面 ---
     @GetMapping("/master/classroom")
     public String showClassroomMaster() {
         // ファイル名: classroomMaster.html に合わせる
-        return "admin/classroomMaster";
+        return "admin/mdClassroom";
     }
 
 }
