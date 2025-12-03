@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教科情報マスタ</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminMdSubjectInformation.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='')}"></div>
+    </div>
+    
+    <div class="subject-info-container">
+        
+        <div class="page-header-wrapper">
+
+            <h1 class="page-title">教科情報マスタ</h1>
+        </div>
+
+        <div class="action-area">
+            <button type="button" class="edit-btn" onclick="toggleEditMode()">編集</button>
+        </div>
+
+        <div class="error-message-area">
+            <span id="errorMsgDuplicate" class="error-text">※同じ教科と教師の組み合わせが既に存在します。</span>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="subject-info-table" id="infoTable">
+                <thead>
+                    <tr>
+                        <th>受講教科</th>
+                        <th>教師</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="info : ${subjectInfoList}">
+                        <td>
+                            <span class="view-mode" th:text="${info.subjectName}"></span>
+                            <input type="text" class="edit-mode" name="subjectName" th:value="${info.subjectName}">
+                            
+                            <button type="button" class="delete-btn" onclick="deleteRow(this)">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                        <td>
+                            <span class="view-mode" th:text="${info.teacherName}"></span>
+                            <select class="edit-mode" name="teacherId">
+                                <option value="">教師を選択</option>
+                                <option th:each="teacher : ${teacherList}"
+                                        th:value="${teacher.id}"
+                                        th:text="${teacher.name}"
+                                        th:selected="${teacher.id == info.teacherId}">
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="add-btn-wrapper">
+            <button type="button" class="add-row-btn" onclick="addRow()">＋</button>
+        </div>
+
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const teacherOptions = /*[[${teacherList}]]*/ []; 
+        const dummyTeachers = [
+            { id: 1, name: '千太郎 先生' },
+            { id: 2, name: '川島 先生' },
+            { id: 3, name: '玉木 先生' },
+        ];
+        const teachers = (teacherOptions && teacherOptions.length > 0) ? teacherOptions : dummyTeachers;
+        /*]]>*/
+    </script>
+
+    <script>
+        function toggleEditMode() {
+            const body = document.body;
+            const btn = document.querySelector('.edit-btn');
+            const errorText = document.getElementById('errorMsgDuplicate');
+            
+            if (body.classList.contains('editing-mode')) {
+                // 適用ボタン押下時
+                if (!validateDuplicates()) {
+                    errorText.style.display = 'inline-block';
+                    return; 
+                }
+
+                errorText.style.display = 'none';
+                finalizeAddedRows();
+
+                body.classList.remove('editing-mode');
+                btn.textContent = '編集';
+            } else {
+                // 編集ボタン押下時
+                body.classList.add('editing-mode');
+                btn.textContent = '適用';
+                errorText.style.display = 'none';
+            }
+        }
+
+        function addRow() {
+            const tableBody = document.querySelector('#infoTable tbody');
+            const newRow = document.createElement('tr');
+            
+            newRow.classList.add('added-row');
+            
+            let optionsHtml = '<option value="">教師を選択</option>';
+            teachers.forEach(teacher => {
+                optionsHtml += `<option value="${teacher.id}">${teacher.name}</option>`;
+            });
+
+            newRow.innerHTML = `
+                <td>
+                    <input type="text" class="edit-mode" name="newSubjectName" placeholder="教科名を入力" style="display:block;">
+                    <button type="button" class="delete-btn" onclick="deleteRow(this)" style="display:flex;">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </td>
+                <td>
+                    <select class="edit-mode" name="newTeacherId" style="display:block;">
+                        ${optionsHtml}
+                    </select>
+                </td>
+            `;
+            
+            tableBody.appendChild(newRow);
+        }
+
+        // ▼▼▼ 行削除処理 ▼▼▼
+        function deleteRow(btn) {
+            if (confirm('この行を削除しますか？')) {
+                const row = btn.closest('tr');
+                row.remove();
+            }
+        }
+
+        function validateDuplicates() {
+            const rows = document.querySelectorAll('#infoTable tbody tr');
+            const pairs = new Map();
+            let hasError = false;
+
+            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+
+            rows.forEach((row, index) => {
+                const nameInput = row.querySelector('input[name="subjectName"], input[name="newSubjectName"]');
+                const teacherSelect = row.querySelector('select[name="teacherId"], select[name="newTeacherId"]');
+
+                if (!nameInput || !teacherSelect) return;
+
+                const nameVal = nameInput.value.trim();
+                const teacherVal = teacherSelect.value;
+
+                if (nameVal && teacherVal) {
+                    const key = nameVal + "::" + teacherVal;
+
+                    if (pairs.has(key)) {
+                        hasError = true;
+                        nameInput.classList.add('input-error');
+                        teacherSelect.classList.add('input-error');
+                        
+                        const prevRowIndex = pairs.get(key);
+                        const prevRow = rows[prevRowIndex];
+                        const prevName = prevRow.querySelector('input[name="subjectName"], input[name="newSubjectName"]');
+                        const prevTeacher = prevRow.querySelector('select[name="teacherId"], select[name="newTeacherId"]');
+                        if (prevName) prevName.classList.add('input-error');
+                        if (prevTeacher) prevTeacher.classList.add('input-error');
+
+                    } else {
+                        pairs.set(key, index);
+                    }
+                }
+            });
+
+            return !hasError; 
+        }
+
+        function finalizeAddedRows() {
+            const addedRows = document.querySelectorAll('.added-row');
+            
+            addedRows.forEach(row => {
+                const nameInput = row.querySelector('input[name="newSubjectName"]');
+                const teacherSelect = row.querySelector('select[name="newTeacherId"]');
+                
+                const nameVal = nameInput.value.trim();
+                const teacherVal = teacherSelect.value;
+
+                if (!nameVal || !teacherVal) {
+                    row.remove();
+                } else {
+                    const nameTd = nameInput.parentElement;
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'view-mode';
+                    nameSpan.textContent = nameVal;
+                    nameTd.insertBefore(nameSpan, nameInput);
+                    nameInput.style.display = ''; 
+
+                    // 削除ボタンのスタイルもリセット（block表示になっていたのをCSS制御に戻す）
+                    const delBtn = row.querySelector('.delete-btn');
+                    if(delBtn) delBtn.style.display = ''; 
+
+                    const teacherTd = teacherSelect.parentElement;
+                    const teacherSpan = document.createElement('span');
+                    teacherSpan.className = 'view-mode';
+                    const selectedText = teacherSelect.options[teacherSelect.selectedIndex].text;
+                    teacherSpan.textContent = selectedText;
+                    teacherTd.insertBefore(teacherSpan, teacherSelect);
+                    teacherSelect.style.display = '';
+
+                    row.classList.remove('added-row');
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
