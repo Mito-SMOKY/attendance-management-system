@@ -1,43 +1,57 @@
 package com.example.attendancemanagementsystem.attendance.record.controller;
 
 import com.example.attendancemanagementsystem.attendance.record.dto.RecordDTO;
+import com.example.attendancemanagementsystem.attendance.record.dto.VerifiedRecordDto;
 import com.example.attendancemanagementsystem.attendance.record.service.RecordService;
+import com.example.attendancemanagementsystem.common.component.NfcDataHolder;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/attendance/record")
-
 public class RecordController {
+
     private final RecordService recordService;
-    public RecordController(RecordService recordService) {
+    private final NfcDataHolder nfcDataHolder;
+
+    // コンストラクタ
+    public RecordController(RecordService recordService, NfcDataHolder nfcDataHolder) {
         this.recordService = recordService;
+        this.nfcDataHolder = nfcDataHolder;
     }
 
-    // /api/attendance/record/nfc へのPOSTリクエストを処理
-    @PostMapping("/nfc") 
+    // NFC出欠記録受信エンドポイント
+    @PostMapping("/nfc")
     public ResponseEntity<String> recordFromNFC(@RequestBody RecordDTO recordDTO) {
-
-        System.out.println("---- 受信テスト: NFCから送信されたJSON ----");
-            System.out.println("card_id = " + recordDTO.getCardId());
-            System.out.println("userId = " + recordDTO.getUserId());
-            System.out.println("readTime" + recordDTO.getReadTime());
-            System.out.println("reader_id = " + recordDTO.getReaderId());
-            System.out.println("---------------------------------------------");
-
-
         try {
-            // 処理をステップ5のServiceに丸投げ
-            recordService.processAttendanceScan(recordDTO);
+            //検証実行
+            VerifiedRecordDto verifiedData = recordService.processAttendanceScan(recordDTO);
 
-            // 成功したらGatewayに200 OKを返す
-            return ResponseEntity.ok("Data processed.");
+            //成功 -> 画面に通知 (既存カードとしてIDを表示)
+            nfcDataHolder.setScannedData(
+                verifiedData.getCardId(), 
+                String.valueOf(verifiedData.getUserId())
+            );
+            return ResponseEntity.ok("Detected (Registered)");
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            
+            //検証エラー (未登録など) 画面通知
+            String cardId = recordDTO.getCardId();
+            if (cardId != null && !cardId.isEmpty()) {
+                // 新規カードとして書き込み画面へ (UserIDは空)
+                nfcDataHolder.setScannedData(cardId, null);
+                return ResponseEntity.ok("Detected (New Card)");
+            }
+            
+            // カードIDすら読めない -> 「読み込み失敗画面」へ
+            nfcDataHolder.setError("カード情報の読み取りに失敗しました");
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+
         } catch (Exception e) {
-            System.err.println("出欠記録エラー: " + e.getMessage());
-            return ResponseEntity.status(500).body("Error processing attendance data");
+            // その他のシステムエラー -> 「読み込み失敗画面」へ
+            nfcDataHolder.setError("システムエラー: " + e.getMessage());
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
 }

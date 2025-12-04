@@ -15,4 +15,7 @@ public interface CardsRepository extends JpaRepository<CardsEntity, String> {
 
     // カードIDの検索
     Optional<CardsEntity> findByCardId(String cardId);
+
+    // 有効なカードIDの検索
+    Optional<CardsEntity> findByUserIdAndIsActiveTrue(Integer userId);
 }

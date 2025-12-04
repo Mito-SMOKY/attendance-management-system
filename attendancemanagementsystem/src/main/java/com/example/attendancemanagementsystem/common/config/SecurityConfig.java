@@ -37,11 +37,7 @@ public class SecurityConfig {
 
     /**
      * @Order(1) APIキー認証用のFilterChain (優先度: 高)
-     * /api/** のパスのみに適用されます。
-     * @param http HttpSecurity
-     * @param apiKey application.propertiesから注入されるAPIキー
-     * @return SecurityFilterChain
-     * @throws Exception 
+     * PythonやRaspiからのアクセス (/api/attendance/**) 専用です。
      */
     @Bean
     @Order(1)
@@ -51,7 +47,10 @@ public class SecurityConfig {
     ) throws Exception {
 
         http
-            .securityMatcher("/api/**") // APIパスのみに適用
+            //"/api/**" から "/api/attendance/**" に限定します。
+            ///api/issue/** はここをスルーして下の設定(Order 2)に行きます。
+            .securityMatcher("/api/attendance/**") 
+            
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(eh -> eh
@@ -61,10 +60,7 @@ public class SecurityConfig {
                 })
             )
             .authorizeHttpRequests(authz -> authz
-                // /api/attendance/はAPIキーがあればアクセス許可
-                .requestMatchers("/api/attendance/**").authenticated() 
-                // その他の /api/ で始まるリクエストはすべて拒否 (セキュリティ強化)
-                .anyRequest().denyAll() 
+                .anyRequest().authenticated()
             )
             .addFilterBefore(new ApiKeyAuthFilter(apiKey),
                     UsernamePasswordAuthenticationFilter.class);
@@ -75,40 +71,34 @@ public class SecurityConfig {
 
     /**
      * @Order(2) Web UI用のFilterChain (優先度: 低)
-     * /api/ を除くすべてのWebアクセス(フォームログイン、/admin, /studentなど)に適用されます。
-     * @param http HttpSecurity
-     * @return SecurityFilterChain
-     * @throws Exception
+     * ブラウザからのアクセス (/api/issue/** や画面表示) 用です。
      */
     @Bean
-    @Order(2) // APIフィルタチェーンの後に処理されるように順序を明示
+    @Order(2) 
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                //CSRF 無効化
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(authorize -> authorize
-                        // /api/へのアクセスは全てAPIフィルタチェーンに任せる
-                        .requestMatchers("/api/**").denyAll() 
+                        // 画面側API (/api/issue/**) は管理者権限が必要（ログインセッションで判定）
+                        .requestMatchers("/api/issue/**").hasRole("ADMIN")
                         
-                        // ログイン、CSS、JSは全員許可
-                        .requestMatchers("/login", "/css/**", "/js/**", "/error").permitAll()
+                        // attendance以外のAPIが万が一ここに来たら拒否
+                        .requestMatchers("/api/attendance/**").denyAll() 
                         
-                        // ロール（権限）に基づいたアクセス許可
+                        .requestMatchers("/login", "/css/**", "/js/**", "/image/**", "/error").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/student/**").hasRole("STUDENT")
-                        
-                        // その他のリクエストは認証済みであれば許可
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .successHandler(customAuthenticationSuccessHandler()) 
-                        .permitAll() // ログインフォーム関連のURLを許可
+                        .permitAll() 
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout") // 明示的なログアウトURL
-                        .logoutSuccessUrl("/login?logout") // ログアウト後の遷移先
+                        .logoutUrl("/logout") 
+                        .logoutSuccessUrl("/login?logout") 
                         .permitAll()
                 );
 

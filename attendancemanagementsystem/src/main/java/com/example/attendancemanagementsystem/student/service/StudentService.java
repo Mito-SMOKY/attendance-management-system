@@ -31,22 +31,22 @@ public class StudentService {
     // --- 6つのリポジトリを注入 ---
     private final UsersRepository usersRepository;
     private final StudentRepository studentRepository;
-    private final EnrollmentsRepository enrollmentsRepository;
-    private final TimetableRepository timetableRepository;
+    // private final EnrollmentsRepository enrollmentsRepository;
+    // private final TimetableRepository timetableRepository;
     private final AttendanceRepository attendanceRepository;
     private final CalendarRepository calendarRepository;
 
     @Autowired
     public StudentService(UsersRepository usersRepository,
-                          StudentRepository studentRepository,
-                          EnrollmentsRepository enrollmentsRepository,
-                          TimetableRepository timetableRepository,
-                          AttendanceRepository attendanceRepository,
-                          CalendarRepository calendarRepository) {
+                        StudentRepository studentRepository,
+                        EnrollmentsRepository enrollmentsRepository,
+                        TimetableRepository timetableRepository,
+                        AttendanceRepository attendanceRepository,
+                        CalendarRepository calendarRepository) {
         this.usersRepository = usersRepository;
         this.studentRepository = studentRepository;
-        this.enrollmentsRepository = enrollmentsRepository;
-        this.timetableRepository = timetableRepository;
+        // this.enrollmentsRepository = enrollmentsRepository;
+        // this.timetableRepository = timetableRepository;
         this.attendanceRepository = attendanceRepository;
         this.calendarRepository = calendarRepository;
     }
