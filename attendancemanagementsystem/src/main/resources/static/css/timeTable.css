@@ -1,0 +1,118 @@
+/* weeklyTimetable.css */
+
+.timetable-container {
+    
+    width: 95%;
+    max-width: 1400px;
+    margin: 20px auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 15px;
+}
+
+.timetable-header {
+    margin-top: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    /* background-color: #f0f8ff; */
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-size: 1.5em;
+}
+
+.month-year-selector select {
+    padding: 6px;
+    margin-right: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* 週ナビゲーション */
+.week-navigation {
+    display: flex;
+    align-items: center;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.nav-arrow {
+    background: none;
+    border: 1px solid #00cabd;
+    color: #00cabd;
+    padding: 4px 10px;
+    margin: 0 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.week-info {
+    color: #333;
+}
+
+.calendar-icon {
+    /* カレンダーアイコンのスタイル */
+    font-size: 1em;
+    color: #00cabd;
+    cursor: pointer;
+}
+
+/* 時間割テーブル */
+.timetable-wrapper {
+    overflow-x: auto;
+}
+
+.timetable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    min-width: 800px; /* 最小幅を設定してスマホ表示時に横スクロール可能にする */
+}
+
+.timetable th, .timetable td {
+    border: 1px solid #ccc;
+    padding: 10px 5px;
+    text-align: center;
+    height: 60px; /* セルの高さを固定 */
+}
+
+.timetable thead th {
+    background-color: #00acbd;
+    color: white;
+    font-weight: normal;
+    font-size: 0.9em;
+}
+
+.time-slot-header {
+    width: 100px; /* 時間帯列の幅を固定 */
+    background-color: #f8f8f8 !important;
+    color: #333 !important;
+    font-weight: bold !important;
+}
+
+/* 授業があるセル */
+.timetable-entry {
+    font-size: 0.9em;
+    cursor: pointer;
+    line-height: 1.2;
+}
+
+.subject-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #00acbd;
+}
+
+.classroom-name {
+    font-size: 1.2em;
+    color: #666;
+}
+
+.disabled-arrow,
+.nav-arrow:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none; 
+}
