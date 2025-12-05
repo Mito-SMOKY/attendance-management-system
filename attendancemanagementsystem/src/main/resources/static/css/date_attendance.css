@@ -41,7 +41,7 @@ body {
     background-color: #f0f8fa;
 }
 
-/* ▼▼▼ 日付表示エリア (修正済み) ▼▼▼ */
+/* 日付表示エリア  */
 .date-display-area {
     margin-bottom: 20px;
 }
@@ -83,7 +83,6 @@ body {
     font-size: 1rem;
     color: #333;
 }
-/* ▲▲▲ 修正ここまで ▲▲▲ */
 
 
 /* 詳細テーブル */
@@ -178,4 +177,17 @@ body {
     line-height: 22px;
     font-weight: bold;
     font-size: 1rem;
+}
+
+.subject-link {
+    text-decoration: none; /* 下線を消す */
+    display: block;        /* クリック領域を確保 */
+    color: inherit;        /* もとの色を引き継ぐ */
+    transition: opacity 0.3s;
+}
+
+.subject-link:hover .subject-name {
+    text-decoration: underline; /* ホバー時に下線 */
+    color: #00bdca;             /* ホバー時にテーマカラーにする */
+    cursor: pointer;
 }

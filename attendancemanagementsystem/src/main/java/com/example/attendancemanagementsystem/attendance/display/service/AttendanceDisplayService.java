@@ -90,8 +90,9 @@ public class AttendanceDisplayService {
 
             }
 
-            // DTOに追加
+            // DTOに追加 (コンストラクタの第一引数に subjectId を追加)
             result.add(new DailyAttendanceDto(
+                tt.getSubjectId(), // ★追加: これでHTML側でIDが使えるようになります
                 tt.getSlotId(),
                 subjectName,
                 classroomName,
