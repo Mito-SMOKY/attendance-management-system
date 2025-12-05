@@ -167,3 +167,59 @@ a {
   vertical-align: middle;
   margin-bottom: 2px;
 }
+
+/* =========================================
+   ドロップダウンメニュー設定
+   ========================================= */
+
+/* ドロップダウンの親要素 */
+.header-nav li.dropdown {
+  position: relative; /* 子要素の基準位置にする */
+}
+
+/* 「その他 ▼」の文字 */
+.dropdown-toggle {
+  cursor: pointer;
+}
+
+/* ドロップダウンの中身（初期状態は非表示） */
+.dropdown-menu {
+  display: none; /* 隠す */
+  position: absolute;
+  top: 100%; /* 親の下に配置 */
+  left: 0;
+  background-color: white;
+  min-width: 200px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  z-index: 2000;
+  padding: 10px 0;
+}
+
+/* ドロップダウン内のリンク */
+.dropdown-menu a {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 16px; /* ヘッダー文字より少し小さく */
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.dropdown-menu a:last-child {
+  border-bottom: none;
+}
+
+.dropdown-menu a:hover {
+  background-color: #f1f1f1;
+  color: #00bdca;
+  opacity: 1; /* ヘッダーの透明度変化を打ち消す */
+  border-bottom: 1px solid #eee; /* ヘッダーの下線を消す */
+}
+
+/* ホバー時に表示する場合（PC向け） */
+/* スマホも考慮するならJSでクラス付け替えの方が良いですが、今回はCSSのみの簡易版 */
+.header-nav li.dropdown:hover .dropdown-menu {
+  display: block;
+}
