@@ -1,0 +1,269 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px; 
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* =========================================
+   レイアウトコンテナ
+   ========================================= */
+.classroom-container {
+    width: 95%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-top: 120px; 
+    padding-bottom: 100px;
+}
+
+/* =========================================
+   ページヘッダー
+   ========================================= */
+.page-header-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    border-bottom: 3px solid #539DA4;
+    padding-bottom: 5px;
+}
+
+.backbutton-wrapper {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* =========================================
+   アクションエリア (編集ボタン)
+   ========================================= */
+.filter-area {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+}
+
+.edit-btn {
+    height: 40px;
+    padding: 0 30px;
+    background-color: #fff;
+    border: 2px solid #539DA4;
+    border-radius: 5px;
+    color: #539DA4;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.edit-btn:hover {
+    background-color: #f0fcfd;
+}
+
+body.editing-mode .edit-btn {
+    background-color: #539DA4;
+    color: white;
+}
+
+/* エラーメッセージ */
+.error-message-area {
+    min-height: 24px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.error-text {
+    color: #e74c3c;
+    font-weight: bold;
+    font-size: 1rem;
+    display: none;
+}
+
+/* =========================================
+   教室一覧テーブル
+   ========================================= */
+.table-wrapper {
+    width: 100%;
+    border: 1px solid #999;
+    background-color: white;
+    overflow-x: auto;
+    border-radius: 4px;
+    
+    /* ▼▼▼ 修正: 常時表示し、高さは中身に合わせる ▼▼▼ */
+    display: block; 
+    height: auto; 
+    min-height: 0; /* 強制的な高さを解除 */
+}
+
+.classroom-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    min-width: 600px;
+}
+
+.classroom-table th,
+.classroom-table td {
+    border: 1px solid #999;
+    padding: 10px;
+    vertical-align: middle !important;
+}
+
+.classroom-table thead th {
+    background-color: #539DA4;
+    color: white;
+    font-weight: normal;
+    font-size: 1.1rem;
+    padding: 15px 0;
+}
+
+.classroom-table tbody td {
+    background-color: #fff;
+    color: #333;
+    font-size: 1rem;
+    height: 60px;
+}
+
+/* グルーピングスタイル */
+.group-merged {
+    border-top: hidden !important; 
+}
+
+.group-merged .form-input,
+.group-merged .form-select {
+    opacity: 0; 
+    pointer-events: none; 
+}
+
+/* 入力フォーム・プルダウン */
+.form-input {
+    width: 100%;
+    padding: 5px;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    color: #333;
+    text-align: center;
+    pointer-events: none;
+    outline: none;
+}
+
+.form-select {
+    display: inline-block;
+    padding: 5px;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    color: #333;
+    text-align: center;
+    pointer-events: none;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0 2px;
+    width: 100%;
+}
+
+/* 編集モード時 */
+body.editing-mode .form-input,
+body.editing-mode .form-select {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    pointer-events: auto;
+}
+
+body.editing-mode .group-merged .form-input,
+body.editing-mode .group-merged .form-select {
+    border: none;
+    background-color: transparent;
+}
+
+body.editing-mode .form-select {
+    appearance: auto;
+    -webkit-appearance: auto;
+}
+
+body.editing-mode .form-input:focus,
+body.editing-mode .form-select:focus {
+    border-color: #539DA4;
+}
+
+.input-error {
+    border: 2px solid #e74c3c !important;
+    background-color: #fce4e4 !important;
+    opacity: 1 !important;
+}
+
+/* 追加行の表示制御 */
+.added-row {
+    display: none;
+}
+body.editing-mode .added-row {
+    display: table-row;
+}
+
+/* =========================================
+   追加ボタン (+)
+   ========================================= */
+.add-btn-wrapper {
+    display: none;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+body.editing-mode .add-btn-wrapper {
+    display: flex;
+}
+
+.add-row-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #539DA4;
+    color: white;
+    border: none;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s, background-color 0.3s;
+}
+
+.add-row-btn:hover {
+    background-color: #468990;
+    transform: scale(1.1);
+}
+
+.add-row-btn:active {
+    transform: scale(0.95);
+}

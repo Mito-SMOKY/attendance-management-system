@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>結果 - 出欠管理システム</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/nfc/nfc.css}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
+</head>
+<body>
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+
+    <div class="writer-container">
+        
+        <div th:if="${status == 'success'}" class="result-area">
+            <div class="instruction-text text-success">書き込み成功！</div>
+            
+            <img th:src="@{/image/success.gif}" alt="Success" class="result-image">
+            
+            <p class="result-message">正常に発行されました。</p>
+        </div>
+
+        <div th:if="${status == 'error'}" class="result-area">
+            <div class="instruction-text text-error">書き込み失敗</div>
+
+            <img th:src="@{/image/error.gif}" alt="Error" class="result-image">
+
+            <p class="result-message">書き込み中にエラーが発生しました。<br>もう一度お試しください。</p>
+            
+            <p th:if="${message}" th:text="${message}" style="color:red; font-size:0.9rem; margin-top:10px;"></p>
+        </div>
+
+        <p style="margin-top: 30px; color: #888;">
+            3秒後に待機画面に戻ります...
+        </p>
+    </div>
+
+    <script th:src="@{/js/nfc_result.js}"></script>
+</body>
+</html>

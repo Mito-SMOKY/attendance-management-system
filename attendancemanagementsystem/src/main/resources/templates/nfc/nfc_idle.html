@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>待機中 - 出欠管理システム</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/nfc/nfc.css}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
+</head>
+<body>
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header}"></div>
+    </div>
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/nfc/nfc_idle')}"></div>
+    </div>
+
+    <div class="writer-container">
+        <div class="instruction-text">
+            リーダーにカードを<br>かざしてください
+        </div>
+        <img th:src="@{/image/loading.gif}" alt="Scanning..." class="idle-image">
+    </div>
+
+    <script th:src="@{/js/nfc_idle.js}"></script>
+</body>
+</html>

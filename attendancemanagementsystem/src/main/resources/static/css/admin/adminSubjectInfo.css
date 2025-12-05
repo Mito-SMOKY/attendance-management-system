@@ -1,0 +1,188 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px; 
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* =========================================
+   レイアウトコンテナ
+   ========================================= */
+.subject-info-container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 0 auto;
+    /* ヘッダー(約80px) + 余白 */
+    padding-top: 120px; 
+    padding-bottom: 50px;
+}
+
+/* =========================================
+   ページタイトルエリア
+   ========================================= */
+.page-header-wrapper {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    display: inline-block;
+    border-bottom: 3px solid #539DA4;
+    padding-bottom: 5px;
+}
+
+/* =========================================
+   メインコンテンツ (左右分割)
+   ========================================= */
+.main-content-grid {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+/* --- 左側パネル (詳細情報) --- */
+.left-panel {
+    flex: 1;
+    min-width: 550px; /* 画像のテーブル幅に合わせて調整 */
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* 各情報ブロック共通スタイル */
+.info-block {
+    /* 以前のinfo-blockのスタイルを削除し、テーブルに直接スタイルを適用 */
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+}
+
+/* 上段の基本情報テーブル用ヘッダーと編集ボタン */
+.basic-info-header {
+    display: flex;
+    justify-content: flex-end; /* 編集ボタンを右寄せ */
+    align-items: center;
+    margin-bottom: 10px; /* テーブルとの間隔 */
+}
+
+/* 編集ボタン */
+.edit-btn {
+    padding: 6px 20px;
+    background-color: #fff;
+    border: 1px solid #707070;
+    border-radius: 4px;
+    color: #333;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-left: auto; /* 右寄せ */
+}
+.edit-btn:hover {
+    background-color: #f0f0f0;
+}
+
+
+/* ▼▼▼ 画像に合わせたテーブルデザイン (基本情報・詳細設定 共通) ▼▼▼ */
+.detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #999; /* 外枠 */
+    background-color: white; /* 全体の背景 */
+}
+
+.detail-table th,
+.detail-table td {
+    padding: 15px 10px;
+    border: 1px solid #999; /* 格子状の罫線 */
+    vertical-align: middle;
+}
+
+/* 項目名セル */
+.detail-table th {
+    background-color: #539DA4; /* 画像のような青緑色 */
+    color: white;
+    font-weight: normal;
+    text-align: center;
+    width: 25%; /* 4カラムのバランス */
+    white-space: nowrap;
+}
+
+/* データ内容セル */
+.detail-table td {
+    color: #333;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: left; /* データは左寄せ */
+    width: 25%; /* 4カラムのバランス */
+}
+
+/* 特に成績評価方法など長文用 */
+.text-content {
+    white-space: pre-wrap;
+    line-height: 1.6;
+}
+
+
+/* --- 右側パネル (履修者リスト) --- */
+.right-panel {
+    flex: 0 0 300px; /* 幅固定 */
+    display: flex;
+    flex-direction: column;
+}
+
+/* リストテーブル */
+.student-list-wrapper {
+    width: 100%;
+    border: 1px solid #999;
+    background-color: white;
+    max-height: 600px; /* スクロール制限 */
+    overflow-y: auto;
+}
+
+.student-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.student-table th,
+.student-table td {
+    border: 1px solid #999;
+    padding: 12px;
+}
+
+/* ヘッダー固定 */
+.student-table thead th {
+    background-color: #539DA4;
+    color: white;
+    font-weight: normal;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.student-table tbody td {
+    font-size: 1rem;
+    color: #333;
+}
