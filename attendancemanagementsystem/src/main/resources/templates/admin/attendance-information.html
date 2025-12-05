@@ -6,9 +6,7 @@
     <title>生徒出席情報</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    
     <link rel="stylesheet" th:href="@{/css/adminattendance.css}">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -17,34 +15,53 @@
         <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
     </div>
     
-
     <div class="attendance-container">
         
         <div class="top-info-bar">
             <div class="timer-section">
-                <div class="timer-display">00:00</div>
+                <div class="timer-display" id="currentTime">00:00</div>
             </div>
             
             <div class="center-title">
                 <h1>生徒出席情報</h1>
-                <p>12月 13日 1限目 231教室</p>
+                <p><span id="currentDate">--月 --日</span> 1限目 231教室</p>
             </div>
             
-            <div class="tool-area">
-                <button class="tool-btn filter-btn">
+            <div class="tool-area" style="position: relative;">
+                
+                <div class="edit-area">
+                    <select id="statusSelect" class="status-select">
+                        <option value="">ステータス選択</option>
+                        <option value="present">出席</option>
+                        <option value="absent">欠席</option>
+                        <option value="public">公欠</option>
+                        <option value="candidate">公欠候補</option>
+                    </select>
+                    <button class="apply-btn" id="applyStatusBtn">変更</button>
+                </div>
+
+                <button class="tool-btn filter-btn" id="filterBtn">
                     <i class="fa-solid fa-filter"></i>
                 </button>
                 
-                <button class="tool-btn bulk-btn">
+                <div class="filter-menu" id="filterMenu">
+                    <div class="filter-item" data-filter="all">全て表示</div>
+                    <div class="filter-item" data-filter="present">出席</div>
+                    <div class="filter-item" data-filter="absent">欠席</div>
+                    <div class="filter-item" data-filter="other">その他(公欠等)</div>
+                </div>
+
+                <button class="tool-btn bulk-btn" id="bulkSelectBtn">
                     一括選択
                 </button>
             </div>
         </div>
 
         <div class="table-wrapper">
-            <table class="attendance-table">
+            <table class="attendance-table" id="attendanceTable">
                 <colgroup>
-                    <col style="width: 8%;">  <col style="width: 8%;">  <col style="width: 25%;"> <col style="width: 15%;"> <col style="width: 34%;"> <col style="width: 10%;"> </colgroup>
+                    <col style="width: 8%;"> <col style="width: 8%;"> <col style="width: 25%;"> <col style="width: 15%;"> <col style="width: 34%;"> <col style="width: 10%;"> 
+                </colgroup>
                 <thead>
                     <tr>
                         <th>学年</th>
@@ -56,77 +73,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="row-absent">
-                        <td>2</td>
-                        <td>AA</td>
-                        <td>川島 未裕</td>
-                        <td>-</td>
-                        <td class="status-cell-absent">欠席</td>
-                        <td><input type="checkbox" class="row-checkbox"></td>
-                    </tr>
-                    <tr class="row-absent">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>-</td>
-                        <td class="status-cell-absent"></td>
-                        <td><input type="checkbox" class="row-checkbox"></td>
-                    </tr>
-                    <tr class="row-present">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="status-cell-present"></td>
-                        <td><input type="checkbox" class="row-checkbox"></td>
-                    </tr>
-                    <tr class="row-present">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="status-cell-present"></td>
-                        <td><input type="checkbox" class="row-checkbox"></td>
-                    </tr>
-                    <tr class="row-present">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="status-cell-present"></td>
-                        <td><input type="checkbox" class="row-checkbox"></td>
-                    </tr>
-                    <tr class="row-present">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="status-cell-present"></td>
-                        <td><input type="checkbox" class="row-checkbox"></td>
-                    </tr>
-                    <tr class="row-present">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="status-cell-present"></td>
-                        <td><input type="checkbox" class="row-checkbox"></td>
-                    </tr>
-                    <tr class="row-public">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>-</td>
-                        <td class="status-cell-public"></td>
-                        <td><input type="checkbox" class="row-checkbox"></td>
-                    </tr>
-                    <tr class="row-absent">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>-</td>
-                        <td class="status-cell-absent"></td>
-                        <td><input type="checkbox" class="row-checkbox"></td>
+                    <tr th:each="student : ${studentList}" class="student-row">
+                        <td th:text="${student.grade}"></td>
+                        <td th:text="${student.className}"></td>
+                        <td th:text="${student.name}"></td>
+                        <td th:text="${student.authTime != null ? student.authTime : '-'}"></td>
+                        
+                        <td class="status-cell"
+                            th:data-status="${student.statusId == 1 ? 'absent' : (student.statusId == 2 ? 'present' : 'other')}"
+                            th:text="${student.statusLabel}"
+                            th:classappend="${student.statusId == 1 ? 'status-cell-absent' : 
+                                             (student.statusId == 2 ? 'status-cell-present' : 
+                                             (student.statusId == 3 ? 'status-cell-public' : ''))}">
+                        </td>
+                        
+                        <td><input type="checkbox" class="row-checkbox" th:value="${student.id}"></td>
                     </tr>
                 </tbody>
             </table>
@@ -138,5 +99,124 @@
 
     </div>
 
-</body>
-</html>
+   <script>
+        // --- 時刻・日付更新処理 ---
+        function updateTimeAndDate() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+            const month = now.getMonth() + 1;
+            const date = now.getDate();
+            document.getElementById('currentDate').textContent = `${month}月 ${date}日`;
+        }
+        updateTimeAndDate();
+        setInterval(updateTimeAndDate, 1000);
+
+        // --- 一括選択処理 ---
+        let isAllSelected = false;
+        document.getElementById('bulkSelectBtn').addEventListener('click', function() {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            const visibleRows = Array.from(document.querySelectorAll('.student-row')).filter(row => row.style.display !== 'none');
+            
+            isAllSelected = !isAllSelected;
+            
+            visibleRows.forEach(row => {
+                const checkbox = row.querySelector('.row-checkbox');
+                if(checkbox) checkbox.checked = isAllSelected;
+            });
+        });
+
+        // --- フィルター機能 ---
+        const filterBtn = document.getElementById('filterBtn');
+        const filterMenu = document.getElementById('filterMenu');
+        const filterItems = document.querySelectorAll('.filter-item');
+        const rows = document.querySelectorAll('.student-row');
+
+        filterBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            filterMenu.classList.toggle('active');
+        });
+
+        document.addEventListener('click', () => {
+            filterMenu.classList.remove('active');
+        });
+
+        filterItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const filterType = item.getAttribute('data-filter');
+                rows.forEach(row => {
+                    const statusCell = row.querySelector('.status-cell');
+                    const currentStatus = statusCell.getAttribute('data-status');
+
+                    if (filterType === 'all') {
+                        row.style.display = '';
+                    } else if (filterType === 'other') {
+                        if (currentStatus !== 'present' && currentStatus !== 'absent') {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    } else {
+                        if (currentStatus === filterType) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        });
+
+        // --- ステータス変更処理 ---
+        const applyStatusBtn = document.getElementById('applyStatusBtn');
+        const statusSelect = document.getElementById('statusSelect');
+
+        const statusConfig = {
+            'present':   { label: '出席', className: 'status-cell-present' },
+            'absent':    { label: '欠席', className: 'status-cell-absent' },
+            'public':    { label: '公欠', className: 'status-cell-public' },
+            'candidate': { label: '公欠候補', className: 'status-cell-public' }
+        };
+
+        applyStatusBtn.addEventListener('click', () => {
+            const selectedValue = statusSelect.value;
+            if (!selectedValue) {
+                alert("ステータスを選択してください");
+                return;
+            }
+
+            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert("変更する生徒を選択してください");
+                return;
+            }
+
+            checkboxes.forEach(checkbox => {
+                const row = checkbox.closest('tr');
+                const statusCell = row.querySelector('.status-cell');
+                const config = statusConfig[selectedValue];
+
+                statusCell.classList.remove('status-cell-present', 'status-cell-absent', 'status-cell-public');
+                statusCell.classList.add(config.className);
+                statusCell.textContent = config.label + "(変更済)";
+
+                if(selectedValue === 'public' || selectedValue === 'candidate') {
+                    statusCell.setAttribute('data-status', 'other');
+                } else {
+                    statusCell.setAttribute('data-status', selectedValue);
+                }
+            });
+
+            checkboxes.forEach(cb => cb.checked = false);
+            isAllSelected = false;
+        });
+
+        // ▼▼▼ 今回追加した部分 ▼▼▼
+        // --- セッションを閉じる（ページ遷移）処理 ---
+        document.querySelector('.close-session-btn').addEventListener('click', function() {
+            // 同じフォルダにある timetable.html に遷移します
+            window.location.href = 'timetable';
+        });
+
+    </script>

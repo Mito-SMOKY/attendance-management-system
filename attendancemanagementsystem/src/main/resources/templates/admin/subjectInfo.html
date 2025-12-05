@@ -33,51 +33,104 @@
                 
                 <div class="info-block">
                     <div class="basic-info-header">
-                        <button class="edit-btn">編集</button>
+                        <button class="edit-btn" id="toggleEditBtn">編集</button>
                     </div>
                     <table class="detail-table">
                         <tbody>
                             <tr>
                                 <th>講座名</th>
-                                <td th:text="${subjectName}"></td>
+                                <td>
+                                    <span class="view-mode" th:text="${subjectName}"></span>
+                                    <select class="edit-mode" name="subjectName">
+                                        <option value="">選択</option>
+                                        <option th:each="item : ${subjectNameList}" 
+                                                th:value="${item.val}" th:text="${item.label}"
+                                                th:selected="${item.val == subjectName}"></option>
+                                    </select>
+                                </td>
                                 <th>年度</th>
-                                <td th:text="${year}"></td>
+                                <td>
+                                    <span class="view-mode" th:text="${year}"></span>
+                                    <select class="edit-mode" name="year">
+                                        <option value="">選択</option>
+                                        <option th:each="y : ${yearList}" 
+                                                th:value="${y}" th:text="${y}"
+                                                th:selected="${y == year}"></option>
+                                    </select>
+                                </td>
                             </tr>
                             <tr>
                                 <th>コース・学年</th>
-                                <td th:text="${courseGrade}"></td>
+                                <td>
+                                    <span class="view-mode" th:text="${courseGrade}"></span>
+                                    <select class="edit-mode" name="courseGrade">
+                                        <option value=""></option>
+                                        <option th:each="cg : ${courseGradeList}" 
+                                                th:value="${cg.id}" th:text="${cg.name}"
+                                                th:selected="${cg.name == courseGrade}"></option>
+                                    </select>
+                                </td>
                                 <th>教科ID</th>
-                                <td th:text="${subjectId}"></td>
+                                <td>
+                                    <span class="view-mode" th:text="${subjectId}"></span>
+                                    <select class="edit-mode" name="subjectId">
+                                        <option value="">選択</option>
+                                        <option th:each="sid : ${subjectIdList}" 
+                                                th:value="${sid}" th:text="${sid}"
+                                                th:selected="${sid == subjectId}"></option>
+                                    </select>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="info-block">
-                    <div class="basic-info-header">
-                        </div>
                     <table class="detail-table">
                         <tbody>
                             <tr>
                                 <th colspan="2">担当教員</th>
-                                <td colspan="2" th:text="${teacherName}"></td>
+                                <td colspan="2">
+                                    <span class="view-mode" th:text="${teacherName}"></span>
+                                    <select class="edit-mode" name="teacherName">
+                                        <option value="">教員を選択</option>
+                                        <option th:each="teacher : ${teacherList}" 
+                                                th:value="${teacher.id}" th:text="${teacher.name}"
+                                                th:selected="${teacher.name == teacherName}"></option>
+                                    </select>
+                                </td>
                             </tr>
                             <tr>
                                 <th colspan="2">単位数</th>
-                                <td colspan="2" th:text="${credits}"></td>
+                                <td colspan="2">
+                                    <span class="view-mode" th:text="${credits}"></span>
+                                    <input type="text" class="edit-mode edit-input" name="credits" th:value="${credits}">
+                                </td>
                             </tr>
                             <tr>
                                 <th colspan="2">曜日・コマ</th>
-                                <td colspan="2" th:text="${schedule}"></td>
+                                <td colspan="2">
+                                    <span class="view-mode" th:text="${schedule}"></span>
+                                    <input type="text" class="edit-mode edit-input" name="schedule" th:value="${schedule}">
+                                </td>
                             </tr>
                             <tr>
                                 <th colspan="2">教室</th>
-                                <td colspan="2" th:text="${classroom}"></td>
+                                <td colspan="2">
+                                    <span class="view-mode" th:text="${classroom}"></span>
+                                    <select class="edit-mode" name="classroom">
+                                        <option value="">教室を選択</option>
+                                        <option th:each="room : ${classroomList}" 
+                                                th:value="${room.id}" th:text="${room.name}"
+                                                th:selected="${room.name == classroom}"></option>
+                                    </select>
+                                </td>
                             </tr>
                             <tr>
                                 <th colspan="2">成績評価方法</th>
                                 <td colspan="2">
-                                    <div class="text-content" th:text="${gradingMethod}"></div>
+                                    <div class="view-mode text-content" th:text="${gradingMethod}"></div>
+                                    <textarea class="edit-mode edit-textarea" name="gradingMethod" th:text="${gradingMethod}"></textarea>
                                 </td>
                             </tr>
                         </tbody>
@@ -96,17 +149,14 @@
                         </thead>
                         <tbody>
                             <tr th:each="student : ${studentList}">
-                                <td th:text="${student.name}"></td>
+                                <td>
+                                    <a th:href="@{/student/info/{id}(id=${student.id})}" 
+                                       th:text="${student.name}" class="student-link"></a>
+                                </td>
                             </tr>
                             
-                            <tr th:if="${studentList == null}"><td>&nbsp;</td></tr>
-                            <tr th:if="${studentList == null}"><td>&nbsp;</td></tr>
-                            <tr th:if="${studentList == null}"><td>&nbsp;</td></tr>
-                            <tr th:if="${studentList == null}"><td>&nbsp;</td></tr>
-                            <tr th:if="${studentList == null}"><td>&nbsp;</td></tr>
-                            <tr th:if="${studentList == null}"><td>&nbsp;</td></tr>
-                            <tr th:if="${studentList == null}"><td>&nbsp;</td></tr>
-                            <tr th:if="${studentList == null}"><td>&nbsp;</td></tr>
+                            <tr th:if="${#lists.isEmpty(studentList)}">
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -115,6 +165,59 @@
         </div>
 
     </div>
+
+   <script>
+        document.getElementById('toggleEditBtn').addEventListener('click', function() {
+            const viewModes = document.querySelectorAll('.view-mode');
+            const editModes = document.querySelectorAll('.edit-mode');
+            const isEditing = this.classList.contains('active-edit');
+
+            if (!isEditing) {
+                // === 編集モードへ ===
+                viewModes.forEach(el => el.style.display = 'none');
+                editModes.forEach(el => el.style.display = 'block'); 
+
+                this.textContent = '保存';
+                this.classList.add('active-edit');
+                this.style.backgroundColor = '#539DA4';
+                this.style.color = 'white';
+            } else {
+                // === 保存処理 (画面反映) ===
+                
+                editModes.forEach(input => {
+                    // 親要素(td)を探す
+                    const parent = input.parentElement;
+                    const viewSpan = parent.querySelector('.view-mode');
+                    
+                    if (viewSpan) {
+                        if (input.tagName === 'SELECT') {
+                            // ▼▼▼ 修正箇所: プルダウンの処理 ▼▼▼
+                            // valueが空（初期値の「選択してください」等）の場合は、表示を空にする
+                            if (input.value === "") {
+                                viewSpan.textContent = ""; 
+                            } else {
+                                // 値が入っている場合のみ、そのテキスト(例: "数学I")を表示
+                                const selectedOption = input.options[input.selectedIndex];
+                                if(selectedOption) viewSpan.textContent = selectedOption.text;
+                            }
+                        } else {
+                            // input/textareaの場合
+                            viewSpan.textContent = input.value;
+                        }
+                    }
+                });
+
+                // === 通常モードへ ===
+                editModes.forEach(el => el.style.display = 'none');
+                viewModes.forEach(el => el.style.display = 'block'); 
+
+                this.textContent = '編集';
+                this.classList.remove('active-edit');
+                this.style.backgroundColor = '';
+                this.style.color = '';
+            }
+        });
+    </script>
 
 </body>
 </html>

@@ -208,3 +208,67 @@ body {
     top: 0;
     z-index: 1;
 }
+
+/* （既存のCSSの末尾に追加してください） */
+
+/* =========================================
+   ▼ 追加: 教科名リンク ▼
+   ========================================= */
+.info-table a {
+    color: #539DA4;
+    text-decoration: underline;
+    font-weight: bold;
+    cursor: pointer;
+}
+.info-table a:hover {
+    color: #3e7b80;
+    text-decoration: none;
+}
+
+/* =========================================
+   ▼ 追加: 編集フォーム ▼
+   ========================================= */
+.summary-input {
+    width: 60px;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #999;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.edit-val {
+    /* JSでblock/none切り替え */
+    text-align: center;
+}
+
+/* =========================================
+   ▼ 追加: 時間割の色分け (〇/✕) ▼
+   ========================================= */
+
+/* セル内のステータス表示ボックス */
+.status-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    font-weight: bold;
+    font-size: 1.2rem;
+    /* セル全体を塗りつぶしたい場合はここで背景色を指定せず、親のtdにクラスをつける方法もありますが、
+       今回はdivに対して色をつけます */
+    border-radius: 4px; /* 角丸 */
+}
+
+/* 出席 (〇) : 薄い緑 */
+.bg-present {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* 欠席 (✕) : 薄い赤 */
+.bg-absent {
+    background-color: #f8d7da;
+    color: #721c24;
+}

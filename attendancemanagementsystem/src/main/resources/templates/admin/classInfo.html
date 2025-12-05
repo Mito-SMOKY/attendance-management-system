@@ -7,7 +7,6 @@
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/admininfo.css}">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -17,7 +16,7 @@
     </div>
 
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/login')}"></div>
+        <div th:replace="~{fragments/_parts :: backButton(url='/classList')}"></div>
     </div>
     
     <div class="info-container">
@@ -25,8 +24,7 @@
         <h1 class="page-title">授業情報</h1>
 
         <div class="controls-area">
-        
-            <button class="edit-btn">編集</button>
+            <button class="edit-btn" id="toggleEditBtn">編集</button>
         </div>
 
         <div class="top-info-section">
@@ -36,15 +34,17 @@
                     <tbody>
                         <tr>
                             <th>教科名</th>
-                            <td></td>
+                            <td>
+                                <a href="#" class="subject-link" th:text="${subjectName}"></a>
+                            </td>
                         </tr>
                         <tr>
                             <th>担当教員</th>
-                            <td>鈴木千太郎</td>
+                            <td th:text="${teacherName}"></td>
                         </tr>
                         <tr>
                             <th>コース</th>
-                            <td></td>
+                            <td th:text="${courseName}"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -55,15 +55,41 @@
                     <tbody>
                         <tr>
                             <th>教室</th>
-                            <td></td>
+                            <td>
+                                <span id="viewRoomName" class="view-mode-text" th:text="${roomName}"></span>
+                                
+                                <div class="edit-mode-wrapper">
+                                    <select id="editRoomSelect" class="classroom-select">
+                                        <option value="">教室を選択</option>
+                                        <option th:each="room : ${roomList}" 
+                                                th:value="${room.id}" 
+                                                th:text="${room.name}"
+                                                th:selected="${room.id == currentRoomId}"></option>
+                                    </select>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <th>授業時間</th>
-                            <td></td>
+                            <td>
+                                <span id="viewClassTime" class="view-mode-text" th:text="${classTime}"></span>
+                                
+                                <div class="edit-mode-wrapper time-input-container">
+                                    <input type="text" id="startHour" class="time-input-mini" placeholder="00" th:value="${startHour}">
+                                    <span class="time-colon">:</span>
+                                    <input type="text" id="startMin" class="time-input-mini" placeholder="00" th:value="${startMin}">
+                                    
+                                    <span class="time-tilde">~</span>
+                                    
+                                    <input type="text" id="endHour" class="time-input-mini" placeholder="00" th:value="${endHour}">
+                                    <span class="time-colon">:</span>
+                                    <input type="text" id="endMin" class="time-input-mini" placeholder="00" th:value="${endMin}">
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <th>日付</th>
-                            <td></td>
+                            <td th:text="${classDate}"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -76,7 +102,8 @@
             <div class="student-table-wrapper">
                 <table class="student-table">
                     <colgroup>
-                        <col style="width: 15%;"> <col style="width: 10%;"> <col style="width: 15%;"> <col style="width: 30%;"> <col style="width: 30%;"> </colgroup>
+                        <col style="width: 15%;"> <col style="width: 10%;"> <col style="width: 15%;"> <col style="width: 30%;"> <col style="width: 30%;"> 
+                    </colgroup>
                     <thead>
                         <tr>
                             <th>学籍番号</th>
@@ -87,37 +114,76 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td class="status-present"></td>
+                        <tr th:each="student : ${studentList}">
+                            <td th:text="${student.number}"></td>
+                            <td th:text="${student.grade}"></td>
+                            <td th:text="${student.className}"></td>
+                            <td th:text="${student.name}"></td>
+                            
+                            <td class="status-cell"
+                                th:text="${student.attended ? '〇' : '✕'}"
+                                th:classappend="${student.attended ? 'status-present' : 'status-absent'}">
+                            </td>
                         </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td class="status-absent"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td class="status-present"></td>
-                        </tr>
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </div>
 
-        <div class="footer-action">
-            <button class="start-session-btn">セッションを開始</button>
-        </div>
-
     </div>
+
+    <script>
+        document.getElementById('toggleEditBtn').addEventListener('click', function() {
+            // 要素取得
+            const viewTexts = document.querySelectorAll('.view-mode-text');
+            const editWrappers = document.querySelectorAll('.edit-mode-wrapper');
+            const isEditing = this.classList.contains('active-edit');
+
+            if (!isEditing) {
+                // === 編集モードへ切り替え ===
+                viewTexts.forEach(el => el.style.display = 'none');
+                // flexで表示（横並び維持）
+                editWrappers.forEach(el => el.style.display = 'flex');
+
+                this.textContent = '保存';
+                this.classList.add('active-edit');
+                this.style.backgroundColor = '#539DA4'; 
+                this.style.color = 'white';
+
+            } else {
+                // === 保存ボタン押下時 ===
+                
+                // 1. 教室名の反映
+                const roomSelect = document.getElementById('editRoomSelect');
+                const viewRoom = document.getElementById('viewRoomName');
+                const selectedOption = roomSelect.options[roomSelect.selectedIndex];
+                if (selectedOption && selectedOption.value !== "") {
+                    viewRoom.textContent = selectedOption.text;
+                }
+
+                // 2. 時間の反映
+                const sH = document.getElementById('startHour').value;
+                const sM = document.getElementById('startMin').value;
+                const eH = document.getElementById('endHour').value;
+                const eM = document.getElementById('endMin').value;
+                const viewTime = document.getElementById('viewClassTime');
+                
+                // 全て入力されていたら反映
+                if(sH && sM && eH && eM) {
+                    viewTime.textContent = `${sH}:${sM} ~ ${eH}:${eM}`;
+                }
+
+                // === 通常モードへ戻す ===
+                editWrappers.forEach(el => el.style.display = 'none');
+                viewTexts.forEach(el => el.style.display = 'inline');
+                
+                this.textContent = '編集';
+                this.classList.remove('active-edit');
+                this.style.backgroundColor = '';
+                this.style.color = '';
+            }
+        });
+    </script>
 
 </body>
 </html>

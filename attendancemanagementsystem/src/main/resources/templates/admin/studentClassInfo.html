@@ -16,7 +16,6 @@
         <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
     </div>
     
-    
     <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url='/studentInfo')}"></div>
     </div>
@@ -30,7 +29,7 @@
         <div class="main-content">
             
             <div class="left-panel">
-                <div class="student-name-display">
+                <div class="student-name-display" th:text="${studentName}">
                     ○○ ×× さん
                 </div>
 
@@ -38,27 +37,29 @@
                     <tbody>
                         <tr>
                             <th>教科名</th>
-                            <td></td>
+                            <td>
+                                <a th:href="@{/subject/detail/{id}(id=${subjectId})}" th:text="${subjectName}">数学</a>
+                            </td>
                         </tr>
                         <tr>
                             <th>教室</th>
-                            <td></td>
+                            <td th:text="${classroomName}">231</td>
                         </tr>
                         <tr>
                             <th>担当教員</th>
-                            <td></td>
+                            <td th:text="${teacherName}">佐藤 先生</td>
                         </tr>
                         <tr>
                             <th>必要コマ数</th>
-                            <td></td>
+                            <td th:text="${requiredCredits}">30</td>
                         </tr>
                         <tr>
                             <th>履修済</th>
-                            <td></td>
+                            <td th:text="${earnedCredits}">15</td>
                         </tr>
                         <tr>
                             <th>現在の出席率</th>
-                            <td></td>
+                            <td th:text="${attendanceRate} + '%'">80%</td>
                         </tr>
                     </tbody>
                 </table>
@@ -80,21 +81,46 @@
                         <tbody>
                             <tr>
                                 <td>コマ数</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
+                                
+                                <td>
+                                    <span class="view-val" th:text="${presentCount}">0</span>
+                                    <div class="edit-val" style="display:none;">
+                                        <input type="number" class="summary-input" th:value="${presentCount}" min="0">
+                                    </div>
+                                </td>
+                                
+                                <td>
+                                    <span class="view-val" th:text="${absentCount}">0</span>
+                                    <div class="edit-val" style="display:none;">
+                                        <input type="number" class="summary-input" th:value="${absentCount}" min="0">
+                                    </div>
+                                </td>
+                                
+                                <td>
+                                    <span class="view-val" th:text="${suspendCount}">0</span>
+                                    <div class="edit-val" style="display:none;">
+                                        <input type="number" class="summary-input" th:value="${suspendCount}" min="0">
+                                    </div>
+                                </td>
+                                
+                                <td>
+                                    <span class="view-val" th:text="${publicCount}">0</span>
+                                    <div class="edit-val" style="display:none;">
+                                        <input type="number" class="summary-input" th:value="${publicCount}" min="0">
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                     
-                    <button class="edit-btn">編集</button>
+                    <button class="edit-btn" id="toggleEditBtn">編集</button>
                 </div>
 
                 <div class="schedule-wrapper">
                     <table class="schedule-table">
                         <colgroup>
-                            <col style="width: 20%;"> <col style="width: 20%;"> <col style="width: 20%;"> <col style="width: 20%;"> <col style="width: 20%;"> </colgroup>
+                            <col style="width: 20%;"> <col style="width: 20%;"> <col style="width: 20%;"> <col style="width: 20%;"> <col style="width: 20%;"> 
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th>日付</th>
@@ -105,33 +131,40 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                             <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                             <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                            <tr th:each="schedule : ${scheduleList}">
+                                <td th:text="${schedule.date}">12/01</td>
+                                
+                                <td>
+                                    <div class="status-cell" 
+                                         th:if="${schedule.period1 != null}"
+                                         th:text="${schedule.period1.attended ? '〇' : '✕'}"
+                                         th:classappend="${schedule.period1.attended ? 'bg-present' : 'bg-absent'}">
+                                    </div>
+                                </td>
+                                
+                                <td>
+                                    <div class="status-cell" 
+                                         th:if="${schedule.period2 != null}"
+                                         th:text="${schedule.period2.attended ? '〇' : '✕'}"
+                                         th:classappend="${schedule.period2.attended ? 'bg-present' : 'bg-absent'}">
+                                    </div>
+                                </td>
+                                
+                                <td>
+                                    <div class="status-cell" 
+                                         th:if="${schedule.period3 != null}"
+                                         th:text="${schedule.period3.attended ? '〇' : '✕'}"
+                                         th:classappend="${schedule.period3.attended ? 'bg-present' : 'bg-absent'}">
+                                    </div>
+                                </td>
+                                
+                                <td>
+                                    <div class="status-cell" 
+                                         th:if="${schedule.period4 != null}"
+                                         th:text="${schedule.period4.attended ? '〇' : '✕'}"
+                                         th:classappend="${schedule.period4.attended ? 'bg-present' : 'bg-absent'}">
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -141,6 +174,51 @@
         </div>
 
     </div>
+
+    <script>
+        document.getElementById('toggleEditBtn').addEventListener('click', function() {
+            const viewVals = document.querySelectorAll('.view-val');
+            const editVals = document.querySelectorAll('.edit-val');
+            const isEditing = this.classList.contains('active-edit');
+
+            if (!isEditing) {
+                // 編集モードへ
+                viewVals.forEach(el => el.style.display = 'none');
+                editVals.forEach(el => el.style.display = 'block');
+
+                this.textContent = '保存';
+                this.classList.add('active-edit');
+                this.style.backgroundColor = '#539DA4';
+                this.style.color = 'white';
+            } else {
+                // 保存処理
+                editVals.forEach(editDiv => {
+                    const input = editDiv.querySelector('input');
+                    const cell = editDiv.parentElement;
+                    const viewSpan = cell.querySelector('.view-val');
+                    
+                    if(input && viewSpan) {
+                        // マイナス値チェック
+                        let val = parseInt(input.value, 10);
+                        if(isNaN(val) || val < 0) {
+                            val = 0;
+                            input.value = 0;
+                        }
+                        viewSpan.textContent = val;
+                    }
+                });
+
+                // 通常モードへ
+                editVals.forEach(el => el.style.display = 'none');
+                viewVals.forEach(el => el.style.display = 'inline');
+
+                this.textContent = '編集';
+                this.classList.remove('active-edit');
+                this.style.backgroundColor = '';
+                this.style.color = '';
+            }
+        });
+    </script>
 
 </body>
 </html>

@@ -16,7 +16,6 @@
         <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
     </div>
     
-    
     <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url='/studentList')}"></div>
     </div> 
@@ -24,7 +23,6 @@
     <div class="info-container">
         
         <div class="page-header-wrapper">
-
             <h1 class="page-title">生徒情報</h1>
         </div>
 
@@ -32,12 +30,10 @@
             
             <div class="left-sidebar-area">
                 
-                <div class="student-name-display">
-                    ○○ ×× さん
-                </div>
+                <div class="student-name-display" th:text="${studentName}"></div>
 
                 <form class="sidebar-search-form">
-                    <input type="text" class="sidebar-search-input" placeholder="教科名を検索">
+                    <input type="text" class="sidebar-search-input" placeholder="キーワードを入力">
                     <button type="submit" class="sidebar-search-btn">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
@@ -46,14 +42,9 @@
                 <div class="subject-list-box">
                     <div class="sidebar-title">受講教科一覧</div>
                     <ul class="subject-list">
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
+                        <li th:each="subject : ${subjectList}">
+                            <a th:href="@{/subject/detail/{id}(id=${subject.id})}" th:text="${subject.name}"></a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -62,11 +53,8 @@
                 
                 <div class="attendance-controls">
                     <select class="month-select">
-                        <option value=""></option>
-                        <option value=""></option>
-                        <option value=""></option>
                     </select>
-                    <button class="edit-btn">編集</button>
+                    <button class="edit-btn" id="toggleEditBtn">編集</button>
                 </div>
 
                 <table class="status-summary-table">
@@ -85,13 +73,55 @@
                     <tbody>
                         <tr>
                             <td>日数</td>
-                            <td>日</td>
-                            <td>日</td>
-                            <td>日</td>
-                            <td>日</td>
-                            <td>日</td>
-                            <td>日</td>
-                            <td>日</td>
+                            
+                            <td>
+                                <span class="view-val" th:text="${presentDays}"></span><span class="view-unit">日</span>
+                                <div class="edit-val" style="display:none;">
+                                    <input type="number" class="summary-input" th:value="${presentDays}" min="0"> 日
+                                </div>
+                            </td>
+                            
+                            <td>
+                                <span class="view-val" th:text="${sickDays}"></span><span class="view-unit">日</span>
+                                <div class="edit-val" style="display:none;">
+                                    <input type="number" class="summary-input" th:value="${sickDays}" min="0"> 日
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="view-val" th:text="${lateDays}"></span><span class="view-unit">日</span>
+                                <div class="edit-val" style="display:none;">
+                                    <input type="number" class="summary-input" th:value="${lateDays}" min="0"> 日
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="view-val" th:text="${earlyDays}"></span><span class="view-unit">日</span>
+                                <div class="edit-val" style="display:none;">
+                                    <input type="number" class="summary-input" th:value="${earlyDays}" min="0"> 日
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="view-val" th:text="${suspendDays}"></span><span class="view-unit">日</span>
+                                <div class="edit-val" style="display:none;">
+                                    <input type="number" class="summary-input" th:value="${suspendDays}" min="0"> 日
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="view-val" th:text="${publicDays}"></span><span class="view-unit">日</span>
+                                <div class="edit-val" style="display:none;">
+                                    <input type="number" class="summary-input" th:value="${publicDays}" min="0"> 日
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="view-val" th:text="${otherDays}"></span><span class="view-unit">日</span>
+                                <div class="edit-val" style="display:none;">
+                                    <input type="number" class="summary-input" th:value="${otherDays}" min="0"> 日
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -117,102 +147,52 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td></td>
+                            <tr th:each="schedule : ${scheduleList}">
+                                <td th:text="${schedule.date}"></td>
+
                                 <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
+                                    <div class="cell-content" th:if="${schedule.period1 != null}">
+                                        <div class="subject-name" th:text="${schedule.period1.subjectName}"></div>
+                                        <div class="status-mark"
+                                             th:text="${schedule.period1.isAttended ? '〇' : '✕'}"
+                                             th:classappend="${schedule.period1.isAttended ? 'bg-present' : 'bg-absent'}">
+                                        </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
+                                    <div class="cell-content" th:if="${schedule.period2 != null}">
+                                        <div class="subject-name" th:text="${schedule.period2.subjectName}"></div>
+                                        <div class="status-mark"
+                                             th:text="${schedule.period2.isAttended ? '〇' : '✕'}"
+                                             th:classappend="${schedule.period2.isAttended ? 'bg-present' : 'bg-absent'}">
+                                        </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
+                                    <div class="cell-content" th:if="${schedule.period3 != null}">
+                                        <div class="subject-name" th:text="${schedule.period3.subjectName}"></div>
+                                        <div class="status-mark"
+                                             th:text="${schedule.period3.isAttended ? '〇' : '✕'}"
+                                             th:classappend="${schedule.period3.isAttended ? 'bg-present' : 'bg-absent'}">
+                                        </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
+                                    <div class="cell-content" th:if="${schedule.period4 != null}">
+                                        <div class="subject-name" th:text="${schedule.period4.subjectName}"></div>
+                                        <div class="status-mark"
+                                             th:text="${schedule.period4.isAttended ? '〇' : '✕'}"
+                                             th:classappend="${schedule.period4.isAttended ? 'bg-present' : 'bg-absent'}">
+                                        </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
+                                    <div class="cell-content" th:if="${schedule.period5 != null}">
+                                        <div class="subject-name" th:text="${schedule.period5.subjectName}"></div>
+                                        <div class="status-mark"
+                                             th:text="${schedule.period5.isAttended ? '〇' : '✕'}"
+                                             th:classappend="${schedule.period5.isAttended ? 'bg-present' : 'bg-absent'}">
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -222,6 +202,55 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('toggleEditBtn').addEventListener('click', function() {
+            const viewVals = document.querySelectorAll('.view-val');
+            const viewUnits = document.querySelectorAll('.view-unit');
+            const editVals = document.querySelectorAll('.edit-val');
+            const isEditing = this.classList.contains('active-edit');
+
+            if (!isEditing) {
+                // 編集モードへ
+                viewVals.forEach(el => el.style.display = 'none');
+                viewUnits.forEach(el => el.style.display = 'none');
+                editVals.forEach(el => el.style.display = 'flex');
+
+                this.textContent = '保存';
+                this.classList.add('active-edit');
+                this.style.backgroundColor = '#539DA4';
+                this.style.color = 'white';
+            } else {
+                // 保存処理（画面反映）
+                editVals.forEach(editDiv => {
+                    const input = editDiv.querySelector('input');
+                    const cell = editDiv.parentElement;
+                    const viewSpan = cell.querySelector('.view-val');
+                    
+                    if(input && viewSpan) {
+                        // ▼▼▼ マイナス値チェック ▼▼▼
+                        let val = parseInt(input.value, 10);
+                        if (isNaN(val) || val < 0) {
+                            val = 0; // マイナスまたは不正な値なら0にする
+                            input.value = 0;
+                        }
+                        
+                        viewSpan.textContent = val;
+                    }
+                });
+
+                // 通常モードへ
+                editVals.forEach(el => el.style.display = 'none');
+                viewVals.forEach(el => el.style.display = 'inline');
+                viewUnits.forEach(el => el.style.display = 'inline');
+
+                this.textContent = '編集';
+                this.classList.remove('active-edit');
+                this.style.backgroundColor = '';
+                this.style.color = '';
+            }
+        });
+    </script>
 
 </body>
 </html>

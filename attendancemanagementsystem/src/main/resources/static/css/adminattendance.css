@@ -83,7 +83,7 @@ body {
     display: flex;
     justify-content: flex-end;
     align-items: flex-end;
-    gap: 10px; /* ボタン同士の間隔 */
+    gap: 10px;
 }
 
 /* --- ツールボタン共通スタイル --- */
@@ -92,7 +92,7 @@ body {
     border: 1px solid #707070;
     border-radius: 4px;
     height: 40px;
-    color: #66B0B6; /* アイコン・文字色 */
+    color: #66B0B6;
     cursor: pointer;
     display: flex;
     justify-content: center;
@@ -104,15 +104,15 @@ body {
     background-color: #f0fcfd;
 }
 
-/* フィルターボタン (アイコンのみ) */
+/* フィルターボタン */
 .filter-btn {
     width: 40px;
     font-size: 1.2rem;
 }
 
-/* 一括選択ボタン (文字あり) */
+/* 一括選択ボタン */
 .bulk-btn {
-    padding: 0 15px; /* 文字の左右に余白 */
+    padding: 0 15px;
     font-size: 0.9rem;
     font-weight: bold;
 }
@@ -149,39 +149,34 @@ body {
     font-size: 0.95rem;
 }
 
-/* --- 行の背景色設定 --- */
+/* ▼▼▼ データ行のスタイル修正 ▼▼▼ */
+.attendance-table tbody td {
+    background-color: #fff;
+    color: #000; /* 文字色を黒に変更 */
+    font-size: 1rem;
+}
 
-/* 欠席 */
+/* --- ステータスセルの背景色 --- */
+
+/* 欠席: 薄い赤 */
 .status-cell-absent {
-    background-color: #EFCFCF; 
-    color: white; 
-}
-.row-absent td:not(.status-cell-absent) {
-    background-color: #FFFFFF; 
-    color: #333;
+    background-color: #ffcccc !important; /* 少し明るめの薄い赤 */
+    color: #000;
 }
 
-/* 出席 */
+/* 出席 (変更済含む): 薄い緑 */
 .status-cell-present {
-    background-color: #EAF6EA; 
-    color: #333; 
-}
-.row-present td:not(.status-cell-present) {
-    background-color: #FFFFFF; 
-    color: #333;
+    background-color: #d4edda !important; /* 薄い緑 */
+    color: #000;
 }
 
-/* 公欠候補 */
+/* 公欠候補: 白 */
 .status-cell-public {
-    background-color: #FFFFFF; 
-    color: #333;
-}
-.row-public td:not(.status-cell-public) {
-    background-color: #FFFFFF; 
-    color: #333;
+    background-color: #ffffff !important; /* 白 */
+    color: #000;
 }
 
-/* 時間列背景 */
+/* 時間列背景などは白のまま */
 .attendance-table tbody td:nth-child(4) {
     background-color: #FFFFFF;
 }
@@ -218,4 +213,78 @@ body {
 }
 .close-session-btn:hover {
     background-color: #f0fcfd;
+}
+
+/* =========================================
+   ▼ 追加スタイル: フィルター・一括編集機能 ▼
+   ========================================= */
+
+/* フィルターメニュー（初期は非表示） */
+.filter-menu {
+    display: none;
+    position: absolute;
+    top: 50px; /* ボタンの下あたり */
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 100;
+    width: 150px;
+    text-align: left; /* 左寄せ */
+}
+
+/* メニュー表示時のクラス */
+.filter-menu.active {
+    display: block;
+}
+
+/* メニュー項目 */
+.filter-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.filter-item:hover {
+    background-color: #f0fcfd;
+}
+
+.filter-item:last-child {
+    border-bottom: none;
+}
+
+/* 編集エリア（プルダウンとボタン） */
+.edit-area {
+    display: flex;
+    gap: 5px;
+    margin-right: 10px;
+}
+
+.status-select {
+    padding: 5px;
+    border: 1px solid #707070;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    height: 40px; /* 他のボタンと高さを合わせる */
+    background-color: #fff;
+    color: #333;
+}
+
+.apply-btn {
+    background-color: #539DA4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0 15px;
+    cursor: pointer;
+    font-weight: bold;
+    height: 40px; /* 他のボタンと高さを合わせる */
+    transition: opacity 0.3s;
+}
+
+.apply-btn:hover {
+    opacity: 0.8;
 }

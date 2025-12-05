@@ -25,25 +25,23 @@ body {
     width: 95%;
     max-width: 1200px;
     margin: 0 auto;
-    /* ヘッダー(約80px) + 余白 */
     padding-top: 120px; 
     padding-bottom: 50px;
 }
 
 /* =========================================
-   ページヘッダーエリア (戻るボタンとタイトルを格納)
+   ページヘッダーエリア
    ========================================= */
 .page-header-wrapper {
-    position: relative; /* 子要素配置の基準 */
+    position: relative;
     display: flex;
-    justify-content: center; /* タイトルを中央に */
-    align-items: center;     /* 垂直中央 */
+    justify-content: center;
+    align-items: center;
     height: 50px;
-    margin-bottom: 30px;     /* 下のコンテンツとの間隔 */
+    margin-bottom: 30px;
     width: 100%;
 }
 
-/* --- タイトル --- */
 .page-title {
     font-size: 2rem;
     font-weight: bold;
@@ -54,24 +52,19 @@ body {
     line-height: 1.2;
 }
 
-/* --- 戻るボタン (parts.cssの影響を完全に打ち消して配置) --- */
+/* 戻るボタンのスタイル */
 a.backbutton {
-    /* 配置：ヘッダーエリアの左端に絶対配置 */
     position: absolute !important;
     left: 0 !important;
     top: 50% !important;
-    transform: translateY(-50%) !important; /* 垂直中央補正 */
+    transform: translateY(-50%) !important;
     margin: 0 !important;
-    
-    /* 見た目：ボタン形状に整える */
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
     height: 40px !important;
-    width: auto !important;
     min-width: 90px;
     padding: 0 20px !important;
-    
     border: 1px solid #00bdca !important;
     border-radius: 5px !important;
     background-color: #fff !important;
@@ -79,9 +72,7 @@ a.backbutton {
     font-size: 1rem !important;
     text-decoration: none !important;
     font-weight: bold !important;
-    cursor: pointer !important;
-    box-shadow: none !important;
-    z-index: 10; /* 他の要素より手前に */
+    z-index: 10;
 }
 a.backbutton::before {
     content: '＜';
@@ -94,7 +85,7 @@ a.backbutton:hover {
 
 
 /* =========================================
-   メインコンテンツエリア (左：サイドバー / 右：詳細)
+   メインコンテンツエリア
    ========================================= */
 .main-content-area {
     display: flex;
@@ -103,15 +94,14 @@ a.backbutton:hover {
     flex-wrap: wrap;
 }
 
-/* --- 左側エリア (生徒名・検索・教科リスト) --- */
+/* --- 左側サイドバー --- */
 .left-sidebar-area {
-    flex: 0 0 280px; /* 固定幅 */
+    flex: 0 0 280px;
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-/* 生徒名表示 */
 .student-name-display {
     font-size: 1.5rem;
     font-weight: bold;
@@ -123,7 +113,6 @@ a.backbutton:hover {
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* サイドバー検索フォーム */
 .sidebar-search-form {
     display: flex;
     gap: 5px;
@@ -155,7 +144,7 @@ a.backbutton:hover {
     opacity: 0.9;
 }
 
-/* 受講教科リストボックス */
+/* 受講教科リスト */
 .subject-list-box {
     background-color: white;
     border: 1px solid #ccc;
@@ -199,13 +188,12 @@ a.backbutton:hover {
 }
 
 
-/* --- 右側エリア (出欠情報・テーブル) --- */
+/* --- 右側詳細エリア --- */
 .attendance-detail-main {
     flex: 1;
     min-width: 600px;
 }
 
-/* コントロール (月選択・編集) */
 .attendance-controls {
     display: flex;
     justify-content: space-between;
@@ -268,7 +256,28 @@ a.backbutton:hover {
     color: #333;
 }
 
-/* 時間割テーブル */
+/* --- 編集用入力エリアのスタイル --- */
+.summary-input {
+    width: 50px;
+    padding: 2px 5px;
+    text-align: center;
+    border: 1px solid #999;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.edit-val {
+    /* JSでflexにして表示 */
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+
+/* =========================================
+   時間割テーブル
+   ========================================= */
 .table-wrapper {
     width: 100%;
     border: 1px solid #999;
@@ -304,12 +313,14 @@ a.backbutton:hover {
     height: 70px;
 }
 
+/* --- セル内の要素配置 --- */
 .cell-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 8px; /* 教科名とマークの間隔 */
+    height: 100%;
 }
 
 .subject-name {
@@ -317,21 +328,29 @@ a.backbutton:hover {
     font-size: 1rem;
 }
 
-.status-tag {
-    display: inline-block;
-    font-size: 0.8rem;
-    padding: 3px 12px;
-    border-radius: 15px;
-    color: white;
-    font-weight: normal;
-    min-width: 60px;
+/* 出欠マーク (〇/✕) の共通スタイル */
+.status-mark {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%; /* 丸く表示 */
+    font-weight: bold;
+    font-size: 1.1rem;
+    line-height: 1;
 }
 
-/* ステータス色 */
-.bg-present { background-color: #66BB6A; }
-.bg-sick { background-color: #EF5350; }
-.bg-late { background-color: #FFCA28; color: #333; }
-.bg-early { background-color: #FFA726; }
-.bg-suspend { background-color: #78909C; }
-.bg-public { background-color: #42A5F5; }
-.bg-other { background-color: #AB47BC; }
+/* 出席 (〇) : 薄い緑背景 */
+.bg-present {
+    background-color: #d4edda;
+    color: #155724; /* 濃い緑の文字 */
+    border: 1px solid #c3e6cb;
+}
+
+/* 欠席 (✕) : 薄い赤背景 */
+.bg-absent {
+    background-color: #f8d7da;
+    color: #721c24; /* 濃い赤の文字 */
+    border: 1px solid #f5c6cb;
+}

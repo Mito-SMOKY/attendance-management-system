@@ -25,7 +25,6 @@ body {
     width: 95%;
     max-width: 1200px;
     margin: 0 auto;
-    /* ヘッダー固定分(約80px) + 余白 */
     padding-top: 120px; 
     padding-bottom: 50px;
 }
@@ -43,27 +42,27 @@ body {
 }
 
 /* =========================================
-   検索・フィルターエリア (左寄せ)
+   検索・フィルターエリア
    ========================================= */
 .search-filter-area {
     display: flex;
     align-items: center;
-    gap: 10px; /* 要素間の間隔 */
+    gap: 10px;
     margin-bottom: 20px;
     justify-content: flex-start;
+    position: relative;
 }
 
-/* 検索フォーム (入力欄のみ) */
+/* 検索フォーム */
 .search-form {
     display: flex;
     align-items: center;
 }
 
-/* 検索入力欄 */
 .search-input {
     height: 40px;
     width: 300px;
-    padding: 5px 10px; /* アイコンが外に出たので普通のパディング */
+    padding: 5px 10px;
     border: 1px solid #707070;
     border-radius: 5px;
     font-size: 1rem;
@@ -71,7 +70,7 @@ body {
     background-color: white;
 }
 
-/* --- ツールボタン共通スタイル (検索ボタン & フィルターボタン) --- */
+/* --- ツールボタン共通スタイル --- */
 .tool-btn {
     height: 40px;
     width: 45px;
@@ -82,12 +81,77 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #539DA4; /* テーマカラー */
-    font-size: 1.2rem;
+    color: #539DA4;
     transition: background-color 0.3s;
+    padding: 0; 
 }
 .tool-btn:hover {
     background-color: #f0f0f0;
+}
+
+/* ▼▼▼ 追加：SVGフィルターアイコンのデザイン設定 ▼▼▼ */
+.filter-icon-svg {
+    width: 24px;   /* サイズ調整 */
+    height: 24px;
+    fill: #539DA4; /* 中身の色（テーマカラー） */
+    /* もし線だけにしたい場合は fill:none; stroke:#539DA4; stroke-width:2; に変更 */
+}
+
+/* --- フィルターメニュー（ポップアップ） --- */
+.filter-menu {
+    display: none;
+    position: absolute;
+    top: 50px;
+    left: 350px; /* 検索窓の横あたりから開始 */
+    width: 250px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    padding: 15px;
+    z-index: 100;
+}
+
+.filter-menu.active {
+    display: block;
+}
+
+.filter-group {
+    margin-bottom: 15px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+.filter-actions {
+    text-align: right;
+}
+
+.apply-btn {
+    background-color: #539DA4;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.apply-btn:hover {
+    background-color: #3e7b80;
 }
 
 
@@ -97,7 +161,6 @@ body {
 .table-wrapper {
     width: 100%;
     border: 1px solid #999;
-    margin-bottom: 30px;
     overflow-x: auto;
     background-color: white;
 }
@@ -116,57 +179,15 @@ body {
     vertical-align: middle;
 }
 
-/* ヘッダー行 */
 .student-table thead th {
-    background-color: #539DA4; /* 濃い青緑 */
+    background-color: #539DA4;
     color: white;
     font-weight: normal;
     padding: 12px 0;
     font-size: 1rem;
 }
 
-/* データ行 */
 .student-table tbody td {
     font-size: 1rem;
     color: #333;
-}
-
-/* =========================================
-   ページネーション (下部中央)
-   ========================================= */
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-top: 30px;
-}
-
-.page-link {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 35px;
-    height: 35px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    text-decoration: none;
-    color: #333;
-    background-color: white;
-    transition: background-color 0.3s;
-}
-
-.page-link:hover {
-    background-color: #f0f0f0;
-}
-
-.page-link.active {
-    background-color: #539DA4;
-    color: white;
-    border-color: #539DA4;
-}
-
-.page-dots {
-    color: #333;
-    font-weight: bold;
 }

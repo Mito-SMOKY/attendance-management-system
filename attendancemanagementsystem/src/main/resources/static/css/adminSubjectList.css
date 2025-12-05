@@ -23,27 +23,25 @@ body {
    ========================================= */
 .subject-list-container {
     width: 95%;
-    max-width: 1000px; /* テーブル幅に合わせて調整 */
+    max-width: 1000px;
     margin: 0 auto;
-    /* ヘッダー(約80px) + 余白 */
     padding-top: 120px; 
     padding-bottom: 50px;
 }
 
 /* =========================================
-   ページヘッダー (戻るボタン & タイトル)
+   ページヘッダー
    ========================================= */
 .page-header-wrapper {
-    position: relative; /* 子要素配置の基準 */
+    position: relative;
     display: flex;
-    justify-content: center; /* タイトルを中央に */
+    justify-content: center;
     align-items: center;
     height: 50px;
     margin-bottom: 30px;
     width: 100%;
 }
 
-/* タイトル */
 .page-title {
     font-size: 2rem;
     font-weight: bold;
@@ -53,8 +51,7 @@ body {
     padding-bottom: 5px;
 }
 
-/* 戻るボタン (parts.cssのスタイルを継承しつつ配置固定) */
-
+/* 戻るボタンのホバー */
 .backbutton:hover {
     background-color: #f0f0f0 !important;
 }
@@ -65,12 +62,13 @@ body {
 .search-filter-area {
     display: flex;
     align-items: center;
-    gap: 10px; /* ボタン間の隙間 */
+    gap: 10px;
     margin-bottom: 20px;
-    justify-content: flex-start; /* 左寄せ */
+    justify-content: flex-start;
+    position: relative; /* メニュー位置基準 */
 }
 
-/* 入力フォーム */
+/* 検索フォーム */
 .search-form {
     display: flex;
     align-items: center;
@@ -87,11 +85,11 @@ body {
     background-color: white;
 }
 
-/* ツールボタン共通 (検索・フィルター) */
+/* ツールボタン共通 */
 .tool-btn {
     height: 40px;
     min-width: 45px;
-    padding: 0 15px;
+    padding: 0; /* SVG表示のためpadding削除 */
     background-color: white;
     border: 1px solid #707070;
     border-radius: 5px;
@@ -99,13 +97,78 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #539DA4; /* テーマカラー */
+    color: #539DA4;
     font-size: 1.2rem;
     transition: background-color 0.3s;
 }
 .tool-btn:hover {
     background-color: #f0f0f0;
 }
+
+/* ▼▼▼ 追加：SVGフィルターアイコンのデザイン ▼▼▼ */
+.filter-icon-svg {
+    width: 24px;
+    height: 24px;
+    fill: #539DA4; /* 中身の色 */
+}
+
+/* ▼▼▼ 追加：フィルターメニュー（ポップアップ） ▼▼▼ */
+.filter-menu {
+    display: none;
+    position: absolute;
+    top: 50px; /* ボタンの下 */
+    left: 350px; /* 位置調整 */
+    width: 250px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    padding: 15px;
+    z-index: 100;
+}
+
+.filter-menu.active {
+    display: block;
+}
+
+.filter-group {
+    margin-bottom: 15px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+.filter-actions {
+    text-align: right;
+}
+
+.apply-btn {
+    background-color: #539DA4;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.apply-btn:hover {
+    background-color: #3e7b80;
+}
+
 
 /* =========================================
    教科一覧テーブル
@@ -132,7 +195,6 @@ body {
     vertical-align: middle;
 }
 
-/* ヘッダー行 */
 .subject-table thead th {
     background-color: #539DA4;
     color: white;
@@ -141,25 +203,23 @@ body {
     font-size: 1rem;
 }
 
-/* データ行 */
 .subject-table tbody td {
     font-size: 1rem;
     color: #333;
 }
 
-/* 詳細ボタン */
-.detail-btn {
-    display: inline-block;
-    padding: 6px 20px;
-    border: 1px solid #539DA4;
-    border-radius: 4px;
-    background-color: #fff;
+/* ▼▼▼ 追加：教科名リンクのスタイル ▼▼▼ */
+.subject-link {
     color: #539DA4;
-    text-decoration: none;
-    font-size: 0.9rem;
+    text-decoration: underline;
     font-weight: bold;
-    transition: background-color 0.3s;
+    cursor: pointer;
+    display: block; /* セル全体をクリックしやすく */
+    width: 100%;
+    height: 100%;
 }
-.detail-btn:hover {
-    background-color: #f0fcfd;
+.subject-link:hover {
+    color: #3e7b80;
+    text-decoration: none;
+    background-color: #f9f9f9; /* ホバー時にセルの色を変える */
 }

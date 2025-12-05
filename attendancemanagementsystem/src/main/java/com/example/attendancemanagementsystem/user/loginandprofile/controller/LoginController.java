@@ -51,6 +51,18 @@ public class LoginController {
     public String showstudentInfo() {
         return "admin/studentInfo";
     }
+    @GetMapping("/studentClassInfo")
+    public String showstudentClassInfo() {
+        return "admin/studentClassInfo";
+    }
+    @GetMapping("/subjectInfo")
+    public String showsubjectInfo() {
+        return "admin/subjectInfo";
+    }
+    @GetMapping("/subjectList")
+    public String showsubjectList() {
+        return "admin/subjectList";
+    }
 }
 //     @GetMapping("/main_calendar")
 //     public String showMainCalendar() {

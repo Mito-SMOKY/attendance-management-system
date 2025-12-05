@@ -25,7 +25,6 @@ body {
     width: 95%;
     max-width: 1200px;
     margin: 0 auto;
-    /* ヘッダー(約80px) + 余白 */
     padding-top: 120px; 
     padding-bottom: 50px;
 }
@@ -62,30 +61,27 @@ body {
 /* --- 左側パネル (詳細情報) --- */
 .left-panel {
     flex: 1;
-    min-width: 550px; /* 画像のテーブル幅に合わせて調整 */
+    min-width: 550px;
     display: flex;
     flex-direction: column;
     gap: 30px;
 }
 
-/* 各情報ブロック共通スタイル */
+/* 情報ブロック */
 .info-block {
-    /* 以前のinfo-blockのスタイルを削除し、テーブルに直接スタイルを適用 */
     background-color: transparent;
     border: none;
     padding: 0;
-    box-shadow: none;
 }
 
-/* 上段の基本情報テーブル用ヘッダーと編集ボタン */
+/* ヘッダーと編集ボタン */
 .basic-info-header {
     display: flex;
-    justify-content: flex-end; /* 編集ボタンを右寄せ */
+    justify-content: flex-end;
     align-items: center;
-    margin-bottom: 10px; /* テーブルとの間隔 */
+    margin-bottom: 10px;
 }
 
-/* 編集ボタン */
 .edit-btn {
     padding: 6px 20px;
     background-color: #fff;
@@ -96,67 +92,78 @@ body {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s;
-    margin-left: auto; /* 右寄せ */
+    margin-left: auto;
 }
 .edit-btn:hover {
     background-color: #f0f0f0;
 }
 
-
-/* ▼▼▼ 画像に合わせたテーブルデザイン (基本情報・詳細設定 共通) ▼▼▼ */
+/* テーブルデザイン */
 .detail-table {
     width: 100%;
     border-collapse: collapse;
-    border: 1px solid #999; /* 外枠 */
-    background-color: white; /* 全体の背景 */
+    border: 1px solid #999;
+    background-color: white;
+    /* ▼▼▼ 追加: 列幅を中身に依存させず固定する設定 ▼▼▼ */
+    table-layout: fixed; 
 }
 
 .detail-table th,
 .detail-table td {
     padding: 15px 10px;
-    border: 1px solid #999; /* 格子状の罫線 */
+    border: 1px solid #999;
     vertical-align: middle;
 }
 
-/* 項目名セル */
 .detail-table th {
-    background-color: #539DA4; /* 画像のような青緑色 */
+    background-color: #539DA4;
     color: white;
     font-weight: normal;
     text-align: center;
-    width: 25%; /* 4カラムのバランス */
+    width: 25%; /* 4列構成なので25%で固定 */
     white-space: nowrap;
 }
 
-/* データ内容セル */
 .detail-table td {
     color: #333;
     font-size: 1rem;
     font-weight: bold;
-    text-align: left; /* データは左寄せ */
-    width: 25%; /* 4カラムのバランス */
+    text-align: left;
+    width: 25%; /* こちらも25% */
 }
 
-/* 特に成績評価方法など長文用 */
 .text-content {
     white-space: pre-wrap;
     line-height: 1.6;
 }
 
+/* ▼▼▼ 追加: 編集モード用のスタイル ▼▼▼ */
+.edit-mode {
+    display: none; /* 初期は非表示 */
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.edit-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
 
 /* --- 右側パネル (履修者リスト) --- */
 .right-panel {
-    flex: 0 0 300px; /* 幅固定 */
+    flex: 0 0 300px;
     display: flex;
     flex-direction: column;
 }
 
-/* リストテーブル */
 .student-list-wrapper {
     width: 100%;
     border: 1px solid #999;
     background-color: white;
-    max-height: 600px; /* スクロール制限 */
+    max-height: 600px;
     overflow-y: auto;
 }
 
@@ -172,7 +179,6 @@ body {
     padding: 12px;
 }
 
-/* ヘッダー固定 */
 .student-table thead th {
     background-color: #539DA4;
     color: white;
@@ -185,4 +191,39 @@ body {
 .student-table tbody td {
     font-size: 1rem;
     color: #333;
+}
+
+/* ▼▼▼ 追加: 生徒名のリンクスタイル ▼▼▼ */
+.student-link {
+    color: #539DA4;
+    text-decoration: underline;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+}
+.student-link:hover {
+    color: #3e7b80;
+    text-decoration: none;
+}
+
+/* --- 追記：結合セル（colspan="2"）の幅ズレ防止 --- */
+
+/* 上のテーブルは width: 25% × 4列 = 100% で安定していますが、
+  下のテーブルは2列結合しているため、明示的に 50% を指定しないと計算が狂います。
+*/
+.detail-table th[colspan="2"] {
+    width: 50%;
+}
+
+.detail-table td[colspan="2"] {
+    width: 50%;
+}
+
+/* テキストエリアが固有の幅（cols属性など）を持っていて
+  テーブル幅を押し広げてしまうのを防ぎます
+*/
+.edit-textarea {
+    width: 100%;
+    min-width: 0; /* 重要：これで強制的に親要素の幅に収まります */
+    box-sizing: border-box;
 }

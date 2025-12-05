@@ -16,7 +16,6 @@
         <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
     </div>
     
-    
     <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url='/timetable')}"></div>
     </div> 
@@ -32,8 +31,8 @@
                 <th>教科名</th>
                 <td>
                     <select>
-                        <option>システム構築</option>
-                        <option>プログラミング</option>
+                        <option></option>
+                        <option></option>
                     </select>
                 </td>
             </tr>
@@ -41,8 +40,8 @@
                 <th>コース</th>
                 <td>
                     <select>
-                        <option>SE・マスター</option>
-                        <option>IT・エキスパート</option>
+                        <option></option>
+                        <option></option>
                     </select>
                 </td>
             </tr>
@@ -50,8 +49,8 @@
                 <th>教室</th>
                 <td>
                     <select>
-                        <option>231</option>
-                        <option>232</option>
+                        <option></option>
+                        <option></option>
                     </select>
                 </td>
             </tr>
@@ -76,6 +75,14 @@
         </div>
         
     </div>
+
+    <script>
+        document.querySelector('.btn-start-session').addEventListener('click', function() {
+            // 遷移先のファイル名またはURLを指定してください
+            // Spring Bootのコントローラー経由の場合は '/attendance-information' などになります
+            window.location.href = 'attendance-information';
+        });
+    </script>
 
 </body>
 </html>
