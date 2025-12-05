@@ -10,12 +10,12 @@
 </head>
 <body>
 
-    <div th:replace="~{fragments/_parts :: student-header}"></div>
+    <div th:replace="~{fragments/_parts :: header}"></div>
 
     <div class="container">
         
         <div class="header-nav">
-            <button onclick="history.back()" class="back-btn">
+            <button th:onclick="|location.href='@{/student/main_calendar}'|" class="back-btn">
                 <i class="fas fa-chevron-left"></i> 戻る
             </button>
         </div>
@@ -40,7 +40,9 @@
                     <td class="td-slot" th:text="${item.slotId}">1</td>
                     
                     <td class="td-subject">
-                        <div class="subject-name" th:text="${item.subjectName}">LINUX基礎</div>
+                        <a th:href="@{/student/subject_attendance(subjectId=${item.subjectId})}" class="subject-link">
+                            <div class="subject-name" th:text="${item.subjectName}">LINUX基礎</div>
+                        </a>
                         <div class="classroom-name" th:text="${item.classroomName}">231</div>
                     </td>
                     
@@ -92,7 +94,7 @@
                 // value用: YYYY-MM-DD
                 const yyyy = dateObj.getFullYear();
                 const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-                const dd = String(dateObj.getDate()).padStart(2, '0');
+                const dd = String(dateObj.getDate()).padStart(2, '0')
                 const dateString = `${yyyy}-${mm}-${dd}`;
 
                 // 表示用: YYYY/MM/DD(曜日)

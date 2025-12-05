@@ -27,7 +27,6 @@ public class SubjectListService {
     private final AttendanceRepository attendanceRepository;
     private final SubjectRepository subjectRepository;
 
-    // @Autowired
     public SubjectListService(
             UsersRepository usersRepository,
             EnrollmentsRepository enrollmentsRepository,
@@ -73,7 +72,6 @@ public class SubjectListService {
                     .map(u -> u.getName()).orElse("未定");
 
             SubjectListDto dto = new SubjectListDto(subjectId, courseName, subjectName, teacherName);
-
             
             // 1. 全授業数
             int rawTotal = timetableRepository.countTotalClassesBySubject(deptId, subjectId);

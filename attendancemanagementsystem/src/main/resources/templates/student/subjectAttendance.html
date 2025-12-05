@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教科出席情報</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/subjectAttendance.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+ <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header}"></div>
+    </div>
+
+    <div class="backbutton-container">
+        <button type="button" onclick="history.back()" class="backbutton">戻る</button>
+    </div>
+    
+    <input type="hidden" id="currentSubjectId" th:value="${attendanceData.subjectId}">
+
+    <div class="month-select-form">
+        <select id="year-dropdown" class="month-dropdown">
+            <option th:each="year : ${yearList}" 
+                    th:value="${year}" 
+                    th:text="${year}" 
+                    th:selected="${year == selectedYear}"></option>
+        </select>
+        /
+        <select id="month-dropdown" class="month-dropdown">
+            <option th:each="month : ${monthList}" 
+                    th:value="${month}" 
+                    th:text="${month}" 
+                    th:selected="${month == selectedMonth}"></option>
+        </select>
+    </div>
+
+<div class="main-content-container">
+    
+    <div class="info-sidebar">
+        <table class="info-table">
+            <tr>
+                <td class="info-label">教科名</td>
+                <td class="info-value subject-name" th:text="${attendanceData.subjectName}"></td>
+            </tr>
+            <tr>
+                <td class="info-label">教室</td>
+                <td class="info-value" id="classroom-value" th:text="${attendanceData.classroom}"></td>
+            </tr>
+            <tr>
+                <td class="info-label">担当教師</td>
+                <td class="info-value" id="teacher-value" th:text="${attendanceData.teacherName}"></td>
+            </tr>
+            <tr>
+                <td class="info-label">必要コマ数</td>
+                <td class="info-value placeholder" id="required-classes-value" th:text="${attendanceData.requiredClasses}"></td>
+            </tr>
+            <tr>
+                <td class="info-label">現在の出席率</td>
+                <td class="info-value placeholder" id="current-rate-value" th:text="${#numbers.formatDecimal(attendanceData.currentAttendanceRate * 100, 0, 1) + '%'}"></td>
+            </tr>
+            <tr>
+                <td class="info-label">欠席可能日数</td>
+                <td class="info-value placeholder" id="max-absence-value" th:text="${attendanceData.maxAbsenceClasses}"></td>
+            </tr>
+        </table>
+        
+        <div id="risk-warning-icon" th:classappend="${attendanceData.maxAbsenceClasses <= 1} ? 'visible' : 'hidden'" class="risk-warning-icon">
+             &#9888;
+        </div>
+    </div>
+
+    <div class="attendance-detail-area">
+        
+        <div class="attendance-summary-container">
+            <div class="summary-box status-label">出欠状況</div>
+            
+            <div class="summary-grid">
+                <div class="summary-box label">出席 <span class="present">〇</span></div>
+                <div class="summary-box label">欠席 <span class="absent">✕</span></div>
+                <div class="summary-box label">遅刻 <span class="late">△</span></div>
+                <div class="summary-box label">公欠 <span class="attendance-public">〇</span></div>
+                <div class="summary-box label">公欠候補</div>
+
+                <div class="summary-box days" id="present-classes-value" th:text="${attendanceData.presentClasses} + 'コマ'"></div>
+                <div class="summary-box days" id="absent-classes-value" th:text="${attendanceData.absentClasses} + 'コマ'"></div>
+                <div class="summary-box days" id="late-classes-value" th:text="${attendanceData.lateClasses} + 'コマ'"></div>
+                <div class="summary-box days" id="official-absent-value" th:text="${attendanceData.officialAbsentClasses} + 'コマ'"></div>
+                <div class="summary-box days" id="official-pending-value" th:text="${attendanceData.officialPendingClasses} + 'コマ'"></div>
+            </div>
+        </div>
+
+        <div class="calendar-table-container">
+            <table class="calendar-table">
+                <thead>
+                    <tr>
+                        <th>日付</th>
+                        <th>1限</th>
+                        <th>2限</th>
+                        <th>3限</th>
+                        <th>4限</th>
+                        <th>教室</th>
+                    </tr>
+                </thead>
+                <tbody id="calendar-body">
+                    <tr th:each="day : ${attendanceData.dailyAttendanceList}">
+                        <td class="date-day" th:text="${day.dateDay}"></td>
+                        
+                        <td th:each="status : ${day.classStatuses}" class="status-cell">
+                            <span th:text="${status}" 
+                                  th:classappend="${status == '○'} ? 'present' : 
+                                                 (${status == '✕'} ? 'absent' : 
+                                                 (${status == '△'} ? 'late' : 
+                                                 (${status == '公'} ? 'attendance-public' : 'no-class')))">
+                            </span>
+                        </td>
+                        
+                        <td class="classroom-cell" th:text="${day.classroom}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="help-text">
+            <span>&#63;</span> 出席情報に誤りがある場合、担任の先生にお知らせください
+        </div>
+        
+    </div>
+</div>
+
+<script th:src="@{/js/subjectAttendance.js}"></script>
+
+</body>
+</html>
