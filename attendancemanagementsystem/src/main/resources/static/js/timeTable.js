@@ -4,11 +4,33 @@ document.addEventListener('DOMContentLoaded', function() {
     const initialWeekStartStr = (typeof window.initialWeekStartStr !== 'undefined') ? window.initialWeekStartStr : '';
     const initialDateStr = (typeof window.initialDateStr !== 'undefined') ? window.initialDateStr : '';
     const initialData = (typeof window.initialData !== 'undefined') ? window.initialData : null;
-
+    
     console.log('window.initialWeekStartStr', initialWeekStartStr, 'initialDateStr', initialDateStr, 'initialData?', !!initialData);
 
+    // ★★★ 修正: currentUserId の初期化とイベントリスナーの設定 ★★★
+    let currentUserId; 
+    
+    const userSelect = document.getElementById('adminUserSelect');
+    if (userSelect) {
+        // プルダウンがあれば初期値を設定し、イベントリスナーを追加
+        currentUserId = userSelect.value;
+        window.currentUserId = currentUserId; // 他の関数からも参照できるように設定
+        
+        userSelect.addEventListener('change', (event) => {
+            // ユーザーが選択した新しいIDを取得
+            window.currentUserId = event.target.value;
+            
+            // 選択されたユーザーの時間割を再取得・再描画する
+            fetchTimetableData(currentWeekStart); 
+        });
+    } else {
+        // プルダウンがなければデフォルト値を設定
+        currentUserId = document.querySelector('body').dataset.initialUserId || 'admin001';
+        window.currentUserId = currentUserId;
+    }
 
-     function parseISODateLocal(s) {
+
+    function parseISODateLocal(s) {
         if (!s) return new Date(NaN);
         if (s instanceof Date) return s;
         // 期待フォーマット: "YYYY-MM-DD"（サーバー側でこの形式を渡す想定）
@@ -18,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const y = parseInt(m[1], 10);
                 const mo = parseInt(m[2], 10) - 1;
                 const d = parseInt(m[3], 10);
+                // Date(year, monthIndex, day) の形式でローカル日付を強制的に作成
                 return new Date(y, mo, d);
             }
         }
@@ -44,16 +67,24 @@ document.addEventListener('DOMContentLoaded', function() {
         return date;
     }
 
-    // --- currentWeekStart の初期化 ---
-    let rawStart;
-    if (initialWeekStartStr) rawStart = initialWeekStartStr;
-    else if (initialDateStr) rawStart = initialDateStr;
-    else rawStart = new Date();
+    // --------------------------------------------------------------------------
+    // ★★★ 修正ブロック: currentWeekStart の初期化 ★★★
+    // --------------------------------------------------------------------------
+    let currentWeekStart;
+    
+    // 1. HTMLから渡された日付文字列をパース
+    const parsedStart = parseISODateLocal(initialWeekStartStr || initialDateStr);
 
-    let currentWeekStart = toWeekStartMonday(rawStart);
-    if (isNaN(currentWeekStart.getTime())) {
+    if (isNaN(parsedStart.getTime())) {
+        // 2. パース失敗 (NaN) の場合、現在日にフォールバック
+        console.error("初期日付文字列が無効です。現在日を基準に設定します。");
         currentWeekStart = toWeekStartMonday(new Date());
+    } else {
+        // 3. パース成功の場合、その週の月曜日に正規化
+        currentWeekStart = toWeekStartMonday(parsedStart);
     }
+    // --------------------------------------------------------------------------
+
 
     // DOM 要素
     const yearSelector = document.getElementById('yearSelector');
@@ -132,7 +163,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const dateStr = formatDateYMD(startDate);
-        const apiEndpoint = `/student/api/timetabledata?date=${dateStr}`;
+        const userId = window.currentUserId || 
+                           document.getElementById('adminUserSelect')?.value || 
+                           'admin001';
+        const apiEndpoint = `/api/timetabledata?date=${dateStr}&userId=${userId}`;
 
         console.log('fetching timetable for weekStart (mon):', dateStr);
 
@@ -146,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 強制的に月曜基準の weekStart にする（サーバーが違っていてもこちらで統一）
                 const normalized = toWeekStartMonday(raw && raw.weekStart ? raw.weekStart : startDate);
                 const weekStartStr = isNaN(normalized.getTime()) ? formatDateYMD(startDate) : formatDateYMD(normalized);
- 
+    
                 // 常に月曜〜金曜の日付配列を自前生成（表示の整合性を保つ）
                 const dates = [];
                 for (let i = 0; i < 5; i++) {
@@ -164,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.schedule = data.schedule || {};
 
                 // currentWeekStart を更新
-                 currentWeekStart = parseISODateLocal(weekStartStr);
+                currentWeekStart = parseISODateLocal(weekStartStr);
 
                 console.log("normalized/enforced weekStart:", data.weekStart, "dates:", data.dates);
                 renderTimetable(data);
@@ -206,19 +240,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // header: 月曜〜金曜を ISO 日付で表示（必要ならフォーマット変更）
         if (data.dates && data.dates.length === 5) {
-             theadRow.innerHTML = '<th class="time-slot-header">時間</th>';
-             data.dates.forEach(dateStr => {
+            theadRow.innerHTML = '<th class="time-slot-header">時間</th>';
+            data.dates.forEach(dateStr => {
                 const d = parseISODateLocal(dateStr);
-                 const label = (d.getMonth() + 1) + '/' + d.getDate() + ' (' + ['日','月','火','水','木','金','土'][d.getDay()] + ')';
-                 theadRow.innerHTML += `<th>${label}</th>`;
-             });
-         }
+                const label = (d.getMonth() + 1) + '/' + d.getDate() + ' (' + ['日','月','火','水','木','金','土'][d.getDay()] + ')';
+                theadRow.innerHTML += `<th>${label}</th>`;
+            });
+        }
+        
+        // --------------------------------------------------------------------------
+        // ★★★ 修正箇所: ナビゲーションバーの日付表示ロジック ★★★
+        // --------------------------------------------------------------------------
+        let monthToShow;
+        if (monthSelector && !isNaN(parseInt(monthSelector.value))) {
+            // 月セレクタが有効ならその値を使う
+            monthToShow = parseInt(monthSelector.value);
+        } else if (!isNaN(currentWeekStart.getTime())) {
+            // セレクタが無効だが currentWeekStart が有効なら、その日付の中央値の月を使う
+            const middleDay = new Date(currentWeekStart);
+            middleDay.setDate(middleDay.getDate() + 3); // 週の中央の日付を取得
+            monthToShow = middleDay.getMonth();
+        } else {
+            // どちらも無効な場合は現在月を使う (フォールバック)
+            monthToShow = new Date().getMonth();
+        }
+        
+        const displayMonth = monthToShow + 1; // 0-indexed から 1-indexed に変換
 
-        const currentSelectedMonth = monthSelector ? parseInt(monthSelector.value) : (new Date(currentWeekStart)).getMonth();
-        const displayMonth = currentSelectedMonth + 1;
         const weekNumber = data.weekNumber || '';
         const displayEl = document.getElementById('currentWeekDisplay');
-        if (displayEl) displayEl.textContent = `${displayMonth}月 第${weekNumber}週`;
+        
+        // displayMonth が有効な数値であることを最終確認
+        if (displayEl && !isNaN(displayMonth)) { 
+            displayEl.textContent = `${displayMonth}月 第${weekNumber}週`;
+        } else if (displayEl) {
+            // 万が一まだNaNが残る場合はエラー表示
+            displayEl.textContent = `日付エラー 第${weekNumber}週`;
+        }
+        // --------------------------------------------------------------------------
 
         // body
         const slots = Array.isArray(data.timeSlots) ? data.timeSlots : [];
@@ -245,7 +304,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     
-
     console.log('初期 currentWeekStart:', isNaN(currentWeekStart.getTime()) ? 'invalid' : currentWeekStart.toISOString().split('T')[0]);
 
     if (initialData && initialData.schedule) {
@@ -266,7 +324,8 @@ document.addEventListener('DOMContentLoaded', function() {
         currentWeekStart = parseISODateLocal(initialData.weekStart);
         renderTimetable(initialData);
     } else {
-        const dateToFetch = isNaN(currentWeekStart.getTime()) ? toWeekStartMonday(new Date()) : currentWeekStart;
+        // API呼び出しで初期データを取得
+        const dateToFetch = currentWeekStart;
         console.log('fetching for weekStart:', dateToFetch.toISOString().split('T')[0]);
         fetchTimetableData(dateToFetch);
     }

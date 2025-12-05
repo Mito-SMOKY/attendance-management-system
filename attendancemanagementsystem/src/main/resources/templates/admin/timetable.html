@@ -3,101 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>スケジュール</title>
+    <title>時間割</title>
     
-    <link rel="stylesheet" th:href="@{/css/admintime.css}">
     <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/timeTable.css}">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <div class="header-container">
+ <div class="header-container">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
 
-    <div class="schedule-container">
+    <label class="selectbox-3">
+        <select id="adminUserSelect">
+            <option th:each="user : ${adminUsers}"
+            th:value="${user.id}"
+            th:text="${user.name}"
+            th:selected="${user.id == initialUserId}">
+            </option>
+        </select>
+    </label>
+
+    <script th:inline="javascript">
+    const initialWeekStartStr = /*[[${weekStart}]]*/ ''; 
+    const initialUserId = /*[[${initialUserId}]]*/ '';
+    /*<![CDATA[*/
+    window.initialDateStr = /*[[${initialDate}]]*/ '';
+    window.initialData = /*[[${initialData}]]*/ null;
+    /*]]>*/
+    </script>
+
+    <script th:src="@{/js/timeTable.js}" defer></script>
+    
+    <div class="timetable-container">
         
-        <div class="controls-top-row">
-            <select class="user-select">
-                <option>○○ ××</option>
-                <option>他のユーザー</option>
-            </select>
+        <div class="timetable-header">
             
-            <a href="#" class="calendar-link">
-                <i class="fa-solid fa-calendar-days"></i>
-                カレンダー
-            </a>
-        </div>
-
-        <div class="controls-bottom-row">
-            <!-- カレンダーのヘッダー -->
-            <div class="week-navigation">
-                <span id="prevWeekButton" class="nav-arrow">＜</span>
-                <div class="week-info">
-                    <span class="week-num">2週</span>
-                    11/2024
-                    <span class="triangle">▼</span>
+            <div class="month-year-selector">
+                <select id="yearSelector"></select>
+                <select id="monthSelector"></select>
                 </div>
-                <span id="nextWeekButton" class="nav-arrow">＞</span>
+
+            <div class="week-navigation">
+                <button id="prevWeekBtn" class="nav-arrow"><</button>
+                <span id="currentWeekDisplay" class="week-info"></span>
+                <button id="nextWeekBtn" class="nav-arrow">></button>
             </div>
             
-            <div class="exit-icon-container">
-                <a href="#" class="exit-btn">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                </a>
+            <div class="calendar-icon">
+                <span>カレンダー</span>
             </div>
         </div>
 
-        <div class="table-wrapper">
-            <table class="schedule-table">
-                <colgroup>
-                    <col class="col-time">
-                    <col class="col-day"><col class="col-day"><col class="col-day"><col class="col-day">
-                    <col class="col-day"><col class="col-day"><col class="col-day">
-                </colgroup>
+        <div class="timetable-wrapper">
+            <table id="weeklyTimetable" class="timetable">
                 <thead>
                     <tr>
-                        <th>時間</th>
-                        <th>11日</th>
-                        <th>12月</th>
-                        <th>13火</th>
-                        <th>14水</th>
-                        <th>15木</th>
-                        <th>16金</th>
-                        <th>17土</th>
-                    </tr>
+                        <th class="time-slot-header">時間</th>
+                        </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td class="time-cell">9:30<br>11:00</td>
-                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                        <td class="time-cell">11:10<br>12:30</td>
-                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                        <td class="time-cell">13:30<br>14:50</td>
-                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                        <td class="time-cell">15:00<br>16:20</td>
-                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                        <td class="time-cell">16:30<br>17:00</td>
-                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                        <td class="time-cell">17:00<br>以降</td>
-                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                </tbody>
+                <tbody id="timetableBody">
+                    </tbody>
             </table>
         </div>
-
     </div>
+    
+    
+    
 
 </body>
 </html>

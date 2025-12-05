@@ -31,11 +31,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(authorize -> authorize
+
+                        .requestMatchers("/api/timetabledata**").permitAll()
                         // ログイン、CSS、JSは全員許可
                         .requestMatchers("/login", "/css/**", "/js/**").permitAll()
                         
-                        // ★ 必須の修正点: ロール（権限）に基づいたアクセス許可を追加
-                        // /admin/で始まるURLにはROLE_ADMINが必要
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         // /student/で始まるURLにはROLE_STUDENTが必要
                         .requestMatchers("/student/**").hasRole("STUDENT")
