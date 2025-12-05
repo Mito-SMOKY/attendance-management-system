@@ -156,4 +156,7 @@ def main_loop():
             time.sleep(1)
 
 if __name__ == "__main__":
-    main_loop()
+    try:
+        main_loop()
+    except KeyboardInterrupt:
+        print("\n終了しました")
