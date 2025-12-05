@@ -46,4 +46,16 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
            "AND a.status.statusId = 6") // 6:出席停止
     int countSuspensions(@Param("userId") Integer userId, @Param("subjectId") Integer subjectId);
 
+    // 指定した生徒・期間・教科の出席データを取得
+    // (これが無いと SubjectAttendanceDetailService でエラーになります)
+    @Query("SELECT a FROM AttendanceEntity a " +
+           "WHERE a.student = :student " +
+           "AND a.timeTable.date BETWEEN :startDate AND :endDate " +
+           "AND a.timeTable.subjectId = :subjectId")
+    List<AttendanceEntity> findByStudentAndDateRangeAndSubject(
+            @Param("student") StudentEntity student, 
+            @Param("startDate") LocalDate startDate, 
+            @Param("endDate") LocalDate endDate, 
+            @Param("subjectId") Integer subjectId);
+
 }

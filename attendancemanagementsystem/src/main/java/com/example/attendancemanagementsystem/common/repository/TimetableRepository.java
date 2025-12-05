@@ -31,4 +31,8 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
            "AND t.date <= CURRENT_DATE")
     int countTotalClassesBySubject(@Param("deptId") Integer deptId, @Param("subjectId") Integer subjectId);
 
+    //指定した教科・期間の時間割を日付順・時限順で取得
+    //(これが無いと SubjectAttendanceDetailService でエラーになります)
+    List<TimetableEntity> findBySubjectIdAndDateBetweenOrderByDateAscSlotIdAsc(Integer subjectId, LocalDate startDate, LocalDate endDate);
+
 }
