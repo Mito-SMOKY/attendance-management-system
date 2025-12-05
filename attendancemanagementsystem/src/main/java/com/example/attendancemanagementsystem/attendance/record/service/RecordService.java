@@ -3,10 +3,12 @@ package com.example.attendancemanagementsystem.attendance.record.service;
 import com.example.attendancemanagementsystem.attendance.record.dto.RecordDTO;
 import com.example.attendancemanagementsystem.attendance.record.dto.VerifiedRecordDto;
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
+import com.example.attendancemanagementsystem.common.entity.AttendanceStatusEntity;
 import com.example.attendancemanagementsystem.common.entity.CardsEntity;
 import com.example.attendancemanagementsystem.common.entity.ClassroomEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.repository.AttendanceRepository;
+import com.example.attendancemanagementsystem.common.repository.AttendanceStatusRepository; // ★追加
 import com.example.attendancemanagementsystem.common.repository.CardsRepository;
 import com.example.attendancemanagementsystem.common.repository.ClassroomRepository;
 import org.springframework.stereotype.Service;
@@ -22,26 +24,30 @@ public class RecordService {
     private final DecryptionService decryptionService;
     private final AttendanceRepository attendanceRepository;
     private final ClassroomRepository classroomRepository;
+    private final AttendanceStatusRepository attendanceStatusRepository; // ★追加
 
+    // コンストラクタ (引数を追加)
     public RecordService(CardsRepository cardsRepository, 
                         DecryptionService decryptionService,
                         AttendanceRepository attendanceRepository,
-                        ClassroomRepository classroomRepository) {
+                        ClassroomRepository classroomRepository,
+                        AttendanceStatusRepository attendanceStatusRepository) { // ★追加
         this.cardsRepository = cardsRepository;
         this.decryptionService = decryptionService;
         this.attendanceRepository = attendanceRepository;
         this.classroomRepository = classroomRepository;
+        this.attendanceStatusRepository = attendanceStatusRepository; // ★追加
     }
 
     @Transactional
     public VerifiedRecordDto processAttendanceScan(RecordDTO recordDTO) {
 
-        // 復号処理
+        // 1. 復号処理
         String encryptedHex = recordDTO.getUserId();
         String originalUserIdString = decryptionService.decryptUserId(encryptedHex);
         Integer originalUserId = Integer.parseInt(originalUserIdString);
 
-        // カードID検証
+        // 2. カードID検証
         String cardId = recordDTO.getCardId();
         CardsEntity card = cardsRepository.findByCardId(cardId)
                 .orElseThrow(() -> new IllegalArgumentException("未登録のカードです: " + cardId));
@@ -53,7 +59,7 @@ public class RecordService {
             throw new IllegalStateException("カード所有者とデータが不一致です(偽造の疑い)。");
         }
 
-        // 時刻変換
+        // 3. 時刻変換
         LocalDateTime scanTime;
         try {
             if (recordDTO.getReadTime() != null) {
@@ -65,35 +71,38 @@ public class RecordService {
             scanTime = LocalDateTime.now();
         }
 
-        // 教室の特定(未登録は拒否)
+        // 4. セキュリティチェック
         String readerMacAddress = recordDTO.getReaderId();
-        
         if (readerMacAddress == null || readerMacAddress.isEmpty()) {
             throw new SecurityException("不正なアクセス: ReaderIDがありません。");
         }
-
-        // DB検索
         Optional<ClassroomEntity> classroomOpt = classroomRepository.findByMacAddress(readerMacAddress);
-
         if (classroomOpt.isEmpty()) {
-            // 未登録なら例外を投げて処理を止める
             throw new SecurityException("未登録のリーダー(MAC: " + readerMacAddress + ")からのアクセスは拒否されました。");
         }
-        
-        // 成功ログ
         System.out.println("認証OK: " + classroomOpt.get().getClassroomName() + " (MAC: " + readerMacAddress + ")");
 
-
-        // Attendanceテーブルへの保存
+        // ★★★ 5. DB保存処理 ★★★
         AttendanceEntity attendance = new AttendanceEntity();
+        
+        // ユーザーセット
         StudentEntity studentRef = new StudentEntity();
         studentRef.setUserId(originalUserId); 
         attendance.setStudent(studentRef);
+
         attendance.setCreatedAt(scanTime);
-        attendance.setStatusId(1); // 出席
+        
+        // ★修正: リポジトリからステータス(ID=1:出席)を取得してセット
+        AttendanceStatusEntity status = attendanceStatusRepository.findById(1)
+            .orElseThrow(() -> new IllegalStateException("ステータスID=1 がDBに見つかりません。"));
+        
+        attendance.setStatusId(status); // メソッド名はEntityに合わせてください(setStatusId または setStatus)
+
+        // TimeTableID は Entity側で nullable=true に設定済みであればセット不要
+
         attendanceRepository.save(attendance);
 
-        // 結果DTOの返却
+        // 結果返却
         return new VerifiedRecordDto(
                 originalUserId,
                 cardId,

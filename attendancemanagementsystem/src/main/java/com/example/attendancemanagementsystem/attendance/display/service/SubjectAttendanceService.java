@@ -9,7 +9,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +35,6 @@ public class SubjectAttendanceService {
     private final SubjectRepository subjectRepository;
     private final ClassroomRepository classroomRepository;
 
-    @Autowired
     public SubjectAttendanceService(
             UsersRepository usersRepository,
             StudentRepository studentRepository,

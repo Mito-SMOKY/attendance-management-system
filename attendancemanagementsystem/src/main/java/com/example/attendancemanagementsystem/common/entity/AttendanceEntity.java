@@ -2,6 +2,8 @@ package com.example.attendancemanagementsystem.common.entity;
 
 import java.time.LocalDateTime;
 
+// import javax.swing.plaf.TreeUI;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,7 +34,8 @@ public class AttendanceEntity {
 
     // 変数名を 'timeTable' にすることで getTimeTable() が生成されます
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TimeTableID", nullable = false) 
+    // @JoinColumn(name = "TimeTableID", nullable = false) 
+    @JoinColumn(name = "TimeTableID", nullable = true) 
     private TimetableEntity timeTable;
 
     // UserID (Student) との紐づけ
@@ -58,13 +61,11 @@ public class AttendanceEntity {
     public void setAttendanceId(Integer attendanceId) {
         this.attendanceId = attendanceId;
     }
-
-    
     public AttendanceStatusEntity getStatus() {
         return status;
     }
 
-    public void setStatus(AttendanceStatusEntity status) {
+    public void setStatusId(AttendanceStatusEntity status) {
         this.status = status;
     }
 
