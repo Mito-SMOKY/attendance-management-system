@@ -35,7 +35,7 @@ public class WriterService {
         String scriptPath = java.nio.file.Paths.get(projectDir, "python_scripts", "nfc_writer_json.py").toString();
 
         try {
-            // 第1引数: UserID, 第2引数: CardID (Python側ですり替えチェックに使用)
+            // Pythonスクリプトを実行
             ProcessBuilder pb = new ProcessBuilder(
                 "python", 
                 scriptPath, 

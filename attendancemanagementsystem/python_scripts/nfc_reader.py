@@ -9,7 +9,7 @@ from smartcard.Exceptions import CardConnectionException, NoCardException
 # ==========================================
 # ★設定エリア
 # ==========================================
-JAVA_API_URL = "http://127.0.0.1:8080/api/attendance/record/nfc"
+JAVA_API_URL = "http://127.0.0.1:8080/api/issue/scan"
 API_KEY = "MySecretKey_Pi_to_Java_12345"
 START_PAGE = 10
 # ==========================================
