@@ -4,6 +4,8 @@ package com.example.attendancemanagementsystem.user.admin.controller;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -27,8 +29,8 @@ import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm
 import com.example.attendancemanagementsystem.user.admin.service.AdminService;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
-// @Controller
-// @RequestMapping("/admin")
+@Controller
+@RequestMapping("/admin")
 public class AdminController {
 
     @Autowired

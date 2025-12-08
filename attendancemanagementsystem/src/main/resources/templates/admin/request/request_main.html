@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>生徒用-申請画面</title>
+    <title>管理者用-申請画面</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/common/request.css}">
@@ -14,16 +14,17 @@
 <body>
 
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: student-header}"></div>
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
 
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url=@{/main_calendar})}"></div>
+        <div th:replace="~{fragments/_parts :: historyBackButton}"></div>
     </div>
 
     <div class="content-wrapper">
         <div class="action-buttons">
-            <a th:href="@{/request_form}"  class="ghost-button">公欠申請</a>
+            <a th:href="@{url}"  class="ghost-button">生徒削除画面</a>
+            <a th:href="@{url}"  class="ghost-button">ステータス変更</a>
             <a th:href="@{url}"  class="ghost-button">申請履歴</a>
         </div>
     </div>
