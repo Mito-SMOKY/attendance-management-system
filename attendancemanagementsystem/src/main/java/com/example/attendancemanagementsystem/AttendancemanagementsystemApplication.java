@@ -13,7 +13,7 @@ public class AttendancemanagementsystemApplication {
         SpringApplication.run(AttendancemanagementsystemApplication.class, args);
     }
 
-    // ★ここから追加: 起動時に正しいハッシュ値を計算して表示する
+    // 起動時に正しいハッシュ値を計算して表示する
     @Bean
     public CommandLineRunner generateCorrectHash(PasswordEncoder passwordEncoder) {
         return args -> {
@@ -27,5 +27,4 @@ public class AttendancemanagementsystemApplication {
             System.out.println("==========================================");
         };
     }
-    // ★ここまで
 }

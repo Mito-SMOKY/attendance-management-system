@@ -54,7 +54,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
             // ★デバッグログ: administratorテーブルの検索結果確認
             if (adminDetails == null) {
-                System.out.println("★[Debug] adminDetails is NULL (administratorテーブルにデータが見つかりません)");
+                // System.out.println("★[Debug] adminDetails is NULL (administratorテーブルにデータが見つかりません)");
                 // データがない場合は安全のため通常の管理者に倒す
                 role = "ROLE_ADMIN";
             } else {
@@ -62,16 +62,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
                 if (adminDetails.getAdminLevelId() == 1) {
                     role = "ROLE_SUPER_ADMIN";
-                    System.out.println("★[Debug] 判定結果: ROLE_SUPER_ADMIN (上位管理者)");
+                    // System.out.println("★[Debug] 判定結果: ROLE_SUPER_ADMIN (上位管理者)");
                 } else {
                     role = "ROLE_ADMIN";
-                    System.out.println("★[Debug] 判定結果: ROLE_ADMIN (通常管理者)");
+                    // System.out.println("★[Debug] 判定結果: ROLE_ADMIN (通常管理者)");
                 }
             }
         }
 
-        System.out.println("★[Debug] 最終決定ロール: " + role);
-        System.out.println("--------------------------------------------------");
+        // System.out.println("★[Debug] 最終決定ロール: " + role);
+        // System.out.println("--------------------------------------------------");
 
         //ロール（権限）の情報を持つリストの作成
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
