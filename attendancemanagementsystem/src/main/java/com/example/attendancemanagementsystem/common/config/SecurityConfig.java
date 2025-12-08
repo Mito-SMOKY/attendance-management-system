@@ -91,6 +91,8 @@ public class SecurityConfig {
                         
                         // 修正箇所2: /admin/** は ADMIN または SUPER_ADMIN を許可
                         .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        // ログイン、CSS、JSは全員許可
+                        .requestMatchers("/login", "/css/**", "/js/**","/image/**").permitAll()
                         
                         .requestMatchers("/student/**").hasRole("STUDENT")
                         .anyRequest().authenticated()

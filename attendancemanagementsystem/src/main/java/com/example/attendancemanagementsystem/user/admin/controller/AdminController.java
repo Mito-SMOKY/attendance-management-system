@@ -43,6 +43,12 @@ public class AdminController {
         return 3; 
     }
 
+    
+    @GetMapping("/timetable")
+    public String showTimetablePage() {
+        return "admin/timetable";
+    }
+
     @GetMapping("/home")
     public String home() {
         return "admin/home";
@@ -174,5 +180,29 @@ public class AdminController {
         return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
     }
     
-    // ... (他のメソッドはそのまま) ...
+    // ... (既存のメソッド) ...
+
+    // ... (前略) ...
+
+    // --- 11. マスタデータ管理メニュー画面 ---
+    @GetMapping("/master-data")
+    public String showMasterDataMenu() {
+        // ファイル名: masterDataMenu.html に合わせる
+        return "admin/mdList"; 
+    }
+
+    // --- 12. 教科マスタ詳細画面 ---
+    @GetMapping("/master/subject")
+    public String showSubjectMaster() {
+        // ファイル名: subjectMaster.html に合わせる
+        return "admin/mdSubject";
+    }
+
+    // --- 13. 教室マスタ詳細画面 ---
+    @GetMapping("/master/classroom")
+    public String showClassroomMaster() {
+        // ファイル名: classroomMaster.html に合わせる
+        return "admin/mdClassroom";
+    }
+
 }

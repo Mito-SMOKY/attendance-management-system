@@ -1,18 +1,102 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Attendance Management System</title>
+    <link rel="stylesheet" th:href="@{/css/login/login.css}" />
+    <link rel="stylesheet" th:href="@{/css/parts.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+
+  <body>
+    <div class="header-container">
+      <div th:replace="~{fragments/_parts :: main-header}"></div>
+    </div>
+
+    <div class="login-container">
+      <h2 class="title">出欠管理システム</h2>
+
+      <form th:action="@{/login}" method="post">
+        <div class="form-group">
+          <label class="label" for="username"
+            >ユーザーID または メールアドレス</label
+          >
+          <input
+            class="form"
+            type="text"
+            id="username"
+            name="username"
+            required
+            placeholder="例）Miyu.k1234@gmail.com"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="password">パスワード</label>
+          <div class="password-wrapper">
+            <input
+              class="form"
+              type="password"
+              id="password"
+              name="password"
+              required
+              placeholder="例）password1234"
+            />
+            <i
+              class="fa-solid fa-eye-slash toggle-password"
+              id="togglePassword"
+            ></i>
+          </div>
+        </div>
+
+        <div th:if="${param.error}">
+          <p class="error">ユーザーIDまたはパスワードが正しくありません。</p>
+        </div>
+
+        <a class="forget-password" href="#">
+          <p class="message">パスワードをお忘れですか？</p>
+        </a>
+
+        <button type="submit" class="button">ログイン</button>
+      </form>
+    </div>
+
+    <script>
+      const togglePassword = document.querySelector("#togglePassword");
+      const password = document.querySelector("#password");
+
+      togglePassword.addEventListener("click", function (e) {
+        // type属性を切り替える (password <-> text)
+        const type =
+          password.getAttribute("type") === "password" ? "text" : "password";
+        password.setAttribute("type", type);
+
+        // アイコンを切り替える (fa-eye <-> fa-eye-slash)
+        this.classList.toggle("fa-eye"); // 開いた目
+        this.classList.toggle("fa-eye-slash"); // 閉じた目
+      });
+    </script>
+  </body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Attendance Management System</title>
-    <link rel="stylesheet" th:href="@{/css/login/login.css}">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
 </head>
 
 <body>
 
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: main-header}"></div>
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
     </div>
 
     <div class="login-container">
@@ -27,7 +111,15 @@
 
             <div class="form-group">
                 <label class="label" for="password">パスワード</label>
-                <input class="form" type="password" id="password" name="password" required placeholder="例）password1234">
+                <div class="password-wrapper">
+                    <input class="form" type="password" id="password" name="password" required placeholder="例）password1234">
+                    
+                    <img src="/image/eyeClose.png" 
+                         th:src="@{/image/eyeClose.png}" 
+                         alt="パスワード表示切り替え" 
+                         class="toggle-password-img" 
+                         id="togglePasswordImg">
+                </div>
             </div>
   
             <div th:if="${param.error}">
@@ -42,9 +134,35 @@
 
         </form>
 
-
-
-        
-
     </div>
+
+    <script>
+        const togglePasswordImg = document.querySelector('#togglePasswordImg');
+        const passwordInput = document.querySelector('#password');
+
+        // ▼▼▼ 修正2: パスを '' (シングルクォート) で囲む & 正しいファイル名にする ▼▼▼
+        const eyeOpenPath = '/image/eyeOpen.png';
+        const eyeClosePath = '/image/eyeClose.png';
+        
+        togglePasswordImg.addEventListener('click', function (e) {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // 画像を切り替える
+            if (type === 'text') {
+                this.src = eyeOpenPath; // 目を開いた画像
+            } else {
+                this.src = eyeClosePath; // 目を閉じた画像
+            }
+        });
+
+        passwordInput.onload = function() {
+             togglePasswordImg.src = passwordInput.getAttribute('type') === 'password' 
+                 ? document.querySelector('#togglePasswordImg').getAttribute('th:src') 
+                 : eyeOpenPath;
+        };
+
+    </script>
+
 </body>
+</html> -->
