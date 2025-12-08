@@ -22,7 +22,7 @@ public class Student {
     @Column(name = "UserID")
     private Integer userId; // UsersテーブルのIDと同じ
 
-    // ★削除: private String studentNumber; 
+    //private String studentNumber; 
 
     @Column(name = "StudentStatusID", nullable = false)
     private Integer studentStatusId;
@@ -35,7 +35,7 @@ public class Student {
     @Column(name = "DeleteFlag")
     private boolean deleteFlag;
 
-    // ★追加: Usersテーブルと紐づける（IDを共有するため OneToOne @MapsId が理想ですが、簡易的にマッピング）
+    //Usersテーブルと紐づける（IDを共有するため OneToOne @MapsId が理想ですが、簡易的にマッピング）
     @OneToOne(cascade = CascadeType.ALL)
     @MapsId // StudentのIDはUsersのIDと同じものを使う設定
     @JoinColumn(name = "UserID") 
@@ -44,8 +44,6 @@ public class Student {
     // --- Getter / Setter ---
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
-
-    // getStudentNumber / setStudentNumber は削除
 
     public Integer getStudentStatusId() { return studentStatusId; }
     public void setStudentStatusId(Integer studentStatusId) { this.studentStatusId = studentStatusId; }

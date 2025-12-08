@@ -17,10 +17,10 @@ public class MajorEntity {
     @Column(name = "CourseID")
     private Integer courseId;
 
-    // コンストラクタ
+    // --- constructor ---
     public MajorEntity() {}
 
-    // Getter / Setter
+    // --- Getter/Setter ---
     public Integer getMajorId() { return majorId; }
     public void setMajorId(Integer majorId) { this.majorId = majorId; }
 

@@ -20,7 +20,7 @@ public class CardsEntity {
     @Column(name = "issued_Date")
     private LocalDateTime issuedDate;
 
-    // --- コンストラクタ ---
+    // --- constructor ---
     public CardsEntity() {
     }
 
@@ -30,8 +30,8 @@ public class CardsEntity {
         this.isActive = isActive;
         this.issuedDate = issuedDate;
     }
+    
     // --- Getter/Setter ---
-
     public String getCardId() {
         return cardId;
     }
