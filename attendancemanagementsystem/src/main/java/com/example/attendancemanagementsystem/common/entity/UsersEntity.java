@@ -6,9 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-// import lombok.Data; // Lombokは使わないので削除 (またはコメントアウト)
 
-// @Data // Lombokは使わないので削除
+
 @Entity
 @Table(name = "Users")
 public class UsersEntity {
@@ -33,8 +32,7 @@ public class UsersEntity {
     @Column(name = "Password", nullable = false)
     private String password;
 
-    // --- ここから下は手動で追加したGetter/Setter ---
-
+    // --- Getter/Setter ---
     public Integer getUserId() {
         return userId;
     }
