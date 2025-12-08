@@ -1,6 +1,6 @@
 package com.example.attendancemanagementsystem.user.admin.service;
 
-import java.util.ArrayList; // ★ここがポイント
+import java.util.ArrayList; 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +17,8 @@ import com.example.attendancemanagementsystem.common.repository.DepartmentSubjec
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
 import com.example.attendancemanagementsystem.user.admin.dto.SubjectMatrixRowDTO;
 
+
+//教科マスタ系？
 @Service
 public class AdminSubjectService {
 
