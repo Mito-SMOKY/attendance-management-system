@@ -1,10 +1,5 @@
 package com.example.attendancemanagementsystem.common.config;
 
-import com.example.attendancemanagementsystem.common.security.ApiKeyAuthFilter;
-import com.example.attendancemanagementsystem.user.loginandprofile.handler.CustomAuthenticationSuccessHandler;
-
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.example.attendancemanagementsystem.common.security.ApiKeyAuthFilter;
+import com.example.attendancemanagementsystem.user.loginandprofile.handler.CustomAuthenticationSuccessHandler;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @Profile("!dummy")
@@ -80,14 +80,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(authorize -> authorize
-                        // 画面側API (/api/issue/**) は管理者権限が必要（ログインセッションで判定）
-                        .requestMatchers("/api/issue/**").hasRole("ADMIN")
+                        // 画面側API (/api/issue/**) は管理者権限または上位管理者権限が必要
+                        // 修正箇所1: ADMIN または SUPER_ADMIN を許可
+                        .requestMatchers("/api/issue/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                         
                         // attendance以外のAPIが万が一ここに来たら拒否
                         .requestMatchers("/api/attendance/**").denyAll() 
                         
                         .requestMatchers("/login", "/css/**", "/js/**", "/image/**", "/error").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        
+                        // 修正箇所2: /admin/** は ADMIN または SUPER_ADMIN を許可
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        
                         .requestMatchers("/student/**").hasRole("STUDENT")
                         .anyRequest().authenticated()
                 )
