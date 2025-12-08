@@ -23,6 +23,7 @@ public class AttendancemanagementsystemApplication {
             System.out.println("==========================================");
             System.out.println("【重要】このハッシュ値をSQLに使ってください:");
             System.out.println(encoded);
+			System.err.println("これはpassword=\"password\"の正しいハッシュ値です。");
             System.out.println("==========================================");
         };
     }
