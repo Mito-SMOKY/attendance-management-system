@@ -42,7 +42,6 @@ public class Datalist {
     private UsersEntity creatorUser;
 
     // --- Getter / Setter ---
-
     public Integer getDataListId() {
         return dataListId;
     }

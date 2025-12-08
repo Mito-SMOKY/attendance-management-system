@@ -25,10 +25,10 @@ public class SubjectEntity {
     @Column(name = "RequiredCredits", nullable = false)
     private Integer requiredCredits;
 
-    // コンストラクタ
+    // --- constructor ---
     public SubjectEntity() {}
 
-    // Getter / Setter
+    // --- Getter/Setter ---
     public Integer getSubjectId() { return subjectId; }
     public void setSubjectId(Integer subjectId) { this.subjectId = subjectId; }
 

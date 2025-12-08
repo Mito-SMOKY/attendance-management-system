@@ -53,11 +53,11 @@ public class TimetableEntity {
     @OneToMany(mappedBy = "timeTable", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AttendanceEntity> attendances;
 
-    // --- コンストラクタ ---
+    // --- constructor ---
     public TimetableEntity() {
     }
 
-    // --- ゲッター・セッター ---
+    // --- Getter/Setter ---
     public Integer getTimeTableId() {
         return timeTableId;
     }
