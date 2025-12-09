@@ -105,7 +105,6 @@ public class SubjectAttendanceService {
             List<TimetableEntity> tts = entry.getValue();
 
             List<String> statuses = new ArrayList<>();
-            // ★修正箇所1: "no-class" を "-" に変更
             for (int i = 0; i < 4; i++) statuses.add("-");
             
             String classroomName = "-";
@@ -115,11 +114,10 @@ public class SubjectAttendanceService {
                         .map(c -> c.getClassroomName()).orElse("-");
                 
                 if (dto.getTeacherName() == null) {
-                     String tName = usersRepository.findById(tt.getUserId()).map(u -> u.getName()).orElse("-");
-                     dto.setTeacherName(tName);
+                    String tName = usersRepository.findById(tt.getUserId()).map(u -> u.getName()).orElse("-");
+                    dto.setTeacherName(tName);
                 }
 
-                // ★修正箇所2: "no-class" を "-" に変更
                 String statusSymbol = "-";
                 
                 AttendanceEntity att = attendances.stream()
@@ -163,6 +161,20 @@ public class SubjectAttendanceService {
             double rate = (double) (present + official) / total;
             dto.setCurrentAttendanceRate(rate);
         }
+
+        // 1. 現在セットされている「欠席許容数」を取得
+        int maxLimit = dto.getMaxAbsenceClasses();
+
+        // 2. 「残り欠席可能数 = 基準値 - 実際の欠席数」を計算
+        int remaining = maxLimit - absent;
+
+        // 3. マイナスにならないように0で止める
+        if (remaining < 0) {
+            remaining = 0;
+        }
+
+        // 4. DTOに「残り回数」をセットし直す
+        dto.setMaxAbsenceClasses(remaining);
 
         return dto;
     }
