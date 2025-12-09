@@ -17,10 +17,10 @@ public class ClassroomEntity {
     @Column(name = "MacAddress")
     private String macAddress;
 
-    // コンストラクタ
+    // --- constructor ---
     public ClassroomEntity() {}
 
-    // Getter / Setter
+    // --- Getter/Setter ---
     public Integer getClassroomId() { return classroomId; }
     public void setClassroomId(Integer classroomId) { this.classroomId = classroomId; }
 

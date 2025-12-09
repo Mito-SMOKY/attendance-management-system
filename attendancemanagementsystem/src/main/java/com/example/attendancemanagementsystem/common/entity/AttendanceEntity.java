@@ -43,7 +43,7 @@ public class AttendanceEntity {
     @JoinColumn(name = "UserID", nullable = false) 
     private StudentEntity student;
 
-    // --- コンストラクタ ---
+    // --- constructor ---
     public AttendanceEntity() {
     }
 
@@ -53,7 +53,7 @@ public class AttendanceEntity {
         this.createdAt = LocalDateTime.now();
     }
 
-    // --- ゲッター・セッター ---
+    // --- Getter/Setter ---
     public Integer getAttendanceId() {
         return attendanceId;
     }

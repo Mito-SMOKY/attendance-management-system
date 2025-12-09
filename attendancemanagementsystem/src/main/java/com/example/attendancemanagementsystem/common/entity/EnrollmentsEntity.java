@@ -40,11 +40,11 @@ public class EnrollmentsEntity {
     @JoinColumn(name = "DepartmentID") // DBのFKカラム名
     private DepartmentEntity department;
 
-    // --- コンストラクタ ---
+    // --- constructor ---
     public EnrollmentsEntity() {
     }
 
-    // --- ゲッター・セッター ---
+    // --- Getter/Setter ---
     public Integer getEnrollmentsId() {
         return enrollmentsId;
     }

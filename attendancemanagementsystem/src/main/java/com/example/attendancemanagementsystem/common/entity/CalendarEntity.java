@@ -34,11 +34,11 @@ public class CalendarEntity {
     @JoinColumn(name = "UserID") // DBのFKカラム名
     private UsersEntity users;
 
-    // --- コンストラクタ ---
+    // --- constructor ---
     public CalendarEntity() {
     }
 
-    // --- ゲッター・セッター ---
+    // --- Getter/Setter ---
     public Integer getCalendarId() {
         return calendarId;
     }

@@ -25,12 +25,11 @@ public class DepartmentEntity {
     @Column(name = "Class")
     private String className; // DBカラム名 "Class" に対応
 
-    // --- コンストラクタ ---
+    // --- constructor ---
     public DepartmentEntity() {
     }
 
     // --- Getter / Setter ---
-
     public Integer getDepartmentId() {
         return departmentId;
     }
