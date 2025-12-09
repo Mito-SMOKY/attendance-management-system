@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プロフィール</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/common/profile.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="header-container">
+
+    <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
+        <div th:replace="~{fragments/_parts :: student-header}"></div>
+    </div>
+    <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+</div>
+
+
+<div class="profile-container">
+    <div class="form-group">
+        <label >氏名</label>
+        <input class="Name-form" type="text" id="username" name="username" required placeholder="田中 花子">
+    </div>
+
+</div>
+
+    <script th:src="@{/js/profile.js}"></script>
+</body>
+</html>

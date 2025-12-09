@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>プロフィール</title>
+    <title>ユーザー詳細</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/common/profile.css}">
@@ -38,11 +38,22 @@
                 <h2 class="card-title">ユーザ詳細</h2>
                 
                 <ul class="detail-list">
-                    <li th:if="${userData.Role} == '利用者'"><a href="#" class="detail-link">プロフィール編集</a></li>
-                    <li th:if="${userData.Role} != '利用者'"><a href="#" class="detail-link">プロフィール</a></li>
+                    <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
+                        <li><a href="/profile" class="detail-link">プロフィール</a></li>
+                    </div>
 
-                    <li><a href="#" class="detail-link">プライバシー設定</a></li>
-                    
+                    <!-- <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+                        <li><a href="admin/profile" class="detail-link">プロフィール</a></li>
+                    </div> -->
+
+                    <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
+                        <li><a href="#" class="detail-link">プライバシー設定</a></li>
+                    </div>
+
+                    <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+                        <li><a href="#" class="detail-link">プライバシー設定</a></li>
+                    </div>
+
                     <li class="timezone-item">
                         <span class="timezone-label">タイムゾーン</span>
                         <span class="timezone-value" th:text="${userData.Timezone}"></span>

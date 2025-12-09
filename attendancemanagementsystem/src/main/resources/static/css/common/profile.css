@@ -195,3 +195,44 @@ body {
         padding: 15px;
     }
 }
+
+
+.form-group {
+    display: block;
+    align-items: center;
+    margin-bottom: 10px;
+    width: 100%;
+    padding-block-end: 10px;
+}
+
+input{
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+input:focus{
+    outline: none;
+    border-color: #00bdca;
+    box-shadow: 0 0 5px #00bdca;
+}
+
+input::placeholder{
+    color: #7a7a7a;
+    opacity: 0.3;
+}
+
+.label{
+    width: 150px;
+    text-align: left;
+    font-size: 20px;
+}
+
+.Name-form{
+    width: 100%;
+    margin: 10px 0;
+    padding: 20px;
+    font-size: 16px;
+    border: 1px solid #00bdca;
+    border-radius: 5px;
+    box-sizing: border-box;
+    
+}
