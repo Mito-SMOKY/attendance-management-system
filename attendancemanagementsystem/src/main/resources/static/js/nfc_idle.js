@@ -1,26 +1,33 @@
-// idle.js: 待機画面用スクリプト
+// nfc_idle.js: 待機画面用スクリプト
 
 let lastTimestamp = 0;
 
 // 1秒ごとにポーリングを実行
 setInterval(async () => {
     try {
-        const res = await fetch('/api/issue/poll');
+        // キャッシュ対策で時間を付与
+        const res = await fetch('/api/issue/poll?t=' + new Date().getTime());
         const data = await res.json();
+
+        // ログ出力(確認用)
+        // console.log("Server Status:", data.status);
 
         // タイムスタンプが更新されたら画面遷移
         if (data.timestamp > lastTimestamp) {
-            lastTimestamp = data.timestamp;
             
-            // カード検知！ -> 書き込み画面へ移動
+            // 初回ロード時はタイムスタンプ同期のみ
+            if (lastTimestamp === 0) {
+                lastTimestamp = data.timestamp;
+                return;
+            }
+            lastTimestamp = data.timestamp;
+
+            // URLパラメータを付けずにリダイレクトする
             if (data.status === 'SCANNED') {
-                const cardId = encodeURIComponent(data.cardId || '');
-                const userId = encodeURIComponent(data.userId || '');
-                // リダイレクト
-                window.location.href = `/admin/nfc/confirm?cardId=${cardId}&userId=${userId}`;
+                window.location.href = '/admin/nfc/confirm';
             } 
-            // エラー検知 -> 結果画面(失敗)へ移動
             else if (data.status === 'ERROR') {
+                // エラーメッセージをURLエンコードして付与
                 const msg = encodeURIComponent(data.error || 'エラー');
                 window.location.href = `/admin/nfc/result?status=error&msg=${msg}`;
             }

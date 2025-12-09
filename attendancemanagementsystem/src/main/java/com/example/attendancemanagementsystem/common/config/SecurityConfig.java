@@ -1,17 +1,14 @@
 package com.example.attendancemanagementsystem.common.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.example.attendancemanagementsystem.user.loginandprofile.handler.CustomAuthenticationSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.attendancemanagementsystem.common.security.ApiKeyAuthFilter;
 import com.example.attendancemanagementsystem.user.loginandprofile.handler.CustomAuthenticationSuccessHandler;
@@ -19,8 +16,52 @@ import com.example.attendancemanagementsystem.user.loginandprofile.handler.Custo
 import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
-@Profile("!dummy")
+@EnableWebSecurity
 public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            // 1. APIへのアクセス制限を解除 (Pythonからのアクセスを通すため)
+            .authorizeHttpRequests(auth -> auth
+                // 静的リソース
+                .requestMatchers("/css/**", "/js/**", "/image/**", "/error").permitAll()
+                
+                // "/api/issue/**" (PC登録用) と "/api/attendance/**" (ラズパイ出席用)
+                // これらはプログラムからのアクセスなので、ログインなしで許可する
+                .requestMatchers("/api/issue/**", "/api/attendance/record/**").permitAll()
+                
+                // 画面系のアクセス制御 (既存の設定)
+                .requestMatchers("/login").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/student/**").hasRole("STUDENT")
+                
+                // それ以外は認証必須
+                .anyRequest().authenticated()
+            )
+            
+            // 2. CSRF対策を無効化 (API用)
+            // PythonからPOSTする際にブロックされないようにする
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/issue/**", "/api/attendance/record/**")
+            )
+            
+            // 3. ログイン画面の設定
+            .formLogin(login -> login
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .successHandler(customAuthenticationSuccessHandler())
+                .failureUrl("/login?error=true")
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout")
+                .permitAll()
+            );
+
+        return http.build();
+    }
 
     // --- 共通Bean定義 ---
     @Bean
@@ -31,83 +72,5 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
         return new CustomAuthenticationSuccessHandler();
-    }
-    // ----------------------
-
-
-    /**
-     * @Order(1) APIキー認証用のFilterChain (優先度: 高)
-     * PythonやRaspiからのアクセス (/api/attendance/**) 専用です。
-     */
-    @Bean
-    @Order(1)
-    public SecurityFilterChain apiFilterChain(
-            HttpSecurity http,
-            @Value("${nfc.auth.api-key}") String apiKey
-    ) throws Exception {
-
-        http
-            //"/api/**" から "/api/attendance/**" に限定します。
-            ///api/issue/** はここをスルーして下の設定(Order 2)に行きます。
-            .securityMatcher("/api/attendance/**") 
-            
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(eh -> eh
-                .authenticationEntryPoint((req, res, ex) -> {
-                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    res.getWriter().write("Unauthorized: API Key Required or Invalid");
-                })
-            )
-            .authorizeHttpRequests(authz -> authz
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(new ApiKeyAuthFilter(apiKey),
-                    UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
-
-
-    /**
-     * @Order(2) Web UI用のFilterChain (優先度: 低)
-     * ブラウザからのアクセス (/api/issue/** や画面表示) 用です。
-     */
-    @Bean
-    @Order(2) 
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-
-                .authorizeHttpRequests(authorize -> authorize
-                        // 画面側API (/api/issue/**) は管理者権限または上位管理者権限が必要
-                        // 修正箇所1: ADMIN または SUPER_ADMIN を許可
-                        .requestMatchers("/api/issue/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
-                        
-                        // attendance以外のAPIが万が一ここに来たら拒否
-                        .requestMatchers("/api/attendance/**").denyAll() 
-                        
-                        .requestMatchers("/login", "/css/**", "/js/**", "/image/**", "/error").permitAll()
-                        
-                        // 修正箇所2: /admin/** は ADMIN または SUPER_ADMIN を許可
-                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
-                        // ログイン、CSS、JSは全員許可
-                        .requestMatchers("/login", "/css/**", "/js/**","/image/**").permitAll()
-                        
-                        .requestMatchers("/student/**").hasRole("STUDENT")
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .successHandler(customAuthenticationSuccessHandler()) 
-                        .permitAll() 
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout") 
-                        .logoutSuccessUrl("/login?logout") 
-                        .permitAll()
-                );
-
-        return http.build();
     }
 }
