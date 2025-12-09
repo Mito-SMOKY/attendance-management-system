@@ -1,18 +1,69 @@
 <link rel="stylesheet" th:href="@{/css/parts.css}">
 
-<div th:fragment="backButton(url)">
+<!-- <div th:fragment="backButton(url)">
     <a th:href="@{${url}}" class="backbutton">戻る</a>
+</div> -->
+
+<!-- 前画面に戻るだけ -->
+<div th:fragment="historyBackButton">
+    <button type="button" 
+            onclick="history.back()" 
+            class="backbutton">戻る
+    </button>
+</div>
+
+<!-- 遷移先URLを保持して戻る -->
+<div th:fragment="backButton(url)">
+    <button type="button" 
+            th:onclick="'location.href=\'' + @{${url}} + '\''" 
+             class="backbutton">戻る
+    </button>
 </div>
 
 
-<div th:fragment="header-container">
-    <header class="main-header">
+<!-- 画面ができ次第ヘッダーのリンクを追加する -->
+
+<!-- 共通ヘッダー -->
+<div th:fragment="main-header">
+    <header class="main-header"></header>
+</div>
+
+<!-- 生徒用ヘッダー -->
+<div th:fragment="student-header">
+    <header class="main-header-student">
+        
         <div class="header-left">
             <span>〇〇××さん</span>
         </div>
         <nav class="header-nav">
             <ul>
-                <li><a href="#">日付</a></li>
+                <li><a th:href="@{/student/main_calendar}">日付</a></li>
+                <li><a href="#">教科</a></li>
+                <li><a th:href="@{/student/request_main}">その他</a></li>
+            </ul>
+        </nav>
+        <div class="header-right">
+            <a href="#" class="icon-link">
+                <i class="fas fa-user"></i>
+            </a>
+            <a href="#" class="icon-link notification">
+                <i class="fas fa-bell"></i>
+                <span class="notification-dot"></span>
+            </a>
+        </div>
+    </header>
+</div>
+
+<!-- 管理者・上位管理者用ヘッダー -->
+<div th:fragment="admin-header">
+    <header class="main-header-admin">
+        
+        <div class="header-left">
+            <span>〇〇××さん</span>
+        </div>
+        <nav class="header-nav">
+            <ul>
+                <li><a th:href="@{/admin/timetable}">日付</a></li>
                 <li><a href="#">教科</a></li>
                 <li><a href="#">生徒</a></li>
                 <li><a href="#">その他</a></li>

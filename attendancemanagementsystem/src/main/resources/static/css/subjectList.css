@@ -1,0 +1,85 @@
+.main-container {
+    
+    width: 90%;
+    max-width: 1000px;
+    margin: 30px auto;
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.subject-table {
+    margin-top: 100px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.subject-table th, .subject-table td {
+    border: 2px solid #e0e0e0;
+    padding: 12px 15px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+/* ヘッダーのスタイル (画像の青緑色を再現) */
+.subject-table th {
+    background-color: #00bcd4;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.subject-info-cell {
+    line-height: 1.4;
+}
+
+.course-name {
+    font-size: 0.9em;
+    color: #616161; 
+    display: block;
+}
+
+.subject-name {
+    font-size: 1.1em;
+    color: #039be5; 
+    text-decoration: none;
+    font-weight: 500;
+}
+.subject-name:hover {
+    text-decoration: underline;
+}
+
+/* 出席率セル */
+.attendance-cell {
+    white-space: nowrap; 
+}
+
+/* 危険マーク (黄色) */
+.risk-warning {
+    color: #ffc107; 
+    font-size: 1.2em;
+    margin-right: 5px;
+    font-weight: bold;
+}
+
+/* --- プログレスバーのスタイル --- */
+.attendance-bar-container {
+    width: 150px;
+    height: 10px;
+    background-color: #e0e0e0; 
+    border-radius: 5px;
+    overflow: hidden;
+    display: block;
+    margin-top: 5px;
+}
+
+.attendance-bar {
+    height: 100%;
+    background-color: #4dd0e1; /* 通常の進捗バーの色 */
+    transition: width 0.5s ease-in-out;
+}
+
+/* 出席率が危険域の場合のバーの色 (オプション) */
+.risk-bar {
+    background-color: #ff9800; 
+}

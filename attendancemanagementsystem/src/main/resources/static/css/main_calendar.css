@@ -1,0 +1,381 @@
+/* カレンダーのCSS */
+
+.calendar-header {
+    width: 95%; /* 80% -> 95% に広げる */
+    align-items: center;
+    margin: 0 auto 20px auto;
+    /* margin-top: 200px; */
+    display: flex;
+    justify-content: space-between; 
+    font-size: 1.2rem; /* 文字サイズUP */
+    color: #001f22;
+    flex-wrap: wrap; 
+    gap: 15px;
+    padding-top: 20px;
+}
+
+.input{
+  width: 120px; /* 少し大きく */
+  height: 50px;
+  padding: 5px 15px;
+  border: #00bdca 2px solid;
+  border-radius: 25px;
+  font-size: 1.2rem; /* 文字サイズUP */
+}
+
+.jumpButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px; /* 少し大きく */
+    height: 50px;
+    margin:0 auto;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 3px rgb(0 0 0 / 25%), 0 2px 3px -2px rgb(0 0 0 / 15%);
+    background-color: #00bdca;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem; /* 文字サイズUP */
+    cursor: pointer;
+}
+
+.jumpButton:hover {
+    background-color: #1579c0;
+}
+
+.calendar thead{
+    background-color: #00bdca;
+}
+
+.calendar-ym {
+    text-align: center; /* 中央揃えに変更 */
+    margin: 60px 0 20px 0;
+    padding-top: 20px; /* 余白調整 */
+    font-size: 3rem;
+    font-weight: 700;
+    color:#008b95;
+}
+
+
+.calendar {
+    max-width: 100%; /* 制限解除 */
+    width: 95%;      /* 画面いっぱい使う */
+    margin: 0 auto 50px auto;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 1.2rem; /* カレンダー内の文字サイズUP */
+}
+
+.calendar th,
+.calendar td {
+    border: 1px solid #000;
+    text-align: center;
+    vertical-align: top; /* 数字を左上に */
+    padding: 5px;
+}
+
+.calendar th {
+    padding: 15px 0; /* ヘッダーの高さUP */
+    color: #fff;
+}
+
+.calendar td {
+    height: 120px; /* ★マス目の高さを50px -> 120pxに倍増 */
+    position: relative;
+}
+
+/* 日付の数字 */
+.day-number {
+    text-align: left;
+    padding-left: 5px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+@media (max-width: 767.98px) {
+    .calendar th,
+    .calendar td {
+        padding: 6px;
+        font-size: 12px;
+        height: 70px; /* スマホ時は少し控えめに */
+    }
+    .calendar th {
+        padding: 3px 6px;
+    }
+}
+
+.calendar .sun {
+    color: #e17f7e;
+    background-color: #f8e4e2;
+}
+.calendar .sat {
+    color: #7ab6f3;
+    background-color: #e7f6fd;
+}
+.calendar .mute {
+    color: #aaa;
+    background-color: #f9f9f9;
+}
+.calendar .today {
+    background-color: #eeffde;
+    border: 2px solid #76c948; /* 今日の枠線を強調 */
+}
+.calendar .off {
+    background-color: #fadcdb;
+}
+
+/* 強制的に土日カラーを当てる */
+.calendar tr th:nth-child(1),
+.calendar tr td:nth-child(1),
+.calendar th.sun,
+.calendar td.sun,
+.calendar .sun {
+    color: #e17f7e !important;
+    background-color: #f8e4e2 !important;
+}
+
+.calendar tr th:nth-child(7),
+.calendar tr td:nth-child(7),
+.calendar th.sat,
+.calendar td.sat,
+.calendar .sat {
+    color: #1e88e5 !important;
+    background-color: #e7f6fd !important;
+}
+
+.calendar .today.sat,
+.calendar td.today.sat {
+    background-color: #e7f6fd !important;
+    color: #1e88e5 !important;
+}
+
+.calendar thead th.sun {
+    background-color: #ffb3b3; 
+    color: #c00;
+}
+.calendar thead th.sat {
+    background-color: #b3d9ff; 
+    color: #0059b3;
+}
+
+.calendar-controls {
+    display: flex;
+    align-items: center; /* 垂直中央揃え */
+    margin: 0 auto;
+    gap: 20px; 
+    box-sizing: border-box;
+    flex-wrap: wrap;
+}
+
+.calendar-toggle {
+    flex-shrink: 0; 
+    font-size: 1.2rem; /* トグル横の文字も大きく */
+}
+
+.calendar-table-container {
+    margin: auto;
+    align-items: center;
+    width: 100%; /* コンテナ幅いっぱい */
+    display: flex;
+    justify-content: center;
+}
+
+
+/* トグルボタン */
+.toggle-button {
+    display: inline-block;
+    position: relative;
+    width: 60px; /* 少し大きく */
+    height: 30px;
+    border-radius: 30px;
+    border: 3px solid #4defed;
+    box-sizing: content-box;
+    cursor: pointer;
+    transition: border-color .4s;
+    vertical-align: middle;
+}
+
+.toggle-button:has(:checked) {
+    border-color: #2ee2e5;
+}
+
+.toggle-button::after {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    width: 26px; /* 中の丸も大きく */
+    height: 26px;
+    border-radius: 50%;
+    background-color: #4defed;
+    content: '';
+    transition: left .4s;
+}
+
+.toggle-button:has(:checked)::after {
+    left: 32px;
+    background-color: #2ee2e5;
+}
+
+.toggle-button input {
+    display: none;
+}
+
+
+/* 予定追加モーダルのCSS */
+
+#existing-events-list {
+    max-height: 150px; 
+    overflow-y: auto;
+    border: 1px solid #eee;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.modal-overlay {
+    display: none; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.modal-content {
+    width: 500px;
+    height: auto; /* 高さは自動調整に */
+    min-height: 400px;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    min-width: 300px;
+}
+
+.modal-content form div {
+    margin-bottom: 15px;
+}
+.modal-content label {
+    display: block;
+    margin-bottom: 5px;
+}
+.modal-content input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border-color: #00bdca;
+}
+
+.model-actions-container {
+    display: flex;
+    gap: 20px;
+    justify-content: right;
+}
+
+.modal-actions {
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    height: 40px;
+    margin: 20px auto 0;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 3px rgb(0 0 0 / 25%), 0 2px 3px -2px rgb(0 0 0 / 15%);
+    background-color: #00bdca;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+.Title{
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #00bdca;
+}
+
+/* (JSで生成される) 予定リストのコンテナ */
+.schedule-list {
+    margin-top: 4px; 
+    text-align: left;
+}
+
+/* (JSで生成される) 個別の予定アイテム */
+.schedule-item {
+    font-size: 0.9rem; /* 少し大きく */
+    font-weight: normal;  
+    color: #333;    
+    border-radius: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: left;
+    width: 100%;
+    display: block;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f4f4f4; /* 背景色 */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin-bottom: 2px;
+}
+
+.delete-schedule-btn {
+    background-color: #ff6f65; /* (赤) */
+    border : none;
+    border-radius: 4px;
+    color: white;
+    font-size: 1rem;
+    min-width: auto;
+    padding: 2px 6px;
+    cursor: pointer; 
+}
+.delete-schedule-btn:hover {
+    background-color: #cc6464;
+}
+
+/* ▼▼▼ 以下を追加：出欠マークの色と配置 ▼▼▼ */
+
+.attendance-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60%; /* セルの中央付近に配置 */
+}
+
+/* 共通設定 */
+.attendance-present, 
+.attendance-absent, 
+.attendance-late,
+.attendance-public { /* ←ここに追加 */
+    font-size: 2.5rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* 出席 (〇) - 青緑 */
+.attendance-present {
+    color: #00bdca; 
+}
+
+/* 欠席 (×) - 赤 */
+.attendance-absent {
+    color: #ff6f65; 
+}
+
+/* 遅刻・早退 (△) - オレンジ */
+.attendance-late {
+    color: #f39c12; 
+}
+
+/* 公欠 (〇) - 緑 */
+.attendance-public {
+    color: #28a745; /* くっきりした緑 */
+}

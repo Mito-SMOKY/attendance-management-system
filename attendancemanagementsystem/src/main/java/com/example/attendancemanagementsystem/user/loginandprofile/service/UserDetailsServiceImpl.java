@@ -4,14 +4,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import java.util.List;
+
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 
@@ -47,10 +46,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         //ロール（権限）の情報を持つリストの作成
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 
-        return new User(
+        // CustomUserDetails を使い、userId を渡す
+        return new CustomUserDetails(
                 user.getLoginId(), 
                 user.getPassword(),
-                authorities
+                authorities,
+                user.getUserId()
         );
     }
 }

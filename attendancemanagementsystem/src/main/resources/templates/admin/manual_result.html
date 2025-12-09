@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>登録完了</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        text-align: center;
+      }
+      .container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      h1 {
+        color: #28a745;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .btn-dl {
+        background-color: #007bff;
+      }
+      .btn-hist {
+        background-color: #6c757d;
+      }
+      .btn-dl:hover {
+        background-color: #0056b3;
+      }
+      .btn-hist:hover {
+        background-color: #5a6268;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>登録完了！</h1>
+      <p>アカウント情報の保存が完了しました。</p>
+      <p>
+        CSVファイルのダウンロードが自動的に開始されます。<br />
+        開始されない場合はボタンを押してください。
+      </p>
+
+      <form
+        id="csvDownloadForm"
+        th:action="@{/admin/download-manual-csv}"
+        th:object="${manualForm}"
+        method="post"
+      >
+        <input type="hidden" th:field="*{datalistName}" />
+
+        <th:block th:each="acc, stat : *{accounts}">
+          <input
+            type="hidden"
+            th:field="*{accounts[__${stat.index}__].studentNumber}"
+          />
+          <input type="hidden" th:field="*{accounts[__${stat.index}__].name}" />
+          <input
+            type="hidden"
+            th:field="*{accounts[__${stat.index}__].password}"
+          />
+        </th:block>
+
+        <button type="submit" class="btn btn-dl">CSVをダウンロード</button>
+      </form>
+
+      <br />
+      <a th:href="@{/admin/creation-history}" class="btn btn-hist"
+        >履歴一覧へ移動</a
+      >
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var form = document.getElementById("csvDownloadForm");
+        if (form) {
+          setTimeout(function () {
+            form.submit();
+            console.log("自動ダウンロードを開始しました");
+          }, 1000); // 待ち時間を少し長め(1秒)にしてみる
+        } else {
+          console.error("フォームが見つかりませんでした");
+        }
+      });
+    </script>
+  </body>
+</html>
