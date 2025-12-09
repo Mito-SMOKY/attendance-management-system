@@ -32,4 +32,8 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
     //指定した教科・期間の時間割を日付順・時限順で取得
     List<TimetableEntity> findBySubjectIdAndDateBetweenOrderByDateAscSlotIdAsc(Integer subjectId, LocalDate startDate, LocalDate endDate);
 
+    //学科IDと日付範囲を指定して時間割を取得
+    List<TimetableEntity> findByDepartment_DepartmentIdAndDateBetweenOrderByDateAscSlotIdAsc(
+            Integer departmentId, LocalDate startDate, LocalDate endDate);
+
 }

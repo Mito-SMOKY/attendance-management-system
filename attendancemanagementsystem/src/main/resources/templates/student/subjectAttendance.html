@@ -69,7 +69,7 @@
         </table>
         
         <div id="risk-warning-icon" th:classappend="${attendanceData.maxAbsenceClasses <= 1} ? 'visible' : 'hidden'" class="risk-warning-icon">
-             &#9888;
+            &#9888;
         </div>
     </div>
 
@@ -111,10 +111,10 @@
                         
                         <td th:each="status : ${day.classStatuses}" class="status-cell">
                             <span th:text="${status}" 
-                                  th:classappend="${status == '○'} ? 'present' : 
-                                                 (${status == '✕'} ? 'absent' : 
-                                                 (${status == '△'} ? 'late' : 
-                                                 (${status == '公'} ? 'attendance-public' : 'no-class')))">
+                                th:classappend="${status == '○'} ? 'present' : 
+                                                (${status == '✕'} ? 'absent' : 
+                                                (${status == '△'} ? 'late' : 
+                                                (${status == '公'} ? 'attendance-public' : 'no-class')))">
                             </span>
                         </td>
                         
