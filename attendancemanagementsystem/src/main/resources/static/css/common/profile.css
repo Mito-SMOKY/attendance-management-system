@@ -1,0 +1,197 @@
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    
+}
+
+/* 全体のコンテナ */
+.profile-container {
+    margin-top: 100px;
+    width: 100%;
+    max-width: 1000px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 20px 30px;
+}
+
+/* ユーザーヘッダー */
+.user-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.user-icon {
+    width: 50px;
+    height: 50px;
+    background-color: #20a0b2; /* 画像のイメージカラー */
+    border-radius: 50%;
+    margin-right: 15px;
+    /* 人型アイコンの描画（今回はCSSで簡易的に表現） */
+    position: relative;
+    overflow: hidden;
+}
+.user-icon::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 18px;
+    background-color: #ffffff;
+    border-radius: 50%;
+}
+.user-icon::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 30px;
+    background-color: #ffffff;
+    border-radius: 50% 50% 0 0;
+}
+
+
+.user-name {
+    font-size: 2rem;
+    color: #333;
+    margin: 0;
+    padding-right: 10px;
+}
+
+.user-type {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+}
+
+.header-separator {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 10px 0 30px;
+}
+
+/* コンテンツ全体（カードを横並びにする） */
+.content-wrapper {
+    display: flex;
+    gap: 20px;
+}
+
+/* 各情報カードの共通スタイル */
+.card {
+    flex: 1; /* 2つのカードが均等な幅を占める */
+    padding: 20px;
+    border: 1px solid #e0e0e0; /* 画像の枠線 */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+/* ユーザー詳細カード */
+.user-details-card {
+    /* 特になし */
+}
+
+.detail-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.detail-list li {
+    margin-bottom: 15px;
+}
+
+.detail-link {
+    color: #20a0b2; /* リンクの色をアイコンと同じ青系に */
+    text-decoration: none;
+    font-size: 1rem;
+}
+.detail-link:hover {
+    text-decoration: underline;
+}
+
+.timezone-item {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.timezone-label {
+    display: block; /* タイムゾーンのラベルを独立させる */
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 4px;
+    font-size: 1.5em;
+}
+
+.timezone-value {
+    color: #666;
+    display: block;
+}
+
+/* コース詳細カード */
+.course-details-card {
+    /* 特になし */
+}
+
+.course-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+}
+
+.course-list li {
+    margin-bottom: 5px;
+    font-size: 0.95rem;
+    color: #20a0b2; /* コースIDと名前をリンクのような色に */
+}
+
+/* さらに表示で隠す要素 */
+.hidden-course {
+    display: none;
+}
+
+/* さらに表示ボタン */
+.show-more-button {
+    background: none;
+    border: none;
+    color: #20a0b2;
+    cursor: pointer;
+    padding: 5px 0;
+    font-size: 0.95rem;
+    text-align: left;
+    display: block;
+    width: 100%;
+}
+.show-more-button:hover {
+    text-decoration: underline;
+}
+.hidden-button {
+    display: none;
+}
+
+/* レスポンシブ対応（画面幅が狭い場合） */
+@media (max-width: 600px) {
+    .content-wrapper {
+        flex-direction: column; /* 縦並びにする */
+    }
+    .profile-container {
+        padding: 15px;
+    }
+}

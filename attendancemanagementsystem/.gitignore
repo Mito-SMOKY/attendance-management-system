@@ -33,5 +33,6 @@ build/
 .vscode/
 
 #ローカル開発用のテストcontroller
-TestController.java
+TestControllerStudent.java
+TestControllerAdmin.java
 Dummymodel
