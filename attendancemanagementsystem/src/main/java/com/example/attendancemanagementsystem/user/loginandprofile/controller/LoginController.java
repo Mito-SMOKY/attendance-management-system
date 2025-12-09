@@ -21,10 +21,6 @@ public class LoginController {
         return "student/main_calendar";
     }
 
-    @GetMapping("/sessionMenu")
-    public String showsessionMenu() {
-        return "admin/sessionMenu";
-    }
 
     @GetMapping("/timetable")
     public String showtimetable() {
@@ -50,18 +46,6 @@ public class LoginController {
     @GetMapping("/studentInfo")
     public String showstudentInfo() {
         return "admin/studentInfo";
-    }
-    @GetMapping("/studentClassInfo")
-    public String showstudentClassInfo() {
-        return "admin/studentClassInfo";
-    }
-    @GetMapping("/subjectInfo")
-    public String showsubjectInfo() {
-        return "admin/subjectInfo";
-    }
-    @GetMapping("/subjectList")
-    public String showsubjectList() {
-        return "admin/subjectList";
     }
 }
 //     @GetMapping("/main_calendar")

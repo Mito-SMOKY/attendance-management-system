@@ -1,7 +1,7 @@
 package com.example.attendancemanagementsystem.common.entity;
 
-import java.time.LocalDate; // LocalDate をインポート
-import java.util.List; // List をインポート
+import java.time.LocalDate;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -28,16 +28,16 @@ public class TimetableEntity {
     private LocalDate date;
 
     @Column(name = "SlotID")
-    private Integer slotId; // ※本来は TimeSlotEntity への @ManyToOne
+    private Integer slotId; 
 
     @Column(name = "UserID")
-    private Integer userId; // ※本来は AdministratorEntity への @ManyToOne
+    private Integer userId; 
 
     @Column(name = "SubjectID")
-    private Integer subjectId; // ※本来は SubjectEntity への @ManyToOne
+    private Integer subjectId; 
 
     @Column(name = "ClassroomID")
-    private Integer classroomId; // ※本来は ClassroomEntity への @ManyToOne
+    private Integer classroomId; 
 
     @Column(name = "AcademicYear")
     private Integer academicYear;
@@ -46,18 +46,18 @@ public class TimetableEntity {
 
     // Timetable(多) 対 Department(1)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "DepartmentID") // DBのFKカラム名
+    @JoinColumn(name = "DepartmentID") 
     private DepartmentEntity department;
 
     // Timetable(1) 対 Attendance(多)
-    @OneToMany(mappedBy = "timetable", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "timeTable", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AttendanceEntity> attendances;
 
-    // --- コンストラクタ ---
+    // --- constructor ---
     public TimetableEntity() {
     }
 
-    // --- ゲッター・セッター ---
+    // --- Getter/Setter ---
     public Integer getTimeTableId() {
         return timeTableId;
     }
@@ -114,7 +114,6 @@ public class TimetableEntity {
         this.academicYear = academicYear;
     }
 
-    // 関連のゲッター・セッター
     public DepartmentEntity getDepartment() {
         return department;
     }

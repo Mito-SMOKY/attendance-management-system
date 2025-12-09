@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日付詳細</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/student/date_attendance.css}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
+</head>
+<body>
+
+    <div th:replace="~{fragments/_parts :: student-header}"></div>
+
+    <div class="container">
+        
+        <div class="header-nav">
+            <button th:onclick="|location.href='@{/student/main_calendar}'|" class="back-btn">
+                <i class="fas fa-chevron-left"></i> 戻る
+            </button>
+        </div>
+
+        <div class="date-display-area">
+            <div class="date-select-wrapper">
+                <select id="dateSelect" class="date-select">
+                    </select>
+                <i class="fas fa-chevron-down select-icon"></i>
+            </div>
+        </div>
+        <table class="detail-table">
+            <thead>
+                <tr>
+                    <th class="th-slot">時限</th>
+                    <th class="th-subject">教科名</th>
+                    <th class="th-status">出席</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${dailyList}">
+                    <td class="td-slot" th:text="${item.slotId}">1</td>
+                    
+                    <td class="td-subject">
+                        <a th:href="@{/student/subject_attendance(subjectId=${item.subjectId})}" class="subject-link">
+                            <div class="subject-name" th:text="${item.subjectName}">LINUX基礎</div>
+                        </a>
+                        <div class="classroom-name" th:text="${item.classroomName}">231</div>
+                    </td>
+                    
+                    <td class="td-status">
+                        <span th:if="${item.status == '〇'}" class="status-mark status-ok">〇</span>
+                        <span th:if="${item.status == '×'}" class="status-mark status-ng">×</span>
+                        <span th:if="${item.status == '△'}" class="status-mark status-late">△</span>
+                        
+                        <span th:unless="${item.status == '〇' or item.status == '×' or item.status == '△'}" 
+                              th:text="${item.status}"></span>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(dailyList)}">
+                    <td colspan="3" class="no-data">授業予定はありません</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="footer-note">
+            <span class="note-icon">?</span> 出席情報に誤りがある場合、担任の先生にお知らせください
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const select = document.getElementById('dateSelect');
+            
+            // URLから現在の日付パラメータを取得 (例: ?date=2025-11-06)
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentDateStr = urlParams.get('date'); 
+            
+            if (!currentDateStr) return; 
+
+            const currentDate = new Date(currentDateStr);
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth(); // 0始まり (11月は 10)
+
+            // その月の日数を計算
+            const lastDay = new Date(year, month + 1, 0).getDate();
+            
+            const dayNames = ['(日)', '(月)', '(火)', '(水)', '(木)', '(金)', '(土)'];
+
+            // 1日から末日までループして option を生成
+            for (let d = 1; d <= lastDay; d++) {
+                const dateObj = new Date(year, month, d);
+                
+                // value用: YYYY-MM-DD
+                const yyyy = dateObj.getFullYear();
+                const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const dd = String(dateObj.getDate()).padStart(2, '0')
+                const dateString = `${yyyy}-${mm}-${dd}`;
+
+                // 表示用: YYYY/MM/DD(曜日)
+                const dayOfWeek = dayNames[dateObj.getDay()];
+                const label = `${yyyy}/${mm}/${dd} ${dayOfWeek}`;
+
+                const option = document.createElement('option');
+                option.value = dateString;
+                option.textContent = label;
+
+                if (dateString === currentDateStr) {
+                    option.selected = true;
+                }
+
+                select.appendChild(option);
+            }
+
+            // 変更時の画面遷移
+            select.addEventListener('change', function() {
+                const selectedDate = this.value;
+                window.location.href = `/student/attendance/date?date=${selectedDate}`;
+            });
+        });
+    </script>
+
+</body>
+</html>

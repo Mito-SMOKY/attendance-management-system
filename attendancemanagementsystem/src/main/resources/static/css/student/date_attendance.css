@@ -1,0 +1,193 @@
+@charset "UTF-8";
+
+body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    color: #333;
+}
+
+.container {
+    max-width: none; 
+    width: 90%; 
+    margin: 50px auto; 
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 8px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+    min-height: 80vh;
+}
+
+/* 戻るボタンエリア */
+.header-nav {
+    margin-bottom: 20px;
+}
+
+.back-btn {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #58aab8;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+.back-btn:hover {
+    background-color: #f0f8fa;
+}
+
+/* 日付表示エリア  */
+.date-display-area {
+    margin-bottom: 20px;
+}
+
+.date-select-wrapper {
+    position: relative;
+    display: inline-block;
+    background-color: #fff;
+    border: 1px solid #333;
+    border-radius: 4px;
+    min-width: 250px;
+}
+
+.date-select {
+    width: 100%;
+    padding: 10px 40px 10px 20px; /* 右側に矢印アイコン分の余白 */
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    appearance: none; /* デフォルト矢印を消す */
+    -webkit-appearance: none;
+    cursor: pointer;
+    color: #333;
+}
+
+.date-select:focus {
+    outline: 2px solid #58aab8;
+}
+
+/* カスタム矢印アイコン */
+.select-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 1rem;
+    color: #333;
+}
+
+
+/* 詳細テーブル */
+.detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    border: 1px solid #ccc;
+}
+
+.detail-table th, .detail-table td {
+    border: 1px solid #ccc;
+    text-align: center;
+    vertical-align: middle;
+    padding: 15px 10px;
+    font-size: 1.1rem;
+}
+
+/* ヘッダー行 */
+.detail-table thead th {
+    background-color: #58aab8; 
+    color: #fff;
+    font-weight: normal;
+    padding: 12px;
+}
+
+.th-slot { width: 8%; }
+.th-subject { width: 80%; }
+.th-status { width: 12%; }
+
+/* データ行 */
+.td-slot {
+    font-weight: bold;
+    font-size: 1.4rem;
+    font-family: sans-serif;
+}
+
+.td-subject {
+    line-height: 1.6;
+}
+
+.subject-name {
+    font-weight: bold;
+    color: #4da0b0; 
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+}
+
+.classroom-name {
+    font-size: 1rem;
+    color: #555;
+    font-weight: bold;
+}
+
+/* 出席マーク */
+.status-mark {
+    font-size: 2rem;
+    display: block;
+    line-height: 1;
+}
+
+.status-ok { color: #333; }
+.status-ng { color: #333; }
+.status-late { color: #f39c12; }
+
+.no-data {
+    padding: 40px;
+    color: #888;
+    font-size: 1.2rem;
+}
+
+/* 注釈 */
+.footer-note {
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.note-icon {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background-color: #58aab8;
+    color: #fff;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 22px;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.subject-link {
+    text-decoration: none; /* 下線を消す */
+    display: block;        /* クリック領域を確保 */
+    color: inherit;        /* もとの色を引き継ぐ */
+    transition: opacity 0.3s;
+}
+
+.subject-link:hover .subject-name {
+    text-decoration: underline; /* ホバー時に下線 */
+    color: #00bdca;             /* ホバー時にテーマカラーにする */
+    cursor: pointer;
+}

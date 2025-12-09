@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>教科一覧</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/student/subjectList.css}"> 
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: student-header}"></div>
+    </div>
+
+    <!-- 教科一覧のコンテナ -->
+    <div class="main-container">
+        <table class="subject-table">
+            <thead>
+                <tr>
+                    <th class="col-subject">教科名</th>
+                    <th class="col-teacher">担当教師</th>
+                    <th class="col-attendance">出席率</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="subject : ${subjectList}">
+                    <td class="subject-info-cell">
+                        <div th:text="${subject.courseName}" class="course-name"></div>
+                        <a th:href="@{/student/subject_attendance(subjectId=${subject.subjectId})}" 
+                            th:text="${subject.subjectName}" 
+                            class="subject-name">
+                        </a>
+                    </td>
+                    
+                    <td th:text="${subject.teacherName}" class="teacher-name-cell"></td>
+                    
+                    <td class="attendance-cell">
+                        <span th:if="${subject.isAttendanceRisk()}" class="risk-warning">&#9888;</span>
+
+                        <span th:text="|${subject.attendedClasses}/${subject.totalClasses}コマ|"></span>
+                        
+                        <span th:text="|${#numbers.formatDecimal(subject.attendanceRate * 100, 0, 0)}%履修済|"></span>
+                        
+                        <!-- atenndanceRate=出席率の計算 
+                         現在までの授業数/現在までの受講数で算出-->
+                        <div class="attendance-bar-container">
+                            <div class="attendance-bar" 
+                                th:style="|width: ${#numbers.formatDecimal(subject.attendanceRate * 100, 0, 0)}%;|"
+                                th:classappend="${subject.isAttendanceRisk()} ? 'risk-bar' : ''">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

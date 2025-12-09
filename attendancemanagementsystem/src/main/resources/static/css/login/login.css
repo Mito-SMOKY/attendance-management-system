@@ -1,0 +1,150 @@
+/* ログイン画面 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden; 
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    padding: 30px;
+    margin-top: 100px;
+}
+
+.firstLogin-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: auto;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 50px;
+    color: #00bdca;
+    padding: 30px;
+}
+
+.form-group {
+    display: block;
+    align-items: center;
+    margin-bottom: 10px;
+    width: 100%;
+    padding-block-end: 10px;
+}
+
+input {
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+input:focus {
+    outline: none;
+    border-color: #00bdca;
+    box-shadow: 0 0 5px #00bdca;
+}
+
+input::placeholder {
+    color: #7a7a7a;
+    opacity: 0.3;
+}
+
+.label {
+    display: block; /* 念のためブロック要素に */
+    width: 100%;
+    text-align: left;
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.form {
+    width: 100%;
+    margin: 10px 0;
+    padding: 20px;
+    font-size: 16px;
+    border: 1px solid #00bdca;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* ▼▼▼ パスワード表示切り替え用のスタイル ▼▼▼ */
+.password-wrapper {
+    position: relative; /* アイコンを絶対配置するための基準 */
+    width: 100%;
+}
+
+.password-wrapper .form {
+    padding-right: 50px; /* アイコンと被らないように右側に余白を作る */
+    margin: 0; /* ラッパーの中なのでマージン調整 */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%); /* 垂直中央揃え */
+    cursor: pointer;
+    color: #00bdca; /* テーマカラーに合わせる */
+    font-size: 1.2rem;
+    z-index: 10;
+}
+.toggle-password:hover {
+    opacity: 0.7;
+}
+/* ▲▲▲ ここまで追加 ▲▲▲ */
+
+
+.forget-password {
+    display: block; /* ブロック要素にして中央寄せを効かせる */
+    text-align: center;
+    font-size: 16px;
+    color: #00bdca;
+    text-decoration: underline; /* line-throughs(打ち消し線)ではなくunderline(下線)が一般的ですが、元の通りにするならここを変更 */
+    margin-top: 10px;
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    margin: 30px auto;
+    padding: .9em 2em;
+    border: 2px solid #00bdca;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #00bdca;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.button:hover {
+    background-color: #00bdca;
+    color: white;
+}
+
+.first-login-message {
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.error {
+    color: rgb(159, 0, 0);
+    text-align: center;
+    margin-top: 10px;
+}

@@ -7,6 +7,7 @@
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/admininfo.css}">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -24,7 +25,8 @@
         <h1 class="page-title">授業情報</h1>
 
         <div class="controls-area">
-            <button class="edit-btn" id="toggleEditBtn">編集</button>
+        
+            <button class="edit-btn">編集</button>
         </div>
 
         <div class="top-info-section">
@@ -102,8 +104,7 @@
             <div class="student-table-wrapper">
                 <table class="student-table">
                     <colgroup>
-                        <col style="width: 15%;"> <col style="width: 10%;"> <col style="width: 15%;"> <col style="width: 30%;"> <col style="width: 30%;"> 
-                    </colgroup>
+                        <col style="width: 15%;"> <col style="width: 10%;"> <col style="width: 15%;"> <col style="width: 30%;"> <col style="width: 30%;"> </colgroup>
                     <thead>
                         <tr>
                             <th>学籍番号</th>
@@ -114,18 +115,28 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="student : ${studentList}">
-                            <td th:text="${student.number}"></td>
-                            <td th:text="${student.grade}"></td>
-                            <td th:text="${student.className}"></td>
-                            <td th:text="${student.name}"></td>
-                            
-                            <td class="status-cell"
-                                th:text="${student.attended ? '〇' : '✕'}"
-                                th:classappend="${student.attended ? 'status-present' : 'status-absent'}">
-                            </td>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="status-present"></td>
                         </tr>
-                    </tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="status-absent"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="status-present"></td>
+                        </tr>
+                        </tbody>
                 </table>
             </div>
         </div>

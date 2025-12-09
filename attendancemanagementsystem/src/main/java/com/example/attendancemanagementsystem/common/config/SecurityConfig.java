@@ -1,19 +1,69 @@
 package com.example.attendancemanagementsystem.common.config;
 
+import com.example.attendancemanagementsystem.user.loginandprofile.handler.CustomAuthenticationSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import com.example.attendancemanagementsystem.user.loginandprofile.handler.CustomAuthenticationSuccessHandler; 
+
+import com.example.attendancemanagementsystem.common.security.ApiKeyAuthFilter;
+import com.example.attendancemanagementsystem.user.loginandprofile.handler.CustomAuthenticationSuccessHandler;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
-@Profile("!dummy")
+@EnableWebSecurity
 public class SecurityConfig {
 
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            // 1. APIへのアクセス制限を解除 (Pythonからのアクセスを通すため)
+            .authorizeHttpRequests(auth -> auth
+                // 静的リソース
+                .requestMatchers("/css/**", "/js/**", "/image/**", "/error").permitAll()
+                
+                // "/api/issue/**" (PC登録用) と "/api/attendance/**" (ラズパイ出席用)
+                // これらはプログラムからのアクセスなので、ログインなしで許可する
+                .requestMatchers("/api/issue/**", "/api/attendance/record/**").permitAll()
+                
+                // 画面系のアクセス制御 (既存の設定)
+                .requestMatchers("/login").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/student/**").hasRole("STUDENT")
+                
+                // それ以外は認証必須
+                .anyRequest().authenticated()
+            )
+            
+            // 2. CSRF対策を無効化 (API用)
+            // PythonからPOSTする際にブロックされないようにする
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/issue/**", "/api/attendance/record/**")
+            )
+            
+            // 3. ログイン画面の設定
+            .formLogin(login -> login
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .successHandler(customAuthenticationSuccessHandler())
+                .failureUrl("/login?error=true")
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout")
+                .permitAll()
+            );
+
+        return http.build();
+    }
+
+    // --- 共通Bean定義 ---
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -22,36 +72,5 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
         return new CustomAuthenticationSuccessHandler();
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                //CSRF 無効化
-                .csrf(csrf -> csrf.disable())
-
-                .authorizeHttpRequests(authorize -> authorize
-                        // ログイン、CSS、JSは全員許可
-                        .requestMatchers("/login", "/css/**", "/js/**").permitAll()
-                        
-                        // ★ 必須の修正点: ロール（権限）に基づいたアクセス許可を追加
-                        // /admin/で始まるURLにはROLE_ADMINが必要
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // /student/で始まるURLにはROLE_STUDENTが必要
-                        .requestMatchers("/student/**").hasRole("STUDENT")
-                        
-                        // その他のリクエストは認証済みであれば許可
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .successHandler(customAuthenticationSuccessHandler()) 
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/login")
-                );
-
-        return http.build();
     }
 }
