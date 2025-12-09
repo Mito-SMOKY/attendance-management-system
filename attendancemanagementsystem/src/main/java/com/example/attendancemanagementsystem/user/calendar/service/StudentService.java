@@ -36,9 +36,9 @@ public class StudentService {
 
     
     public StudentService(UsersRepository usersRepository,
-                          StudentRepository studentRepository,
-                          AttendanceRepository attendanceRepository,
-                          CalendarRepository calendarRepository) {
+                        StudentRepository studentRepository,
+                        AttendanceRepository attendanceRepository,
+                        CalendarRepository calendarRepository) {
         this.usersRepository = usersRepository;
         this.studentRepository = studentRepository;
         // this.enrollmentsRepository = enrollmentsRepository;

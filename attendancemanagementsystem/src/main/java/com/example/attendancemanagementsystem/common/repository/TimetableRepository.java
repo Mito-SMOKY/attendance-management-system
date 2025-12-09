@@ -6,8 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-// Entityパスをインポート
 import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.entity.TimetableEntity;
 
@@ -26,9 +24,16 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
 
     // ② 特定の学科・科目で、今日までに実施された授業コマ数をカウント
     @Query("SELECT COUNT(t) FROM TimetableEntity t " +
-           "WHERE t.department.departmentId = :deptId " +
-           "AND t.subjectId = :subjectId " +
-           "AND t.date <= CURRENT_DATE")
+        "WHERE t.department.departmentId = :deptId " +
+        "AND t.subjectId = :subjectId " +
+        "AND t.date <= CURRENT_DATE")
     int countTotalClassesBySubject(@Param("deptId") Integer deptId, @Param("subjectId") Integer subjectId);
+
+    //指定した教科・期間の時間割を日付順・時限順で取得
+    List<TimetableEntity> findBySubjectIdAndDateBetweenOrderByDateAscSlotIdAsc(Integer subjectId, LocalDate startDate, LocalDate endDate);
+
+    //学科IDと日付範囲を指定して時間割を取得
+    List<TimetableEntity> findByDepartment_DepartmentIdAndDateBetweenOrderByDateAscSlotIdAsc(
+            Integer departmentId, LocalDate startDate, LocalDate endDate);
 
 }

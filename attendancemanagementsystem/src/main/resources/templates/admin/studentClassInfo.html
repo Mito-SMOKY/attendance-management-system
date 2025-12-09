@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>受講情報</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminStudentClassInfo.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+    
+    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/studentInfo')}"></div>
+    </div>
+
+    <div class="info-container">
+        
+        <div class="page-title-area">
+            <h1 class="page-title">受講情報</h1>
+        </div>
+
+        <div class="main-content">
+            
+            <div class="left-panel">
+                <div class="student-name-display">
+                    ○○ ×× さん
+                </div>
+
+                <table class="info-table">
+                    <tbody>
+                        <tr>
+                            <th>教科名</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>教室</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>担当教員</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>必要コマ数</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>履修済</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>現在の出席率</th>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="right-panel">
+                
+                <div class="status-section">
+                    <table class="summary-table">
+                        <thead>
+                            <tr>
+                                <th>出欠状況</th>
+                                <th>出席</th>
+                                <th>欠席</th>
+                                <th>出停</th>
+                                <th>公欠</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>コマ数</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <button class="edit-btn">編集</button>
+                </div>
+
+                <div class="schedule-wrapper">
+                    <table class="schedule-table">
+                        <colgroup>
+                            <col style="width: 20%;"> <col style="width: 20%;"> <col style="width: 20%;"> <col style="width: 20%;"> <col style="width: 20%;"> </colgroup>
+                        <thead>
+                            <tr>
+                                <th>日付</th>
+                                <th>一限目</th>
+                                <th>二限目</th>
+                                <th>三限目</th>
+                                <th>四限目</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                             <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                             <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

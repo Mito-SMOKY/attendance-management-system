@@ -6,7 +6,7 @@
 
     <title>教科一覧</title>
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/subjectList.css}"> 
+    <link rel="stylesheet" th:href="@{/css/student/subjectList.css}"> 
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -32,7 +32,10 @@
                 <tr th:each="subject : ${subjectList}">
                     <td class="subject-info-cell">
                         <div th:text="${subject.courseName}" class="course-name"></div>
-                        <a href="#" th:text="${subject.subjectName}" class="subject-name"></a>
+                        <a th:href="@{/student/subject_attendance(subjectId=${subject.subjectId})}" 
+                            th:text="${subject.subjectName}" 
+                            class="subject-name">
+                        </a>
                     </td>
                     
                     <td th:text="${subject.teacherName}" class="teacher-name-cell"></td>

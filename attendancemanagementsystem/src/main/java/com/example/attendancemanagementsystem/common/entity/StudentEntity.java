@@ -51,11 +51,11 @@ public class StudentEntity {
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AttendanceEntity> attendances;
 
-    // --- コンストラクタ ---
+    // --- constructor ---
     public StudentEntity() {
     }
 
-    // --- ゲッター・セッター ---
+    // --- Getter/Setter ---
     public Integer getUserId() {
         return userId;
     }

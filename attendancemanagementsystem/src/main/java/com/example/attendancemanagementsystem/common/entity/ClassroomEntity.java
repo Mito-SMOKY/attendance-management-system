@@ -1,14 +1,9 @@
 package com.example.attendancemanagementsystem.common.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "classroom")
+@Table(name = "Classroom")
 public class ClassroomEntity {
 
     @Id
@@ -22,10 +17,10 @@ public class ClassroomEntity {
     @Column(name = "MacAddress")
     private String macAddress;
 
-    // コンストラクタ
+    // --- constructor ---
     public ClassroomEntity() {}
 
-    // Getter / Setter
+    // --- Getter/Setter ---
     public Integer getClassroomId() { return classroomId; }
     public void setClassroomId(Integer classroomId) { this.classroomId = classroomId; }
 

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>時間割登録</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminTimetableEdit.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/timeTableList2')}"></div>
+    </div>
+
+    <div class="timetable-edit-container">
+        
+        <div class="page-title-wrapper">
+            <h1 class="page-title">時間割登録</h1>
+        </div>
+
+        <form action="#" method="post">
+            
+            <div class="filter-area">
+                <div class="filter-inputs">
+                    <select class="filter-select term-select">
+                        <option>2024年度 前期</option>
+                        <option>2024年度 後期</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="">学科を選択</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="">コースを選択</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="">学年</option>
+                    </select>
+                </div>
+
+                <div class="filter-buttons">
+                    <button type="button" class="edit-btn" onclick="toggleEditMode()">編集</button>
+                    
+                    <button type="submit" class="confirm-btn">決定</button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="edit-table">
+                    <colgroup>
+                        <col style="width: 140px;"> 
+                        <col style="width: 17.2%;"> 
+                        <col style="width: 17.2%;"> 
+                        <col style="width: 17.2%;"> 
+                        <col style="width: 17.2%;"> 
+                        <col style="width: 17.2%;"> 
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>月</th>
+                            <th>火</th>
+                            <th>水</th>
+                            <th>木</th>
+                            <th>金</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th class="col-period">
+                                <span class="period-number">1</span>
+                                <span class="period-time">9:30～11:00</span>
+                            </th>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                        </tr>
+
+                        <tr>
+                            <th class="col-period">
+                                <span class="period-number">2</span>
+                                <span class="period-time">11:10～12:30</span>
+                            </th>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                        </tr>
+
+                        <tr>
+                            <th class="col-period">
+                                <span class="period-number">3</span>
+                                <span class="period-time">13:30～14:50</span>
+                            </th>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                        </tr>
+
+                        <tr>
+                            <th class="col-period">
+                                <span class="period-number">4</span>
+                                <span class="period-time">15:00～16:20</span>
+                            </th>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                        </tr>
+
+                        <tr>
+                            <th class="col-period">
+                                <span class="period-number">5</span>
+                                <span class="period-time">16:30～17:00</span>
+                            </th>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                            <td><select class="cell-select"><option></option></select></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </form>
+
+    </div>
+
+    <script>
+        function toggleEditMode() {
+            var body = document.body;
+            var btn = document.querySelector('.edit-btn');
+            
+            // クラスのつけ外し
+            body.classList.toggle('editing-mode');
+            
+            // ボタンの文字を切り替え
+            if (body.classList.contains('editing-mode')) {
+                btn.textContent = '適用';
+            } else {
+                btn.textContent = '編集';
+            }
+        }
+    </script>
+
+</body>
+</html>

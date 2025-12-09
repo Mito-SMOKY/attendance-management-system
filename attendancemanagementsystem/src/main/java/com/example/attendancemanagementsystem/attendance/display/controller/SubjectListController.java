@@ -9,18 +9,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.example.attendancemanagementsystem.attendance.display.dto.SubjectListDto; // 名前変更
-import com.example.attendancemanagementsystem.attendance.display.service.SubjectListService; // 名前変更
+import com.example.attendancemanagementsystem.attendance.display.dto.SubjectListDto;
+import com.example.attendancemanagementsystem.attendance.display.service.SubjectListService;
 
 @Controller
 @RequestMapping("/student")
 public class SubjectListController {
 
-    private final SubjectListService subjectAttendanceService;
+    private final SubjectListService subjectListService;
 
-    // @Autowired
-    public SubjectListController(SubjectListService subjectAttendanceService) {
-        this.subjectAttendanceService = subjectAttendanceService;
+    public SubjectListController(SubjectListService subjectListService) {
+        this.subjectListService = subjectListService;
     }
 
     /**
@@ -32,10 +31,10 @@ public class SubjectListController {
         
         String loginId = userDetails.getUsername();
 
-        List<SubjectListDto> subjectList = subjectAttendanceService.getSubjectList(loginId);
+        List<SubjectListDto> subjectList = subjectListService.getSubjectList(loginId);
 
         model.addAttribute("subjectList", subjectList);
 
-        return "student/subjectList"; // HTMLファイル名はそのまま
+        return "student/subjectList"; 
     }
 }

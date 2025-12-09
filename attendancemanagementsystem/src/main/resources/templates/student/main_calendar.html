@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>利用者メイン</title>
-    <link rel="stylesheet" th:href="@{/css/main_calendar.css}">
+    <link rel="stylesheet" th:href="@{/css/common/main_calendar.css}">
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
 </head>
@@ -14,7 +14,7 @@
 <body>
 
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: header}"></div>
+        <div th:replace="~{fragments/_parts :: student-header}"></div>
     </div>
 
     <div id="calendar" class="calendar">

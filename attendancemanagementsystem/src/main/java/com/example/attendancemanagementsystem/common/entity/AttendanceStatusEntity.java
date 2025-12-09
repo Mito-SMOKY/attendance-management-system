@@ -19,9 +19,7 @@ public class AttendanceStatusEntity {
     @Column(name = "StatusName", nullable = false, length = 50)
     private String statusName;
 
-    // --- コンストラクタ ---
-    
-    // JPAのために引数なしコンストラクタが必須です
+    // --- constructor ---
     public AttendanceStatusEntity() {
     }
 
@@ -30,8 +28,7 @@ public class AttendanceStatusEntity {
         this.statusName = statusName;
     }
 
-    // --- ゲッター・セッター ---
-
+    // --- Getter/Setter ---
     public Integer getStatusId() {
         return statusId;
     }
