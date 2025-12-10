@@ -77,12 +77,15 @@ body {
 }
 
 /* =========================================
-   クラス一覧テーブル (学科・コース・学年のみ)
+   クラス一覧テーブル
    ========================================= */
 .table-wrapper {
     width: 100%;
     border: 1px solid #999;
     background-color: white;
+    /* 中身に合わせて高さが伸びるように設定 */
+    height: auto;
+    min-height: 0;
 }
 
 .timetable-table {

@@ -2,6 +2,7 @@ import time
 import requests
 import datetime
 import uuid
+import urllib3
 from smartcard.System import readers
 from smartcard.util import toHexString
 from smartcard.Exceptions import CardConnectionException, NoCardException
@@ -9,7 +10,9 @@ from smartcard.Exceptions import CardConnectionException, NoCardException
 # ==========================================
 # ★設定エリア
 # ==========================================
-JAVA_API_URL = "http://127.0.0.1:8080/api/attendance/record/nfc"
+# SSL警告を無視する設定
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+JAVA_API_URL = "https://127.0.0.1:8080/api/issue/scan"
 API_KEY = "MySecretKey_Pi_to_Java_12345"
 START_PAGE = 10
 # ==========================================
@@ -74,6 +77,7 @@ def main_loop():
     last_card_uid = None
     session = requests.Session()
     session.trust_env = False
+    session.verify = False  # SSL証明書を検証しない設定
 
     while True:
         try:
@@ -95,7 +99,7 @@ def main_loop():
                 time.sleep(0.5)
                 continue
 
-            # 1. UID取得
+            # UID取得
             card_id = get_uid(connection)
             if not card_id:
                 continue
@@ -107,7 +111,7 @@ def main_loop():
             last_card_uid = card_id
             print(f"\n>> 検知! CardID: {card_id}")
 
-            # 2. データ領域読み取り (修正版)
+            # データ領域読み取り
             encrypted_data = read_encrypted_hex(connection)
             
             if encrypted_data:
@@ -115,7 +119,7 @@ def main_loop():
             else:
                 print("   データなし (新規カード扱い)")
 
-            # 3. 送信
+            # 送信
             payload = {
                 "card_id": card_id,
                 "userId": encrypted_data, 
@@ -129,13 +133,16 @@ def main_loop():
             }
 
             try:
+                print(f"DEBUG: 送信先URL = {JAVA_API_URL}")
                 print("   Web画面へ通知中...", end=" ")
+                
                 response = session.post(
                     JAVA_API_URL, 
                     json=payload, 
                     headers=headers, 
                     timeout=5,
-                    proxies={"http": None, "https": None}
+                    proxies={"http": None, "https": None}, # プロキシ無効化
+                    verify=False # SSL検証無効化
                 )
                 
                 if response.status_code == 200:

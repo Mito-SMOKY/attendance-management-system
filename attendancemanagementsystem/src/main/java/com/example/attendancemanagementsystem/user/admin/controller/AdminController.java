@@ -12,11 +12,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -27,8 +29,8 @@ import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm
 import com.example.attendancemanagementsystem.user.admin.service.AdminService;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
-// @Controller
-// @RequestMapping("/admin")
+@Controller
+@RequestMapping("/admin")
 public class AdminController {
 
     @Autowired
@@ -40,7 +42,13 @@ public class AdminController {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             return userDetails.getUserId();
         }
-        return 3; 
+        return 3;
+    }
+
+    
+    @GetMapping("/timetable")
+    public String showTimetablePage() {
+        return "admin/timetable";
     }
 
     @GetMapping("/home")
@@ -174,5 +182,29 @@ public class AdminController {
         return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
     }
     
-    // ... (他のメソッドはそのまま) ...
+    // ... (既存のメソッド) ...
+
+    // ... (前略) ...
+
+    // --- 11. マスタデータ管理メニュー画面 ---
+    @GetMapping("/master-data")
+    public String showMasterDataMenu() {
+        // ファイル名: masterDataMenu.html に合わせる
+        return "admin/mdList"; 
+    }
+
+    // --- 12. 教科マスタ詳細画面 ---
+    @GetMapping("/master/subject")
+    public String showSubjectMaster() {
+        // ファイル名: subjectMaster.html に合わせる
+        return "admin/mdSubject";
+    }
+
+    // --- 13. 教室マスタ詳細画面 ---
+    @GetMapping("/master/classroom")
+    public String showClassroomMaster() {
+        // ファイル名: classroomMaster.html に合わせる
+        return "admin/mdClassroom";
+    }
+
 }
