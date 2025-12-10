@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー詳細</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/common/profile.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="header-container">
+
+    <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
+        <div th:replace="~{fragments/_parts :: student-header}"></div>
+    </div>
+    <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+
+</div>
+
+    <div class="profile-container">
+        <div class="user-header">
+            <div class="user-icon"></div>
+            <h1 class="user-name" th:text="${userData.Name}"></h1>
+            <p class="user-role" th:text="${userData.Role}"></p>
+        </div>
+        
+        <hr class="header-separator">
+
+        <div class="content-wrapper">
+            <div class="card user-details-card">
+                <h2 class="card-title">ユーザ詳細</h2>
+                
+                <ul class="detail-list">
+                    <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
+                        <li><a href="/profile" class="detail-link">プロフィール</a></li>
+                    </div>
+
+                    <!-- <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+                        <li><a href="admin/profile" class="detail-link">プロフィール</a></li>
+                    </div> -->
+
+                    <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
+                        <li><a href="#" class="detail-link">プライバシー設定</a></li>
+                    </div>
+
+                    <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+                        <li><a href="#" class="detail-link">プライバシー設定</a></li>
+                    </div>
+
+                    <li class="timezone-item">
+                        <span class="timezone-label">タイムゾーン</span>
+                        <span class="timezone-value" th:text="${userData.Timezone}"></span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card subject-details-card">
+                <h2 class="card-title">
+
+                <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
+                    <span>受講教科詳細</span>
+                    </div>
+                <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+                    <span>担当教科詳細</span>
+                </div>
+
+                </h2>
+
+                <ul class="subject-list" id="subjectList">
+                    <li th:each="subject, iterStat : ${subjectData}" 
+                        th:classappend="${iterStat.index >= 5} ? 'hidden-subject' : ''">
+                        <span th:text="'[' + ${subject.SubjectID} + '] ' + ${subject.SubjectName}">
+                        </span>
+                    </li>
+                </ul>
+
+                <button id="showMoreButton" class="show-more-button">さらに表示</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/profile.js}"></script>
+</body>
+</html>
