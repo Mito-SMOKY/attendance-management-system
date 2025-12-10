@@ -28,6 +28,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/issue/**", "/api/attendance/record/**").permitAll()
                 
                 // 画面系のアクセス制御 (既存の設定)
+
+                // テスト用
+                .requestMatchers("/test/**").permitAll()
                 .requestMatchers("/login").permitAll()
                 // .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
@@ -40,6 +43,9 @@ public class SecurityConfig {
             // 2. CSRF対策を無効化 (API用)
             // PythonからPOSTする際にブロックされないようにする
             .csrf(csrf -> csrf
+                
+                //テスト用
+                .ignoringRequestMatchers("/test/**")
                 .ignoringRequestMatchers("/api/issue/**", "/api/attendance/record/**")
             )
             
