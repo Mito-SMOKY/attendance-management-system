@@ -1,0 +1,230 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px; 
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* =========================================
+   レイアウトコンテナ
+   ========================================= */
+.subject-info-container {
+    width: 95%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-top: 120px; 
+    padding-bottom: 100px;
+}
+
+/* =========================================
+   ページタイトル
+   ========================================= */
+.page-header-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    border-bottom: 3px solid #539DA4;
+    padding-bottom: 5px;
+}
+
+.backbutton-wrapper {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* =========================================
+   アクションエリア (編集ボタン)
+   ========================================= */
+.action-area {
+    display: flex;
+    justify-content: flex-end; 
+    margin-bottom: 5px; 
+}
+
+.edit-btn {
+    height: 40px;
+    padding: 0 25px;
+    background-color: #fff;
+    border: 2px solid #539DA4;
+    border-radius: 4px;
+    color: #539DA4;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.edit-btn:hover {
+    background-color: #539DA4;
+    color: white;
+}
+
+body.editing-mode .edit-btn {
+    background-color: #539DA4;
+    color: white;
+}
+
+/* エラーメッセージ */
+.error-message-area {
+    min-height: 24px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.error-text {
+    color: #e74c3c;
+    font-weight: bold;
+    font-size: 1rem;
+    display: none;
+}
+
+/* =========================================
+   テーブル
+   ========================================= */
+.table-wrapper {
+    width: 100%;
+    border: 1px solid #999;
+    background-color: white;
+    overflow-x: auto;
+}
+
+.subject-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    min-width: 600px;
+}
+
+.subject-info-table th, 
+.subject-info-table td {
+    border: 1px solid #999;
+    padding: 10px;
+    height: 60px;
+    vertical-align: middle;
+    position: relative; /* 削除ボタンの配置基準 */
+}
+
+.subject-info-table th {
+    background-color: #539DA4;
+    color: white;
+    font-weight: normal;
+    width: 50%;
+}
+
+/* モード切替 */
+.edit-mode {
+    display: none;
+    width: 100%;
+    padding: 8px;
+    /* 削除ボタンと被らないように右に余白を作る */
+    padding-right: 40px; 
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.view-mode {
+    display: block;
+    width: 100%;
+}
+
+body.editing-mode .edit-mode {
+    display: block;
+}
+
+body.editing-mode .view-mode {
+    display: none;
+}
+
+/* ▼▼▼ 削除ボタン（ゴミ箱） ▼▼▼ */
+.delete-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: none; /* 通常非表示 */
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+    z-index: 10;
+}
+
+body.editing-mode .delete-btn {
+    display: flex; /* 編集時のみ表示 */
+}
+
+/* エラー時の赤枠 */
+.input-error {
+    border: 2px solid #e74c3c !important;
+    background-color: #fce4e4 !important;
+}
+
+/* =========================================
+   追加ボタン (+)
+   ========================================= */
+.add-btn-wrapper {
+    display: none;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+body.editing-mode .add-btn-wrapper {
+    display: flex;
+}
+
+.add-row-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #539DA4;
+    color: white;
+    border: none;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s, background-color 0.3s;
+}
+
+.add-row-btn:hover {
+    background-color: #468990;
+    transform: scale(1.1);
+}
+
+.add-row-btn:active {
+    transform: scale(0.95);
+}
