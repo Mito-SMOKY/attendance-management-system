@@ -1,6 +1,5 @@
 package com.example.attendancemanagementsystem.common.config;
 
-import com.example.attendancemanagementsystem.user.loginandprofile.handler.CustomAuthenticationSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,10 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-import com.example.attendancemanagementsystem.common.security.ApiKeyAuthFilter;
 import com.example.attendancemanagementsystem.user.loginandprofile.handler.CustomAuthenticationSuccessHandler;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -33,7 +29,8 @@ public class SecurityConfig {
                 
                 // 画面系のアクセス制御 (既存の設定)
                 .requestMatchers("/login").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                // .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                 .requestMatchers("/student/**").hasRole("STUDENT")
                 
                 // それ以外は認証必須
