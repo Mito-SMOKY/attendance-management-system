@@ -196,10 +196,19 @@ body {
     }
 }
 
+.form-container {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    width: 100%;
+    height: auto;
+}
+
 
 .form-group {
     display: block;
-    align-items: center;
+    align-items: left;
     margin-bottom: 10px;
     width: 100%;
     padding-block-end: 10px;
@@ -226,8 +235,8 @@ input::placeholder{
     font-size: 20px;
 }
 
-.Name-form{
-    width: 100%;
+.form{
+    width: 40%;
     margin: 10px 0;
     padding: 20px;
     font-size: 16px;
@@ -235,4 +244,29 @@ input::placeholder{
     border-radius: 5px;
     box-sizing: border-box;
     
+}
+
+.mailaddress-button {
+    background-color: white;
+    border: 1px solid #777;
+    border-radius: 8px;
+    color: #00bdca;
+    
+    padding: 13px 14px; /* ボタンを大きくする */
+    
+    width: 100px; /* ボタンの幅を固定 */
+    max-width: 100%; 
+    text-align: center;
+    
+    font-size: 1em; /* 文字も大きくする */
+    
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none; /* aタグにしたため下線消去 */
+}
+
+.mailaddress-button:hover {
+    background-color: #f9f9f9;
+    border-color: #333;
 }

@@ -25,9 +25,26 @@
 
 
 <div class="profile-container">
-    <div class="form-group">
-        <label >氏名</label>
-        <input class="Name-form" type="text" id="username" name="username" required placeholder="田中 花子">
+
+    <div class="user-header">
+        <div class="user-icon"></div>
+        <h1 class="user-name" th:text="${userData.Name}"></h1>
+        <p class="user-role" th:text="${userData.Role}"></p>
+    </div>
+
+    <div class="form-container">
+    
+       
+            <span class="label" for="username" >氏名</span>
+            <input class="form" type="text" id="username" name="username" required placeholder="田中 花子">
+
+
+            <span class="label" for="mailaddress">メールアドレス</span>
+            <input class="form" type="text" id="mailaddress" name="mailaddress" required placeholder="example123@gmail.com">
+            <a th:href="@{#}"  class="mailaddress-button">変更</a>
+
+        
+
     </div>
 
 </div>

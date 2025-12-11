@@ -39,12 +39,12 @@
                 
                 <ul class="detail-list">
                     <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
-                        <li><a href="/profile" class="detail-link">プロフィール</a></li>
+                        <li><a href="/student/profile" class="detail-link">プロフィール</a></li>
                     </div>
 
-                    <!-- <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
-                        <li><a href="admin/profile" class="detail-link">プロフィール</a></li>
-                    </div> -->
+                    <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+                        <li><a href="/admin/profile" class="detail-link">プロフィール</a></li>
+                    </div>
 
                     <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
                         <li><a href="#" class="detail-link">プライバシー設定</a></li>
