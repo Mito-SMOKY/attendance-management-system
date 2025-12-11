@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.entity.DepartmentSubject;
-import com.example.attendancemanagementsystem.common.entity.Subject;
-import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
+import com.example.attendancemanagementsystem.common.entity.SubjectEntity;
+import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;//
 import com.example.attendancemanagementsystem.common.repository.DepartmentSubjectRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
 import com.example.attendancemanagementsystem.user.admin.dto.SubjectMatrixRowDTO;
@@ -37,13 +37,13 @@ public class AdminSubjectService {
 
     // --- 2. 教科マトリクスデータの取得 ---
     public List<SubjectMatrixRowDTO> getSubjectMatrixData() {
-        List<Subject> subjects = subjectRepository.findAll();
+        List<SubjectEntity> subjects = subjectRepository.findAll();
         List<DepartmentEntity> departments = departmentRepository.findAll();
         List<DepartmentSubject> relations = departmentSubjectRepository.findAll();
 
         List<SubjectMatrixRowDTO> rows = new ArrayList<>();
 
-        for (Subject sub : subjects) {
+        for (SubjectEntity sub : subjects) {
             Map<String, Boolean> statusMap = new HashMap<>();
             Integer grade = null; 
 
