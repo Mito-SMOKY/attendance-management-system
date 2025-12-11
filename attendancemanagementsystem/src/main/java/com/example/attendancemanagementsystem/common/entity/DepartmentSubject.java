@@ -23,7 +23,7 @@ public class DepartmentSubject {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("subjectId")
     @JoinColumn(name = "SubjectID")
-    private Subject subject;
+    private SubjectEntity    subject;
 
     @Column(name = "Grade")
     private Integer grade;
@@ -34,8 +34,8 @@ public class DepartmentSubject {
     public void setId(DepartmentSubjectKey id) { this.id = id; }
     public DepartmentEntity getDepartment() { return department; }
     public void setDepartment(DepartmentEntity department) { this.department = department; }
-    public Subject getSubject() { return subject; }
-    public void setSubject(Subject subject) { this.subject = subject; }
+    public SubjectEntity getSubject() { return subject; }
+    public void setSubject(SubjectEntity subject) { this.subject = subject; }
     public Integer getGrade() { return grade; }
     public void setGrade(Integer grade) { this.grade = grade; }
 }
