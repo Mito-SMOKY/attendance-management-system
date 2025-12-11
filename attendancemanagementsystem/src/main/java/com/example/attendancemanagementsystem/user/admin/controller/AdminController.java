@@ -27,6 +27,7 @@ import com.example.attendancemanagementsystem.common.entity.Datalist;
 import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
 import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm;
 import com.example.attendancemanagementsystem.user.admin.service.AdminService;
+import com.example.attendancemanagementsystem.user.admin.service.AdminSubjectService;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
 @Controller
@@ -35,6 +36,9 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private AdminSubjectService adminSubjectService;
 
     private Integer getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -207,4 +211,32 @@ public class AdminController {
         return "admin/mdClassroom";
     }
 
+    // --- 12. 教科マスタ詳細画面 (GET) ---
+    @GetMapping("/mdSubjectInformation")
+    public String showSubjectInformation(Model model) {
+        // DTOリストを取得してViewに渡す
+        model.addAttribute("subjectInfoList", adminSubjectService.getSubjectInfoList());
+        // 教師選択肢リスト
+        model.addAttribute("teacherList", adminSubjectService.getTeacherList());
+        
+        return "admin/mdSubjectInformation";
+    }
+
+    // --- 13. 教科マスタ保存 (POST) ---
+    @PostMapping("/mdSubjectInformation/save")
+    public String saveSubjectInformation(
+            @RequestParam(name = "subjectId", required = false) List<Integer> subjectIds,
+            @RequestParam(name = "subjectName", required = false) List<String> subjectNames,
+            @RequestParam(name = "teacherId", required = false) List<Integer> teacherIds,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            adminSubjectService.saveSubjectList(subjectIds, subjectNames, teacherIds);
+            redirectAttributes.addFlashAttribute("successMessage", "変更を保存しました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+        }
+
+        return "redirect:/admin/mdSubjectInformation";
+    }
 }
