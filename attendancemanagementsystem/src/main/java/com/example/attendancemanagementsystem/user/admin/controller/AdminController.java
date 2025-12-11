@@ -206,5 +206,9 @@ public class AdminController {
         // ファイル名: classroomMaster.html に合わせる
         return "admin/mdClassroom";
     }
-
+    @GetMapping("/accountManage")
+    public String showaccountManage() {
+        return "admin/accountManage";
+    }  
 }
+

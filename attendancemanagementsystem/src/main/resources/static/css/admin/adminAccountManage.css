@@ -30,8 +30,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 300px;       /* 画像の比率に合わせて幅を設定 */
-    height: 60px;       /* 高さ */
+    width: 500px;       /* 画像の比率に合わせて幅を設定 */
+    height: 100px;       /* 高さ */
     
     background-color: #fff;
     color: #539DA4;     /* 画像の水色テキストカラー */
@@ -39,7 +39,7 @@
     border: 1px solid #333; /* 黒い枠線 */
     border-radius: 12px;    /* 角丸 */
     
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     font-weight: bold;
     text-decoration: none; /* リンクの下線を消す */
     
