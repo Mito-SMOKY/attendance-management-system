@@ -1,0 +1,54 @@
+@charset "UTF-8";
+
+/* コンテナ設定 */
+.account-manage-container {
+    width: 90%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding-top: 60px; /* ヘッダーや戻るボタンとの間隔 */
+    text-align: center;
+}
+
+/* ページタイトル */
+.page-title {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 50px; /* タイトルとボタンの間隔 */
+    font-weight: normal; /* 画像に合わせて少し細めに調整（必要ならboldに） */
+}
+
+/* ボタンエリア */
+.menu-buttons-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px; /* ボタン同士の間隔 */
+}
+
+/* ボタンの共通スタイル */
+.menu-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 300px;       /* 画像の比率に合わせて幅を設定 */
+    height: 60px;       /* 高さ */
+    
+    background-color: #fff;
+    color: #539DA4;     /* 画像の水色テキストカラー */
+    
+    border: 1px solid #333; /* 黒い枠線 */
+    border-radius: 12px;    /* 角丸 */
+    
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none; /* リンクの下線を消す */
+    
+    box-sizing: border-box;
+    transition: background-color 0.3s, opacity 0.3s;
+}
+
+/* ホバー時の挙動（任意） */
+.menu-btn:hover {
+    background-color: #f9f9f9;
+    opacity: 0.8;
+}
