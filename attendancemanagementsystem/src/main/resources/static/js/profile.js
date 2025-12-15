@@ -192,5 +192,69 @@ function showStatusMessage(message, type) {
             }
         });
     });
+
+
+    
+    // ラジオボタンを変更するだけで通知設定の保存を行う
+
+    document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('notificationSettingForm');
+    const radioButtons = document.querySelectorAll('input[name="notification_option"]');
+
+    radioButtons.forEach(radio => {
+        radio.addEventListener('change', function() {
+            // 選択された値を取得
+            const selectedValue = this.value; 
+            
+            // サーバーへ非同期で送信する関数を実行
+            saveNotificationSetting(selectedValue);
+        });
+    });
+});
+
+/**
+ * 選択された値をバックエンドAPIに非同期で送信する関数
+ * @param {string} value - 送信する通知設定の値 ('ALL', 'MENTIONS', 'NONE')
+ */
+function saveNotificationSetting(value) {
+    const apiUrl = '/student/api/notification/update'; // ★★★ バックエンドのAPIエンドポイントを仮定 ★★★
+    
+    // 送信するデータ（JSON形式）
+    const data = {
+        notificationStatus: value 
+    };
+
+    console.log(`[API CALL] Sending value: ${value}`);
+
+    // Fetch APIを使用して非同期でPOSTリクエストを送信
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            // Spring Securityなどを利用する場合、CSRFトークンの設定が必要になることが多い
+            // 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            // ステータスコードが200番台以外の場合
+            throw new Error('Network response was not ok. Status: ' + response.status);
+        }
+        // レスポンスがJSONであればパースする
+        return response.json(); 
+    })
+    .then(data => {
+        // 成功時の処理
+        console.log('設定がサーバーに保存されました:', data);
+        // ★ ユーザーへのフィードバックをここに記述 ★
+        // 例: 画面上に「保存しました」という一時メッセージを表示
+    })
+    .catch(error => {
+        // 失敗時の処理
+        console.error('設定の保存中にエラーが発生しました:', error);
+        // 例: エラーメッセージをユーザーに表示
+    });
+}
     
 });

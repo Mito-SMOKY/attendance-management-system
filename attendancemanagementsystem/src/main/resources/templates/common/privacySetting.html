@@ -42,14 +42,9 @@
                     
                     <div class="label-and-button">
                         <span class="label">氏名</span>
-                        <button class="edit-button" id="edit-button" data-target="name">編集</button>
-                        <button class="save-button hidden" id="save-button" data-target="name">確定</button> <button class="cancel-button hidden" id="cancel-button" data-target="name">キャンセル</button>
                     </div>
                 
-                    <p class="display-value" id="display-value" th:text="${userData.Name}"></p> 
-                    
-                    <!-- 編集ボタンを押したときに出る -->
-                    <input class="edit-field hidden" type="text" id="username-input" name="username" required th:value="${userData.Name}">
+                    <p class="display-value" id="display-value" th:text="${userData.Name}"></p>
                 </div>
             </div>
         </div>
@@ -64,43 +59,33 @@
                 <ul class="detail-list">
 
                     <div class="detail-content">
-                        <span class="card-title">メールアドレス</span>
-                        <a href="#" class="edit-button">編集</a>
-                        <p class="display-value" th:text="${userData.Email}"></p>
+                        <span class="card-title">プライバシー設定</span>
                     </div>
 
                     <div class="detail-content">
-                        <li><a href="privacySetting" class="detail-link">プライバシー設定</a></li>
+                        <a href="#" class="detail-link">パスワード変更</a>
                     </div>
 
                     <li class="detail-content">
-                        <span class="card-title">タイムゾーン</span>
-                        <span class="timezone-value" th:text="${userData.Timezone}"></span>
+                        <span class="card-title">プッシュ通知設定</span>
+                        <form id="notificationSettingForm"> 
+                            <fieldset class="radio-2">
+                                <label>
+                                    <input type="radio" name="notification_option" value="ALL" checked/>
+                                    すべて通知
+                                </label>
+                                <label>
+                                    <input type="radio" name="notification_option" value="MENTIONS"/>
+                                    メンションのみ通知
+                                </label>
+                                <label>
+                                    <input type="radio" name="notification_option" value="NONE"/>
+                                    通知しない
+                                </label>
+                            </fieldset>
+                            </form>
                     </li>
                 </ul>
-            </div>
-
-            <div class="card subject-details-card">
-                <h2 class="card-title">
-
-                   <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
-                     <span>受講教科詳細</span>
-                    </div>
-                <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
-                    <span>担当教科詳細</span>
-                </div>
-
-                </h2>
-
-                <ul class="subject-list" id="subjectList">
-                    <li th:each="subject, iterStat : ${subjectData}" 
-                        th:classappend="${iterStat.index >= 5} ? 'hidden-subject' : ''">
-                        <span th:text="'[' + ${subject.SubjectID} + '] ' + ${subject.SubjectName}">
-                        </span>
-                    </li>
-                </ul>
-
-                <button id="showMoreButton" class="show-more-button">さらに表示</button>
             </div>
         </div>
     </div>

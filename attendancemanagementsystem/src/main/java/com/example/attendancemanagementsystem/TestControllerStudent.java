@@ -43,7 +43,7 @@ public class TestControllerStudent {
         return "common/userDetail";
     }
 
-    @GetMapping("/profile")
+    @GetMapping("/privacySetting")
     public String ShowUserDetailtMain(Model model) {
         Map<String, String> userData = Map.of(
             "UserID", "2321010",
@@ -58,7 +58,7 @@ public class TestControllerStudent {
 
         
 
-        return "/common/profile";
+        return "/common/privacySetting";
     }
 
     @PostMapping("/api/updateName")

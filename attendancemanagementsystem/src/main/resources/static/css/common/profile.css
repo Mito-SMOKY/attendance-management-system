@@ -30,10 +30,10 @@ body {
 .user-icon {
     width: 50px;
     height: 50px;
-    background-color: #20a0b2; /* 画像のイメージカラー */
+    background-color: #20a0b2;
     border-radius: 50%;
     margin-right: 15px;
-    /* 人型アイコンの描画（今回はCSSで簡易的に表現） */
+    margin-top: 20px;
     position: relative;
     overflow: hidden;
 }
@@ -289,4 +289,65 @@ input::placeholder{
 
 .detail-content{
     padding-bottom: 20px;
+}
+
+/* プッシュ通知設定 */
+.radio-2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .3em 2em;
+    border: none;
+    padding-top: 10px;
+}
+
+.radio-2 label {
+    display: flex;
+    align-items: center;
+    gap: 0 .5em;
+    position: relative;
+    cursor: pointer;
+}
+
+.radio-2 label::before,
+.radio-2 label::after {
+    border-radius: 50%;
+    content: '';
+}
+
+.radio-2 label::before {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #dee5eb;
+    box-sizing: border-box;
+}
+
+.radio-2 label::after {
+    position: absolute;
+    top: 50%;
+    left: 9px;
+    transform: translate(-50%, -50%);
+    width: 9px;
+    height: 9px;
+    background-color: #dee5eb;
+}
+
+.radio-2 label:has(:checked)::after {
+    background-color: #00bdca;
+    animation: anim-radio-2 .3s linear;
+}
+
+@keyframes anim-radio-2 {
+    0% {
+        box-shadow: 0 0 0 1px transparent;
+    }
+    50% {
+        box-shadow: 0 0 0 10px #2589d033;
+    }
+    100% {
+        box-shadow: 0 0 0 10px transparent;
+    }
+}
+
+.radio-2 input {
+    display: none;
 }
