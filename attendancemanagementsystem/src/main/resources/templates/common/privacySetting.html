@@ -14,16 +14,21 @@
 
 <body>
 
-<div class="header-container">
+    <div class="header-container">
 
-    <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
-        <div th:replace="~{fragments/_parts :: student-header}"></div>
-    </div>
-    <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
+            <div th:replace="~{fragments/_parts :: student-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+
     </div>
 
-</div>
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: historyBackButton}"></div>
+    </div>
+
 
     <!-- プロフィール全体 -->
     <div class="profile-container">
