@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通知一覧</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/common/notification.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="header-container">
+
+        <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
+            <div th:replace="~{fragments/_parts :: student-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+
+    </div>
+
+
+    <div id="notificationPage">
+        <div class="top-controls">
+            <input type="text" id="keywordSearch" placeholder="タイトルをキーワード検索" onchange="fetchNotifications()">
+            <select id="notificationTypeFilter" onchange="fetchNotifications()">
+                <option value="GENERAL">全体向け</option>
+                <option value="APPLICATION_RECEIVED">受信した申請</option>
+                <option value="APPLICATION_SENT">送信した申請</option>
+            </select>
+            <button class="search-icon">検索</button>
+            <button class="filter-icon">絞り込み</button>
+        </div>
+        
+        <div class="tab-container" style="display: none;"></div> 
+        
+        <div class="notification-table-container">
+            <table class="notification-table">
+                <thead>
+                    <tr>
+                        <th class="col-date">日付</th>
+                        <th class="col-time">時間</th>
+                        <th class="col-detail">通知タイトル（詳細）</th>
+                    </tr>
+                </thead>
+                <tbody id="notificationList">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+<script th:src="@{/js/notification.js}"></script>
+
+</body>
+
+</html>

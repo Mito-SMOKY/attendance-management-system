@@ -1,0 +1,119 @@
+/* --- ベースとリセット --- */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+#notificationPage {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- 検索とフィルターのコントロール --- */
+.top-controls {
+    display: flex;
+    gap: 10px; /* 要素間のスペース */
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+#keywordSearch,
+#notificationTypeFilter {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    flex-grow: 1; /* キーワード検索欄を広げる */
+}
+
+#keywordSearch {
+    max-width: 350px; /* 検索バーの幅を制限 */
+}
+
+#notificationTypeFilter {
+    max-width: 200px; /* 絞り込みドロップダウンの幅を制限 */
+}
+
+/* 検索・フィルタアイコン（添付画像を参考にした配置） */
+.search-icon,
+.filter-icon {
+    padding: 10px 15px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* --- 通知一覧テーブル --- */
+.notification-table-container {
+    overflow-x: auto; /* テーブルが画面幅を超えた場合、スクロール可能にする */
+}
+
+.notification-table {
+    width: 100%;
+    border-collapse: separate; /* セル間のボーダーを分ける */
+    border-spacing: 0;
+    table-layout: fixed; /* カラム幅を固定 */
+}
+
+/* ヘッダーのスタイル */
+.notification-table th {
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 12px 15px;
+    text-align: left;
+    border-top: 1px solid #ccc;
+    border-bottom: 2px solid #ccc;
+    font-weight: bold;
+}
+
+/* ボディの行のスタイル */
+.notification-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top; /* 縦方向の揃えを上端に */
+}
+
+/* 行のホバー効果 */
+.notification-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* --- カラム幅の設定 (添付画像を参考) --- */
+.col-date {
+    width: 15%; 
+    min-width: 90px;
+    font-weight: bold; /* 日付を強調 */
+    color: #555;
+}
+.col-time {
+    width: 10%;
+    min-width: 60px;
+    color: #888;
+}
+.col-detail {
+    width: 75%;
+    /* リンクの色を青に設定 */
+}
+
+/* リンクスタイル */
+.notification-table a {
+    color: #007bff; /* 青色のリンク */
+    text-decoration: none;
+}
+.notification-table a:hover {
+    text-decoration: underline;
+}
+
+/* テーブル内の日付の結合（画像の日付表示を再現するため） */
+.notification-table tbody tr:not(.date-start) td:first-child {
+    /* 連続した同じ日付のセルを非表示にして、上の日付セルが結合されているように見せる */
+    /* ただし、これはデータ構造を工夫するか、サーバーサイド/JSで処理するのが望ましい */
+}
