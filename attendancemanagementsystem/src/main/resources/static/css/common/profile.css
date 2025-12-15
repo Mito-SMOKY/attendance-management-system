@@ -24,7 +24,7 @@ body {
 .user-header {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .user-icon {
@@ -100,14 +100,10 @@ body {
     font-weight: bold;
     color: #333;
     margin-top: 0;
-    margin-bottom: 20px;
+    padding-bottom: 20px;
 }
 
 /* ユーザー詳細カード */
-.user-details-card {
-    /* 特になし */
-}
-
 .detail-list {
     list-style: none;
     padding: 0;
@@ -119,9 +115,11 @@ body {
 }
 
 .detail-link {
-    color: #20a0b2; /* リンクの色をアイコンと同じ青系に */
+    color: #20a0b2; 
     text-decoration: none;
-    font-size: 1rem;
+    font-size: 1.5rem;
+    line-height: 1.5;
+    padding-bottom: 20px;
 }
 .detail-link:hover {
     text-decoration: underline;
@@ -145,11 +143,6 @@ body {
     display: block;
 }
 
-/* コース詳細カード */
-.course-details-card {
-    /* 特になし */
-}
-
 .course-list {
     list-style: none;
     padding: 0;
@@ -159,10 +152,9 @@ body {
 .course-list li {
     margin-bottom: 5px;
     font-size: 0.95rem;
-    color: #20a0b2; /* コースIDと名前をリンクのような色に */
+    color: #20a0b2; 
 }
 
-/* さらに表示で隠す要素 */
 .hidden-course {
     display: none;
 }
@@ -197,9 +189,9 @@ body {
 }
 
 .form-container {
-    margin-top: 30px;
+    margin-top: 10px;
     display: flex;
-    flex-direction: column;
+    flex-direction:row;
     align-items: left;
     width: 100%;
     height: auto;
@@ -230,43 +222,71 @@ input::placeholder{
 }
 
 .label{
-    width: 150px;
+
+    font-size: 1.5em;
+    font-weight: bold;
+    padding-bottom: 10px;
     text-align: left;
-    font-size: 20px;
+    font-size: 1.8em;
+    
 }
 
-.form{
-    width: 40%;
+.edit-field{
+    width: 70%;
     margin: 10px 0;
-    padding: 20px;
-    font-size: 16px;
+    padding: 10px;
+    font-size: 1.5em;
     border: 1px solid #00bdca;
     border-radius: 5px;
     box-sizing: border-box;
     
 }
 
-.mailaddress-button {
+.edit-button ,
+.save-button,
+.cancel-button{
     background-color: white;
     border: 1px solid #777;
     border-radius: 8px;
     color: #00bdca;
-    
-    padding: 13px 14px; /* ボタンを大きくする */
-    
-    width: 100px; /* ボタンの幅を固定 */
+    padding: 10px 12px; 
     max-width: 100%; 
+    max-height: 40px;
+    height: 100%;
     text-align: center;
-    
-    font-size: 1em; /* 文字も大きくする */
-    
+    font-size: 0.9em;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    text-decoration: none; /* aタグにしたため下線消去 */
+    text-decoration: none;
 }
 
-.mailaddress-button:hover {
+.edit-button:hover {
     background-color: #f9f9f9;
     border-color: #333;
+}
+
+.display-value{
+    font-size: 1.5em;
+}
+
+.label-and-button {
+    display: flex; 
+    align-items: center; 
+    gap: 20px; 
+    margin-bottom: 5px; 
+}
+
+.form-item-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.hidden {
+    display: none !important; /* 強制的に非表示にする */
+}
+
+.detail-content{
+    padding-bottom: 20px;
 }

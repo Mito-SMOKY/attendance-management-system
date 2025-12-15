@@ -9,6 +9,8 @@
     <link rel="stylesheet" th:href="@{/css/common/profile.css}">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
@@ -24,7 +26,7 @@
 </div>
 
 
-<div class="profile-container">
+<div class="profile-container" id="profileContainer" th:data-user-id="${userData.UserID}">
 
     <div class="user-header">
         <div class="user-icon"></div>
@@ -33,18 +35,32 @@
     </div>
 
     <div class="form-container">
-    
-       
-            <span class="label" for="username" >氏名</span>
-            <input class="form" type="text" id="username" name="username" required placeholder="田中 花子">
-
-
-            <span class="label" for="mailaddress">メールアドレス</span>
-            <input class="form" type="text" id="mailaddress" name="mailaddress" required placeholder="example123@gmail.com">
-            <a th:href="@{#}"  class="mailaddress-button">変更</a>
-
         
+        <!-- 名前変更 -->
+        <div class="form-item-group" id="name-group">
+            <div class="label-and-button">
+                <span class="label">氏名</span>
+                <button class="edit-button" id="edit-button" data-target="name">編集</button>
+                <button class="save-button hidden" id="save-button" data-target="name">確定</button> <button class="cancel-button hidden" id="cancel-button" data-target="name">キャンセル</button>
+            </div>
+        
+            <p class="display-value" id="display-value" th:text="${userData.Name}"></p> 
+            
+            <!-- 編集ボタンを押したときに出る -->
+            <input class="edit-field hidden" type="text" id="username-input" name="username" required th:value="${userData.Name}">
+        </div>
 
+        <!-- メルアド変更 -->
+        <div class="form-item-group">
+            <div class="label-and-button">
+                <span class="label">メールアドレス</span>
+                <a th:href="@{#}" class="edit-button">変更</a>
+            </div>
+            
+            <p class="display-value" th:text="${userData.Email}"></p> 
+            
+        </div>
+    
     </div>
 
 </div>
