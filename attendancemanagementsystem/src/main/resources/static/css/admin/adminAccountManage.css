@@ -1,23 +1,40 @@
 @charset "UTF-8";
 
-/* コンテナ設定 */
+/* =========================================
+   コンテナ設定
+   ========================================= */
 .account-manage-container {
     width: 90%;
     max-width: 600px;
     margin: 0 auto;
-    padding-top: 60px; /* ヘッダーや戻るボタンとの間隔 */
-    text-align: center;
+    
+    /* ▼▼▼ 修正: 配置を統一（教科マスタ等に合わせる） ▼▼▼ */
+    padding-top: 120px; 
+    padding-bottom: 50px;
+    
+    text-align: center; /* タイトルやボタンを中央揃え */
 }
 
-/* ページタイトル */
+/* =========================================
+   ページタイトル
+   （画像のデザインに統一）
+   ========================================= */
 .page-title {
-    font-size: 1.5rem;
+    font-size: 2rem;
+    font-weight: bold;
     color: #333;
-    margin-bottom: 50px; /* タイトルとボタンの間隔 */
-    font-weight: normal; /* 画像に合わせて少し細めに調整（必要ならboldに） */
+    margin: 0;
+    
+    /* ▼▼▼ 修正: 下線と余白の設定 ▼▼▼ */
+    display: inline-block;        /* 下線の幅を文字幅に合わせる */
+    border-bottom: 3px solid #539DA4; /* 水色の下線 */
+    padding-bottom: 5px;          /* 文字と線の隙間 */
+    margin-bottom: 30px;          /* 下のボタンとの間隔 */
 }
 
-/* ボタンエリア */
+/* =========================================
+   ボタンエリア
+   ========================================= */
 .menu-buttons-area {
     display: flex;
     flex-direction: column;
@@ -25,29 +42,31 @@
     gap: 25px; /* ボタン同士の間隔 */
 }
 
-/* ボタンの共通スタイル */
+/* =========================================
+   ボタンの共通スタイル
+   ========================================= */
 .menu-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 500px;       /* 画像の比率に合わせて幅を設定 */
-    height: 100px;       /* 高さ */
+    width: 500px;
+    height: 100px;
     
     background-color: #fff;
-    color: #539DA4;     /* 画像の水色テキストカラー */
+    color: #539DA4;
     
-    border: 1px solid #333; /* 黒い枠線 */
-    border-radius: 12px;    /* 角丸 */
+    border: 1px solid #333;
+    border-radius: 12px;
     
     font-size: 1.5rem;
     font-weight: bold;
-    text-decoration: none; /* リンクの下線を消す */
+    text-decoration: none;
     
     box-sizing: border-box;
     transition: background-color 0.3s, opacity 0.3s;
 }
 
-/* ホバー時の挙動（任意） */
+/* ホバー時の挙動 */
 .menu-btn:hover {
     background-color: #f9f9f9;
     opacity: 0.8;

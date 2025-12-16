@@ -1,7 +1,5 @@
 package com.example.attendancemanagementsystem.user.admin.service;
 
-
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -22,7 +20,6 @@ import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.DatalistRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
-import com.example.attendancemanagementsystem.user.admin.model.ManualAccountData;
 import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm;
 import com.example.attendancemanagementsystem.user.admin.model.TempAccountData;
 
@@ -98,32 +95,51 @@ public class AdminService {
         return skippedIds;
     }
 
-    // 5. 手動登録保存
+    // 5. 手動登録保存 (★ここを修正しました)
     @Transactional
     public Datalist saveDatalistFromForm(ManualAccountForm form, Integer creatorId) {
         Datalist datalist = new Datalist();
-        datalist.setDataListName(form.getDatalistName());
+        
+        // ★修正: getDatalistName() -> getDataListName()
+        datalist.setDataListName(form.getDataListName());
         datalist.setCreatorId(creatorId);
 
         List<Student> students = new ArrayList<>();
         Set<String> seenIds = new HashSet<>();
 
-        if (form.getAccounts() != null) {
-            for (ManualAccountData acc : form.getAccounts()) {
-                if (acc.getStudentNumber() == null || acc.getStudentNumber().trim().isEmpty()) {
+        // ★修正: リストを個別に取得してループ処理
+        List<String> names = form.getName();
+        List<String> studentIds = form.getStudentId();
+        // affiliationIdを使う場合はここで取得: List<String> affIds = form.getAffiliationId();
+
+        if (names != null && studentIds != null) {
+            // サイズに合わせてループ（安全のため小さい方のサイズに合わせる）
+            int size = Math.min(names.size(), studentIds.size());
+
+            for (int i = 0; i < size; i++) {
+                String name = names.get(i);
+                String sId = studentIds.get(i);
+
+                // 空チェック
+                if (sId == null || sId.trim().isEmpty()) {
                     continue;
                 }
 
-                String loginId = acc.getStudentNumber().trim();
+                String loginId = sId.trim();
+                
+                // 重複チェック
                 if (seenIds.contains(loginId) || usersRepository.existsByLoginId(loginId)) {
                     continue;
                 }
                 seenIds.add(loginId);
 
                 UsersEntity user = new UsersEntity();
-                user.setName(acc.getName());
+                user.setName(name);
                 user.setLoginId(loginId);
-                user.setPassword(passwordEncoder.encode(acc.getPassword()));
+                
+                // ★修正: フォームにパスワードがないため、学籍番号を初期パスワードとして設定
+                user.setPassword(passwordEncoder.encode(loginId));
+                
                 user.setUserTypeId(1); 
 
                 Student student = new Student();
@@ -171,12 +187,11 @@ public class AdminService {
         return form;
     }
 
-    // 7. CSVファイル生成 (ダウンロード用) ★追加機能
+    // 7. CSVファイル生成 (ダウンロード用)
     public byte[] createCsvFile(Integer datalistId) {
         Datalist datalist = getDatalistById(datalistId);
         StringBuilder sb = new StringBuilder();
 
-        // ★修正: BOM (Byte Order Mark) を追加して、Excelでの文字化けを防ぐ
         sb.append("\uFEFF");
 
         for (Student student : datalist.getStudents()) {
@@ -184,7 +199,6 @@ public class AdminService {
 
             sb.append(student.getUser().getLoginId()).append(",");
             sb.append(student.getUser().getName()).append(",");
-            // ハッシュ化されたパスワードを出力
             sb.append(student.getUser().getPassword());
             sb.append("\r\n");
         }
@@ -192,21 +206,29 @@ public class AdminService {
         return sb.toString().getBytes(StandardCharsets.UTF_8);
     }
 
+    // 8. 手動入力データからのCSV生成 (★ここを修正しました)
     public byte[] createCsvFromForm(ManualAccountForm form) {
         StringBuilder sb = new StringBuilder();
-        sb.append("\uFEFF"); // BOM (文字化け防止)
+        sb.append("\uFEFF"); // BOM
 
-        if (form.getAccounts() != null) {
-            for (ManualAccountData acc : form.getAccounts()) {
-                // 入力がない行はスキップ
-                if (acc.getStudentNumber() == null || acc.getStudentNumber().trim().isEmpty()) {
+        List<String> names = form.getName();
+        List<String> studentIds = form.getStudentId();
+
+        if (names != null && studentIds != null) {
+            int size = Math.min(names.size(), studentIds.size());
+            
+            for (int i = 0; i < size; i++) {
+                String name = names.get(i);
+                String sId = studentIds.get(i);
+
+                if (sId == null || sId.trim().isEmpty()) {
                     continue;
                 }
                 
-                sb.append(acc.getStudentNumber()).append(",");
-                sb.append(acc.getName()).append(",");
-                // ★ポイント: ここはフォームの入力値を使うので「平文」のままです
-                sb.append(acc.getPassword()); 
+                sb.append(sId).append(",");
+                sb.append(name).append(",");
+                // パスワード列（フォームにないので学籍番号を出力しておく）
+                sb.append(sId); 
                 sb.append("\r\n");
             }
         }
