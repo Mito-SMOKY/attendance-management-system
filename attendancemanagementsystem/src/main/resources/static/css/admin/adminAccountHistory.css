@@ -1,0 +1,98 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px; 
+    background-color: #fff; /* 画像背景に合わせて白、または薄いグレー #f4f4f9 */
+    color: #333;
+}
+
+/* =========================================
+   レイアウトコンテナ
+   ========================================= */
+.history-container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 0 auto;
+    
+    /* ヘッダーや戻るボタンとの間隔（統一設定） */
+    padding-top: 120px; 
+    padding-bottom: 50px;
+}
+
+/* =========================================
+   ページタイトル
+   （教科マスタ等と統一したデザイン）
+   ========================================= */
+.page-title-wrapper {
+    text-align: center; /* タイトルを中央揃え */
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    
+    /* 下線と余白の設定 */
+    display: inline-block;        
+    border-bottom: 3px solid #539DA4; /* 水色の下線 */
+    padding-bottom: 5px;          
+    margin-bottom: 40px;          /* テーブルとの間隔 */
+}
+
+/* =========================================
+   テーブル設定
+   ========================================= */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto; /* 横幅が狭い場合にスクロール */
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse; /* 枠線を重ねる */
+    border: 1px solid #333;    /* 外枠 */
+}
+
+/* ヘッダーセル */
+.history-table th {
+    background-color: #539DA4; /* ヘッダー背景色（水色） */
+    color: white;              /* 文字色（白） */
+    font-weight: normal;       /* 画像を見ると太字ではないように見えるためnormal、太字がよければboldへ */
+    padding: 12px 10px;
+    border: 1px solid #333;    /* 枠線 */
+    text-align: left;          /* 画像に合わせて左寄せ（必要ならcenter） */
+}
+
+/* データセル */
+.history-table td {
+    padding: 12px 10px;
+    border: 1px solid #333;    /* 枠線 */
+    vertical-align: middle;
+    background-color: #fff;
+    color: #333;
+}
+
+/* データリスト名のリンクスタイル */
+.data-link {
+    color: #007bff; /* リンクの青色 (画像のイメージに合わせる) */
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.data-link:hover {
+    color: #0056b3;
+    text-decoration: none;
+}
