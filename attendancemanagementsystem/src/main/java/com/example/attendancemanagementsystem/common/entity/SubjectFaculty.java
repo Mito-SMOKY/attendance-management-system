@@ -17,7 +17,7 @@ public class SubjectFaculty {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("subjectId")
     @JoinColumn(name = "SubjectID")
-    private Subject subject;
+    private SubjectEntity subject;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
@@ -25,7 +25,7 @@ public class SubjectFaculty {
     private UsersEntity teacher; // 既存の UsersEntity ではなく Users クラスを使用
 
     public SubjectFaculty() {}
-    public SubjectFaculty(Subject subject, UsersEntity teacher) {
+    public SubjectFaculty(SubjectEntity subject, UsersEntity teacher) {
         this.subject = subject;
         this.teacher = teacher;
         this.id = new SubjectFacultyKey(subject.getSubjectId(), teacher.getUserId());
@@ -33,8 +33,8 @@ public class SubjectFaculty {
     // Getter/Setter...
     public SubjectFacultyKey getId() { return id; }
     public void setId(SubjectFacultyKey id) { this.id = id; }
-    public Subject getSubject() { return subject; }
-    public void setSubject(Subject subject) { this.subject = subject; }
+    public SubjectEntity getSubject() { return subject; }
+    public void setSubject(SubjectEntity subject) { this.subject = subject; }
     public UsersEntity getTeacher() { return teacher; }
     public void setTeacher(UsersEntity teacher) { this.teacher = teacher; }
 }
