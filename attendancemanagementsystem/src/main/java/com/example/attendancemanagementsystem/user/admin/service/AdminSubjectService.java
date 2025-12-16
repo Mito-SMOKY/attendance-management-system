@@ -1,7 +1,7 @@
 package com.example.attendancemanagementsystem.user.admin.service;
 
 import java.util.ArrayList;
-import java.util.List; // 必要
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,22 +9,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.attendancemanagementsystem.common.entity.SubjectEntity;
-import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
-import com.example.attendancemanagementsystem.common.repository.DepartmentSubjectRepository;
+import com.example.attendancemanagementsystem.common.entity.UsersEntity;
+import com.example.attendancemanagementsystem.common.repository.SubjectFacultyRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
+import com.example.attendancemanagementsystem.common.repository.UsersRepository; // 名前が変わっている場合は UsersRepository に修正してください
 import com.example.attendancemanagementsystem.user.admin.dto.SubjectMatrixRowDTO;
 
 @Service
 public class AdminSubjectService {
 
     @Autowired private SubjectRepository subjectRepository;
-    @Autowired private DepartmentRepository departmentRepository;
-    @Autowired private DepartmentSubjectRepository departmentSubjectRepository;
-    // @Autowired private UserRepository userRepository; // 教師データ取得用があれば追加
+    // @Autowired private DepartmentRepository departmentRepository;
+    // @Autowired private DepartmentSubjectRepository departmentSubjectRepository;
+    
+    @Autowired private UsersRepository usersRepository;             // ★追加: 教師データ取得用
+    @Autowired private SubjectFacultyRepository subjectFacultyRepository; // ★追加: 中間テーブル操作用
 
-    // ... (既存のメソッド getAllClassNames, getSubjectMatrixData はそのまま) ...
-
-    // --- ★追加: 教科一覧取得（教師情報付き） ---
+    // --- 教科一覧取得（DBから教師情報・コマ数を結合して取得） ---
     public List<SubjectMatrixRowDTO> getSubjectInfoList() {
         List<SubjectEntity> subjects = subjectRepository.findAll();
         
@@ -33,42 +34,55 @@ public class AdminSubjectService {
             dto.setSubjectId(sub.getSubjectId());
             dto.setSubjectName(sub.getSubjectName());
             
-            // ★EntityにTeacherのリレーションやIDがある場合の想定
-            // dto.setTeacherId(sub.getTeacherId());
-            // if(sub.getTeacher() != null) {
-            //    dto.setTeacherName(sub.getTeacher().getName());
-            // }
+            // コマ数設定 (RequiredCreditsを使用)
+            dto.setCourseCount(sub.getRequiredCredits() != null ? sub.getRequiredCredits() : 1);
             
-            // ★仮実装（カラムがない場合のエラー回避用ダミー）
-            // 実際はDBの値を入れてください
-            dto.setTeacherId(1); 
-            dto.setTeacherName("仮教師A"); 
+            // ★DBから実際の教師IDを取得
+            Integer teacherId = subjectFacultyRepository.findTeacherIdBySubjectId(sub.getSubjectId());
+            
+            if (teacherId != null) {
+                dto.setTeacherId(teacherId);
+                // IDを元に教師名を取得
+                usersRepository.findById(teacherId).ifPresent(user -> {
+                    dto.setTeacherName(user.getName());
+                });
+            } else {
+                dto.setTeacherId(null);
+                dto.setTeacherName("未設定");
+            }
 
             return dto;
         }).collect(Collectors.toList());
     }
 
-    // --- ★追加: 教師リスト取得（プルダウン用） ---
-    // ここでもSubjectMatrixRowDTOを「IDと名前のペア」として再利用します
+    // --- 教師リスト取得（DBのusersテーブルから取得） ---
     public List<SubjectMatrixRowDTO> getTeacherList() {
-        // 本来は userRepository.findByRole(...) などで取得
-        List<SubjectMatrixRowDTO> teachers = new ArrayList<>();
+        // ★ UserTypeID = 2 (管理者/教師) のユーザーをDBから取得
+        // ※DBの定義に合わせて ID 2 が教師・管理者であることを想定しています
+        List<UsersEntity> users = usersRepository.findByUserTypeId(2);
         
-        // ダミーデータ生成
-        SubjectMatrixRowDTO t1 = new SubjectMatrixRowDTO(); t1.setTeacherId(1); t1.setTeacherName("千太郎 先生");
-        SubjectMatrixRowDTO t2 = new SubjectMatrixRowDTO(); t2.setTeacherId(2); t2.setTeacherName("川島 先生");
-        SubjectMatrixRowDTO t3 = new SubjectMatrixRowDTO(); t3.setTeacherId(3); t3.setTeacherName("玉木 先生");
-        
-        teachers.add(t1); teachers.add(t2); teachers.add(t3);
-        return teachers;
+        return users.stream().map(user -> {
+            SubjectMatrixRowDTO dto = new SubjectMatrixRowDTO();
+            dto.setTeacherId(user.getUserId());
+            dto.setTeacherName(user.getName());
+            return dto;
+        }).collect(Collectors.toList());
     }
 
-    // --- ★追加: 一括保存処理 ---
+    // --- 一括保存・削除処理 ---
     @Transactional
-    public void saveSubjectList(List<Integer> subjectIds, List<String> subjectNames, List<Integer> teacherIds) {
+    public void saveSubjectList(
+            List<Integer> subjectIds, 
+            List<String> subjectNames, 
+            List<Integer> teacherIds, 
+            List<Integer> courseCounts) {
+        
         if (subjectNames == null) return;
 
-        // 1. 今回送信されなかったIDを特定して削除（＝画面で削除された行）
+        // ==========================================
+        // 1. 削除機能の実装
+        // ==========================================
+        // 画面から送信されたIDリストを作成（これに含まれないIDは削除対象）
         List<Integer> keptIds = new ArrayList<>();
         if (subjectIds != null) {
             for(Integer id : subjectIds) {
@@ -78,29 +92,59 @@ public class AdminSubjectService {
         
         List<SubjectEntity> allSubjects = subjectRepository.findAll();
         for (SubjectEntity sub : allSubjects) {
+            // 画面から消されたIDを見つけた場合
             if (!keptIds.contains(sub.getSubjectId())) {
-                // FK制約がある場合は deleteById などで関連テーブルも考慮が必要
+                
+                // ★重要: 外部キー制約エラーを防ぐため、先に中間テーブル(subjectfaculty)から削除
+                subjectFacultyRepository.deleteBySubjectId(sub.getSubjectId());
+                
+                // その後、教科マスタ(subject)を削除
                 subjectRepository.delete(sub); 
             }
         }
 
-        // 2. 更新 または 新規作成
+        // ==========================================
+        // 2. 保存・更新処理
+        // ==========================================
         for (int i = 0; i < subjectNames.size(); i++) {
             String name = subjectNames.get(i);
-            // Integer teacherId = (teacherIds != null && teacherIds.size() > i) ? teacherIds.get(i) : null;
+            
+            // リストのインデックス範囲チェックを行いつつ値を取得
             Integer currentId = (subjectIds != null && subjectIds.size() > i) ? subjectIds.get(i) : null;
+            Integer count = (courseCounts != null && courseCounts.size() > i) ? courseCounts.get(i) : 1; 
+            Integer teacherId = (teacherIds != null && teacherIds.size() > i) ? teacherIds.get(i) : null;
 
             SubjectEntity entity;
+            
+            // IDがある場合は更新、なければ新規作成
             if (currentId != null) {
                 entity = subjectRepository.findById(currentId).orElse(new SubjectEntity());
             } else {
                 entity = new SubjectEntity();
             }
 
+            // 教科情報のセット
             entity.setSubjectName(name);
-            // entity.setTeacherId(teacherId); // ★Entityのカラムに合わせてセットしてください
+            entity.setRequiredCredits(count); 
             
-            subjectRepository.save(entity);
+            // TotalCreditsも必須項目のためセット
+            if (entity.getTotalCredits() == null) {
+                entity.setTotalCredits(count); 
+            }
+            
+            // ★まず教科を保存 (ここでSubjectIDが確定/更新される)
+            SubjectEntity savedEntity = subjectRepository.save(entity);
+
+            // ==========================================
+            // 3. 教師情報の紐づけ保存
+            // ==========================================
+            // 一旦、この教科に関連する古い紐づけを削除（重複防止）
+            subjectFacultyRepository.deleteBySubjectId(savedEntity.getSubjectId());
+
+            // 教師が選択されている場合のみ新規登録
+            if (teacherId != null) {
+                subjectFacultyRepository.insertSubjectFaculty(savedEntity.getSubjectId(), teacherId);
+            }
         }
     }
 }

@@ -222,18 +222,21 @@ public class AdminController {
         return "admin/mdSubjectInformation";
     }
 
-    // --- 13. 教科マスタ保存 (POST) ---
     @PostMapping("/mdSubjectInformation/save")
     public String saveSubjectInformation(
             @RequestParam(name = "subjectId", required = false) List<Integer> subjectIds,
             @RequestParam(name = "subjectName", required = false) List<String> subjectNames,
             @RequestParam(name = "teacherId", required = false) List<Integer> teacherIds,
+            // ★追加: コマ数（courseCount）のリストを受け取る
+            @RequestParam(name = "courseCount", required = false) List<Integer> courseCounts,
             RedirectAttributes redirectAttributes) {
         
         try {
-            adminSubjectService.saveSubjectList(subjectIds, subjectNames, teacherIds);
+            // 引数に courseCounts を追加してServiceを呼ぶ
+            adminSubjectService.saveSubjectList(subjectIds, subjectNames, teacherIds, courseCounts);
             redirectAttributes.addFlashAttribute("successMessage", "変更を保存しました。");
         } catch (Exception e) {
+            e.printStackTrace(); // エラー詳細をログに出す
             redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
         }
 

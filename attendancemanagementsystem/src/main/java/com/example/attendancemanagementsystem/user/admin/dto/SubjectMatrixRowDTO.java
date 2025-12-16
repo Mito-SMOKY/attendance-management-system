@@ -11,6 +11,8 @@ public class SubjectMatrixRowDTO {
     private Integer teacherId;
     private String teacherName;
 
+    private Integer courseCount;
+
     // 既存のコンストラクタ（マトリクス画面用として残すか、下のように修正）
     public SubjectMatrixRowDTO(Integer subjectId, String subjectName, Integer grade, Map<String, Boolean> statusMap) {
         this.subjectId = subjectId;
@@ -41,4 +43,7 @@ public class SubjectMatrixRowDTO {
 
     public String getTeacherName() { return teacherName; }
     public void setTeacherName(String teacherName) { this.teacherName = teacherName; }
+
+    public Integer getCourseCount() { return courseCount; }
+    public void setCourseCount(Integer courseCount) { this.courseCount = courseCount; }
 }
