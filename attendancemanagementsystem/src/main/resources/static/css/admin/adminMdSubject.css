@@ -1,279 +1,557 @@
 @charset "UTF-8";
 
+
+
 /* =========================================
+
    基本設定
+
    ========================================= */
+
 *, *::before, *::after {
+
     box-sizing: border-box;
+
 }
+
+
 
 body {
+
     overflow-x: hidden;
+
     width: 100%;
+
     margin: 0;
+
     padding: 0;
+
     font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
-    font-size: 16px; 
+
+    font-size: 16px;
+
     background-color: #f4f4f9;
+
     color: #333;
+
 }
 
+
+
 /* =========================================
+
    レイアウトコンテナ
+
    ========================================= */
+
 .subject-master-container {
+
     width: 95%;
+
     max-width: 1200px;
+
     margin: 0 auto;
-    padding-top: 120px; 
+
+    padding-top: 120px;
+
     padding-bottom: 100px;
+
 }
 
+
+
 /* =========================================
+
    ページタイトル
+
    ========================================= */
+
 .page-header-wrapper {
+
     position: relative;
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     margin-bottom: 30px;
+
 }
+
+
 
 .page-title {
+
     font-size: 2rem;
+
     font-weight: bold;
+
     color: #333;
+
     margin: 0;
+
     border-bottom: 3px solid #539DA4;
+
     padding-bottom: 5px;
+
 }
+
+
 
 .backbutton-wrapper {
+
     position: absolute;
+
     left: 0;
+
     top: 50%;
+
     transform: translateY(-50%);
+
 }
 
+
+
 /* =========================================
+
    コントロールエリア
+
    ========================================= */
+
 .controls-area {
+
     display: flex;
+
     justify-content: space-between;
+
     align-items: flex-end;
+
     margin-bottom: 15px;
+
     gap: 20px;
+
 }
+
+
 
 .search-group {
+
     display: flex;
+
     align-items: center;
+
     gap: 5px;
+
 }
+
+
 
 .search-input {
+
     height: 38px;
+
     width: 250px;
+
     padding: 5px 10px;
+
     border: 1px solid #707070;
+
     border-radius: 4px;
+
     font-size: 0.95rem;
+
     background-color: #fff;
+
 }
+
+
 
 .search-btn {
+
     height: 38px;
+
     padding: 0 15px;
+
     background-color: #539DA4;
+
     border: 1px solid #539DA4;
+
     border-radius: 4px;
+
     color: white;
+
     font-weight: bold;
+
     font-size: 0.9rem;
+
     cursor: pointer;
+
     display: flex;
+
     align-items: center;
+
     gap: 5px;
+
     white-space: nowrap;
+
 }
+
 .search-btn:hover {
+
     opacity: 0.9;
+
 }
+
+
 
 .filter-action-group {
+
     display: flex;
+
     align-items: center;
+
     gap: 15px;
+
 }
+
+
 
 #gradeForm {
+
     display: flex;
+
     gap: 10px;
+
 }
+
+
 
 .grade-filter,
+
 .department-filter {
+
     height: 38px;
+
     padding: 5px 10px;
+
     border: 1px solid #707070;
+
     border-radius: 4px;
+
     font-size: 1rem;
+
     background-color: #fff;
+
     min-width: 120px;
+
 }
+
 .department-filter {
+
     min-width: 150px;
+
 }
+
+
 
 .edit-btn {
+
     height: 38px;
+
     padding: 0 20px;
+
     background-color: #fff;
+
     border: 2px solid #539DA4;
+
     border-radius: 4px;
+
     color: #539DA4;
+
     font-weight: bold;
+
     font-size: 0.9rem;
+
     cursor: pointer;
+
     transition: all 0.3s ease;
+
     white-space: nowrap;
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
 }
+
 .edit-btn:hover {
+
     background-color: #539DA4;
+
     color: white;
+
 }
+
+
 
 body.editing-mode .edit-btn {
+
     background-color: #539DA4;
+
     color: white;
+
 }
+
+
 
 /* =========================================
+
    テーブル
+
    ========================================= */
+
 .table-wrapper {
+
     width: 100%;
+
     border: 1px solid #999;
+
     background-color: white;
+
     overflow-x: auto; /* 横スクロールを許可 */
-    
-    display: block; 
+
+   
+
+    display: block;
+
     height: auto;
-    min-height: 0; 
+
+    min-height: 0;
+
 }
+
+
 
 .subject-table {
+
     width: 100%;
+
     border-collapse: collapse;
+
     text-align: center;
+
     /* min-widthを指定しない、または列数に応じて自動で広がるようにする */
-    min-width: 800px; 
+
+    min-width: 800px;
+
     table-layout: auto; /* 列幅をコンテンツに合わせる */
+
 }
+
+
 
 .subject-table th, .subject-table td {
+
     border: 1px solid #999;
-    padding: 0; 
+
+    padding: 0;
+
     height: 50px;
+
     vertical-align: middle;
+
     /* クラス列の最小幅を確保 */
-    min-width: 80px; 
+
+    min-width: 80px;
+
 }
+
+
 
 .subject-table th {
+
     background-color: #539DA4;
+
     color: white;
+
     font-weight: normal;
+
     padding: 10px 5px;
+
     white-space: nowrap;
+
 }
+
+
 
 /* 教科名セル (固定幅) */
+
 .col-subject-name {
+
     width: 250px;
+
     min-width: 250px; /* 縮まないように固定 */
+
     text-align: left;
+
     padding: 0 10px !important;
-    position: relative; 
+
+    position: relative;
+
     white-space: nowrap;
+
     overflow: hidden;
+
     text-overflow: ellipsis;
+
     /* 横スクロール時に左端に固定したい場合は以下を追加（任意） */
+
     /* position: sticky; left: 0; z-index: 2; background-color: inherit; */
+
 }
+
+
 
 .subject-text {
+
     display: block;
+
     width: 100%;
+
     padding: 5px;
+
     font-size: 1rem;
+
     color: #333;
+
 }
+
+
 
 .subject-input {
+
     width: 100%;
+
     height: 100%;
+
     border: 1px solid #ccc;
+
     border-radius: 4px;
+
     background-color: #fff;
+
     font-size: 1rem;
+
     color: #333;
+
     outline: none;
+
     padding: 5px;
+
 }
+
+
 
 /* 削除ボタン */
+
 .delete-btn {
+
     position: absolute;
+
     right: 5px;
+
     top: 50%;
+
     transform: translateY(-50%);
+
     background: #e74c3c;
+
     color: white;
+
     border: none;
+
     border-radius: 4px;
+
     width: 25px;
+
     height: 25px;
+
     cursor: pointer;
+
     display: none;
+
     justify-content: center;
+
     align-items: center;
+
     font-size: 0.8rem;
+
     z-index: 5;
+
 }
+
+
 
 body.editing-mode .delete-btn {
+
     display: flex;
+
 }
+
+
 
 /* 丸（マーク）と背景色 */
+
 .check-mark {
+
     font-size: 1.5rem;
+
     color: #333;
+
     font-weight: bold;
+
     display: none;
+
     pointer-events: none;
+
 }
+
+
 
 td.checked {
+
     background-color: #d4edda;
+
 }
+
+
 
 td.checked .check-mark {
+
     display: inline-block;
+
 }
+
+
 
 /* 編集モード時のセル操作 */
+
 body.editing-mode .subject-table tbody td:not(.col-subject-name) {
+
     cursor: pointer;
+
     transition: background-color 0.2s;
+
 }
 
+
+
 body.editing-mode .subject-table tbody td:not(.col-subject-name):hover {
+
     background-color: #c3e6cb;
+
 }

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ファイル出力</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminAccountOutput.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/accountList')}"></div>
+    </div>
+
+    <div class="output-container">
+        
+        <h1 class="page-title">ファイル出力</h1>
+
+        <div class="content-wrapper">
+            
+            <div class="description-area">
+                <h2 class="sub-title">出力設定</h2>
+                <p class="description-text">
+                    各生徒のアカウント情報をPDF形式で出力できます。ファイル名は「名前_学籍番号.pdf」です。
+                </p>
+            </div>
+
+            <form id="outputForm" method="post" th:action="@{/admin/download-pdf}">
+                
+                <div class="settings-box">
+                    
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="useZip" checked>
+                            <span class="checkbox-text">zipファイルにまとめる</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="input-label">zipファイル名(未設定時:データリスト名.zip)</label>
+                        <input type="text" name="zipFileName" class="text-input" placeholder="">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="input-label">保存先</label>
+                        <div class="input-with-button">
+                            <input type="text" id="savePathDisplay" name="savePath" class="text-input" placeholder="保存先を選択..." readonly>
+                            
+                            <button type="button" class="browse-btn" onclick="openExplorer()">参照</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="main-button-area">
+                    <button type="button" class="export-btn" onclick="execOutput()">出力</button>
+                </div>
+
+            </form>
+            
+            <div class="bottom-right-area">
+                <a th:href="@{/admin/accountManage}" class="top-link-btn">アカウント作成TOPへ</a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <input type="file" id="dummyFolderInput" webkitdirectory style="display:none;" onchange="updatePath(this)">
+
+    <script>
+        // 参照ボタンが押されたら、隠しinputをクリックしてエクスプローラーを開く
+        function openExplorer() {
+            document.getElementById('dummyFolderInput').click();
+        }
+
+        // フォルダが選択されたら、その名前を入力欄に表示する
+        function updatePath(input) {
+            if (input.files && input.files.length > 0) {
+                // セキュリティ上フルパスは取得できないため、フォルダ名などを表示します
+                // 実際にはブラウザのダウンロード設定が優先されます
+                document.getElementById('savePathDisplay').value = "選択中: (ブラウザのダウンロード先設定が優先されます)";
+            }
+        }
+
+        // 出力実行
+        function execOutput() {
+            // 1. フォーム送信（ダウンロード開始）
+            document.getElementById('outputForm').submit();
+
+            // 2. 1秒後にアカウント管理画面へ遷移
+            setTimeout(function() {
+                alert("出力を開始しました。\nアカウント作成TOPへ戻ります。");
+                window.location.href = '/admin/accountManage';
+            }, 1000);
+        }
+    </script>
+
+</body>
+</html>
