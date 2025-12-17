@@ -30,6 +30,7 @@ public class PasswordResetController {
     public String processForgotPassword(@RequestParam("email") String email, HttpSession session, Model model) {
         String otp = passwordResetService.sendVerificationCode(email);
 
+        // OTPが生成された場合、セッションに保存して認証コード入力画面へリダイレクト
         if (otp != null) {
             session.setAttribute("resetEmail", email);
             session.setAttribute("resetOtp", otp);
@@ -51,6 +52,7 @@ public class PasswordResetController {
     public String verifyOtp(@RequestParam("otp") String inputOtp, HttpSession session) {
         String correctOtp = (String) session.getAttribute("resetOtp");
         
+        // 認証コードの検証
         if (correctOtp != null && correctOtp.equals(inputOtp)) {
             return "redirect:/password/new-password"; 
         } else {
@@ -72,6 +74,7 @@ public class PasswordResetController {
             HttpSession session, 
             Model model) {
         
+            // パスワードと確認用パスワードの一致チェック
         if (!password.equals(confirmPassword)) {
             model.addAttribute("error", "パスワードが一致しません");
             return "login/reset_password";
@@ -79,6 +82,7 @@ public class PasswordResetController {
 
         String email = (String) session.getAttribute("resetEmail");
         
+        // パスワード更新処理
         if (email != null) {
             passwordResetService.updatePassword(email, password);
             
