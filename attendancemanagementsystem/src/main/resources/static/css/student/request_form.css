@@ -47,7 +47,7 @@ body {
 .request-form-table th {
     background-color: #5BBEB9;
     color: white;
-    font-weight: bold;
+    /* font-weight: bold; */
     width: 180px;
     text-align: left;
 }
