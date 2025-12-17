@@ -6,7 +6,7 @@
     <title>申請画面</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/student/request.css}">
+    <link rel="stylesheet" th:href="@{/css/student/request_main.css}">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -17,14 +17,14 @@
         <div th:replace="~{fragments/_parts :: student-header}"></div>
     </div>
 
-    <div class="backbutton-container">
+    <!-- <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url=@{/main_calendar})}"></div>
-    </div>
+    </div> -->
 
     <div class="content-wrapper">
         <div class="action-buttons">
-            <a th:href="@{/request_form}"  class="ghost-button">公欠申請</a>
-            <a th:href="@{url}"  class="ghost-button">申請履歴</a>
+            <a th:href="@{/student/request/form}" class="ghost-button">公欠申請</a>
+            <a th:href="@{/student/request/history}" class="ghost-button">申請履歴</a>
         </div>
     </div>
 

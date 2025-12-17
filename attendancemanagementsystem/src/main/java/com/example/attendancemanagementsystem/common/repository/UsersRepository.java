@@ -1,7 +1,7 @@
 package com.example.attendancemanagementsystem.common.repository;
 
 import java.util.Optional;
-
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
@@ -16,5 +16,8 @@ public interface UsersRepository extends JpaRepository<UsersEntity, Integer> {
     Optional<UsersEntity> findByLoginId(String loginId);
 
     boolean existsByLoginId(String loginId);
+
+    // RoleIDをキーにしてusersテーブルから複数件検索するメソッド
+    List<UsersEntity> findByUserTypeId(Integer userTypeId);
     
 }
