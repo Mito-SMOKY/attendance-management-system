@@ -48,7 +48,7 @@
                         <span th:text="|${#numbers.formatDecimal(subject.attendanceRate * 100, 0, 0)}%履修済|"></span>
                         
                         <!-- atenndanceRate=出席率の計算 
-                         現在までの授業数/現在までの受講数で算出-->
+                        現在までの授業数/現在までの受講数で算出-->
                         <div class="attendance-bar-container">
                             <div class="attendance-bar" 
                                 th:style="|width: ${#numbers.formatDecimal(subject.attendanceRate * 100, 0, 0)}%;|"

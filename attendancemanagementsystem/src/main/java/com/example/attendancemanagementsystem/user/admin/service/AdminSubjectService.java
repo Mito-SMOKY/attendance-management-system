@@ -5,10 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.entity.DepartmentSubject;
 import com.example.attendancemanagementsystem.common.entity.SubjectEntity;
@@ -17,8 +15,6 @@ import com.example.attendancemanagementsystem.common.repository.DepartmentSubjec
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
 import com.example.attendancemanagementsystem.user.admin.dto.SubjectMatrixRowDTO;
 
-
-//教科マスタ系？
 @Service
 public class AdminSubjectService {
 
@@ -29,7 +25,7 @@ public class AdminSubjectService {
     // --- 1. 全クラス名のリスト取得 ---
     public List<String> getAllClassNames() {
         return departmentRepository.findAll().stream()
-                .map(DepartmentEntity::getClassName) // DepartmentEntityから取得
+                .map(DepartmentEntity::getClassName) 
                 .distinct()
                 .sorted()
                 .collect(Collectors.toList());
@@ -53,13 +49,13 @@ public class AdminSubjectService {
                         .anyMatch(r -> r.getSubject().getSubjectId().equals(sub.getSubjectId()) 
                                     && r.getDepartment().getDepartmentId().equals(dept.getDepartmentId()));
                 
-                // クラス名ごとにマップに入れる (上書きされてもOKな仕様とする)
+                // クラス名ごとにマップに入れる
                 statusMap.put(dept.getClassName(), isRelated);
 
                 if (grade == null && isRelated) {
                     grade = relations.stream()
                             .filter(r -> r.getSubject().getSubjectId().equals(sub.getSubjectId()) 
-                                      && r.getDepartment().getDepartmentId().equals(dept.getDepartmentId()))
+                                    && r.getDepartment().getDepartmentId().equals(dept.getDepartmentId()))
                             .findFirst()
                             .map(DepartmentSubject::getGrade)
                             .orElse(null);
