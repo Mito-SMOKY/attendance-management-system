@@ -57,13 +57,16 @@
           <p class="error">ユーザーIDまたはパスワードが正しくありません。</p>
         </div>
 
-        <a class="forget-password" href="#">
+        <a class="forget-password" th:href="@{/password/forgot}">
           <p class="message">パスワードをお忘れですか？</p>
         </a>
 
         <button type="submit" class="button">ログイン</button>
       </form>
     </div>
+        <div th:if="${param.resetSuccess}">
+          <p style="color: blue; font-weight: bold; text-align: center;">パスワードを変更しました。<br>新しいパスワードでログインしてください。</p>
+        </div>
 
     <script>
       const togglePassword = document.querySelector("#togglePassword");

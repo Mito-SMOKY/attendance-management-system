@@ -1,0 +1,261 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* =========================================
+   コンテナ設定
+   ========================================= */
+.manual-container {
+    width: 95%;
+    max-width: 900px; /* パスワード列が増えたので少し幅を広げました */
+    margin: 0 auto;
+    padding-top: 120px; 
+    padding-bottom: 100px;
+    text-align: center;
+}
+
+/* =========================================
+   ページタイトル
+   ========================================= */
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    display: inline-block;        
+    border-bottom: 3px solid #539DA4;
+    padding-bottom: 5px;          
+    margin-bottom: 40px;
+}
+
+/* =========================================
+   上部入力エリア (データリスト名)
+   ========================================= */
+.top-input-area {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto 20px auto;
+    text-align: left;
+}
+
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+/* リスト名入力フィールド */
+.list-name-input {
+    width: 300px;
+    height: 38px;
+    padding: 5px 10px;
+    font-size: 0.95rem;
+    border: 1px solid #707070;
+    border-radius: 4px;
+    background-color: #fff;
+    outline: none;
+    flex-shrink: 0;
+}
+
+/* エラーメッセージテキスト（全体用） */
+.error-text {
+    color: #ff4d4d;
+    font-weight: bold;
+    font-size: 0.9rem;
+    visibility: hidden; 
+}
+
+/* =========================================
+   テーブル設定
+   ========================================= */
+.table-wrapper {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    background-color: transparent; 
+}
+
+.manual-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+    border: 1px solid #999;
+    table-layout: fixed; /* 列幅固定 */
+    background-color: #fff;
+}
+
+/* --- 列幅の設定 --- */
+.col-no { width: 50px; }
+.col-name { width: 25%; }
+.col-student-id { width: 15%; }
+.col-affiliation { width: 20%; }
+.col-password { width: auto; } /* 残りの幅を自動割り当て */
+
+/* ヘッダー */
+.manual-table th {
+    background-color: #539DA4;
+    color: white;
+    padding: 10px 5px;
+    border: 1px solid #999;
+    font-weight: normal;
+    height: 50px;
+    white-space: nowrap;
+}
+
+/* ボディ（セル） */
+.manual-table td {
+    padding: 0; /* 入力欄を広げるため0に設定 */
+    border: 1px solid #999;
+    background-color: #fff; 
+    height: 50px;
+    vertical-align: middle;
+}
+
+.row-num {
+    text-align: center;
+    font-weight: bold;
+}
+
+/* --- セル内の入力要素 --- */
+.cell-input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    padding: 0 10px;
+    font-size: 1rem;
+    outline: none;
+    background: transparent;
+    color: #333;
+    display: block; /* 高さ確保のため */
+}
+
+.cell-select {
+    width: 100%;
+    height: 100%;
+    border: none;
+    padding: 0 5px;
+    font-size: 1rem;
+    outline: none;
+    background: transparent;
+    cursor: pointer;
+    color: #333;
+}
+
+/* --- パスワードと削除ボタンの横並び --- */
+.password-action-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding-right: 5px; /* 右端の余白 */
+}
+
+.password-action-wrapper .cell-input {
+    flex: 1; /* 余白を埋める */
+}
+
+/* 削除ボタン */
+.delete-row-btn {
+    width: 36px;
+    height: 36px;
+    background-color: transparent;
+    color: #999;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s;
+    flex-shrink: 0; /* 縮小しない */
+    margin-left: 5px;
+}
+
+.delete-row-btn:hover {
+    background-color: #ffebee;
+    color: #ff4d4d;
+    border-color: #ff4d4d;
+}
+
+/* --- エラー時のスタイル（赤枠） --- */
+.input-error {
+    background-color: #fff0f0 !important;
+    border: 2px solid #ff4d4d !important;
+    /* セル内のinputにも適用されるよう調整 */
+    box-shadow: inset 0 0 0 2px #ff4d4d; 
+}
+/* select要素などが赤枠からはみ出ないようにする */
+select.input-error, input.input-error {
+    border: 2px solid #ff4d4d !important;
+}
+
+/* =========================================
+   プラスボタンエリア
+   ========================================= */
+.add-btn-wrapper {
+    text-align: right; 
+    margin-top: 5px;
+}
+
+.add-row-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;  
+    height: 38px; 
+    background-color: transparent;
+    border: 2px solid #539DA4; 
+    border-radius: 4px;
+    color: #539DA4;            
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.add-row-btn:hover {
+    background-color: #539DA4;
+    color: white;
+}
+
+/* =========================================
+   作成ボタンエリア
+   ========================================= */
+.submit-area {
+    margin-top: 40px;
+}
+
+.create-btn {
+    height: 45px;
+    width: 200px;
+    padding: 0 15px;
+    background-color: #539DA4;
+    border: 1px solid #539DA4;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.create-btn:hover {
+    opacity: 0.9;
+}

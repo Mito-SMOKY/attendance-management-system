@@ -1,0 +1,208 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* =========================================
+   コンテナ設定
+   ========================================= */
+.output-container {
+    width: 95%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding-top: 120px; 
+    padding-bottom: 100px;
+    text-align: center;
+    position: relative; /* 右下ボタンの配置基準用 */
+    min-height: 80vh;
+}
+
+/* =========================================
+   ページタイトル
+   ========================================= */
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    
+    display: inline-block;        
+    border-bottom: 3px solid #539DA4;
+    padding-bottom: 5px;          
+    margin-bottom: 30px;
+}
+
+/* =========================================
+   コンテンツエリア
+   ========================================= */
+.content-wrapper {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+/* サブタイトルと説明 */
+.sub-title {
+    font-size: 1.3rem;
+    font-weight: normal;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.description-text {
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+/* =========================================
+   設定ボックス (青い枠線エリア)
+   ========================================= */
+.settings-box {
+    border: 2px solid #6EC7D3; /* スクリーンショットに近い少し明るめの水色 */
+    border-radius: 20px;
+    padding: 30px 40px;
+    margin-bottom: 40px;
+    background-color: #fff;
+}
+
+/* フォーム要素共通 */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* ラベル */
+.input-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: normal;
+}
+
+/* テキスト入力 */
+.text-input {
+    width: 100%;
+    height: 40px;
+    padding: 5px 10px;
+    font-size: 1rem;
+    border: 1px solid #333; /* 写真に合わせて黒めの枠線 */
+    border-radius: 2px;
+    outline: none;
+}
+
+/* チェックボックス */
+.checkbox-group {
+    margin-bottom: 15px;
+}
+
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.checkbox-text {
+    margin-left: 8px;
+    font-size: 1.1rem;
+}
+
+input[type="checkbox"] {
+    transform: scale(1.5); /* チェックボックスを少し大きく */
+    accent-color: #539DA4;
+}
+
+/* 参照ボタン付き入力欄 */
+.input-with-button {
+    display: flex;
+    gap: 10px;
+}
+
+.browse-btn {
+    height: 40px;
+    padding: 0 15px;
+    background-color: #eee;
+    border: 1px solid #999;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.browse-btn:hover {
+    background-color: #ddd;
+}
+
+/* =========================================
+   メインボタンエリア (出力ボタン)
+   ========================================= */
+.main-button-area {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.export-btn {
+    width: 200px;
+    height: 50px;
+    
+    /* 統一デザインの水色ボタン */
+    background-color: #539DA4; /* 写真では白ですが、他画面と統一するため水色に設定 */
+    color: white;
+    
+    border: 1px solid #539DA4;
+    border-radius: 8px;
+    
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.export-btn:hover {
+    opacity: 0.9;
+}
+
+/* =========================================
+   右下のリンクボタン
+   ========================================= */
+.bottom-right-area {
+    display: flex;
+    justify-content: flex-end; /* 右寄せ */
+    margin-top: 20px;
+}
+
+.top-link-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #fff;
+    border: 1px solid #333;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: background-color 0.3s;
+}
+
+.top-link-btn:hover {
+    background-color: #f0f0f0;
+}
