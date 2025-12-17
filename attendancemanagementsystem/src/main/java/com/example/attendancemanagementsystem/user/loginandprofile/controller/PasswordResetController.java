@@ -1,5 +1,7 @@
 package com.example.attendancemanagementsystem.user.loginandprofile.controller;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,14 +30,17 @@ public class PasswordResetController {
     // メール送信処理
     @PostMapping("/send-otp")
     public String processForgotPassword(@RequestParam("email") String email, HttpSession session, Model model) {
-        String otp = passwordResetService.sendVerificationCode(email);
+        try {
+            String otp = passwordResetService.sendVerificationCode(email);
+            LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(PasswordResetService.EXPIRY_MINUTES);
 
-        // OTPが生成された場合、セッションに保存して認証コード入力画面へリダイレクト
-        if (otp != null) {
             session.setAttribute("resetEmail", email);
             session.setAttribute("resetOtp", otp);
+            session.setAttribute("resetExpiry", expiryTime);
+
             return "redirect:/password/verify"; 
-        } else {
+
+        } catch (RuntimeException e) {
             model.addAttribute("error", "メールアドレスが見つかりません。");
             return "login/forgot_password";
         }
@@ -51,13 +56,19 @@ public class PasswordResetController {
     @PostMapping("/verify-otp")
     public String verifyOtp(@RequestParam("otp") String inputOtp, HttpSession session) {
         String correctOtp = (String) session.getAttribute("resetOtp");
-        
+        LocalDateTime expiryTime = (LocalDateTime) session.getAttribute("resetExpiry");
+
         // 認証コードの検証
-        if (correctOtp != null && correctOtp.equals(inputOtp)) {
-            return "redirect:/password/new-password"; 
-        } else {
-            return "redirect:/password/verify?error"; 
+        if (correctOtp == null || !correctOtp.equals(inputOtp)) {
+            return "redirect:/password/verify?error=invalid";
         }
+
+        // 有効期限チェック
+        if (expiryTime == null || LocalDateTime.now().isAfter(expiryTime)) {
+            return "redirect:/password/verify?error=expired";
+        }
+
+        return "redirect:/password/new-password";
     }
     
     // 新パスワード入力画面
@@ -86,9 +97,11 @@ public class PasswordResetController {
         if (email != null) {
             passwordResetService.updatePassword(email, password);
             
+            
             // セッション削除
             session.removeAttribute("resetEmail");
             session.removeAttribute("resetOtp");
+            session.removeAttribute("resetExpiry");
             
             return "login/update"; 
         }

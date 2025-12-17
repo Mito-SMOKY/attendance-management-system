@@ -44,9 +44,29 @@
                 <button type="submit" class="confirm-btn">確定</button>
             </div>
             
-            <div th:if="${param.error}">
-                <p class="error-msg">パスワードが間違っています</p>
+            <div th:if="${param.error}" style="color: red; margin-bottom: 15px;">
+            
+            <p th:if="${param.error[0] == 'invalid'}">
+                認証コードが正しくありません。<br>メールを確認して再入力してください。
+            </p>
+
+            <div th:if="${param.error[0] == 'expired'}">
+                <p style="font-weight: bold;">
+                    有効期限が切れています。
+                </p>
+                <p style="font-size: 0.9em;">
+                    セキュリティのため、新しい認証コードを発行してください。
+                </p>
+                <a th:href="@{/password/forgot}" 
+                    style="color: #007bff; text-decoration: underline;">
+                    認証コードを再発行する
+                </a>
             </div>
+
+            <p th:if="${param.error[0] != 'invalid' and param.error[0] != 'expired'}">
+                エラーが発生しました。もう一度お試しください。
+            </p>
+        </div>
         </form>
 
         <div class="resend-area">

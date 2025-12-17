@@ -1,6 +1,6 @@
 package com.example.attendancemanagementsystem.user.loginandprofile.service;
 
-import java.security.SecureRandom;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -9,8 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
+import com.example.attendancemanagementsystem.common.utils.TotpUtil;
 import com.example.attendancemanagementsystem.user.notification.service.NotificationEmailService;
-import com.example.attendancemanagementsystem.user.notification.service.NotificationMessageService;
+import com.example.attendancemanagementsystem.user.notification.service.NotificationMessageService;    
 
 @Service
 public class PasswordResetService {
@@ -20,28 +21,28 @@ public class PasswordResetService {
     @Autowired private NotificationEmailService notificationEmailService;
     @Autowired private PasswordEncoder passwordEncoder;
 
+    // OTP有効期限（分）
+    public static final int EXPIRY_MINUTES = 1;
+
     // パスワードリセット用OTP送信
     @Transactional
     public String sendVerificationCode(String email) {
         
         // ユーザー検索
-        UsersEntity user = usersRepository.findByEmail(email).orElse(null);
+        UsersEntity user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // TOTP計算用の使い捨てシークレットキーを生成（UUIDを使用）
+        String secretKey = UUID.randomUUID().toString();
         
-        if (user == null) {
-            return null;
-        }
+        // TOTPアルゴリズムで6桁のコードを生成
+        String otp = TotpUtil.generateTotp(secretKey);
 
-        // OTP生成
-        SecureRandom random = new SecureRandom();
-        String otp = String.format("%06d", random.nextInt(1000000));
+        //通知送信
+        notificationMessageService.createPasswordResetOtp(user, otp, EXPIRY_MINUTES);
         
-        int expiryMinutes = 30; // 有効期限30分
-
-        // 通知送信
-        notificationMessageService.createPasswordResetOtp(user, otp, expiryMinutes);
-
-        // メール送信
-        notificationEmailService.sendPasswordResetOtp(user, otp, expiryMinutes);
+        //メール送信
+        notificationEmailService.sendPasswordResetOtp(user, otp, EXPIRY_MINUTES);
         
         return otp;
     }
@@ -64,6 +65,6 @@ public class PasswordResetService {
         notificationMessageService.createPasswordChangeCompletion(user);
         
         // メール送信
-        notificationEmailService.sendPasswordChangeCompletion(user);    
+        notificationEmailService.sendPasswordChangeCompletion(user);  
     }
 }
