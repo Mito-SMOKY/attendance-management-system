@@ -1,8 +1,7 @@
 package com.example.attendancemanagementsystem.user.loginandprofile.controller;
 
-import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +9,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.attendancemanagementsystem.user.loginandprofile.service.PasswordResetService;
+import com.example.attendancemanagementsystem.common.entity.UsersEntity;
+import com.example.attendancemanagementsystem.common.enums.OtpPurpose;
+import com.example.attendancemanagementsystem.common.repository.UsersRepository;
+import com.example.attendancemanagementsystem.common.service.OtpService;
+import com.example.attendancemanagementsystem.user.notification.service.NotificationEmailService;
+import com.example.attendancemanagementsystem.user.notification.service.NotificationMessageService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -19,7 +23,19 @@ import jakarta.servlet.http.HttpSession;
 public class PasswordResetController {
 
     @Autowired
-    private PasswordResetService passwordResetService;
+    private OtpService otpService;
+
+    @Autowired
+    private UsersRepository usersRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private NotificationEmailService notificationEmailService;
+
+    @Autowired
+    private NotificationMessageService notificationMessageService;
 
     // メールアドレス入力画面
     @GetMapping("/forgot")
@@ -31,17 +47,22 @@ public class PasswordResetController {
     @PostMapping("/send-otp")
     public String processForgotPassword(@RequestParam("email") String email, HttpSession session, Model model) {
         try {
-            String otp = passwordResetService.sendVerificationCode(email);
-            LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(PasswordResetService.EXPIRY_MINUTES);
+            // ユーザー検索
+            UsersEntity user = usersRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("ユーザーが見つかりません"));
 
+            // OTP送信 (パスワードリセット用)
+            otpService.sendOtp(user, user.getEmail(), OtpPurpose.PASSWORD_RESET);
+            
+            // 成功した場合のみセッションに保存
             session.setAttribute("resetEmail", email);
-            session.setAttribute("resetOtp", otp);
-            session.setAttribute("resetExpiry", expiryTime);
+            session.removeAttribute("isVerified");
 
+            // 入力画面へ移動
             return "redirect:/password/verify"; 
 
         } catch (RuntimeException e) {
-            model.addAttribute("error", "メールアドレスが見つかりません。");
+            model.addAttribute("error", e.getMessage()); 
             return "login/forgot_password";
         }
     }
@@ -52,32 +73,49 @@ public class PasswordResetController {
         return "login/verify_otp";
     }
 
-    // 認証コードチェック
+    // 認証コード検証処理
     @PostMapping("/verify-otp")
-    public String verifyOtp(@RequestParam("otp") String inputOtp, HttpSession session) {
-        String correctOtp = (String) session.getAttribute("resetOtp");
-        LocalDateTime expiryTime = (LocalDateTime) session.getAttribute("resetExpiry");
+    public String verifyOtp(@RequestParam("otp") String inputOtp, HttpSession session, Model model) {
+        String email = (String) session.getAttribute("resetEmail");
 
-        // 認証コードの検証
-        if (correctOtp == null || !correctOtp.equals(inputOtp)) {
+        if (email == null) {
+            return "redirect:/password/forgot";
+        }
+
+        boolean isValid = false;
+        try {
+            // ユーザー検索
+            UsersEntity user = usersRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // OTP検証 (目的を指定)
+            isValid = otpService.verifyOtp(user, inputOtp, OtpPurpose.PASSWORD_RESET);
+
+        } catch (Exception e) {
+            isValid = false;
+        }
+
+        if (!isValid) {
             return "redirect:/password/verify?error=invalid";
         }
 
-        // 有効期限チェック
-        if (expiryTime == null || LocalDateTime.now().isAfter(expiryTime)) {
-            return "redirect:/password/verify?error=expired";
-        }
+        // 認証成功フラグをセッションに保存
+        session.setAttribute("isVerified", true);
 
         return "redirect:/password/new-password";
     }
     
     // 新パスワード入力画面
     @GetMapping("/new-password")
-    public String showNewPasswordForm() {
+    public String showNewPasswordForm(HttpSession session) {
+        Boolean isVerified = (Boolean) session.getAttribute("isVerified");
+        if (isVerified == null || !isVerified) {
+            return "redirect:/password/verify";
+        }
         return "login/reset_password"; 
     }
 
-    //パスワード更新処理
+    // パスワード更新実行
     @PostMapping("/update")
     public String updatePassword(
             @RequestParam("password") String password,
@@ -85,7 +123,11 @@ public class PasswordResetController {
             HttpSession session, 
             Model model) {
         
-            // パスワードと確認用パスワードの一致チェック
+        Boolean isVerified = (Boolean) session.getAttribute("isVerified");
+        if (isVerified == null || !isVerified) {
+            return "redirect:/login";
+        }
+
         if (!password.equals(confirmPassword)) {
             model.addAttribute("error", "パスワードが一致しません");
             return "login/reset_password";
@@ -93,17 +135,31 @@ public class PasswordResetController {
 
         String email = (String) session.getAttribute("resetEmail");
         
-        // パスワード更新処理
         if (email != null) {
-            passwordResetService.updatePassword(email, password);
-            
-            
-            // セッション削除
-            session.removeAttribute("resetEmail");
-            session.removeAttribute("resetOtp");
-            session.removeAttribute("resetExpiry");
-            
-            return "login/update"; 
+            try {
+                // ユーザー取得
+                UsersEntity user = usersRepository.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("ユーザーが見つかりません"));
+
+                // パスワード更新
+                user.setPassword(passwordEncoder.encode(password));
+                usersRepository.save(user);
+
+                // OTP後始末
+                otpService.clearOtp(user);
+
+                // 完了通知 (メール & サイト内)
+                notificationEmailService.sendPasswordChangeCompletion(user);
+                notificationMessageService.createPasswordChangeCompletion(user);
+                
+                // セッション破棄
+                session.invalidate();
+                return "login/update"; 
+
+            } catch (RuntimeException e) {
+                model.addAttribute("error", "更新に失敗しました");
+                return "login/reset_password";
+            }
         }
         
         return "redirect:/login";
