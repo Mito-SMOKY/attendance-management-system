@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder; // ★追加
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +23,7 @@ public class OtpService {
     @Autowired private OtpRepository otpRepository;
     @Autowired private NotificationMessageService notificationMessageService;
     @Autowired private NotificationEmailService notificationEmailService;
-    @Autowired private PasswordEncoder passwordEncoder; // ★追加: ハッシュ化用
+    @Autowired private PasswordEncoder passwordEncoder;
 
     // 設定値
     private static final int EXPIRY_MINUTES = 10;
@@ -46,10 +46,10 @@ public class OtpService {
             }
         }
 
-        // 1生のOTP生成 (6桁)
+        // 生のOTP生成 (6桁)
         String rawToken = String.valueOf(secureRandom.nextInt(900000) + 100000);
 
-        // 2. ハッシュ化して保存
+        // ハッシュ化して保存
         otpEntity.setToken(passwordEncoder.encode(rawToken)); 
         
         otpEntity.setPurpose(purpose);
@@ -138,6 +138,7 @@ public class OtpService {
             otp.setPurpose(null);
             otp.setExpiredAt(null);
             otp.setAttempts(0);
+            otp.setCreateAt(null);
             otpRepository.save(otp);
         });
     }

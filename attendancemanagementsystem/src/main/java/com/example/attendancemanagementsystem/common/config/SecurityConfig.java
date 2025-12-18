@@ -32,6 +32,7 @@ public class SecurityConfig {
                 // テスト用
                 .requestMatchers("/test/**").permitAll()
                 .requestMatchers("/login", "/first-login").permitAll()
+                .requestMatchers("/email/**").permitAll()
                 .requestMatchers("/password/**").permitAll()
                 // .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
