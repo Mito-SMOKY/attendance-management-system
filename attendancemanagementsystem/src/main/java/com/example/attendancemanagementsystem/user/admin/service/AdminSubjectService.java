@@ -1,15 +1,22 @@
 package com.example.attendancemanagementsystem.user.admin.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
+import com.example.attendancemanagementsystem.common.entity.DepartmentSubject;
+import com.example.attendancemanagementsystem.common.entity.DepartmentSubjectKey;
 import com.example.attendancemanagementsystem.common.entity.SubjectEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
+import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
+import com.example.attendancemanagementsystem.common.repository.DepartmentSubjectRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectFacultyRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository; // 名前が変わっている場合は UsersRepository に修正してください
@@ -19,8 +26,8 @@ import com.example.attendancemanagementsystem.user.admin.dto.SubjectMatrixRowDTO
 public class AdminSubjectService {
 
     @Autowired private SubjectRepository subjectRepository;
-    // @Autowired private DepartmentRepository departmentRepository;
-    // @Autowired private DepartmentSubjectRepository departmentSubjectRepository;
+    @Autowired private DepartmentRepository departmentRepository;
+    @Autowired private DepartmentSubjectRepository departmentSubjectRepository;
     
     @Autowired private UsersRepository usersRepository;             // ★追加: 教師データ取得用
     @Autowired private SubjectFacultyRepository subjectFacultyRepository; // ★追加: 中間テーブル操作用
@@ -144,6 +151,94 @@ public class AdminSubjectService {
             // 教師が選択されている場合のみ新規登録
             if (teacherId != null) {
                 subjectFacultyRepository.insertSubjectFaculty(savedEntity.getSubjectId(), teacherId);
+            }
+        }
+    }
+
+    // =========================================================================
+    // ★以下、教科マスタ(mdSubject)用の追加メソッド
+    // =========================================================================
+
+    // --- 全学科(クラス)を取得 ---
+    public List<DepartmentEntity> getAllDepartments() {
+        return departmentRepository.findAll();
+    }
+
+    // --- マトリクスデータ（教科×クラスの紐づけ状況）を取得 ---
+    public List<SubjectMatrixRowDTO> getSubjectMatrixData() {
+        List<SubjectEntity> subjects = subjectRepository.findAll();
+        List<DepartmentEntity> departments = departmentRepository.findAll();
+        List<DepartmentSubject> relations = departmentSubjectRepository.findAll();
+
+        List<SubjectMatrixRowDTO> matrix = new ArrayList<>();
+
+        for (SubjectEntity sub : subjects) {
+            SubjectMatrixRowDTO dto = new SubjectMatrixRowDTO();
+            dto.setSubjectId(sub.getSubjectId());
+            dto.setSubjectName(sub.getSubjectName());
+            // ★GradeがSubjectEntityにないため、便宜上1を設定（画面のフィルタ動作用）
+            dto.setGrade(1); 
+
+            // クラスごとの紐づけ状況をマップに格納 (Key: DepartmentID(String), Value: Boolean)
+            Map<String, Boolean> statusMap = new HashMap<>();
+            for (DepartmentEntity dept : departments) {
+                boolean isRelated = relations.stream().anyMatch(rel -> 
+                    rel.getId().getSubjectId().equals(sub.getSubjectId()) && 
+                    rel.getId().getDepartmentId().equals(dept.getDepartmentId())
+                );
+                statusMap.put(String.valueOf(dept.getDepartmentId()), isRelated);
+            }
+            dto.setStatusMap(statusMap);
+            
+            matrix.add(dto);
+        }
+        return matrix;
+    }
+
+    // --- マトリクスデータの保存 ---
+    // activePairs: "subjectId-departmentId" の形式のリスト
+    @Transactional
+    public void saveSubjectMatrix(List<String> activePairs) {
+        if (activePairs == null) activePairs = new ArrayList<>();
+
+        // 1. 現在の全紐づけを取得
+        List<DepartmentSubject> currentRelations = departmentSubjectRepository.findAll();
+
+        // 2. 削除対象の特定と削除
+        // (DBにあって、画面から送られてきた activePairs に含まれないものを削除)
+        for (DepartmentSubject rel : currentRelations) {
+            String key = rel.getId().getSubjectId() + "-" + rel.getId().getDepartmentId();
+            if (!activePairs.contains(key)) {
+                departmentSubjectRepository.delete(rel);
+            }
+        }
+
+        // 3. 追加対象の特定と保存
+        // (activePairs にあって、DBにないものを追加)
+        List<String> currentKeys = currentRelations.stream()
+                .map(rel -> rel.getId().getSubjectId() + "-" + rel.getId().getDepartmentId())
+                .collect(Collectors.toList());
+
+        for (String pair : activePairs) {
+            if (!currentKeys.contains(pair)) {
+                String[] parts = pair.split("-");
+                Integer sId = Integer.parseInt(parts[0]);
+                Integer dId = Integer.parseInt(parts[1]);
+
+                // 新規登録
+                DepartmentSubject ds = new DepartmentSubject();
+                ds.setId(new DepartmentSubjectKey(dId, sId));
+                
+                // ★注意: Gradeの決定ロジックが必要です
+                // ここでは仮に '1' を設定していますが、本来はDepartment情報などから決定すべきです
+                ds.setGrade(1); 
+
+                ds.setDepartment(departmentRepository.findById(dId).orElse(null));
+                ds.setSubject(subjectRepository.findById(sId).orElse(null));
+
+                if (ds.getDepartment() != null && ds.getSubject() != null) {
+                    departmentSubjectRepository.save(ds);
+                }
             }
         }
     }
