@@ -199,10 +199,26 @@
 
         if (body.classList.contains("editing-mode")) {
           // --- 適用（保存）ボタン押下時 ---
+
+          // ★追加 1: まずエラー表示をクリア
+          document
+            .querySelectorAll(".input-error")
+            .forEach((el) => el.classList.remove("input-error"));
+
+          // ★追加 2: 必須入力チェック (ここを追加！)
+          if (!validateRequired()) {
+            alert(
+              "未入力の項目があります。\nすべての項目を選択・入力してください。"
+            );
+            return; // 処理を中断（保存させない）
+          }
+
+          // 重複チェック
           if (!validateDuplicates()) {
             errorText.style.display = "inline-block";
             return;
           }
+
           if (!confirm("変更を保存しますか？")) {
             return;
           }
@@ -213,6 +229,55 @@
           btn.textContent = "適用";
           errorText.style.display = "none";
         }
+      }
+
+      // ★追加 3: 必須入力チェックを行う関数
+      function validateRequired() {
+        const rows = document.querySelectorAll("#infoTable tbody tr");
+        let isValid = true;
+
+        rows.forEach((row) => {
+          // 各入力項目の取得
+          const major = row.querySelector('select[name="majorId"]');
+          const dept = row.querySelector('select[name="departmentId"]');
+          const grade = row.querySelector('select[name="grade"]');
+          const subjectName = row.querySelector('input[name="subjectName"]');
+          const teacher = row.querySelector('select[name="teacherId"]');
+          const count = row.querySelector('input[name="courseCount"]');
+
+          // もし要素が見つからない場合はスキップ（削除済み行など）
+          if (!major || !dept || !grade || !subjectName || !teacher || !count)
+            return;
+
+          // チェック処理 (値が空文字ならエラー)
+          // ※ trim() は空白スペースのみの入力を防ぐため
+          if (major.value === "") {
+            major.classList.add("input-error");
+            isValid = false;
+          }
+          if (dept.value === "") {
+            dept.classList.add("input-error");
+            isValid = false;
+          }
+          if (grade.value === "") {
+            grade.classList.add("input-error");
+            isValid = false;
+          }
+          if (subjectName.value.trim() === "") {
+            subjectName.classList.add("input-error");
+            isValid = false;
+          }
+          if (teacher.value === "") {
+            teacher.classList.add("input-error");
+            isValid = false;
+          }
+          if (count.value === "" || count.value <= 0) {
+            count.classList.add("input-error");
+            isValid = false;
+          }
+        });
+
+        return isValid;
       }
 
       function addRow() {

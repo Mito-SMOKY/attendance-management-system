@@ -214,7 +214,7 @@ public class AdminController {
     }
 
     // --- 13. 教室マスタ詳細画面 (一覧表示) ---
-    // ★修正: Serviceからデータを取得して画面に渡すように変更
+    // Serviceからデータを取得して画面に渡すように変更
     @GetMapping("/master/classroom")
     public String showClassroomMaster(Model model) {
         List<ClassroomEntity> list = adminClassroomService.getAllClassrooms();
@@ -243,19 +243,17 @@ public class AdminController {
     }
 
     // --- 12. 教科マスタ詳細画面 (GET) ---
-    // ★修正: リンクに合わせてURLを変更 (/mdSubjectInformation → /master/SubjectInformation)
+    // リンクに合わせてURLを変更 (/mdSubjectInformation → /master/SubjectInformation)
     @GetMapping("/master/SubjectInformation")
     public String showSubjectInformation(Model model) {
-        // テーブル表示用（ここはEntityのままでOKですが、念のため修正しても良い）
+        // テーブル表示用（ここはEntityのままでOKだが、念のため修正）
         model.addAttribute("subjectInfoList", adminSubjectService.getSubjectInfoList());
         
-        // ▼▼▼ ここを修正 ▼▼▼
-        // ドロップダウン用には、さっき作った「軽量版メソッド」を使う
+        // ドロップダウン用には「軽量版メソッド」を使う
         model.addAttribute("teacherList", adminSubjectService.getSimpleTeacherList());       // ← 変更
         model.addAttribute("majorList", adminSubjectService.getSimpleMajorList());           // ← 変更
         model.addAttribute("departmentList", adminSubjectService.getSimpleDepartmentList()); // ← 変更
-        // ▲▲▲ 修正ここまで ▲▲▲
-
+        //これDB参照してない可用性0ゾーン
         model.addAttribute("gradeList", java.util.Arrays.asList(1, 2, 3)); 
         
         return "admin/mdSubjectInformation";
@@ -269,11 +267,9 @@ public class AdminController {
             @RequestParam(name = "subjectName", required = false) List<String> subjectNames,
             @RequestParam(name = "teacherId", required = false) List<Integer> teacherIds,
             @RequestParam(name = "courseCount", required = false) List<Integer> courseCounts,
-            // ▼ 追加: HTMLのselectタグから送られてくる新しい値を受け取る
             @RequestParam(name = "majorId", required = false) List<Integer> majorIds,
             @RequestParam(name = "departmentId", required = false) List<Integer> departmentIds,
             @RequestParam(name = "grade", required = false) List<Integer> grades,
-            // ▲ 追加ここまで
             RedirectAttributes redirectAttributes) {
         
         try {
@@ -294,9 +290,7 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("errorMessage", "保存中にエラーが発生しました。");
         }
 
-        // ★修正: リダイレクト先も新しいURLに変更
+        //リダイレクト先も新しいURLに変更
         return "redirect:/admin/master/SubjectInformation";
     }
-
-    // ... (後略)
 }
