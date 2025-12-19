@@ -26,10 +26,8 @@ public class SubjectAttendanceController {
         this.attendanceService = attendanceService;
     }
 
-    /**
-     * 1. 画面表示用
-     * URL: /student/subject_attendance?subjectId=1
-     */
+    //1. 画面表示用
+    //URL: /student/subject_attendance?subjectId=1
     @GetMapping("/subject_attendance")
     public String showPage(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -55,10 +53,8 @@ public class SubjectAttendanceController {
         return "student/subjectAttendance"; 
     }
 
-    /**
-     * 2. JSからの非同期通信用API
-     * URL: /student/api/data?year=2025&month=11&subjectId=1
-     */
+    //2. JSからの非同期通信用API
+    //URL: /student/api/data?year=2025&month=11&subjectId=1
     @GetMapping("/api/data")
     @ResponseBody
     public SubjectAttendanceDto getApiData(

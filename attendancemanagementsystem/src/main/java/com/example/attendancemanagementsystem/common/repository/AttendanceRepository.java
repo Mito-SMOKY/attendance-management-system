@@ -57,5 +57,14 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
               @Param("startDate") LocalDate startDate, 
               @Param("endDate") LocalDate endDate, 
               @Param("subjectId") Integer subjectId);
+       
+       //指定した生徒・教科・ステータスの出席数をカウント(SubjectAttendanceServiceの全期間計算用)
+       @Query("SELECT COUNT(a) FROM AttendanceEntity a " +
+              "WHERE a.student.userId = :studentId " +
+              "AND a.timeTable.subjectId = :subjectId " +
+              "AND a.status.id = :statusId")
+       int countByStatusTotal(@Param("studentId") Integer studentId, 
+              @Param("subjectId") Integer subjectId, 
+              @Param("statusId") Integer statusId);
 
 }
