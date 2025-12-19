@@ -33,8 +33,8 @@ public class AttendanceDisplayController {
      */
     @GetMapping("/date")
     public String dateAttendance(@RequestParam("date") String dateStr,
-                                 @AuthenticationPrincipal UserDetails userDetails,
-                                 Model model) {
+                                @AuthenticationPrincipal UserDetails userDetails,
+                                Model model) {
         
         String loginId = userDetails.getUsername();
         LocalDate date = LocalDate.parse(dateStr);

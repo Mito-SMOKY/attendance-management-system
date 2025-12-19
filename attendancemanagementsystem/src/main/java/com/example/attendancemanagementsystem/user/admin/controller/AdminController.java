@@ -1,5 +1,6 @@
 package com.example.attendancemanagementsystem.user.admin.controller;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -31,6 +32,8 @@ import com.example.attendancemanagementsystem.user.admin.service.AdminService;
 import com.example.attendancemanagementsystem.user.admin.service.AdminSubjectService;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
@@ -53,7 +56,6 @@ public class AdminController {
         return 3;
     }
 
-    
     @GetMapping("/timetable")
     public String showTimetablePage() {
         return "admin/timetable";
@@ -74,12 +76,13 @@ public class AdminController {
         return "admin/upload";
     }
 
+    // ★修正箇所: アップロード後に csvName へ遷移
     @PostMapping("/upload-file")
     public String handleFileUpload(@RequestParam("file") MultipartFile file, Model model) {
         try {
             DatalistForm form = adminService.parseAccountFile(file);
             model.addAttribute("datalistForm", form);
-            return "admin/file_read_result";
+            return "admin/csvName"; 
         } catch (Exception e) {
             model.addAttribute("errorMessage", "ファイルの読み込みに失敗しました: " + e.getMessage());
             return "admin/upload";
@@ -142,10 +145,9 @@ public class AdminController {
         return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
     }
 
-    // --- 8. 手動入力データの保存 ---
+    // --- 手動入力データの保存 ---
     @PostMapping("/save-manual-accounts")
     public String saveManualAccounts(@ModelAttribute ManualAccountForm form, Model model) {
-        // 1. DBへはハッシュ化して保存
         adminService.saveDatalistFromForm(form, getCurrentUserId());
         
         // 2. 完了画面にフォームデータ（平文パスワード入り）を渡す
@@ -158,10 +160,10 @@ public class AdminController {
     @PostMapping("/download-manual-csv")
     public ResponseEntity<byte[]> downloadManualCsv(@ModelAttribute ManualAccountForm form) {
         
-        // 平文パスワード入りのCSVを生成
         byte[] csvData = adminService.createCsvFromForm(form);
         
-        String fileName = form.getDatalistName() + ".csv";
+        String fileName = form.getDataListName() + ".csv";
+        
         String encodedFileName;
         try {
             encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replace("+", "%20");
@@ -175,6 +177,13 @@ public class AdminController {
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 
         return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
+    } 
+
+    // --- csvName.htmlからの遷移用 ---
+    @PostMapping("/account-list")
+    public String postAccountList(@RequestParam("dataListName") String dataListName, Model model) {
+        model.addAttribute("listName", dataListName);
+        return "admin/accountList"; 
     }
     
     // --- 11. マスタデータ管理メニュー画面 ---

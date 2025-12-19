@@ -1,0 +1,168 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    font-size: 16px;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* =========================================
+   コンテナ設定
+   ========================================= */
+.list-container {
+    width: 95%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-top: 120px; 
+    padding-bottom: 100px;
+    text-align: center;
+}
+
+/* =========================================
+   ページタイトル
+   ========================================= */
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    
+    display: inline-block;        
+    border-bottom: 3px solid #539DA4;
+    padding-bottom: 5px;          
+    margin-bottom: 50px;
+}
+
+/* =========================================
+   1. データリスト情報テーブル (上部)
+   ========================================= */
+.info-table-wrapper {
+    width: 100%;
+    max-width: 800px; 
+    margin: 0 auto 40px auto;
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #999;
+    background-color: #fff;
+    table-layout: fixed;
+}
+
+.info-table th {
+    background-color: #539DA4;
+    color: white;
+    padding: 10px;
+    border: 1px solid #999;
+    font-weight: normal;
+    width: 30%;
+}
+
+.info-table td {
+    padding: 10px;
+    border: 1px solid #999;
+    background-color: #fff;
+    text-align: center;
+}
+
+/* =========================================
+   2. アカウント一覧テーブル (下部)
+   ========================================= */
+.account-table-wrapper {
+    width: 100%;
+    max-width: 800px; 
+    margin: 0 auto 50px auto;
+    overflow-x: auto;
+}
+
+.account-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #999;
+    background-color: #fff;
+    min-width: 600px; 
+}
+
+.account-table th {
+    background-color: #539DA4;
+    color: white;
+    padding: 12px 5px;
+    border: 1px solid #999;
+    font-weight: normal;
+    white-space: nowrap;
+}
+
+.account-table td {
+    padding: 10px 5px;
+    border: 1px solid #999;
+    background-color: #fff;
+    vertical-align: middle;
+    text-align: center;
+}
+
+/* 列幅の調整 */
+.col-name { width: 30%; }
+.col-student-id { width: 25%; }
+.col-affiliation { width: 20%; }
+.col-password { width: 25%; }
+
+/* =========================================
+   3. ボタンエリア
+   ========================================= */
+.button-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+}
+
+.action-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    
+    width: 300px;
+    height: 50px;
+    
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* ファイル出力ボタン */
+.export-btn {
+    background-color: #539DA4;
+    color: white;
+    border: 1px solid #539DA4;
+}
+
+.export-btn:hover {
+    opacity: 0.9;
+}
+
+/* アカウント作成TOPへボタン */
+.top-btn {
+    background-color: #fff;
+    color: #539DA4;
+    border: 2px solid #539DA4;
+}
+
+.top-btn:hover {
+    background-color: #f0fcfd;
+}

@@ -42,17 +42,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         String role = "ROLE_USER";
 
         // ★デバッグログ: 取得したユーザー情報を確認
-        System.out.println("--------------------------------------------------");
-        System.out.println("★[Debug] ログイン試行ユーザー: " + user.getName() + " (ID: " + user.getUserId() + ")");
-        System.out.println("★[Debug] UserTypeID: " + user.getUserTypeId());
+        // System.out.println("--------------------------------------------------");
+        // System.out.println("★[Debug] ログイン試行ユーザー: " + user.getName() + " (ID: " + user.getUserId() + ")");
+        // System.out.println("★[Debug] UserTypeID: " + user.getUserTypeId());
 
+        // ユーザータイプに基づいてロールを決定
         if (user.getUserTypeId() == 1) {
             role = "ROLE_STUDENT";
         } else if (user.getUserTypeId() == 2) {
             // 管理者の場合、administratorテーブルから詳細を取得
             AdministratorEntity adminDetails = administratorRepository.findById(user.getUserId()).orElse(null);
 
-            // ★デバッグログ: administratorテーブルの検索結果確認
+            // administratorテーブルの検索結果確認
             if (adminDetails == null) {
                 // System.out.println("★[Debug] adminDetails is NULL (administratorテーブルにデータが見つかりません)");
                 // データがない場合は安全のため通常の管理者に倒す
@@ -76,12 +77,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         //ロール（権限）の情報を持つリストの作成
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 
-        // CustomUserDetails を使い、userId を渡す
+        // CustomUserDetailsのインスタンスを返す
         return new CustomUserDetails(
-                user.getLoginId(), 
-                user.getPassword(),
-                authorities,
-                user.getUserId()
+                user,
+                authorities
         );
     }
 }

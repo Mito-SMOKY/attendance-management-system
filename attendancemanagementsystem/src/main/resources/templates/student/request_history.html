@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>申請履歴</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/student/request_history.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: student-header}"></div>
+    </div>
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url=@{/student/request_main})}"></div>
+    </div>
+
+    <main class="content-wrapper">
+        <h2 class="page-title">申請履歴</h2>
+
+        <div th:if="${successMessage}" class="alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert-error" th:text="${errorMessage}"></div>
+
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>申請日</th>
+                    <th>種別</th>
+                    <th>対象日</th>
+                    <th>時限</th>
+                    <th>状態</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${historyList}">
+                    <td th:text="${item.requestDate}">2025/12/10</td>
+                    <td th:text="${item.type}">公欠</td>
+                    <td th:text="${item.targetDate}">12/12 ～ 12/13</td>
+                    <td th:text="${item.periods}">1・2限</td>
+                    <td>
+                        <span th:text="${item.status}" 
+                            th:class="${'status-badge ' + (item.status == '承認済み' ? 'status-approved' : 
+                                        (item.status == '却下' ? 'status-rejected' : 
+                                        (item.status == '取消済み' ? 'status-withdrawn' : 'status-pending')))}">
+                            申請中
+                        </span>
+                    </td>
+                    <td>
+                        <form th:if="${item.status == '申請中'}" th:action="@{/student/request/cancel}" method="post">
+                            <input type="hidden" name="requestId" th:value="${item.requestId}">
+                            <button type="submit" class="btn-withdraw" onclick="return confirm('取り下げますか？');">取消</button>
+                        </form>
+                        <span th:unless="${item.status == '申請中'}">-</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>
