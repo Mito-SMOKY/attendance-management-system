@@ -10,7 +10,6 @@
       rel="stylesheet"
       th:href="@{/css/admin/adminMdSubjectInformation.css}"
     />
-
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -36,7 +35,7 @@
     >
       <div class="subject-info-container">
         <div class="page-header-wrapper">
-          <h1 class="page-title">教科マスタ</h1>
+          <h1 class="page-title">教科情報マスタ</h1>
         </div>
 
         <div
@@ -68,7 +67,10 @@
           <table class="subject-info-table" id="infoTable">
             <thead>
               <tr>
-                <th>受講教科</th>
+                <th style="width: 20%">コース</th>
+                <th style="width: 10%">クラス</th>
+                <th style="width: 8%">学年</th>
+                <th>受講教科 (結合名)</th>
                 <th>教師</th>
                 <th>コマ数</th>
               </tr>
@@ -80,6 +82,48 @@
                   name="subjectId"
                   th:value="${info.subjectId}"
                 />
+
+                <td>
+                  <span class="view-mode" th:text="${info.majorName}"></span>
+                  <select class="edit-mode" name="majorId">
+                    <option value="">選択</option>
+                    <option
+                      th:each="major : ${majorList}"
+                      th:value="${major.majorId}"
+                      th:text="${major.majorName}"
+                      th:selected="${major.majorName == info.majorName}"
+                    ></option>
+                  </select>
+                </td>
+
+                <td>
+                  <span class="view-mode" th:text="${info.className}"></span>
+                  <select class="edit-mode" name="departmentId">
+                    <option value="">選択</option>
+                    <option
+                      th:each="dept : ${departmentList}"
+                      th:value="${dept.departmentId}"
+                      th:text="${dept.className}"
+                      th:selected="${dept.className == info.className}"
+                    ></option>
+                  </select>
+                </td>
+
+                <td>
+                  <span
+                    class="view-mode"
+                    th:text="${info.grade != null ? info.grade + '年' : '-'}"
+                  ></span>
+                  <select class="edit-mode" name="grade">
+                    <option value="">選択</option>
+                    <option
+                      th:each="gr : ${gradeList}"
+                      th:value="${gr}"
+                      th:text="${gr + '年'}"
+                      th:selected="${gr == info.grade}"
+                    ></option>
+                  </select>
+                </td>
 
                 <td>
                   <span class="view-mode" th:text="${info.subjectName}"></span>
@@ -138,8 +182,11 @@
 
     <script th:inline="javascript">
       /*<![CDATA[*/
-      // Controllerから渡されたteacherListを使用
+      // Controllerから渡されたリストをJS変数に格納
       const teacherOptions = /*[[${teacherList}]]*/ [];
+      const majorOptions = /*[[${majorList}]]*/ [];
+      const departmentOptions = /*[[${departmentList}]]*/ [];
+      const gradeOptions = /*[[${gradeList}]]*/ [];
       /*]]>*/
     </script>
 
@@ -156,12 +203,9 @@
             errorText.style.display = "inline-block";
             return;
           }
-
           if (!confirm("変更を保存しますか？")) {
             return;
           }
-
-          // フォームを送信
           form.submit();
         } else {
           // --- 編集ボタン押下時 ---
@@ -175,36 +219,75 @@
         const tableBody = document.querySelector("#infoTable tbody");
         const newRow = document.createElement("tr");
 
-        let optionsHtml = '<option value="">教師を選択</option>';
+        // 教師プルダウン生成
+        let teacherOpts = '<option value="">教師を選択</option>';
         if (teacherOptions) {
           teacherOptions.forEach((teacher) => {
-            optionsHtml += `<option value="${teacher.teacherId}">${teacher.teacherName}</option>`;
+            teacherOpts += `<option value="${teacher.teacherId}">${teacher.teacherName}</option>`;
           });
         }
 
-        // 新規行：インラインスタイルを削除し、並び順を「教科→教師→コマ数」に変更
+        // コースプルダウン生成
+        let majorOpts = '<option value="">コース選択</option>';
+        if (majorOptions) {
+          majorOptions.forEach((m) => {
+            majorOpts += `<option value="${m.majorId}">${m.majorName}</option>`;
+          });
+        }
+
+        // クラスプルダウン生成
+        let deptOpts = '<option value="">クラス選択</option>';
+        if (departmentOptions) {
+          departmentOptions.forEach((d) => {
+            deptOpts += `<option value="${d.departmentId}">${d.className}</option>`;
+          });
+        }
+
+        // 学年プルダウン生成
+        let gradeOpts = '<option value="">学年選択</option>';
+        if (gradeOptions) {
+          gradeOptions.forEach((g) => {
+            gradeOpts += `<option value="${g}">${g}年</option>`;
+          });
+        }
+
+        // 行のHTMLを構築（すべて編集モードの入力フォームを表示）
         newRow.innerHTML = `
-                <td>
-                    <input type="text" class="edit-mode" name="subjectName" placeholder="教科名を入力">
-                    <button type="button" class="delete-btn" onclick="deleteRow(this)">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </td>
-                <td>
-                    <select class="edit-mode" name="teacherId">
-                        ${optionsHtml}
-                    </select>
-                </td>
-                <td>
-                    <input type="number" class="edit-mode" name="courseCount" placeholder="コマ数" min="1" max="10">
-                </td>
-            `;
+            <td>
+                <select class="edit-mode" name="majorId">${majorOpts}</select>
+            </td>
+            <td>
+                <select class="edit-mode" name="departmentId">${deptOpts}</select>
+            </td>
+            <td>
+                <select class="edit-mode" name="grade">${gradeOpts}</select>
+            </td>
+            <td>
+                <input type="text" class="edit-mode" name="subjectName" placeholder="教科名 (手動入力)">
+                <button type="button" class="delete-btn" onclick="deleteRow(this)">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </td>
+            <td>
+                <select class="edit-mode" name="teacherId">
+                    ${teacherOpts}
+                </select>
+            </td>
+            <td>
+                <input type="number" class="edit-mode" name="courseCount" value="1" min="1" max="10">
+            </td>
+        `;
 
         tableBody.appendChild(newRow);
+
+        // 追加した行が見えるように、もし編集モードでなければ編集モードに切り替える（オプション）
+        // ユーザー体験的には、追加ボタンを押した時点で編集モードになるのが自然です
+        if (!document.body.classList.contains("editing-mode")) {
+          toggleEditMode();
+        }
       }
 
       function deleteRow(btn) {
-        // 削除ボタンを押したら行ごと消す
         if (confirm("この行を削除しますか？")) {
           const row = btn.closest("tr");
           row.remove();
@@ -223,38 +306,26 @@
         rows.forEach((row, index) => {
           const nameInput = row.querySelector('input[name="subjectName"]');
           const teacherSelect = row.querySelector('select[name="teacherId"]');
+          const deptSelect = row.querySelector('select[name="departmentId"]');
 
           if (!nameInput || !teacherSelect) return;
 
           const nameVal = nameInput.value.trim();
           const teacherVal = teacherSelect.value;
+          // クラスも重複チェックのキーに含めるべき場合はここに追加してください
+          // 例: const key = nameVal + "::" + teacherVal + "::" + deptSelect.value;
 
-          // 両方入力されている場合のみチェック
           if (nameVal && teacherVal) {
             const key = nameVal + "::" + teacherVal;
-
             if (pairs.has(key)) {
               hasError = true;
               nameInput.classList.add("input-error");
               teacherSelect.classList.add("input-error");
-
-              // 重複元の行も赤くする
-              const prevRowIndex = pairs.get(key);
-              const prevRow = rows[prevRowIndex];
-              const prevName = prevRow.querySelector(
-                'input[name="subjectName"]'
-              );
-              const prevTeacher = prevRow.querySelector(
-                'select[name="teacherId"]'
-              );
-              if (prevName) prevName.classList.add("input-error");
-              if (prevTeacher) prevTeacher.classList.add("input-error");
             } else {
               pairs.set(key, index);
             }
           }
         });
-
         return !hasError;
       }
     </script>

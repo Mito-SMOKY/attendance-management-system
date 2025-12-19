@@ -246,9 +246,17 @@ public class AdminController {
     // ★修正: リンクに合わせてURLを変更 (/mdSubjectInformation → /master/SubjectInformation)
     @GetMapping("/master/SubjectInformation")
     public String showSubjectInformation(Model model) {
-        // 表示するファイル名は "admin/mdSubjectInformation" のまま変えない！
+        // テーブル表示用（ここはEntityのままでOKですが、念のため修正しても良い）
         model.addAttribute("subjectInfoList", adminSubjectService.getSubjectInfoList());
-        model.addAttribute("teacherList", adminSubjectService.getTeacherList());
+        
+        // ▼▼▼ ここを修正 ▼▼▼
+        // ドロップダウン用には、さっき作った「軽量版メソッド」を使う
+        model.addAttribute("teacherList", adminSubjectService.getSimpleTeacherList());       // ← 変更
+        model.addAttribute("majorList", adminSubjectService.getSimpleMajorList());           // ← 変更
+        model.addAttribute("departmentList", adminSubjectService.getSimpleDepartmentList()); // ← 変更
+        // ▲▲▲ 修正ここまで ▲▲▲
+
+        model.addAttribute("gradeList", java.util.Arrays.asList(1, 2, 3)); 
         
         return "admin/mdSubjectInformation";
     }
@@ -261,14 +269,29 @@ public class AdminController {
             @RequestParam(name = "subjectName", required = false) List<String> subjectNames,
             @RequestParam(name = "teacherId", required = false) List<Integer> teacherIds,
             @RequestParam(name = "courseCount", required = false) List<Integer> courseCounts,
+            // ▼ 追加: HTMLのselectタグから送られてくる新しい値を受け取る
+            @RequestParam(name = "majorId", required = false) List<Integer> majorIds,
+            @RequestParam(name = "departmentId", required = false) List<Integer> departmentIds,
+            @RequestParam(name = "grade", required = false) List<Integer> grades,
+            // ▲ 追加ここまで
             RedirectAttributes redirectAttributes) {
         
         try {
-            adminSubjectService.saveSubjectList(subjectIds, subjectNames, teacherIds, courseCounts);
+            // ▼ 修正: 引数を7つ渡すように変更
+            adminSubjectService.saveSubjectList(
+                subjectIds,
+                subjectNames,
+                teacherIds,
+                courseCounts,
+                majorIds,
+                departmentIds,
+                grades
+            );
+            
             redirectAttributes.addFlashAttribute("successMessage", "変更を保存しました。");
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "保存中にエラーが発生しました。");
         }
 
         // ★修正: リダイレクト先も新しいURLに変更
