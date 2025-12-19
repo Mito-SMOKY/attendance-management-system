@@ -164,12 +164,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const dateStr = formatDateYMD(startDate);
         const userId = window.currentUserId || 
-                           document.getElementById('adminUserSelect')?.value || 
-                           'admin001';
+                        document.getElementById('adminUserSelect')?.value || 
+                        'admin001';
         const apiEndpoint = `/api/timetabledata?date=${dateStr}&userId=${userId}`;
 
         console.log('fetching timetable for weekStart (mon):', dateStr);
-
+        
         fetch(apiEndpoint)
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
