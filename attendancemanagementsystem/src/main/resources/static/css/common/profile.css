@@ -95,8 +95,16 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.card-title {
+.card-title-big{
     font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-top: 0;
+    padding-bottom: 20px;
+}
+
+.card-title {
+    font-size: 1.2rem;
     font-weight: bold;
     color: #333;
     margin-top: 0;
@@ -117,7 +125,7 @@ body {
 .detail-link {
     color: #20a0b2; 
     text-decoration: none;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     line-height: 1.5;
     padding-bottom: 20px;
 }
@@ -267,7 +275,13 @@ input::placeholder{
 }
 
 .display-value{
+    font-size: 1.2em;
+    margin-top: 10px;
+}
+
+.display-name-value{
     font-size: 1.5em;
+    margin-top: 10px;
 }
 
 .label-and-button {

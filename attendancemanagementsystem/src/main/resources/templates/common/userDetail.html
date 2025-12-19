@@ -46,7 +46,7 @@
                         <button class="save-button hidden" id="save-button" data-target="name">確定</button> <button class="cancel-button hidden" id="cancel-button" data-target="name">キャンセル</button>
                     </div>
                 
-                    <p class="display-value" id="display-value" th:text="${userData.Name}"></p> 
+                    <p class="display-name-value" id="display-value" th:text="${userData.Name}"></p> 
                     
                     <!-- 編集ボタンを押したときに出る -->
                     <input class="edit-field hidden" type="text" id="username-input" name="username" required th:value="${userData.Name}">
@@ -62,6 +62,8 @@
             <div class="card user-details-card">
                 
                 <ul class="detail-list">
+
+                    <h1 class="card-title-big">ユーザー詳細</h1>
 
                     <div class="detail-content">
                         <span class="card-title">メールアドレス</span>
@@ -84,7 +86,7 @@
                 <h2 class="card-title">
 
                    <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
-                     <span>受講教科詳細</span>
+                     <span class="card-title-big">受講教科詳細</span>
                     </div>
                 <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
                     <span>担当教科詳細</span>
@@ -95,8 +97,12 @@
                 <ul class="subject-list" id="subjectList">
                     <li th:each="subject, iterStat : ${subjectData}" 
                         th:classappend="${iterStat.index >= 5} ? 'hidden-subject' : ''">
-                        <span th:text="'[' + ${subject.SubjectID} + '] ' + ${subject.SubjectName}">
-                        </span>
+                        
+                        <a th:href="@{/subject/subjectAttendance(id=${subject.SubjectID})}" class="subject-link">
+                            <span class="display-value" th:text="'[' + ${subject.SubjectID} + '] ' + ${subject.SubjectName}">
+                            </span>
+                        </a>
+                        
                     </li>
                 </ul>
 
