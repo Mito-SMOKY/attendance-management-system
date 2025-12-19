@@ -30,16 +30,23 @@ public class WriterPageController {
 
     // 確認画面
     @GetMapping("/confirm")
-    public String showConfirm(
-            @RequestParam(required = false) String cardId,
-            @RequestParam(required = false) String userId,
-            Model model) {
+    public String showConfirm(Model model) {
         
+        // サーバー内部の保持データを取得
+        String cardId = nfcDataHolder.getScannedCardId();
+        String userId = nfcDataHolder.getScannedUserId();
+        
+        // もしデータが空なら（直接URLを叩かれた場合など）、待機画面に戻す安全策
+        if (cardId == null || cardId.isEmpty()) {
+            return "redirect:/admin/nfc/idle";
+        }
+
+        // 画面に渡す
         model.addAttribute("cardId", cardId);
         model.addAttribute("userId", userId);
+        
         return "nfc/nfc_confirm";
     }
-
     // 結果画面
     @GetMapping("/result")
     public String showResult(

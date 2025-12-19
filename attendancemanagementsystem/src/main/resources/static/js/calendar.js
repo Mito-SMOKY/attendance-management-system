@@ -7,6 +7,7 @@ let currentViewMode = 'schedule'; // 'schedule' または 'attendance'
 function createCalendar(month, year) {
     const monthDays = ["日", "月", "火", "水", "木", "金", "土"];
     let tableHTML = '<table class="calendar"><thead><tr>';
+    // 曜日ヘッダーの生成
     for (let i = 0; i < 7; i++) {
         if (i === 0 || i === 6) {
             tableHTML += `<th class="sun">${monthDays[i]}</th>`;
@@ -25,9 +26,11 @@ function createCalendar(month, year) {
     const currentMonth = dateObj.getMonth();
     const currentYear = dateObj.getFullYear();
 
+    // 6週間分の行を生成
     for (let i = 0; i < 6; i++) {
         tableHTML += '<tr>';
 
+        // 7日分のセルを生成
         for (let j = 0; j < 7; j++) {
             if (i === 0 && j < firstDay) {
                 tableHTML += `<td class="mute">${prevDayCount}</td>`;
@@ -37,7 +40,7 @@ function createCalendar(month, year) {
                 tableHTML += `<td class="mute">${nextMonthDayCount}</td>`;
                 dayCount++;
             } else {
-                
+                // データ日付文字列を生成 (YYYY-MM-DD)
                 const dataDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayCount).padStart(2, '0')}`;
 
                 // currentViewMode によって描画内容を分岐
@@ -212,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentSelectedYear = parseInt(yearInput.value, 10);
             const currentSelectedMonth = parseInt(monthInput.value, 10);
             if (!isNaN(currentSelectedYear) && !isNaN(currentSelectedMonth)) {
-                 renderCalendar(currentSelectedMonth, currentSelectedYear);
+                renderCalendar(currentSelectedMonth, currentSelectedYear);
             }
         });
     }
@@ -295,9 +298,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 const parts = modalDateEl.textContent.match(/(\d+)年 (\d+)月/);
                 if (parts) {
-                   const year = parseInt(parts[1], 10);
-                   const month = parseInt(parts[2], 10) - 1;
-                   renderCalendar(month, year);
+                    const year = parseInt(parts[1], 10);
+                    const month = parseInt(parts[2], 10) - 1;
+                    renderCalendar(month, year);
                 }
             } else {
                 alert('削除に失敗しました。サーバーエラーが発生しました。');

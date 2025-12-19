@@ -12,7 +12,7 @@
 </head>
 <body>
 
-<div class="header-container">
+    <div class="header-container">
         <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
     </div>
     
@@ -36,7 +36,10 @@
         <div class="table-wrapper">
             <table class="timetable-table">
                 <colgroup>
-                    <col style="width: 40%;"> <col style="width: 40%;"> <col style="width: 20%;"> </colgroup>
+                    <col style="width: 40%;"> 
+                    <col style="width: 40%;"> 
+                    <col style="width: 20%;"> 
+                </colgroup>
                 <thead>
                     <tr>
                         <th>学科</th>
@@ -45,27 +48,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td></td> <td></td> <td></td> </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                    <tr th:each="item : ${timetableList}">
+                        <td th:text="${item.department}"></td> <td th:text="${item.course}"></td>      <td th:text="${item.grade} + '年'"></td> </tr>
+
+                    <tr th:if="${timetableList == null or timetableList.size() == 0}">
+                        <td colspan="3" style="padding: 30px; color: #777;">
+                            表示するデータがありません。
+                        </td>
                     </tr>
                 </tbody>
             </table>

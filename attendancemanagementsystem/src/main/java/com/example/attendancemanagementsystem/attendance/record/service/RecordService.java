@@ -24,30 +24,30 @@ public class RecordService {
     private final DecryptionService decryptionService;
     private final AttendanceRepository attendanceRepository;
     private final ClassroomRepository classroomRepository;
-    private final AttendanceStatusRepository attendanceStatusRepository; // ★追加
+    private final AttendanceStatusRepository attendanceStatusRepository;
 
-    // コンストラクタ (引数を追加)
+    // コンストラクタ
     public RecordService(CardsRepository cardsRepository, 
                         DecryptionService decryptionService,
                         AttendanceRepository attendanceRepository,
                         ClassroomRepository classroomRepository,
-                        AttendanceStatusRepository attendanceStatusRepository) { // ★追加
+                        AttendanceStatusRepository attendanceStatusRepository) {
         this.cardsRepository = cardsRepository;
         this.decryptionService = decryptionService;
         this.attendanceRepository = attendanceRepository;
         this.classroomRepository = classroomRepository;
-        this.attendanceStatusRepository = attendanceStatusRepository; // ★追加
+        this.attendanceStatusRepository = attendanceStatusRepository;
     }
 
     @Transactional
     public VerifiedRecordDto processAttendanceScan(RecordDTO recordDTO) {
 
-        // 1. 復号処理
+        // 復号処理
         String encryptedHex = recordDTO.getUserId();
         String originalUserIdString = decryptionService.decryptUserId(encryptedHex);
         Integer originalUserId = Integer.parseInt(originalUserIdString);
 
-        // 2. カードID検証
+        // カードID検証
         String cardId = recordDTO.getCardId();
         CardsEntity card = cardsRepository.findByCardId(cardId)
                 .orElseThrow(() -> new IllegalArgumentException("未登録のカードです: " + cardId));
@@ -59,7 +59,7 @@ public class RecordService {
             throw new IllegalStateException("カード所有者とデータが不一致です(偽造の疑い)。");
         }
 
-        // 3. 時刻変換
+        // 時刻変換
         LocalDateTime scanTime;
         try {
             if (recordDTO.getReadTime() != null) {
@@ -71,7 +71,7 @@ public class RecordService {
             scanTime = LocalDateTime.now();
         }
 
-        // 4. セキュリティチェック
+        // セキュリティチェック
         String readerMacAddress = recordDTO.getReaderId();
         if (readerMacAddress == null || readerMacAddress.isEmpty()) {
             throw new SecurityException("不正なアクセス: ReaderIDがありません。");
@@ -82,7 +82,7 @@ public class RecordService {
         }
         System.out.println("認証OK: " + classroomOpt.get().getClassroomName() + " (MAC: " + readerMacAddress + ")");
 
-        // ★★★ 5. DB保存処理 ★★★
+        // DB保存処理
         AttendanceEntity attendance = new AttendanceEntity();
         
         // ユーザーセット
@@ -92,13 +92,11 @@ public class RecordService {
 
         attendance.setCreatedAt(scanTime);
         
-        // ★修正: リポジトリからステータス(ID=1:出席)を取得してセット
+        //リポジトリからステータス(ID=1:出席)を取得してセット
         AttendanceStatusEntity status = attendanceStatusRepository.findById(1)
             .orElseThrow(() -> new IllegalStateException("ステータスID=1 がDBに見つかりません。"));
         
-        attendance.setStatusId(status); // メソッド名はEntityに合わせてください(setStatusId または setStatus)
-
-        // TimeTableID は Entity側で nullable=true に設定済みであればセット不要
+        attendance.setStatusId(status);
 
         attendanceRepository.save(attendance);
 

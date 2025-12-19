@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>マスタ情報の編集</title>
+
+    <link rel="stylesheet" th:href="@{/css/parts.css}" />
+    <link rel="stylesheet" th:href="@{/css/admin/adminMdList.css}" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="header-container">
+      <div
+        th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"
+      ></div>
+    </div>
+
+    <div class="backbutton-container">
+      <div
+        th:replace="~{fragments/_parts :: backButton(url='/admin/home')}"
+      ></div>
+    </div>
+
+    <div class="md-list-container">
+      <div class="page-title-wrapper">
+        <h1 class="page-title">マスタ情報の編集</h1>
+      </div>
+
+        <div class="menu-buttons-area">
+            <a th:href="@{/admin/mdClassroom}" class="menu-btn">
+                教室マスタ
+            </a>
+
+            <a th:href="@{/admin/mdSubjectInformation}" class="menu-btn">
+                教科マスタ
+            </a>
+        </div>
+
+        <a th:href="@{/admin/master/subject}" class="menu-btn"> 教科マスタ </a>
+      </div>
+    </div>
+  </body>
+</html>

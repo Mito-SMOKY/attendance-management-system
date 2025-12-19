@@ -33,9 +33,14 @@
                     <input type="text" id="input-user-id" class="text-input" placeholder="例: 2321001" th:value="${userId}"autocomplete="off">
                 </div>
 
+                <div class="input-group">
+                    <label class="input-label">氏名</label>
+                    <input type="text" id="input-user-name" class="text-input" readonly placeholder="番号を入力すると表示されます">
+                </div>
+                
                 <div class="action-area">
                     <button type="button" id="btn-auth" class="auth-btn">
-                        認証
+                        書き込み
                     </button>
                 </div>
             </div>

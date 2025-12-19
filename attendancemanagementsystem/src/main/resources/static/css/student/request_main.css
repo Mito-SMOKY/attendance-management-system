@@ -1,0 +1,62 @@
+/* request_main.css */
+
+body {
+    margin: 0;
+    padding-top: 80px;
+    background-color: #f9f9f9;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+}
+
+/* メインコンテンツのコンテナ */
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 150px); /* ヘッダー分を除いた中央配置 */
+}
+
+/* ボタンを並べるエリア */
+.action-buttons {
+    display: flex;
+    gap: 40px; /* ボタン同士の間隔 */
+    padding: 20px;
+}
+
+/* 2つのメインボタン（公欠申請・申請履歴） */
+.ghost-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 250px;
+    height: 180px;
+    background-color: white;
+    color: #5BBEB9; /* テーマカラー */
+    border: 3px solid #5BBEB9;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* ホバー時の挙動 */
+.ghost-button:hover {
+    background-color: #5BBEB9;
+    color: white;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+/* アイコンなどを追加したくなった時用の余白 */
+.ghost-button::before {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    margin-bottom: 15px;
+    font-size: 40px;
+}
+
+/* ボタンごとにアイコンを変える場合（任意） */
+.ghost-button[href*="form"]::before { content: "\f044"; }    /* 編集アイコン */
+.ghost-button[href*="history"]::before { content: "\f1da"; } /* 履歴アイコン */

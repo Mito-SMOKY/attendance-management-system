@@ -68,7 +68,7 @@ public class SubjectAttendanceController {
             @RequestParam("month") int month) {
         
         if (subjectId == null) {
-             return new SubjectAttendanceDto();
+            return new SubjectAttendanceDto();
         }
 
         return attendanceService.getAttendanceDetails(userDetails.getUsername(), subjectId, year, month);

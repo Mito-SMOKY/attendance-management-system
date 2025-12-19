@@ -6,9 +6,7 @@
     <title>公欠申請フォーム</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    
-    <link rel="stylesheet" th:href="@{/css/student/request.css}">
-    
+        <link rel="stylesheet" th:href="@{/css/student/request_form.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
@@ -18,146 +16,116 @@
         <div th:replace="~{fragments/_parts :: student-header}"></div>
     </div>
 
-    <div th:replace="~{fragments/_parts :: backButton(url=@{/request_main})}"></div>
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url=@{/student/request_main})}"></div>
+    </div>
     
-    <main class="content-wrapper">
+    <main class="content-wrapper request-form-layout">
     
         <div class="form-container">
-            <table class="request-form-table">
-                <tr>
-                    <th>公欠申請日</th>
-                    <td>
-                        <!-- controllerから日付リストをモデルで受け取る -->
-                        <div class="date-selection">
-                             <select class="date-select" id="startYear" name="startYear">
-                                <option th:each="year : ${years}" 
-                                        th:value="${year}" 
-                                        th:text="${year}">
-                                </option>
-                            </select> 年
-                                
-                            <select class="date-select" id="startMonth" name="startMonth">
-                                <option th:each="month : ${months}" 
-                                        th:value="${month}" 
-                                        th:text="${month}">
-                                </option>
-                            </select> 月
-                                
-                            <select class="date-select" id="startDay" name="startDay">
-                                <option th:each="day : ${days}" 
-                                        th:value="${day}" 
-                                        th:text="${day}">
-                                </option>
-                            </select> 日  ~ 
-
-                            <select class="date-select" id="endYear" name="endYear">
-                                <option th:each="year : ${years}" 
-                                        th:value="${year}" 
-                                        th:text="${year}">
-                                </option>
-                            </select> 年
-                                
-                            <select class="date-select" id="endMonth" name="endMonth">
-                                <option th:each="month : ${months}" 
-                                        th:value="${month}" 
-                                        th:text="${month}">
-                                </option>
-                            </select> 月
-                                
-                            <select class="date-select" id="endDay" name="endDay">
-                                <option th:each="day : ${days}" 
-                                        th:value="${day}" 
-                                        th:text="${day}">
-                                </option>
-                            </select> 日
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                
-                <tr>
-                    <th>公欠申請時間</th>
-                    <td>
-                        <div class="time-checkboxes">
-                            <label class="checkbox-item"><input type="checkbox"> 全て</label>
-                            <label class="checkbox-item"><input type="checkbox"> 1限目</label>
-                            <label class="checkbox-item"><input type="checkbox"> 2限目</label>
-                            <label class="checkbox-item"><input type="checkbox"> 3限目</label>
-                            <label class="checkbox-item"><input type="checkbox"> 4限目</label>
-                            <label class="checkbox-item"><input type="checkbox"> 5限目</label>
-                        </div>
-                    </td>
-                </tr>
-                
-                <tr>
-                    <th>公欠理由</th>
-                    <td>
-                        <textarea class="reason-textarea" placeholder="例）〇〇株式会社へ会社見学に行きます。"></textarea>
-                    </td>
-                </tr>
-            </table>
+            <form id="requestForm" method="post" th:action="@{/student/request/form}">
             
-            <div class="confirm-button-wrapper">
-                <button class="confirm-button">確定</button>
-            </div>
+                <table class="request-form-table">
+                    <tr>
+                        <th style="width: 30%;">申請先 (承認者)</th>
+                        <td>
+                            <div class="custom-select-wrapper">
+                                <select class="date-select" id="approverId" name="approverId" style="width: 100%; max-width: 300px;">
+                                    <option value="" disabled selected>承認者を選択してください</option>
+                                    <option th:each="admin : ${approvers}" 
+                                        th:value="${admin.userId}" 
+                                        th:text="${admin.name}"></option> </select>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>公欠申請日 (開始)</th>
+                        <td>
+                            <div class="date-selection">
+                                <select class="date-select" id="startYear" name="startYear">
+                                    <option th:each="year : ${years}" th:value="${year}" th:text="${year} + '年'"></option>
+                                </select>
+                                <select class="date-select" id="startMonth" name="startMonth">
+                                    <option th:each="m : ${#numbers.sequence(1, 12)}" th:value="${m}" th:text="${m} + '月'"></option>
+                                </select>
+                                <select class="date-select" id="startDay" name="startDay">
+                                    </select>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>公欠申請日 (終了)</th>
+                        <td>
+                            <div class="date-selection">
+                                <select class="date-select" id="endYear" name="endYear">
+                                    <option th:each="year : ${years}" th:value="${year}" th:text="${year} + '年'"></option>
+                                </select>
+                                <select class="date-select" id="endMonth" name="endMonth">
+                                    <option th:each="m : ${#numbers.sequence(1, 12)}" th:value="${m}" th:text="${m} + '月'"></option>
+                                </select>
+                                <select class="date-select" id="endDay" name="endDay">
+                                    </select>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th>時限</th>
+                        <td>
+                            <div style="margin-bottom: 5px;">
+                                <label class="checkbox-item" style="font-weight: bold;">
+                                    <input type="checkbox" id="selectAllPeriods"> 全選択
+                                </label>
+                            </div>
+                            
+                            <div class="time-checkboxes">
+                                <label class="checkbox-item"><input type="checkbox" name="periods" value="1"> 1限</label>
+                                <label class="checkbox-item"><input type="checkbox" name="periods" value="2"> 2限</label>
+                                <label class="checkbox-item"><input type="checkbox" name="periods" value="3"> 3限</label>
+                                <label class="checkbox-item"><input type="checkbox" name="periods" value="4"> 4限</label>
+                                <label class="checkbox-item"><input type="checkbox" name="periods" value="5"> 5限</label>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th>理由</th>
+                        <td>
+                            <textarea class="reason-textarea" name="reason" placeholder="理由を入力してください（例：会社説明会のため）"></textarea>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="submit-button-container" style="text-align: center; margin-top: 30px;">
+                    <button type="button" id="confirmBtn" class="ghost-button" style="padding: 10px 40px;">申請内容を確認する</button>
+                </div>
+            
+            </form>
         </div>
-        
     </main>
 
+    <div id="confirmationModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>申請内容の確認</h3>
+            <p style="margin-bottom: 15px;">以下の内容で申請しますか？</p>
+            <div class="modal-body">
+                <dl>
+                    <dt>【申請先】</dt> <dd id="modalApprover"></dd> 
+                    <dt>【期間】</dt> <dd id="modalPeriod"></dd>
+                    <dt>【時限】</dt> <dd id="modalTime"></dd>
+                    <dt>【理由】</dt> <dd id="modalReason" style="white-space: pre-wrap; word-wrap: break-word;"></dd>
+                </dl>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="modalCancelBtn" class="cancel-btn">修正する</button>
+                <button type="button" id="modalSubmitBtn" class="confirm-btn">確定する</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/request_form.js}"></script>
+
 </body>
-
-
-<!-- 申請日のイベント管理script -->
-
-<script src="/js/request_form.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', (event) => {
-    
-    const startYear = document.getElementById('startYear');
-    const startMonth = document.getElementById('startMonth');
-    const startDay = document.getElementById('startDay'); // 初期の日の値を保持
-    
-    // 初期表示時に一度、最大日数を設定する
-    updateDayOptions('startYear', 'startMonth', 'startDay');
-
-    // 年と月が変更されたときに、日のドロップダウンを更新するイベントを設定
-    if (startYear && startMonth) {
-        startYear.addEventListener('change', () => {
-            updateDayOptions('startYear', 'startMonth', 'startDay');
-        });
-
-        startMonth.addEventListener('change', () => {
-            updateDayOptions('startYear', 'startMonth', 'startDay');
-        });
-    }
-});
-
-    const startYear = document.getElementById('startYear');
-    const startMonth = document.getElementById('startMonth');
-    if (startYear && startMonth) {
-        updateDayOptions('startYear', 'startMonth', 'startDay'); // 初期化
-        startYear.addEventListener('change', () => { updateDayOptions('startYear', 'startMonth', 'startDay'); });
-        startMonth.addEventListener('change', () => { updateDayOptions('startYear', 'startMonth', 'startDay'); });
-    }
-    
-    // --- 終了日用のイベントリスナー 
-    const endYear = document.getElementById('endYear');
-    const endMonth = document.getElementById('endMonth');
-    
-    if (endYear && endMonth) {
-        // 初期表示時に一度、最大日数を設定する
-        updateDayOptions('endYear', 'endMonth', 'endDay'); 
-
-        // 年が変更されたときに、日のドロップダウンを更新
-        endYear.addEventListener('change', () => {
-            updateDayOptions('endYear', 'endMonth', 'endDay');
-        });
-
-        // 月が変更されたときに、日のドロップダウンを更新
-        endMonth.addEventListener('change', () => {
-            updateDayOptions('endYear', 'endMonth', 'endDay');
-        });
-    }
-</script>
-
 </html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アカウント管理</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminAccountManage.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+    </div>
+    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='#')}"></div>
+    </div>
+    
+    <div class="account-manage-container">
+        
+        <h1 class="page-title">アカウント管理</h1>
+
+        <div class="menu-buttons-area">
+            
+            <a href="#" class="menu-btn">ファイルアップロード</a>
+            
+            <a href="#" class="menu-btn">手動入力</a>
+            
+            <a href="#" class="menu-btn">作成履歴</a>
+            
+        </div>
+
+    </div>
+
+</body>
+</html>
