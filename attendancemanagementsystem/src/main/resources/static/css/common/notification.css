@@ -1,14 +1,18 @@
 /* --- ベースとリセット --- */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
     margin: 0;
-    padding: 20px;
 }
 
-#notificationPage {
-    max-width: 900px;
-    margin: 0 auto;
+.container{
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.notificationPage {
+    transform: scale(0.90);
+    /* max-width: 80%; */
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
@@ -17,16 +21,16 @@ body {
 
 /* --- 検索とフィルターのコントロール --- */
 .top-controls {
+    justify-content: center;
+    margin-top: 70px;
     display: flex;
     gap: 10px; /* 要素間のスペース */
-    margin-bottom: 20px;
     align-items: center;
 }
 
 #keywordSearch,
 #notificationTypeFilter {
     padding: 10px 15px;
-    border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
     flex-grow: 1; /* キーワード検索欄を広げる */
@@ -43,12 +47,59 @@ body {
 /* 検索・フィルタアイコン（添付画像を参考にした配置） */
 .search-icon,
 .filter-icon {
+    background-color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
     padding: 10px 15px;
     background-color: #fff;
     border: 1px solid #ccc;
+    
+}
+
+.search-form-3{
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 1rem;
+    
+}
+
+.search-form-3 input {
+    width: 250px;
+    height: 45px;
+    padding: 5px 15px;
+    border: none;
+    box-sizing: border-box;
+    font-size: 1em;
+    outline: none;
+}
+
+.search-form-3 input::placeholder{
+    color: #777777;
+}
+
+.search-form-3 button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 45px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.search-form-3 button::after {
+    width: 24px;
+    height: 24px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z' fill='%23777777'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    content: '';
 }
 
 /* --- 通知一覧テーブル --- */
@@ -58,15 +109,15 @@ body {
 
 .notification-table {
     width: 100%;
-    border-collapse: separate; /* セル間のボーダーを分ける */
+    border-collapse: separate; 
     border-spacing: 0;
-    table-layout: fixed; /* カラム幅を固定 */
+    table-layout: fixed; 
 }
 
 /* ヘッダーのスタイル */
 .notification-table th {
-    background-color: #e0e0e0;
-    color: #333;
+    background-color: #00acbd;
+    color: #ffffff;
     padding: 12px 15px;
     text-align: left;
     border-top: 1px solid #ccc;
@@ -78,7 +129,7 @@ body {
 .notification-table td {
     padding: 12px 15px;
     border-bottom: 1px solid #eee;
-    vertical-align: top; /* 縦方向の揃えを上端に */
+    vertical-align: top; 
 }
 
 /* 行のホバー効果 */
@@ -105,15 +156,257 @@ body {
 
 /* リンクスタイル */
 .notification-table a {
-    color: #007bff; /* 青色のリンク */
+    color: #007bff; 
     text-decoration: none;
 }
 .notification-table a:hover {
     text-decoration: underline;
 }
 
-/* テーブル内の日付の結合（画像の日付表示を再現するため） */
-.notification-table tbody tr:not(.date-start) td:first-child {
-    /* 連続した同じ日付のセルを非表示にして、上の日付セルが結合されているように見せる */
-    /* ただし、これはデータ構造を工夫するか、サーバーサイド/JSで処理するのが望ましい */
+
+/* モーダル */
+.modal-2__wrap input {
+    display: none;
+}
+
+.modal-2__open-label,
+.modal-2__close-label {
+    cursor: pointer;
+}
+
+.modal-2__open-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 15px;
+    height: auto;
+    margin:0 auto;
+    padding: .8em 2em;
+    border: none;
+    border-radius: 5px;
+    outline: 1px solid #00acbd;
+    font-size: 1em;
+}
+
+.label-icon{
+    width: 20px;
+    height: auto;
+}
+
+.modal-2__open-label:hover {
+    background-color: #fff;
+    color: #2589d0;
+    outline: 1px solid #2589d0;
+  
+}
+
+.modal-2 {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: none;
+}
+
+.modal-2__open-input:checked + label + input + .modal-2 {
+    display: block;
+    animation: modal-2-animation .6s;
+}
+
+.modal-2__content-wrap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 650px;
+    background-color: #fefefe;
+    z-index: 2;
+    border-radius: 5px;
+}
+
+.modal-2__close-label {
+    background-color: #777;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 20px;
+    width: 36px;
+    height: 36px;
+    line-height: 1.6;
+    text-align: center;
+    display: table-cell;
+    position: fixed;
+    top: -15px;
+    right: -2%;
+    z-index: 99999;
+    font-size: 1.3em;
+}
+
+.modal-2__content {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 39px 45px 40px;
+}
+
+.modal-2__background {
+    display: flex;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .45);
+    z-index: 1;
+}
+
+@keyframes modal-2-animation {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@media only screen and (max-width: 520px) {
+    .modal-2__open-label {
+        max-width: 90%;
+        padding: .94em 2.1em .94em 2.6em;
+    }
+
+    .modal-2__close-label {
+        top: -17px;
+        right: -4%;
+    }
+
+    .modal-2__content-wrap {
+        width: 90vw;
+    }
+
+    .modal-2__content {
+        padding: 33px 21px 35px;
+        max-width: 100%;
+    }
+}
+
+/* モーダル内のチェックボックス */
+.checkbox-1 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5em 2em;
+    border: none;
+}
+
+.checkbox-1 label {
+    display: flex;
+    align-items: center;
+    gap: 0 .5em;
+    position: relative;
+    cursor: pointer;
+}
+
+.checkbox-1 label::before,
+.checkbox-1 label:has(:checked)::after {
+    content: '';
+}
+
+.checkbox-1 label::before {
+    width: 17px;
+    height: 17px;
+    border-radius: 3px;
+    background-color: #e6edf3;
+}
+
+.checkbox-1 label:has(:checked)::before {
+    background-color: #2589d0;
+}
+
+.checkbox-1 label:has(:checked)::after {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    transform: rotate(45deg);
+    width: 4px;
+    height: 8px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+}
+
+.checkbox-1 input {
+    display: none;
+}
+
+/* リスト内の星アイコン */
+.star-btn {
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #ccc;
+    transition: color 0.2s, transform 0.1s;
+    margin-left: 10px;
+}
+
+/* ブックマークONの時 */
+.star-btn.active {
+    color: #f39c12; 
+}
+
+/* ホバー時の動き */
+.star-btn:hover {
+    transform: scale(1.2);
+    color: #f1c40f;
+}
+
+/* ページネーション全体のレイアウト */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    /* margin-bottom: 10px; */
+    gap: 8px; /* ボタン同士の間隔 */
+}
+
+/* ページ番号ボタンの共通デザイン */
+.page-btn {
+    min-width: 40px;
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid #dee2e6;
+    background-color: #ffffff;
+    color: #00acbd;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+/* マウスホバー時 */
+.page-btn:hover:not(:disabled) {
+    background-color: #e9ecef;
+    border-color: #ddd;
+}
+
+/* 現在表示中のページボタン */
+.page-btn.active {
+    background-color: #00acbd;
+    color: #ffffff;
+    border-color: #00acbd;
+}
+
+/* 「前へ」「次へ」ボタンが無効（disabled）の時 */
+.page-btn:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+    background-color: #f8f9fa;
+}
+
+/* 省略記号 (...) */
+.pagination-ellipsis {
+    padding: 0 5px;
+    color: #6c757d;
 }

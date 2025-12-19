@@ -24,33 +24,82 @@
 
     </div>
 
-
-    <div id="notificationPage">
+    <div class="container">
         <div class="top-controls">
-            <input type="text" id="keywordSearch" placeholder="タイトルをキーワード検索" onchange="fetchNotifications()">
-            <select id="notificationTypeFilter" onchange="fetchNotifications()">
-                <option value="GENERAL">全体向け</option>
-                <option value="APPLICATION_RECEIVED">受信した申請</option>
-                <option value="APPLICATION_SENT">送信した申請</option>
-            </select>
-            <button class="search-icon">検索</button>
-            <button class="filter-icon">絞り込み</button>
+                <!-- <input type="text" id="keywordSearch" placeholder="タイトルをキーワード検索" onchange="fetchNotifications()"> -->
+                <form action="#" class="search-form-3">
+                    <label>
+                        <input type="text" id="keywordSearch" placeholder="キーワードを入力"onchange="fetchNotifications()">
+                    </label>
+                    <button type="submit" aria-label="検索"></button>
+                </form>
+
+                    <div class="modal-2__wrap">
+                        <input type="radio" id="modal-2__open" class="modal-2__open-input" name="modal-2__trigger"/>
+
+                        <!-- 絞り込みフィルター -->
+                        <label for="modal-2__open" class="modal-2__open-label">
+                            <img th:src="@{/image/filter.png}" alt="" class="label-icon">
+                        </label>
+
+                        <input type="radio" id="modal-2__close" name="modal-2__trigger"/>
+
+                        <div class="modal-2">
+                            <div class="modal-2__content-wrap">
+                                <label for="modal-2__close" class="modal-2__close-label">×</label>
+
+                                <div class="modal-2__content">
+                                    <div style="color: #00acbd; font-weight: bold; font-size: 1.5rem; margin-top: 10px;">絞り込み</div><br/>
+                                    <fieldset class="checkbox-1">
+                                        <label>
+                                            <input type="checkbox" id="bookmarkFilter" onchange="fetchNotifications()"/>
+                                            ブックマークのみ表示
+                                        </label>
+                                    </fieldset>
+                                    <fieldset class="checkbox-1">
+                                        <label><input type="checkbox" name="statusFilter" value="unread" class="status-checkbox" onchange="fetchNotifications()"/>未読</label>
+                                        <label><input type="checkbox" name="statusFilter" value="read" class="status-checkbox" onchange="fetchNotifications()"/>既読</label>
+                                    </fieldset>
+
+                                    <div style="color: #00acbd; font-weight: bold; font-size: 1.5rem; margin-top: 10px;">通知タイプ</div><br/>
+                                    <fieldset class="checkbox-1">
+                                        <!-- 通知タイプによる絞り込み（随時変更） -->
+                                        <label><input type="checkbox" name="typeFilter" value="SYSTEM" class="type-checkbox" onchange="fetchNotifications()"/>システム通知</label>
+                                        <label><input type="checkbox" name="typeFilter" value="REQUEST" class="type-checkbox" onchange="fetchNotifications()"/>申請</label>
+                                        <label><input type="checkbox" name="typeFilter" value="GENERAL" class="type-checkbox" onchange="fetchNotifications()"/>全体向け</label>
+                                        </fieldset><br/>
+                                </div>
+                            </div>
+                            <label for="modal-2__close">
+                                <div class="modal-2__background"></div>
+                            </label>
+                        </div>
+                    </div>
+
         </div>
+
+        <div class="notificationPage" id="notificationPage">
         
-        <div class="tab-container" style="display: none;"></div> 
-        
-        <div class="notification-table-container">
-            <table class="notification-table">
-                <thead>
-                    <tr>
-                        <th class="col-date">日付</th>
-                        <th class="col-time">時間</th>
-                        <th class="col-detail">通知タイトル（詳細）</th>
-                    </tr>
-                </thead>
-                <tbody id="notificationList">
-                    </tbody>
-            </table>
+
+            <div class="tab-container" style="display: none;"></div> 
+            
+            <!-- 通知欄 -->
+            <div class="notification-table-container">
+                <table class="notification-table">
+                    <thead>
+                        <tr>
+                            <th class="col-date">日付</th>
+                            <th class="col-time">時間</th>
+                            <th class="col-detail">通知タイトル（詳細）</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notificationList">
+                        </tbody>
+                </table>
+            </div>
+            
+            <div id="paginationContainer" class="pagination-container"></div>
+
         </div>
     </div>
 

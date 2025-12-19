@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,10 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.example.attendancemanagementsystem.Dummymodel.NotificationDto;
-import com.example.attendancemanagementsystem.Dummymodel.NotificationService;
 
 
 
@@ -33,6 +28,7 @@ public class TestControllerStudent {
             "Role", "student",
             "Timezone", "Asia/Tokyo",
             "Email", "miyu.kawashima@example.com"
+            
         );
         
         List<Map<String, String>> subjectData = Arrays.asList(
@@ -79,27 +75,7 @@ public class TestControllerStudent {
         return Map.of("status", "success", "message", "データはDBに保存されませんでしたが、成功としてシミュレーションしました。");
     }
 
-    @RestController
-    @RequestMapping("/api")
-    public class NotificationController {
-
-        // ServiceクラスをDI (依存性の注入) する
-        private final NotificationService notificationService;
-
-        // コンストラクタインジェクション
-        @Autowired
-        public NotificationController(NotificationService notificationService) {
-            this.notificationService = notificationService;
-        }
-
-        @GetMapping("/notificationList")
-        public List<NotificationDto> getNotifications(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String type
-        ) {
-            return notificationService.findNotifications(keyword, type);
-        }
-    }
+    
 
     @GetMapping("/notificationList")
     public String getMethodName(@RequestParam(required = false) String param, Model model) {
@@ -116,5 +92,8 @@ public class TestControllerStudent {
         return "/common/notificationList";
     }
 
+    
+
 
 }
+
