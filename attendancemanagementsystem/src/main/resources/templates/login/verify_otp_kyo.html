@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>パスワード再設定 - 認証コード入力</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/login/loginVerifyOtp.css}">
+</head>
+<body>
+
+    <div class="header-bar"></div>
+
+    <div class="container">
+        
+        <div class="backbutton-container">
+            <div th:replace="~{fragments/_parts :: backButton(url='/password/forgot')}"></div>
+        </div>
+
+        <div class="title-area">
+            <h2 class="system-title">ワンタイムパスワードを入力してください</h2>
+        </div>
+
+        <form id="otpForm" th:action="@{/password/verify-otp}" method="post">
+            
+            <div class="input-area-inline">
+                <input type="text" name="otp" id="otpInput" class="otp-input" 
+                    maxlength="6" placeholder="______" autocomplete="off">
+                
+                <button type="submit" class="submit-btn" id="submitBtn">送信</button>
+            </div>
+
+            <div class="error-container">
+                <div id="jsErrorMsg" class="error-msg"></div>
+
+                <div th:if="${param.error}" class="server-error">
+                    <p class="error-msg" th:if="${param.error[0] == 'invalid'}">
+                        パスワードが間違っています
+                    </p>
+                    <div th:if="${param.error[0] == 'expired'}">
+                        <p class="error-msg">有効期限が切れています。</p>
+                        <a th:href="@{/password/forgot}" class="expire-link">認証コードを再発行する</a>
+                    </div>
+                    <p class="error-msg" th:if="${param.error[0] != 'invalid' and param.error[0] != 'expired'}">
+                        エラーが発生しました。
+                    </p>
+                </div>
+            </div>
+        </form>
+
+        <div class="resend-area">
+            <p class="resend-label">メールが届かない場合</p>
+            <form th:action="@{/password/send-otp}" method="post">
+                <input type="hidden" name="email" th:value="${session.resetEmail}">
+                <button type="submit" class="resend-btn">再送信</button>
+            </form>
+        </div>
+    </div>
+
+    <script th:src="@{/js/login_verifyotp.js}"></script>
+</body>
+</html>
