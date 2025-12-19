@@ -35,12 +35,20 @@ public class NotificationEmailService {
             student.getName(), subjectName, rate);
     }
 
-    // 共通送信処理
-    private void send(UsersEntity user, NotificationType type, String subjectArg, Object... bodyArgs) {
-        if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            return;
-        }
+    // メールアドレス変更確認コード送信
+    public void sendEmailChangeOtp(UsersEntity user, String targetEmail, String otp, int expiryMinutes) {
+        sendToAddress(targetEmail, NotificationType.EMAIL_CHANGE_OTP, null, 
+            user.getName(), otp, expiryMinutes);
+    }
 
+    // メールアドレス変更完了通知送信
+    public void sendEmailChangeCompletion(UsersEntity user) {
+        send(user, NotificationType.EMAIL_CHANGE_COMPLETED, null, 
+            user.getName());
+    }
+
+     // 指定アドレスへ送信処理
+    private void sendToAddress(String toAddress, NotificationType type, String subjectArg, Object... bodyArgs) {
         try {
             String subject = type.getSubjectTemplate();
             if (subject.contains("%s") && subjectArg != null) {
@@ -48,11 +56,17 @@ public class NotificationEmailService {
             }
 
             String body = String.format(type.getBodyTemplate(), bodyArgs);
-            emailService.sendEmail(user.getEmail(), subject, body);
+            emailService.sendEmail(toAddress, subject, body);
             
         } catch (Exception e) {
             System.err.println("メール送信エラー: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    // ユーザーの登録メールアドレスへ送信処理
+    private void send(UsersEntity user, NotificationType type, String subjectArg, Object... bodyArgs) {
+        if (user.getEmail() == null || user.getEmail().isEmpty()) return;
+        sendToAddress(user.getEmail(), type, subjectArg, bodyArgs);
     }
 }

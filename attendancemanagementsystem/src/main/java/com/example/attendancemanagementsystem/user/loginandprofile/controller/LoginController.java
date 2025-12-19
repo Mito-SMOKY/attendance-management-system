@@ -1,5 +1,7 @@
 package com.example.attendancemanagementsystem.user.loginandprofile.controller;
 
+import java.security.Principal;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -7,7 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class LoginController {
 
     @GetMapping("/login")
-    public String showLoginForm() {
+    public String login(Principal principal) {
+        
+        if (principal != null) {
+            return "redirect:/admin/timetable"; 
+        }
+
         return "login/login";
     }
 

@@ -32,6 +32,7 @@ public class SecurityConfig {
                 // テスト用
                 .requestMatchers("/test/**").permitAll()
                 .requestMatchers("/login", "/first-login").permitAll()
+                .requestMatchers("/email/**").permitAll()
                 .requestMatchers("/password/**").permitAll()
                 // .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
@@ -59,9 +60,15 @@ public class SecurityConfig {
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
+                .logoutUrl("/logout")        
+                .logoutSuccessUrl("/login?logout") 
+                .invalidateHttpSession(true)      
+                .deleteCookies("JSESSIONID")  
                 .permitAll()
+            )
+            .rememberMe(remember -> remember
+                .key("secretKey")
+                .tokenValiditySeconds(86400 * 14)
             );
 
         return http.build();
