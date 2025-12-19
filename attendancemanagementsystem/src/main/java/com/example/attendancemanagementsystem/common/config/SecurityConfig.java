@@ -60,9 +60,15 @@ public class SecurityConfig {
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
+                .logoutUrl("/logout")        
+                .logoutSuccessUrl("/login?logout") 
+                .invalidateHttpSession(true)      
+                .deleteCookies("JSESSIONID")  
                 .permitAll()
+            )
+            .rememberMe(remember -> remember
+                .key("secretKey")
+                .tokenValiditySeconds(86400 * 14)
             );
 
         return http.build();
