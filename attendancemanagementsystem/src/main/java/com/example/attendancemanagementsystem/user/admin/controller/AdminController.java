@@ -183,35 +183,35 @@ public class AdminController {
         return "admin/mdList"; 
     }
 
-    // --- 12. 教科マスタ詳細画面 ---
-    @GetMapping("/master/subject")
-    public String showSubjectMaster(Model model) {
-        // クラス(学科)リストを取得 (IDを使うためEntityのリストを渡す)
-        model.addAttribute("departmentList", adminSubjectService.getAllDepartments());
+    //  --- 12. 教科マスタ詳細画面 ---
+    // @GetMapping("/master/subject")
+    // public String showSubjectMaster(Model model) {
+    //     // クラス(学科)リストを取得 (IDを使うためEntityのリストを渡す)
+    //     model.addAttribute("departmentList", adminSubjectService.getAllDepartments());
         
-        // マトリクスデータ(行データ)を取得
-        model.addAttribute("subjectDetailList", adminSubjectService.getSubjectMatrixData());
+    //     // マトリクスデータ(行データ)を取得
+    //     model.addAttribute("subjectDetailList", adminSubjectService.getSubjectMatrixData());
         
-        return "admin/mdSubject";
-    }
+    //     return "admin/mdSubject";
+    // }
 
     // --- 教科マスタ保存 (POST) ---
-    @PostMapping("/master/subject/save")
-    public String saveSubjectMaster(
-            // チェックされたセルの値 ("subjectId-departmentId") をリストで受け取る
-            @RequestParam(name = "activePairs", required = false) List<String> activePairs,
-            RedirectAttributes redirectAttributes) {
+    // @PostMapping("/master/subject/save")
+    // public String saveSubjectMaster(
+    //         // チェックされたセルの値 ("subjectId-departmentId") をリストで受け取る
+    //         @RequestParam(name = "activePairs", required = false) List<String> activePairs,
+    //         RedirectAttributes redirectAttributes) {
         
-        try {
-            adminSubjectService.saveSubjectMatrix(activePairs);
-            redirectAttributes.addFlashAttribute("successMessage", "教科とクラスの紐づけを保存しました。");
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
-        }
+    //     try {
+    //         adminSubjectService.saveSubjectMatrix(activePairs);
+    //         redirectAttributes.addFlashAttribute("successMessage", "教科とクラスの紐づけを保存しました。");
+    //     } catch (Exception e) {
+    //         e.printStackTrace();
+    //         redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+    //     }
 
-        return "redirect:/admin/master/subject";
-    }
+    //     return "redirect:/admin/master/subject";
+    // }
 
     // --- 13. 教室マスタ詳細画面 (一覧表示) ---
     // Serviceからデータを取得して画面に渡すように変更
@@ -242,7 +242,7 @@ public class AdminController {
         return "redirect:/admin/master/classroom";
     }
 
-    // --- 12. 教科マスタ詳細画面 (GET) ---
+    // --- 12. 教科情報マスタ詳細画面 (GET) ---
     // リンクに合わせてURLを変更 (/mdSubjectInformation → /master/SubjectInformation)
     @GetMapping("/master/SubjectInformation")
     public String showSubjectInformation(Model model) {
