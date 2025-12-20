@@ -24,10 +24,10 @@ public class LoginController {
                 return "redirect:/admin/timetable";
             }
             // どちらでもなければトップへ
-            return "redirect:/login";
+            return "redirect:/login/login";
         }
 
-        return "login";
+        return "login/login";
     }
 
     @GetMapping("/first-login")
