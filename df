@@ -1,0 +1,527 @@
+[33mcommit e375f488f36b34adf6debd998e6185880bff7443[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop[m[33m, [m[1;31morigin/develop[m[33m)[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Sat Dec 20 22:21:51 2025 +0900
+
+    fix:小さいぽかをしました
+
+[33mcommit 7883399c75eae31f53e434cf352f89ce4fe9da6d[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Fri Dec 19 13:45:04 2025 +0900
+
+    /feat軽微な修正
+
+[33mcommit ad3b534d49884dec1bb61662d3d9cbe849f68bad[m
+Merge: be03ee2 73915bf
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Fri Dec 19 09:35:36 2025 +0900
+
+    Merge pull request #104 from Mito-SMOKY/feat/otp
+    
+    ログイン・ログアウトの完成
+
+[33mcommit 73915bf642969ade03c6b4070efb08c2d34fafa9[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Fri Dec 19 09:31:15 2025 +0900
+
+    ログイン・ログアウトの完成
+
+[33mcommit c9373715875235ed2cbd92bfff9b134333cfe951[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Thu Dec 18 16:20:38 2025 +0900
+
+    パスワード変更とメールアドレス変更完成
+
+[33mcommit b03d4ee7a0c781f0b4dbcf8fe47bd87843de53d0[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Thu Dec 18 11:15:36 2025 +0900
+
+    ワンタイムパスワード機能完成
+
+[33mcommit be03ee250e87564a7416b6cd07fcc56be04d6ca5[m
+Merge: cb849ed 024e031
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Wed Dec 17 14:50:35 2025 +0900
+
+    Merge pull request #103 from Mito-SMOKY/developOperationTest
+    
+    feat(request):Completed
+
+[33mcommit 024e031d446e2ee37d84f80aeaafb1c0583e85bf[m[33m ([m[1;31morigin/developOperationTest[m[33m)[m
+Merge: e1fa318 bd34f3b
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Wed Dec 17 14:43:14 2025 +0900
+
+    Merge branch 'developOperationTest' of https://github.com/Mito-SMOKY/attendance-management-system into developOperationTest
+
+[33mcommit e1fa318de6dae0409dd77dc9613f573d4326c8a8[m
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Wed Dec 17 14:39:57 2025 +0900
+
+    feat(request):Completed
+
+[33mcommit bd34f3b690fccdb0fe8cb28f28b5f25ddfb4268c[m
+Merge: 3c02089 cb849ed
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Wed Dec 17 13:47:56 2025 +0900
+
+    Merge branch 'feat/notification' into developOperationTest
+
+[33mcommit 3c02089c0800f1ad81675cfc46f214b9f4392a67[m
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Wed Dec 17 13:45:19 2025 +0900
+
+    feat(request):1217
+
+[33mcommit cb849ed5b2799e8720caf8ab9d243f29a0ad047e[m
+Merge: 6b0954e 44f1a9e
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Wed Dec 17 11:31:57 2025 +0900
+
+    Merge pull request #101 from Mito-SMOKY/feat/sender
+    
+    ワンパス完成
+
+[33mcommit 44f1a9e437b68b5b5eb07a76834062ff8feb0219[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Wed Dec 17 11:29:49 2025 +0900
+
+    ワンパス完成
+
+[33mcommit 300ed619082bdb3d12035c31c323d5f089593758[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Wed Dec 17 09:43:47 2025 +0900
+
+    feat:軽微な修正
+
+[33mcommit 0ee8de19e2ebd751782de82d732e639be75cb319[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Tue Dec 16 16:20:53 2025 +0900
+
+    feat/ワンパス系の遷移完了
+
+[33mcommit 6b0954e420ec31ec18de78f6048aaf3fee897605[m
+Merge: f26045e 4668509
+Author: MIyuSlayerHoshino <kyosuke_hoshino@ygcollege.jp>
+Date:   Tue Dec 16 15:45:34 2025 +0900
+
+    Merge pull request #98 from Mito-SMOKY/feat/admin-front-main3
+    
+    admin front main3完成
+
+[33mcommit 4668509d691379996bc2ec52a5c0d2b76e5c5c26[m[33m ([m[1;31morigin/feat/admin-front-main3[m[33m)[m
+Merge: 3eae3ac f26045e
+Author: Kyosuke1016 <kyosuke_hoshino@ygcollege.jp>
+Date:   Tue Dec 16 15:44:50 2025 +0900
+
+    Merge branch 'develop' into feat/admin-front-main3
+
+[33mcommit 3eae3acd0e8b22f47da01fe916ff17b5092e4bf2[m
+Author: Kyosuke1016 <kyosuke_hoshino@ygcollege.jp>
+Date:   Tue Dec 16 15:41:08 2025 +0900
+
+    完成
+
+[33mcommit 1afbc6e5ebed11df30120fcaf40f1877d42e9aff[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Tue Dec 16 12:04:21 2025 +0900
+
+    test
+
+[33mcommit 9337219b7a054175c8efea2eaa49442628333c4e[m
+Merge: f26045e f0e42a5
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Tue Dec 16 12:01:23 2025 +0900
+
+    Merge pull request #97 from Mito-SMOKY/feat/mail
+    
+    feat:ール機能完成と通知機能ほぼ完成
+
+[33mcommit f0e42a5043b56ea92acab0fca9e5fb6b41977da6[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Tue Dec 16 11:59:12 2025 +0900
+
+    feat:ール機能完成と通知機能ほぼ完成
+
+[33mcommit 8312efe4c176f1a796b2277bb5dce1c2956749eb[m
+Author: Kyosuke1016 <kyosuke_hoshino@ygcollege.jp>
+Date:   Thu Dec 11 15:21:38 2025 +0900
+
+    管理者メイン3アカウント管理画面1個完了
+
+[33mcommit f26045e0b14a413d72e248299be7209ca232d667[m
+Merge: 524f1b7 02472a4
+Author: 花山薫 <153043983+zu132@users.noreply.github.com>
+Date:   Thu Dec 11 11:13:53 2025 +0900
+
+    Merge pull request #91 from Mito-SMOKY/fix/deleteSubject.java#90
+    
+    管理者ヘッダーも変更
+
+[33mcommit 02472a48543bb0d55a218e91ba340996b0eb57b4[m
+Author: zu132 <show0531@au.com>
+Date:   Thu Dec 11 11:11:40 2025 +0900
+
+    管理者ヘッダーも変更
+
+[33mcommit 524f1b7e9dab5dd46b4e1f0f00c6ea6869420192[m
+Merge: 56d3b5f ead722d
+Author: Kyosuke1016 <kyosuke_hoshino@ygcollege.jp>
+Date:   Thu Dec 11 10:39:09 2025 +0900
+
+    Merge branch 'develop' of https://github.com/Mito-SMOKY/attendance-management-system into develop
+
+[33mcommit 56d3b5fe9b87c4f1966cd3b8e3d17c92ed48f0c1[m
+Author: Kyosuke1016 <kyosuke_hoshino@ygcollege.jp>
+Date:   Thu Dec 11 10:34:06 2025 +0900
+
+    aaa
+
+[33mcommit ead722d7ee2cbcdb0046385bbf5d528ab5f19bf0[m
+Author: zu132 <show0531@au.com>
+Date:   Thu Dec 11 10:20:32 2025 +0900
+
+    subjectEntityの修正
+
+[33mcommit 78d413e1621f32a40b03721b9d10eb75eea70fd8[m
+Merge: 20354bf 880f3e7
+Author: 花山薫 <153043983+zu132@users.noreply.github.com>
+Date:   Wed Dec 10 15:33:44 2025 +0900
+
+    Merge pull request #89 from Mito-SMOKY/fix/admin-front-marge
+    
+    admin1,2 画面追加
+
+[33mcommit 880f3e7c45bc189332a45471f4797e0e3383acc9[m[33m ([m[1;31morigin/fix/admin-front-marge[m[33m)[m
+Author: zu132 <show0531@au.com>
+Date:   Wed Dec 10 15:31:34 2025 +0900
+
+    delete not used import
+
+[33mcommit 20354bf75f1a07caba8df8670c295528bf2472c8[m
+Merge: a65d147 09121b9
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Wed Dec 10 14:50:37 2025 +0900
+
+    Merge pull request #88 from Mito-SMOKY/feat/headerComplement
+    
+    feat(profile&header):student header transition completed
+
+[33mcommit 09121b915c65e7b593b009f7acf428e37aa45a11[m
+Merge: 962aa8a a65d147
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Wed Dec 10 14:48:13 2025 +0900
+
+    Merge branch 'develop' into feat/headerComplement
+
+[33mcommit 962aa8a2efd7a5e2aeb3e4eacd9ea534cf3c675b[m
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Wed Dec 10 14:43:57 2025 +0900
+
+    feat(profile&header):student header transition completed
+
+[33mcommit a65d14796d8576bbe785d0afcac70b0388b50e57[m
+Merge: f69bdca f140b9c
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Wed Dec 10 14:38:31 2025 +0900
+
+    Merge pull request #87 from Mito-SMOKY/feat/mailServer
+    
+    feat/mailServer構築
+
+[33mcommit f69bdca58479bd361a135a74be11529f73e106f5[m
+Merge: 9bbe319 8226d2b
+Author: 花山薫 <153043983+zu132@users.noreply.github.com>
+Date:   Wed Dec 10 14:31:41 2025 +0900
+
+    Merge pull request #86 from Mito-SMOKY/fix/adminLogin#85
+    
+    add admin role to superadmin
+    
+    completed!
+
+[33mcommit 8226d2b076cc76ca043b362388da0e3b8664d6da[m
+Author: zu132 <show0531@au.com>
+Date:   Wed Dec 10 14:23:31 2025 +0900
+
+    add admin role to superadmin
+
+[33mcommit c9df89dc83a3cfd585096796ec41f6a0136554ca[m
+Author: zu132 <show0531@au.com>
+Date:   Wed Dec 10 14:00:53 2025 +0900
+
+    port changes 8443
+
+[33mcommit f140b9cd43377cc2217fa5d2492e1bd98159aa6a[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Wed Dec 10 09:41:21 2025 +0900
+
+    feat/mailServer構築
+
+[33mcommit 853aba6ec3c0d76d0ffa47fa2369fef1135dded5[m
+Merge: 9bbe319 60d8e9d
+Author: Kyosuke1016 <kyosuke_hoshino@ygcollege.jp>
+Date:   Tue Dec 9 15:16:19 2025 +0900
+
+    Merge branch 'feat/admin-main2-front#50' of https://github.com/Mito-SMOKY/attendance-management-system into fix/admin-front-marge
+
+[33mcommit 9bbe319c925bbc2eee0104a758ee7633b122d61b[m
+Merge: cbd1343 a0156a5
+Author: Kyosuke1016 <kyosuke_hoshino@ygcollege.jp>
+Date:   Tue Dec 9 14:46:42 2025 +0900
+
+    Merge branch 'develop' of https://github.com/Mito-SMOKY/attendance-management-system into develop
+
+[33mcommit cbd13436a11e4589bb340f620d026c3069cd7524[m
+Merge: 3524e8e 2df99ff
+Author: Kyosuke1016 <kyosuke_hoshino@ygcollege.jp>
+Date:   Tue Dec 9 14:44:58 2025 +0900
+
+    Merge branch 'feat/admin-main3-front' of https://github.com/Mito-SMOKY/attendance-management-system into develop
+
+[33mcommit 2df99ff6ccf43322bdbb931ac49db1368d5c1571[m
+Author: Kyosuke1016 <kyosuke_hoshino@ygcollege.jp>
+Date:   Tue Dec 9 14:42:39 2025 +0900
+
+    pending(admin-front):作業保留
+
+[33mcommit 60d8e9d040049ad6fae1bc0b3590533f02e0781b[m[33m ([m[1;32mfeat/admin-main2-front#50[m[33m)[m
+Author: Kyosuke1016 <kyosuke_hoshino@ygcollege.jp>
+Date:   Tue Dec 9 13:50:59 2025 +0900
+
+    feat(admin2):subjectmaster_department
+
+[33mcommit a0156a5745e239a42dcf8f0da070b98b13fb988b[m
+Merge: 5da5de5 5435a9a
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Tue Dec 9 11:53:24 2025 +0900
+
+    Merge pull request #81 from Mito-SMOKY/feat/studentTimetable
+    
+    feat(SubjectAttendance):Completed
+
+[33mcommit 5435a9a6875a876261492009b863d9dc65ba0d52[m
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Tue Dec 9 11:51:48 2025 +0900
+
+    feat(SubjectAttendance):Completed
+
+[33mcommit 5da5de5ce6c2aa13e9b286dfa9199e3844e20bf0[m
+Merge: 2450e3f 84c8412
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Tue Dec 9 10:39:41 2025 +0900
+
+    Merge pull request #80 from Mito-SMOKY/feat/nfc_writer
+    
+    PCから出席できるようになってたからそれをなくしてのとhttps通信を実装した
+
+[33mcommit 84c84123fb94ec88bafb4f9a8ef586c758d04f2f[m
+Merge: 29d0a83 2450e3f
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Tue Dec 9 10:32:59 2025 +0900
+
+    Merge branch 'develop' into feat/nfc_writer
+
+[33mcommit 29d0a8381b3e323fb0ed6830f885a09cb39a5aba[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Tue Dec 9 10:28:44 2025 +0900
+
+    feat:writer https通信ができた
+
+[33mcommit 2450e3f47da42700d227d3829b726a86ad72a8a8[m
+Author: zu132 <show0531@au.com>
+Date:   Mon Dec 8 16:06:35 2025 +0900
+
+    adminControllerの調整
+
+[33mcommit b23c1b5732b3136ab12c3a2eada6e010a4f811c9[m
+Merge: 7546a19 5fe81e0
+Author: zu132 <show0531@au.com>
+Date:   Mon Dec 8 15:51:39 2025 +0900
+
+    Merge branch 'feat/subjectMaster/#61' into develop
+
+[33mcommit f155e7a5a5222edc527239618db20dfad77bd405[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Mon Dec 8 15:51:29 2025 +0900
+
+    feat/NFC完成、セキュリティ向上
+
+[33mcommit 5fe81e05a8ff03023682cc69917f1aa5f127a811[m
+Author: zu132 <show0531@au.com>
+Date:   Mon Dec 8 15:40:13 2025 +0900
+
+    仮垢フロントとマスタ系バックが途中、管理者フロント遷移修正
+
+[33mcommit 7546a195834c292cef02569a4f3e011f4c0c7d34[m
+Merge: 83b9749 5ec429a
+Author: 花山薫 <153043983+zu132@users.noreply.github.com>
+Date:   Mon Dec 8 15:23:19 2025 +0900
+
+    Merge pull request #75 from Mito-SMOKY/feat/sadminLogin#71
+    
+    デバッグコメをコメントアウト
+
+[33mcommit 5ec429aed94cf25ff050b4e999c13e537e3bde9d[m
+Author: zu132 <show0531@au.com>
+Date:   Mon Dec 8 15:20:52 2025 +0900
+
+    デバッグコメをコメントアウト
+
+[33mcommit 96a201159d3b5457ade811055fd0b23ef396833e[m
+Author: zu132 <show0531@au.com>
+Date:   Mon Dec 8 14:40:45 2025 +0900
+
+    コメント追記
+
+[33mcommit 1ae88be3839a6d26a11b0de33d27ccdfe70b7feb[m
+Author: zu132 <show0531@au.com>
+Date:   Mon Dec 8 14:37:19 2025 +0900
+
+    上位管理者のセッションを保持(画面なし)、おまけでハッシュ値つき
+
+[33mcommit 83b974912f3e9a5fa7f16b1c135fe3b0e07e733c[m
+Merge: a5ce8d0 941dd4b
+Author: Harachamu <kiyoaoto1@gmail.com>
+Date:   Mon Dec 8 12:13:17 2025 +0900
+
+    Merge branch 'develop' of https://github.com/Mito-SMOKY/attendance-management-system into develop
+
+[33mcommit a5ce8d0fc84c665f4af8a8139cd28cc203dc6bef[m
+Author: Harachamu <kiyoaoto1@gmail.com>
+Date:   Mon Dec 8 12:13:11 2025 +0900
+
+    refactor:loginとcommonのフォルダー分け
+
+[33mcommit 941dd4b7784debaafa1eb515f9afaf12263035ab[m
+Merge: 188c025 c9c30b0
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Mon Dec 8 12:07:53 2025 +0900
+
+    Merge pull request #72 from Mito-SMOKY/feat/studentTimetable
+    
+    feat(entity&repository):comment correction
+
+[33mcommit c9c30b031d6ca676ee93c93d004f53b858b5cc97[m
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Mon Dec 8 11:51:33 2025 +0900
+
+    feat(entity&repository):comment correction
+
+[33mcommit 188c025cc9024f2be48ad95641a99597a5132ddc[m
+Author: Harachamu <kiyoaoto1@gmail.com>
+Date:   Mon Dec 8 11:40:56 2025 +0900
+
+    refactor:common→loginにフォルダ名変更
+
+[33mcommit 4787d0e201fefef5765708f16aae73645cfd3a4a[m
+Author: Harachamu <kiyoaoto1@gmail.com>
+Date:   Mon Dec 8 10:55:55 2025 +0900
+
+    refactor:フォルダー構造の修正
+
+[33mcommit 429ef0ce276fbf7b28331f525eda75514c780419[m[33m ([m[1;31morigin/feat/debug1208[m[33m)[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Fri Dec 5 16:31:29 2025 +0900
+
+    fix:ファイル名の修正
+
+[33mcommit 4bcd99dd716b4dbfb70f476cba1fddee80ae0ba4[m
+Author: zu132 <show0531@au.com>
+Date:   Fri Dec 5 15:43:37 2025 +0900
+
+    教科マスタの内部たぶんできた
+
+[33mcommit ef191539e337f1c1427a7985940cac1321fed0ce[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Fri Dec 5 15:36:45 2025 +0900
+
+    コンフリなおした
+
+[33mcommit 0a623a5fdb432f60fc68fcdc97259eacd2255993[m
+Merge: b50fc46 384b350
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Fri Dec 5 15:34:06 2025 +0900
+
+    Merge branch 'feat/nfc' into develop
+
+[33mcommit 384b3504a79cbe86f239fd957c5d44da8a8b2194[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Fri Dec 5 14:18:06 2025 +0900
+
+    nfcの機能完成
+
+[33mcommit 24761974ff00ffd7a03329a77d14a830c9814c61[m
+Author: zu132 <show0531@au.com>
+Date:   Fri Dec 5 12:02:23 2025 +0900
+
+    dropdown
+
+[33mcommit b50fc46a4883ecb431031735484606d59b508a49[m
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Fri Dec 5 11:56:25 2025 +0900
+
+    feat(SubjectAttendance):debug2
+
+[33mcommit ce88ad0d6066343edb07b89d2466b1a400b1cf1f[m
+Author: Maple428sugar <yuji.t18@icloud.com>
+Date:   Fri Dec 5 11:46:36 2025 +0900
+
+    feat(SubjectAttendance):debug1
+
+[33mcommit 3f649894d313347414033bd9182f955f9ef29186[m
+Author: Harachamu <kiyoaoto1@gmail.com>
+Date:   Thu Dec 4 16:05:54 2025 +0900
+
+    refactor(header):パーツの更新とstudentヘッダーの調整
+
+[33mcommit 667b407205db46f3e41f8e02cfeaf38005922cd7[m
+Author: miyu-ai <miyu.20041014@icloud.com>
+Date:   Thu Dec 4 16:04:33 2025 +0900
+
+    feat:nfcほぼ完成(出欠情報DB保存なし)
+
+[33mcommit 5ccee092939c2d8f65644e3098057b8b356722e8[m
+Author: zu132 <show0531@au.com>
+Date:   Wed Dec 3 14:30:38 2025 +0900
+
+    v2
+
+[33mcommit 785d72341d7745df057aa17aa37080b0916ce5b4[m
+Author: zu132 <show0531@au.com>
+Date:   Wed Dec 3 14:14:07 2025 +0900
+
+    md change link
+
+[33mcommit ca027311215c850f6db1035dff59918e66128c0e[m
+Merge: f5cec15 d9c7e39
+Author: 花山薫 <153043983+zu132@users.noreply.github.com>
+Date:   Wed Dec 3 13:48:57 2025 +0900
+
+    Merge pull request #66 from Mito-SMOKY/develop
+    
+    最新を俺のブランチに持ってくる
+
+[33mcommit 74638b6603abba0a2ead660322e2beb725de2f87[m
+Author: Kyosuke1016 <kyosuke_hoshino@ygcollege.jp>
+Date:   Wed Dec 3 10:16:07 2025 +0900
+
+    1203
+
+[33mcommit f5cec155de0e6c9d517148dc1166cb73363137c3[m
+Merge: 5cf29ed 355eaf0
+Author: zu132 <show0531@au.com>
+Date:   Tue Dec 2 14:26:48 2025 +0900
+
+    Merge branch 'feat/admin-main2-front#50' into feat/subjectMaster/#61
+
+[33mcommit d9c7e394053f7f0a58e9faa7cfb9116fb88e4c88[m
+Author: Harachamu <kiyoaoto1@gmail.com>
+Date:   Tue Dec 2 14:17:49 2025 +0900
+
+    refactor:(subjectList):ファイル名の変更
+
+[33mcommit 4511808d731b93ae4725521e294e71a8eeb99790[m
+Author: Harachamu <kiyoaoto1@gmail.com>
+Date:   Tue Dec 2 14:04:44 2025 +0900
+
+    refactor:不要ファイル削除
