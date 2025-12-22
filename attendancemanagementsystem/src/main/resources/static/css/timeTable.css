@@ -1,5 +1,5 @@
 .timetable-container {
-    margin-top: 100px;
+    margin-top: 60px;
     width: 95%;
     max-width: 1400px;
     margin: 20px auto;
@@ -41,10 +41,16 @@
 }
 
 .month-year-selector select {
-    padding: 6px;
+    /* padding: 6px;
     margin-right: 5px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 4px; */
+    width: 100px;
+    height: 50px;
+    padding: 5px 10px;
+    border: #00bdca 2px solid;
+    border-radius: 25px;
+    font-size: 1rem;
 }
 
 /* 週ナビゲーション */
@@ -100,7 +106,7 @@
 .timetable thead th {
     background-color: #00acbd;
     color: white;
-    font-weight: normal;
+    font-weight: bold;
     font-size: 0.9em;
 }
 

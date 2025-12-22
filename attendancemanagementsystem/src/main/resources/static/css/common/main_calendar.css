@@ -1,13 +1,10 @@
 /* カレンダーのCSS */
 
 .calendar-header {
-    width: 95%; /* 80% -> 95% に広げる */
-    align-items: center;
+    width: 95%; 
     margin: 0 auto 20px auto;
-    /* margin-top: 200px; */
     display: flex;
-    justify-content: space-between; 
-    font-size: 1.2rem; /* 文字サイズUP */
+    font-size: 1.2rem;
     color: #001f22;
     flex-wrap: wrap; 
     gap: 15px;
@@ -15,33 +12,34 @@
 }
 
 .student-calendar-header{
-    margin-top: 10px;
+    margin-top: 100px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
     padding: 10px;
-    /* background-color: #f0f8ff; */
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     font-size: 1.5em;
 }
 
-.calendar-icon{
+.timetable-icon{
     width: 40px;
     height: 40px;
     align-items : center;
     font-size: 1em;
     cursor: pointer;
+    vertical-align: middle;
+    margin-left: 40px;
 }
 
 .input{
-  width: 120px; /* 少し大きく */
-  height: 50px;
-  padding: 5px 15px;
-  border: #00bdca 2px solid;
-  border-radius: 25px;
-  font-size: 1.2rem; /* 文字サイズUP */
+    width: 90px;
+    height: 50px;
+    padding: 5px 10px;
+    border: #00bdca 2px solid;
+    border-radius: 25px;
+    font-size: 1rem;
 }
 
 .jumpButton{
@@ -71,9 +69,7 @@
 }
 
 .calendar-ym {
-    text-align: center; /* 中央揃えに変更 */
-    margin: 60px 0 20px 0;
-    padding-top: 20px; /* 余白調整 */
+    text-align: center;
     font-size: 2.5rem;
     font-weight: 700;
     color:#008b95;
@@ -91,7 +87,7 @@
 
 .calendar th,
 .calendar td {
-    border: 1px solid #000;
+    border: 1px solid #ccc;
     text-align: center;
     vertical-align: top; /* 数字を左上に */
     padding: 5px;
@@ -183,21 +179,21 @@
 
 .calendar-controls {
     display: flex;
-    align-items: center; /* 垂直中央揃え */
-    gap: 20px; 
+    gap: 10px; 
     box-sizing: border-box;
     flex-wrap: wrap;
+    margin-right:20px;
 }
 
 .calendar-toggle {
     flex-shrink: 0; 
-    font-size: 1.2rem; /* トグル横の文字も大きく */
+    font-size: 1.2rem; 
 }
 
 .calendar-table-container {
     margin: auto;
     align-items: center;
-    width: 100%; /* コンテナ幅いっぱい */
+    width: 100%; 
     display: flex;
     justify-content: center;
 }
