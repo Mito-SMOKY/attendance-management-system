@@ -23,10 +23,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.attendancemanagementsystem.common.entity.ClassroomEntity; // ★追加
 import com.example.attendancemanagementsystem.common.entity.Datalist;
 import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
 import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm;
+import com.example.attendancemanagementsystem.user.admin.service.AdminClassroomService; // ★追加
 import com.example.attendancemanagementsystem.user.admin.service.AdminService;
+import com.example.attendancemanagementsystem.user.admin.service.AdminSubjectService;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,6 +40,12 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private AdminSubjectService adminSubjectService;
+
+    @Autowired
+    private AdminClassroomService adminClassroomService; // ★追加
 
     private Integer getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -140,11 +149,14 @@ public class AdminController {
     @PostMapping("/save-manual-accounts")
     public String saveManualAccounts(@ModelAttribute ManualAccountForm form, Model model) {
         adminService.saveDatalistFromForm(form, getCurrentUserId());
-        model.addAttribute("listName", form.getDataListName());
-        return "admin/accountList"; 
+        
+        // 2. 完了画面にフォームデータ（平文パスワード入り）を渡す
+        model.addAttribute("manualForm", form);
+        
+        return "admin/manual_result";
     }
 
-    // --- 手動登録完了後のCSVダウンロード ---
+    // --- 11. 手動登録完了後のCSVダウンロード ---
     @PostMapping("/download-manual-csv")
     public ResponseEntity<byte[]> downloadManualCsv(@ModelAttribute ManualAccountForm form) {
         
@@ -173,97 +185,121 @@ public class AdminController {
         model.addAttribute("listName", dataListName);
         return "admin/accountList"; 
     }
-
-    // ★★★ 今回追加したメソッド（PDF/ZIP出力用） ★★★
-    @PostMapping("/download-pdf")
-    public void downloadPdf(
-            @RequestParam(name = "useZip", required = false, defaultValue = "false") boolean useZip,
-            @RequestParam(name = "zipFileName", required = false) String zipFileName,
-            HttpServletResponse response) throws IOException {
-
-        // --- PDF/ZIP作成ロジック（現時点ではダミーデータを返却） ---
-        
-        String fileName = "accounts_data";
-        if (useZip) {
-            if (zipFileName != null && !zipFileName.isEmpty()) {
-                fileName = zipFileName;
-            }
-            if (!fileName.endsWith(".zip")) {
-                fileName += ".zip";
-            }
-            response.setContentType("application/zip");
-        } else {
-            fileName += ".pdf";
-            response.setContentType("application/pdf");
-        }
-
-        // ファイルダウンロードヘッダーの設定
-        response.setHeader("Content-Disposition", "attachment; filename=" + 
-                URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replace("+", "%20"));
-
-        // ダミーデータ書き込み
-        String dummyContent = "Test Data: PDF/ZIP generation logic needs to be implemented in AdminService.";
-        response.getOutputStream().write(dummyContent.getBytes(StandardCharsets.UTF_8));
-        response.flushBuffer();
-    }
-
-    // --- 既存のページ遷移用メソッド ---
-
+    
+    // --- 11. マスタデータ管理メニュー画面 ---
     @GetMapping("/master-data")
     public String showMasterDataMenu() {
         return "admin/mdList"; 
     }
 
-    @GetMapping("/master/subject")
-    public String showSubjectMaster() {
-        return "admin/mdSubject";
-    }
+    //  --- 12. 教科マスタ詳細画面 ---
+    // @GetMapping("/master/subject")
+    // public String showSubjectMaster(Model model) {
+    //     // クラス(学科)リストを取得 (IDを使うためEntityのリストを渡す)
+    //     model.addAttribute("departmentList", adminSubjectService.getAllDepartments());
+        
+    //     // マトリクスデータ(行データ)を取得
+    //     model.addAttribute("subjectDetailList", adminSubjectService.getSubjectMatrixData());
+        
+    //     return "admin/mdSubject";
+    // }
 
+    // --- 教科マスタ保存 (POST) ---
+    // @PostMapping("/master/subject/save")
+    // public String saveSubjectMaster(
+    //         // チェックされたセルの値 ("subjectId-departmentId") をリストで受け取る
+    //         @RequestParam(name = "activePairs", required = false) List<String> activePairs,
+    //         RedirectAttributes redirectAttributes) {
+        
+    //     try {
+    //         adminSubjectService.saveSubjectMatrix(activePairs);
+    //         redirectAttributes.addFlashAttribute("successMessage", "教科とクラスの紐づけを保存しました。");
+    //     } catch (Exception e) {
+    //         e.printStackTrace();
+    //         redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+    //     }
+
+    //     return "redirect:/admin/master/subject";
+    // }
+
+    // --- 13. 教室マスタ詳細画面 (一覧表示) ---
+    // Serviceからデータを取得して画面に渡すように変更
     @GetMapping("/master/classroom")
-    public String showClassroomMaster() {
+    public String showClassroomMaster(Model model) {
+        List<ClassroomEntity> list = adminClassroomService.getAllClassrooms();
+        model.addAttribute("classroomList", list);
         return "admin/mdClassroom";
     }
 
-    @GetMapping("/accountManage")
-    public String showaccountManage() {
-        return "admin/accountManage";
-    }  
-    @GetMapping("/timeTableEdit")
-    public String showtimeTableEdit() {
-        return "admin/timeTableEdit";
-    }  
-    @GetMapping("/sessionMenu")
-    public String showsessionMenu() {
-        return "admin/sessionMenu";
-    }  
-    @GetMapping("/mdSubject")
-    public String showmdSubject() {
-        return "admin/mdSubject";
-    }  
-    @GetMapping("/accountHistory")
-    public String showaccountHistory() {
-        return "admin/accountHistory";
-    }  
-    @GetMapping("/csvUpload")
-    public String showcsvUpload() {
-        return "admin/csvUpload";
-    }  
-    @GetMapping("/csvName")
-    public String showcsvName() {
-        return "admin/csvName";
-    }  
-    @GetMapping("/accountInput")
-    public String showaccountInput() {
-        return "admin/accountInput";
-    }  
-    
-    @GetMapping("/accountList")
-    public String showaccountList() {
-        return "admin/accountList";
+    // --- 13.5 教室マスタ保存 (POST) ---
+    // ★追加: 編集・削除・追加を一括保存する処理
+    @PostMapping("/master/classroom/save")
+    public String saveClassroomMaster(
+            @RequestParam(name = "classroomId", required = false) List<Integer> classroomIds,
+            @RequestParam(name = "classroomName", required = false) List<String> classroomNames,
+            @RequestParam(name = "macAddress", required = false) List<String> macAddresses,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            adminClassroomService.saveClassroomList(classroomIds, classroomNames, macAddresses);
+            redirectAttributes.addFlashAttribute("successMessage", "教室情報を保存しました。");
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+        }
+
+        return "redirect:/admin/master/classroom";
     }
 
-    @GetMapping("/accountOutput")
-    public String showaccountOutput() {
-        return "admin/accountOutput";
-    }  
+    // --- 12. 教科情報マスタ詳細画面 (GET) ---
+    // リンクに合わせてURLを変更 (/mdSubjectInformation → /master/SubjectInformation)
+    @GetMapping("/master/SubjectInformation")
+    public String showSubjectInformation(Model model) {
+        // テーブル表示用（ここはEntityのままでOKだが、念のため修正）
+        model.addAttribute("subjectInfoList", adminSubjectService.getSubjectInfoList());
+        
+        // ドロップダウン用には「軽量版メソッド」を使う
+        model.addAttribute("teacherList", adminSubjectService.getSimpleTeacherList());       // ← 変更
+        model.addAttribute("majorList", adminSubjectService.getSimpleMajorList());           // ← 変更
+        model.addAttribute("departmentList", adminSubjectService.getSimpleDepartmentList()); // ← 変更
+        //これDB参照してない可用性0ゾーン
+        model.addAttribute("gradeList", java.util.Arrays.asList(1, 2, 3)); 
+        
+        return "admin/mdSubjectInformation";
+    }
+
+    // --- 保存処理 (POST) ---
+    // ★修正: こちらも合わせてURLを変更 (/mdSubjectInformation/save → /master/SubjectInformation/save)
+    @PostMapping("/master/SubjectInformation/save")
+    public String saveSubjectInformation(
+            @RequestParam(name = "subjectId", required = false) List<Integer> subjectIds,
+            @RequestParam(name = "subjectName", required = false) List<String> subjectNames,
+            @RequestParam(name = "teacherId", required = false) List<Integer> teacherIds,
+            @RequestParam(name = "courseCount", required = false) List<Integer> courseCounts,
+            @RequestParam(name = "majorId", required = false) List<Integer> majorIds,
+            @RequestParam(name = "departmentId", required = false) List<Integer> departmentIds,
+            @RequestParam(name = "grade", required = false) List<Integer> grades,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            // ▼ 修正: 引数を7つ渡すように変更
+            adminSubjectService.saveSubjectList(
+                subjectIds,
+                subjectNames,
+                teacherIds,
+                courseCounts,
+                majorIds,
+                departmentIds,
+                grades
+            );
+            
+            redirectAttributes.addFlashAttribute("successMessage", "変更を保存しました。");
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "保存中にエラーが発生しました。");
+        }
+
+        //リダイレクト先も新しいURLに変更
+        return "redirect:/admin/master/SubjectInformation";
+    }
 }
