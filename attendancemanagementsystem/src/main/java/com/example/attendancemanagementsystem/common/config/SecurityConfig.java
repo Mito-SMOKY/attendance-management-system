@@ -44,12 +44,14 @@ public class SecurityConfig {
             
             // 2. CSRF対策を無効化 (API用)
             // PythonからPOSTする際にブロックされないようにする
-            .csrf(csrf -> csrf
-                
-                //テスト用
-                .ignoringRequestMatchers("/test/**")
-                .ignoringRequestMatchers("/api/issue/**", "/api/attendance/record/**")
-            )
+            .csrf(csrf -> csrf.disable())
+
+            //ここから特定のパスをCSRF保護から除外する場合の例
+            // .csrf(csrf -> csrf
+            //     //テスト用
+            //     .ignoringRequestMatchers("/test/**")
+            //     .ignoringRequestMatchers("/api/issue/**", "/api/attendance/record/**")
+            // )
             
             // 3. ログイン画面の設定
             .formLogin(login -> login
