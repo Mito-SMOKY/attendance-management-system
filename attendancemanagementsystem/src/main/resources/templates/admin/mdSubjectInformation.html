@@ -1,231 +1,398 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>教科情報マスタ</title>
-    
-    <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/admin/adminMdSubjectInformation.css}">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
 
+    <link rel="stylesheet" th:href="@{/css/parts.css}" />
+    <link
+      rel="stylesheet"
+      th:href="@{/css/admin/adminMdSubjectInformation.css}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
+      <div
+        th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"
+      ></div>
     </div>
-    
-    <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='')}"></div>
-    </div>
-    
-    <div class="subject-info-container">
-        
-        <div class="page-header-wrapper">
 
-            <h1 class="page-title">教科マスタ</h1>
+    <div class="backbutton-container">
+      <div
+        th:replace="~{fragments/_parts :: backButton(url='/admin/master-data')}"
+      ></div>
+    </div>
+
+    <form
+      th:action="@{/admin/master/SubjectInformation/save}"
+      method="post"
+      id="masterForm"
+    >
+      <div class="subject-info-container">
+        <div class="page-header-wrapper">
+          <h1 class="page-title">教科情報マスタ</h1>
+        </div>
+
+        <div
+          th:if="${successMessage}"
+          style="color: green; text-align: center; margin-bottom: 10px"
+        >
+          <span th:text="${successMessage}"></span>
+        </div>
+        <div
+          th:if="${errorMessage}"
+          style="color: red; text-align: center; margin-bottom: 10px"
+        >
+          <span th:text="${errorMessage}"></span>
         </div>
 
         <div class="action-area">
-            <button type="button" class="edit-btn" onclick="toggleEditMode()">編集</button>
+          <button type="button" class="edit-btn" onclick="toggleEditMode()">
+            編集
+          </button>
         </div>
 
         <div class="error-message-area">
-            <span id="errorMsgDuplicate" class="error-text">※同じ教科と教師の組み合わせが既に存在します。</span>
+          <span id="errorMsgDuplicate" class="error-text"
+            >※同じ教科と教師の組み合わせが既に存在します。</span
+          >
         </div>
 
         <div class="table-wrapper">
-            <table class="subject-info-table" id="infoTable">
-                <thead>
-                    <tr>
-                        <th>受講教科</th>
-                        <th>教師</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="info : ${subjectInfoList}">
-                        <td>
-                            <span class="view-mode" th:text="${info.subjectName}"></span>
-                            <input type="text" class="edit-mode" name="subjectName" th:value="${info.subjectName}">
-                            
-                            <button type="button" class="delete-btn" onclick="deleteRow(this)">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </td>
-                        <td>
-                            <span class="view-mode" th:text="${info.teacherName}"></span>
-                            <select class="edit-mode" name="teacherId">
-                                <option value="">教師を選択</option>
-                                <option th:each="teacher : ${teacherList}"
-                                        th:value="${teacher.id}"
-                                        th:text="${teacher.name}"
-                                        th:selected="${teacher.id == info.teacherId}">
-                                </option>
-                            </select>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+          <table class="subject-info-table" id="infoTable">
+            <thead>
+              <tr>
+                <th style="width: 20%">コース</th>
+                <th style="width: 10%">クラス</th>
+                <th style="width: 8%">学年</th>
+                <th>受講教科 (結合名)</th>
+                <th>教師</th>
+                <th>コマ数</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="info : ${subjectInfoList}">
+                <input
+                  type="hidden"
+                  name="subjectId"
+                  th:value="${info.subjectId}"
+                />
+
+                <td>
+                  <span class="view-mode" th:text="${info.majorName}"></span>
+                  <select class="edit-mode" name="majorId">
+                    <option value="">選択</option>
+                    <option
+                      th:each="major : ${majorList}"
+                      th:value="${major.majorId}"
+                      th:text="${major.majorName}"
+                      th:selected="${major.majorName == info.majorName}"
+                    ></option>
+                  </select>
+                </td>
+
+                <td>
+                  <span class="view-mode" th:text="${info.className}"></span>
+                  <select class="edit-mode" name="departmentId">
+                    <option value="">選択</option>
+                    <option
+                      th:each="dept : ${departmentList}"
+                      th:value="${dept.departmentId}"
+                      th:text="${dept.className}"
+                      th:selected="${dept.className == info.className}"
+                    ></option>
+                  </select>
+                </td>
+
+                <td>
+                  <span
+                    class="view-mode"
+                    th:text="${info.grade != null ? info.grade + '年' : '-'}"
+                  ></span>
+                  <select class="edit-mode" name="grade">
+                    <option value="">選択</option>
+                    <option
+                      th:each="gr : ${gradeList}"
+                      th:value="${gr}"
+                      th:text="${gr + '年'}"
+                      th:selected="${gr == info.grade}"
+                    ></option>
+                  </select>
+                </td>
+
+                <td>
+                  <span class="view-mode" th:text="${info.subjectName}"></span>
+                  <input
+                    type="text"
+                    class="edit-mode"
+                    name="subjectName"
+                    th:value="${info.subjectName}"
+                  />
+
+                  <button
+                    type="button"
+                    class="delete-btn"
+                    onclick="deleteRow(this)"
+                  >
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </td>
+
+                <td>
+                  <span class="view-mode" th:text="${info.teacherName}"></span>
+                  <select class="edit-mode" name="teacherId">
+                    <option value="">教師を選択</option>
+                    <option
+                      th:each="teacher : ${teacherList}"
+                      th:value="${teacher.teacherId}"
+                      th:text="${teacher.teacherName}"
+                      th:selected="${teacher.teacherId == info.teacherId}"
+                    ></option>
+                  </select>
+                </td>
+
+                <td>
+                  <span class="view-mode" th:text="${info.courseCount}"></span>
+                  <input
+                    type="number"
+                    class="edit-mode"
+                    name="courseCount"
+                    th:value="${info.courseCount}"
+                    min="1"
+                    max="10"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <div class="add-btn-wrapper">
-            <button type="button" class="add-row-btn" onclick="addRow()">＋</button>
+          <button type="button" class="add-row-btn" onclick="addRow()">
+            ＋
+          </button>
         </div>
-
-    </div>
+      </div>
+    </form>
 
     <script th:inline="javascript">
-        /*<![CDATA[*/
-        const teacherOptions = /*[[${teacherList}]]*/ []; 
-        const dummyTeachers = [
-            { id: 1, name: '千太郎 先生' },
-            { id: 2, name: '川島 先生' },
-            { id: 3, name: '玉木 先生' },
-        ];
-        const teachers = (teacherOptions && teacherOptions.length > 0) ? teacherOptions : dummyTeachers;
-        /*]]>*/
+      /*<![CDATA[*/
+      // Controllerから渡されたリストをJS変数に格納
+      const teacherOptions = /*[[${teacherList}]]*/ [];
+      const majorOptions = /*[[${majorList}]]*/ [];
+      const departmentOptions = /*[[${departmentList}]]*/ [];
+      const gradeOptions = /*[[${gradeList}]]*/ [];
+      /*]]>*/
     </script>
 
     <script>
-        function toggleEditMode() {
-            const body = document.body;
-            const btn = document.querySelector('.edit-btn');
-            const errorText = document.getElementById('errorMsgDuplicate');
-            
-            if (body.classList.contains('editing-mode')) {
-                // 適用ボタン押下時
-                if (!validateDuplicates()) {
-                    errorText.style.display = 'inline-block';
-                    return; 
-                }
+      function toggleEditMode() {
+        const body = document.body;
+        const btn = document.querySelector(".edit-btn");
+        const errorText = document.getElementById("errorMsgDuplicate");
+        const form = document.getElementById("masterForm");
 
-                errorText.style.display = 'none';
-                finalizeAddedRows();
+        if (body.classList.contains("editing-mode")) {
+          // --- 適用（保存）ボタン押下時 ---
 
-                body.classList.remove('editing-mode');
-                btn.textContent = '編集';
+          // ★追加 1: まずエラー表示をクリア
+          document
+            .querySelectorAll(".input-error")
+            .forEach((el) => el.classList.remove("input-error"));
+
+          // ★追加 2: 必須入力チェック (ここを追加！)
+          if (!validateRequired()) {
+            alert(
+              "未入力の項目があります。\nすべての項目を選択・入力してください。"
+            );
+            return; // 処理を中断（保存させない）
+          }
+
+          // 重複チェック
+          if (!validateDuplicates()) {
+            errorText.style.display = "inline-block";
+            return;
+          }
+
+          if (!confirm("変更を保存しますか？")) {
+            return;
+          }
+          form.submit();
+        } else {
+          // --- 編集ボタン押下時 ---
+          body.classList.add("editing-mode");
+          btn.textContent = "適用";
+          errorText.style.display = "none";
+        }
+      }
+
+      // ★追加 3: 必須入力チェックを行う関数
+      function validateRequired() {
+        const rows = document.querySelectorAll("#infoTable tbody tr");
+        let isValid = true;
+
+        rows.forEach((row) => {
+          // 各入力項目の取得
+          const major = row.querySelector('select[name="majorId"]');
+          const dept = row.querySelector('select[name="departmentId"]');
+          const grade = row.querySelector('select[name="grade"]');
+          const subjectName = row.querySelector('input[name="subjectName"]');
+          const teacher = row.querySelector('select[name="teacherId"]');
+          const count = row.querySelector('input[name="courseCount"]');
+
+          // もし要素が見つからない場合はスキップ（削除済み行など）
+          if (!major || !dept || !grade || !subjectName || !teacher || !count)
+            return;
+
+          // チェック処理 (値が空文字ならエラー)
+          // ※ trim() は空白スペースのみの入力を防ぐため
+          if (major.value === "") {
+            major.classList.add("input-error");
+            isValid = false;
+          }
+          if (dept.value === "") {
+            dept.classList.add("input-error");
+            isValid = false;
+          }
+          if (grade.value === "") {
+            grade.classList.add("input-error");
+            isValid = false;
+          }
+          if (subjectName.value.trim() === "") {
+            subjectName.classList.add("input-error");
+            isValid = false;
+          }
+          if (teacher.value === "") {
+            teacher.classList.add("input-error");
+            isValid = false;
+          }
+          if (count.value === "" || count.value <= 0) {
+            count.classList.add("input-error");
+            isValid = false;
+          }
+        });
+
+        return isValid;
+      }
+
+      function addRow() {
+        const tableBody = document.querySelector("#infoTable tbody");
+        const newRow = document.createElement("tr");
+
+        // 教師プルダウン生成
+        let teacherOpts = '<option value="">教師を選択</option>';
+        if (teacherOptions) {
+          teacherOptions.forEach((teacher) => {
+            teacherOpts += `<option value="${teacher.teacherId}">${teacher.teacherName}</option>`;
+          });
+        }
+
+        // コースプルダウン生成
+        let majorOpts = '<option value="">コース選択</option>';
+        if (majorOptions) {
+          majorOptions.forEach((m) => {
+            majorOpts += `<option value="${m.majorId}">${m.majorName}</option>`;
+          });
+        }
+
+        // クラスプルダウン生成
+        let deptOpts = '<option value="">クラス選択</option>';
+        if (departmentOptions) {
+          departmentOptions.forEach((d) => {
+            deptOpts += `<option value="${d.departmentId}">${d.className}</option>`;
+          });
+        }
+
+        // 学年プルダウン生成
+        let gradeOpts = '<option value="">学年選択</option>';
+        if (gradeOptions) {
+          gradeOptions.forEach((g) => {
+            gradeOpts += `<option value="${g}">${g}年</option>`;
+          });
+        }
+
+        // 行のHTMLを構築（すべて編集モードの入力フォームを表示）
+        newRow.innerHTML = `
+            <td>
+                <select class="edit-mode" name="majorId">${majorOpts}</select>
+            </td>
+            <td>
+                <select class="edit-mode" name="departmentId">${deptOpts}</select>
+            </td>
+            <td>
+                <select class="edit-mode" name="grade">${gradeOpts}</select>
+            </td>
+            <td>
+                <input type="text" class="edit-mode" name="subjectName" placeholder="教科名 (手動入力)">
+                <button type="button" class="delete-btn" onclick="deleteRow(this)">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </td>
+            <td>
+                <select class="edit-mode" name="teacherId">
+                    ${teacherOpts}
+                </select>
+            </td>
+            <td>
+                <input type="number" class="edit-mode" name="courseCount" value="1" min="1" max="10">
+            </td>
+        `;
+
+        tableBody.appendChild(newRow);
+
+        // 追加した行が見えるように、もし編集モードでなければ編集モードに切り替える（オプション）
+        // ユーザー体験的には、追加ボタンを押した時点で編集モードになるのが自然です
+        if (!document.body.classList.contains("editing-mode")) {
+          toggleEditMode();
+        }
+      }
+
+      function deleteRow(btn) {
+        if (confirm("この行を削除しますか？")) {
+          const row = btn.closest("tr");
+          row.remove();
+        }
+      }
+
+      function validateDuplicates() {
+        const rows = document.querySelectorAll("#infoTable tbody tr");
+        const pairs = new Map();
+        let hasError = false;
+
+        document
+          .querySelectorAll(".input-error")
+          .forEach((el) => el.classList.remove("input-error"));
+
+        rows.forEach((row, index) => {
+          const nameInput = row.querySelector('input[name="subjectName"]');
+          const teacherSelect = row.querySelector('select[name="teacherId"]');
+          const deptSelect = row.querySelector('select[name="departmentId"]');
+
+          if (!nameInput || !teacherSelect) return;
+
+          const nameVal = nameInput.value.trim();
+          const teacherVal = teacherSelect.value;
+          // クラスも重複チェックのキーに含めるべき場合はここに追加してください
+          // 例: const key = nameVal + "::" + teacherVal + "::" + deptSelect.value;
+
+          if (nameVal && teacherVal) {
+            const key = nameVal + "::" + teacherVal;
+            if (pairs.has(key)) {
+              hasError = true;
+              nameInput.classList.add("input-error");
+              teacherSelect.classList.add("input-error");
             } else {
-                // 編集ボタン押下時
-                body.classList.add('editing-mode');
-                btn.textContent = '適用';
-                errorText.style.display = 'none';
+              pairs.set(key, index);
             }
-        }
-
-        function addRow() {
-            const tableBody = document.querySelector('#infoTable tbody');
-            const newRow = document.createElement('tr');
-            
-            newRow.classList.add('added-row');
-            
-            let optionsHtml = '<option value="">教師を選択</option>';
-            teachers.forEach(teacher => {
-                optionsHtml += `<option value="${teacher.id}">${teacher.name}</option>`;
-            });
-
-            newRow.innerHTML = `
-                <td>
-                    <input type="text" class="edit-mode" name="newSubjectName" placeholder="教科名を入力" style="display:block;">
-                    <button type="button" class="delete-btn" onclick="deleteRow(this)" style="display:flex;">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </td>
-                <td>
-                    <select class="edit-mode" name="newTeacherId" style="display:block;">
-                        ${optionsHtml}
-                    </select>
-                </td>
-            `;
-            
-            tableBody.appendChild(newRow);
-        }
-
-        // ▼▼▼ 行削除処理 ▼▼▼
-        function deleteRow(btn) {
-            if (confirm('この行を削除しますか？')) {
-                const row = btn.closest('tr');
-                row.remove();
-            }
-        }
-
-        function validateDuplicates() {
-            const rows = document.querySelectorAll('#infoTable tbody tr');
-            const pairs = new Map();
-            let hasError = false;
-
-            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
-
-            rows.forEach((row, index) => {
-                const nameInput = row.querySelector('input[name="subjectName"], input[name="newSubjectName"]');
-                const teacherSelect = row.querySelector('select[name="teacherId"], select[name="newTeacherId"]');
-
-                if (!nameInput || !teacherSelect) return;
-
-                const nameVal = nameInput.value.trim();
-                const teacherVal = teacherSelect.value;
-
-                if (nameVal && teacherVal) {
-                    const key = nameVal + "::" + teacherVal;
-
-                    if (pairs.has(key)) {
-                        hasError = true;
-                        nameInput.classList.add('input-error');
-                        teacherSelect.classList.add('input-error');
-                        
-                        const prevRowIndex = pairs.get(key);
-                        const prevRow = rows[prevRowIndex];
-                        const prevName = prevRow.querySelector('input[name="subjectName"], input[name="newSubjectName"]');
-                        const prevTeacher = prevRow.querySelector('select[name="teacherId"], select[name="newTeacherId"]');
-                        if (prevName) prevName.classList.add('input-error');
-                        if (prevTeacher) prevTeacher.classList.add('input-error');
-
-                    } else {
-                        pairs.set(key, index);
-                    }
-                }
-            });
-
-            return !hasError; 
-        }
-
-        function finalizeAddedRows() {
-            const addedRows = document.querySelectorAll('.added-row');
-            
-            addedRows.forEach(row => {
-                const nameInput = row.querySelector('input[name="newSubjectName"]');
-                const teacherSelect = row.querySelector('select[name="newTeacherId"]');
-                
-                const nameVal = nameInput.value.trim();
-                const teacherVal = teacherSelect.value;
-
-                if (!nameVal || !teacherVal) {
-                    row.remove();
-                } else {
-                    const nameTd = nameInput.parentElement;
-                    const nameSpan = document.createElement('span');
-                    nameSpan.className = 'view-mode';
-                    nameSpan.textContent = nameVal;
-                    nameTd.insertBefore(nameSpan, nameInput);
-                    nameInput.style.display = ''; 
-
-                    // 削除ボタンのスタイルもリセット（block表示になっていたのをCSS制御に戻す）
-                    const delBtn = row.querySelector('.delete-btn');
-                    if(delBtn) delBtn.style.display = ''; 
-
-                    const teacherTd = teacherSelect.parentElement;
-                    const teacherSpan = document.createElement('span');
-                    teacherSpan.className = 'view-mode';
-                    const selectedText = teacherSelect.options[teacherSelect.selectedIndex].text;
-                    teacherSpan.textContent = selectedText;
-                    teacherTd.insertBefore(teacherSpan, teacherSelect);
-                    teacherSelect.style.display = '';
-
-                    row.classList.remove('added-row');
-                }
-            });
-        }
+          }
+        });
+        return !hasError;
+      }
     </script>
-
-</body>
+  </body>
 </html>
