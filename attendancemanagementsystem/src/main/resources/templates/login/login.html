@@ -48,11 +48,6 @@
             />
             <div th:replace="~{fragments/_parts :: passwordToggle('password')}"></div>
 
-            <!-- <i
-              class="fa-solid fa-eye-slash toggle-password"
-              id="togglePassword"
-            ></i> -->
-
           </div>
         </div>
 
@@ -74,22 +69,5 @@
         <div th:if="${param.resetSuccess}">
           <p style="color: blue; font-weight: bold; text-align: center;">パスワードを変更しました。<br>新しいパスワードでログインしてください。</p>
         </div>
-
-    <!-- <script>
-      const togglePassword = document.querySelector("#togglePassword");
-      const password = document.querySelector("#password");
-
-      togglePassword.addEventListener("click", function (e) {
-        // type属性を切り替える (password <-> text)
-        const type =
-          password.getAttribute("type") === "password" ? "text" : "password";
-        password.setAttribute("type", type);
-
-        // アイコンを切り替える (fa-eye <-> fa-eye-slash)
-        this.classList.toggle("fa-eye"); // 開いた目
-        this.classList.toggle("fa-eye-slash"); // 閉じた目
-      });
-    </script> -->
-
   </body>
 </html>

@@ -53,6 +53,7 @@
     align-items: center;
     font-size: 1.1em;
     font-weight: bold;
+    justify-items: center;
 }
 
 .nav-arrow {
@@ -93,7 +94,7 @@
     border: 1px solid #ccc;
     padding: 10px 5px;
     text-align: center;
-    height: 60px; /* セルの高さを固定 */
+    height: 90px; /* セルの高さを固定 */
 }
 
 .timetable thead th {

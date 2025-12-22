@@ -14,6 +14,27 @@
     padding-top: 20px;
 }
 
+.student-calendar-header{
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    /* background-color: #f0f8ff; */
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-size: 1.5em;
+}
+
+.calendar-icon{
+    width: 40px;
+    height: 40px;
+    align-items : center;
+    font-size: 1em;
+    cursor: pointer;
+}
+
 .input{
   width: 120px; /* 少し大きく */
   height: 50px;
@@ -53,7 +74,7 @@
     text-align: center; /* 中央揃えに変更 */
     margin: 60px 0 20px 0;
     padding-top: 20px; /* 余白調整 */
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 700;
     color:#008b95;
 }
@@ -163,7 +184,6 @@
 .calendar-controls {
     display: flex;
     align-items: center; /* 垂直中央揃え */
-    margin: 0 auto;
     gap: 20px; 
     box-sizing: border-box;
     flex-wrap: wrap;
