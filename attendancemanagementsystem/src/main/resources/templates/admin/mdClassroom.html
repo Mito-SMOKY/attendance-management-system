@@ -26,75 +26,157 @@
       ></div>
     </div>
 
-    <div class="classroom-container">
-      <div class="page-header-wrapper">
-        <h1 class="page-title">教室マスタ</h1>
-      </div>
+    <form
+      th:action="@{/admin/master/classroom/save}"
+      method="post"
+      id="masterForm"
+    >
+      <div class="classroom-container">
+        <div class="page-header-wrapper">
+          <h1 class="page-title">教室マスタ</h1>
+        </div>
 
-      <div class="filter-area">
-        <button type="button" class="edit-btn" onclick="toggleEditMode()">
-          編集
-        </button>
-      </div>
-
-      <div class="error-message-area">
-        <span id="errorMsgRequired" class="error-text"
-          >※教室情報と教室名の両方を入力してください。</span
+        <div
+          th:if="${successMessage}"
+          style="color: green; text-align: center; margin-bottom: 10px"
         >
-        <span id="errorMsgDuplicate" class="error-text"
-          >※入力された教室名は既に使用されています。</span
+          <span th:text="${successMessage}"></span>
+        </div>
+        <div
+          th:if="${errorMessage}"
+          style="color: red; text-align: center; margin-bottom: 10px"
         >
-      </div>
+          <span th:text="${errorMessage}"></span>
+        </div>
 
-      <div class="table-wrapper">
-        <table class="classroom-table" id="classroomTable">
-          <colgroup>
-            <col style="width: 50%" />
-            <col style="width: 50%" />
-          </colgroup>
-          <thead>
-            <tr>
-              <th>教室情報</th>
-              <th>教室名</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+        <div class="filter-area">
+          <button type="button" class="edit-btn" onclick="toggleEditMode()">
+            編集
+          </button>
+        </div>
 
-      <div class="add-btn-wrapper">
-        <button type="button" class="add-row-btn" onclick="addClassroomRow()">
-          ＋
-        </button>
+        <div class="error-message-area">
+          <span id="errorMsgRequired" class="error-text" style="display: none"
+            >※教室名は必須入力です。</span
+          >
+          <span id="errorMsgDuplicate" class="error-text" style="display: none"
+            >※入力された教室名は既に使用されています。</span
+          >
+        </div>
+
+        <div class="table-wrapper">
+          <table class="classroom-table" id="classroomTable">
+            <colgroup>
+              <col style="width: 40%" />
+              <col style="width: 50%" />
+              <col style="width: 10%" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>教室名</th>
+                <th>MACアドレス</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="room : ${classroomList}">
+                <input
+                  type="hidden"
+                  name="classroomId"
+                  th:value="${room.classroomId}"
+                />
+
+                <td>
+                  <span
+                    class="view-mode"
+                    th:text="${room.classroomName}"
+                  ></span>
+                  <input
+                    type="text"
+                    class="form-input edit-mode"
+                    style="display: none"
+                    name="classroomName"
+                    th:value="${room.classroomName}"
+                    placeholder="教室名 (例: 201)"
+                  />
+                </td>
+
+                <td>
+                  <span class="view-mode" th:text="${room.macAddress}"></span>
+                  <input
+                    type="text"
+                    class="form-input edit-mode"
+                    style="display: none"
+                    name="macAddress"
+                    th:value="${room.macAddress}"
+                    placeholder="AA:BB:CC:11:22:33"
+                  />
+                </td>
+
+                <td>
+                  <button
+                    type="button"
+                    class="delete-btn"
+                    onclick="deleteRow(this)"
+                    style="display: none"
+                  >
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="add-btn-wrapper" style="display: none">
+          <button type="button" class="add-row-btn" onclick="addClassroomRow()">
+            ＋
+          </button>
+        </div>
       </div>
-    </div>
+    </form>
 
     <script>
       function toggleEditMode() {
         const body = document.body;
         const btn = document.querySelector(".edit-btn");
+        const form = document.getElementById("masterForm");
         const errorMsgReq = document.getElementById("errorMsgRequired");
         const errorMsgDup = document.getElementById("errorMsgDuplicate");
 
+        // 編集モード関連の要素
+        const viewModes = document.querySelectorAll(".view-mode");
+        const editModes = document.querySelectorAll(".edit-mode"); // input要素
+        const deleteBtns = document.querySelectorAll(".delete-btn");
+        const addBtnWrapper = document.querySelector(".add-btn-wrapper");
+
         if (body.classList.contains("editing-mode")) {
-          const isSuccess = applyAddedRows();
+          // --- 適用（保存）ボタン押下時 ---
 
-          if (isSuccess) {
-            body.classList.remove("editing-mode");
-            btn.textContent = "編集";
-            errorMsgReq.style.display = "none";
-            errorMsgDup.style.display = "none";
-
-            sortClassroomTable();
-            mergeCells();
+          // バリデーション
+          if (!validateData()) {
+            return;
           }
+
+          if (!confirm("変更を保存しますか？")) {
+            return;
+          }
+
+          // フォーム送信
+          form.submit();
         } else {
+          // --- 編集ボタン押下時 ---
           body.classList.add("editing-mode");
           btn.textContent = "適用";
+
+          // 表示切り替え
+          viewModes.forEach((el) => (el.style.display = "none"));
+          editModes.forEach((el) => (el.style.display = "block"));
+          deleteBtns.forEach((el) => (el.style.display = "inline-block"));
+          addBtnWrapper.style.display = "block";
+
           errorMsgReq.style.display = "none";
           errorMsgDup.style.display = "none";
-
-          unmergeCells();
         }
       }
 
@@ -102,74 +184,69 @@
         const tableBody = document.querySelector("#classroomTable tbody");
         const newRow = document.createElement("tr");
 
-        newRow.classList.add("added-row");
-
+        // 新規行にはIDがないのでhidden inputは不要（またはvalue=""）
         newRow.innerHTML = `
                 <td>
-                    <select class="form-select" name="floor">
-                        <option value="">階を選択</option>
-                        <option value="2F">2F</option>
-                        <option value="3F">3F</option>
-                        <option value="4F">4F</option>
-                    </select>
+                    <input type="text" class="form-input" name="classroomName" placeholder="教室名 (例: 201)">
                 </td>
                 <td>
-                    <input type="text" class="form-input" placeholder="教室名 (例: 201)" name="newName">
+                    <input type="text" class="form-input" name="macAddress" placeholder="AA:BB:CC:11:22:33">
+                </td>
+                <td>
+                    <button type="button" class="delete-btn" onclick="deleteRow(this)">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
                 </td>
             `;
 
         tableBody.appendChild(newRow);
       }
 
-      function applyAddedRows() {
-        const addedRows = document.querySelectorAll(".added-row");
-        const tableRows = document.querySelectorAll("#classroomTable tbody tr");
+      function deleteRow(btn) {
+        if (confirm("この行を削除しますか？")) {
+          const row = btn.closest("tr");
+          row.remove();
+        }
+      }
 
+      function validateData() {
+        const rows = document.querySelectorAll("#classroomTable tbody tr");
+        const names = new Map();
         let hasEmptyError = false;
         let hasDuplicateError = false;
 
+        // エラー表示リセット
         document.getElementById("errorMsgRequired").style.display = "none";
         document.getElementById("errorMsgDuplicate").style.display = "none";
         document
           .querySelectorAll(".input-error")
           .forEach((el) => el.classList.remove("input-error"));
 
-        let existingNames = [];
-        tableRows.forEach((row) => {
-          if (!row.classList.contains("added-row")) {
-            const input = row.querySelector('input[name="newName"]');
-            const nameCell = row.cells[1];
-            const inputInCell = nameCell.querySelector("input");
-            const name = inputInCell ? inputInCell.value : nameCell.innerText;
+        rows.forEach((row, index) => {
+          const nameInput = row.querySelector('input[name="classroomName"]');
+          if (!nameInput) return; // 削除済みなどで要素がない場合
 
-            if (name) existingNames.push(name.trim());
-          }
-        });
+          const valName = nameInput.value.trim();
 
-        let currentBatchNames = [];
-
-        addedRows.forEach((row) => {
-          const selectElement = row.querySelector('select[name="floor"]');
-          const inputElement = row.querySelector('input[name="newName"]');
-
-          const valFloor = selectElement ? selectElement.value : "";
-          const valName = inputElement ? inputElement.value.trim() : "";
-
-          if (valFloor === "" && valName === "") return;
-
-          if (valFloor === "" || valName === "") {
+          // 必須チェック
+          if (valName === "") {
             hasEmptyError = true;
-            if (valFloor === "") selectElement.classList.add("input-error");
-            if (valName === "") inputElement.classList.add("input-error");
+            nameInput.classList.add("input-error");
           } else {
-            if (
-              existingNames.includes(valName) ||
-              currentBatchNames.includes(valName)
-            ) {
+            // 重複チェック
+            if (names.has(valName)) {
               hasDuplicateError = true;
-              inputElement.classList.add("input-error");
+              nameInput.classList.add("input-error");
+
+              // 先に見つかった重複元も赤くする
+              const prevRowIndex = names.get(valName);
+              const prevRow = rows[prevRowIndex];
+              const prevInput = prevRow.querySelector(
+                'input[name="classroomName"]'
+              );
+              if (prevInput) prevInput.classList.add("input-error");
             } else {
-              currentBatchNames.push(valName);
+              names.set(valName, index);
             }
           }
         });
@@ -184,123 +261,8 @@
             "inline-block";
           return false;
         }
-
-        addedRows.forEach((row) => {
-          const selectElement = row.querySelector('select[name="floor"]');
-          const inputElement = row.querySelector('input[name="newName"]');
-
-          const valFloor = selectElement ? selectElement.value : "";
-          const valName = inputElement ? inputElement.value.trim() : "";
-
-          if (valFloor !== "" && valName !== "") {
-            const newInput = document.createElement("input");
-            newInput.type = "text";
-            newInput.className = "form-input";
-            newInput.value = valFloor;
-            newInput.name = "info";
-
-            selectElement.parentNode.replaceChild(newInput, selectElement);
-            row.classList.remove("added-row");
-          } else {
-            row.remove();
-          }
-        });
-
         return true;
       }
-
-      function sortClassroomTable() {
-        const tableBody = document.querySelector("#classroomTable tbody");
-        const rows = Array.from(tableBody.querySelectorAll("tr"));
-
-        rows.sort((a, b) => {
-          const getVal = (row, cellIndex) => {
-            const cell = row.cells[cellIndex];
-            if (!cell) return "";
-            const input = cell.querySelector(".form-input, .form-select");
-            return input ? input.value : cell.innerText.trim();
-          };
-
-          const floorA = getVal(a, 0);
-          const floorB = getVal(b, 0);
-          if (floorA < floorB) return -1;
-          if (floorA > floorB) return 1;
-
-          const nameA = getVal(a, 1);
-          const nameB = getVal(b, 1);
-
-          const numA = parseInt(nameA.replace(/\D/g, ""));
-          const numB = parseInt(nameB.replace(/\D/g, ""));
-
-          if (!isNaN(numA) && !isNaN(numB)) {
-            return numA - numB;
-          } else {
-            return nameA < nameB ? -1 : 1;
-          }
-        });
-
-        rows.forEach((row) => tableBody.appendChild(row));
-      }
-
-      function mergeCells() {
-        const tableBody = document.querySelector("#classroomTable tbody");
-        const rows = tableBody.querySelectorAll("tr");
-        if (rows.length === 0) return;
-
-        let prevRow = null;
-        let rowspanCount = 1;
-
-        for (let i = 0; i < rows.length; i++) {
-          const row = rows[i];
-          if (row.classList.contains("added-row")) continue;
-
-          const cell = row.cells[0];
-          const input = cell.querySelector(".form-input");
-          const val = input ? input.value : cell.innerText.trim();
-
-          if (prevRow) {
-            const prevCell = prevRow.cells[0];
-            const prevInput = prevCell.querySelector(".form-input");
-            const prevVal = prevInput
-              ? prevInput.value
-              : prevCell.innerText.trim();
-
-            if (val === prevVal) {
-              rowspanCount++;
-              prevCell.rowSpan = rowspanCount;
-              cell.style.display = "none";
-            } else {
-              prevRow = row;
-              rowspanCount = 1;
-              cell.style.display = "";
-              cell.rowSpan = 1;
-            }
-          } else {
-            prevRow = row;
-            rowspanCount = 1;
-            cell.style.display = "";
-            cell.rowSpan = 1;
-          }
-        }
-      }
-
-      function unmergeCells() {
-        const tableBody = document.querySelector("#classroomTable tbody");
-        const rows = tableBody.querySelectorAll("tr");
-
-        rows.forEach((row) => {
-          const cell = row.cells[0];
-          if (cell) {
-            cell.style.display = "";
-            cell.rowSpan = 1;
-          }
-        });
-      }
-
-      window.addEventListener("load", () => {
-        sortClassroomTable();
-        mergeCells();
-      });
     </script>
   </body>
 </html>
