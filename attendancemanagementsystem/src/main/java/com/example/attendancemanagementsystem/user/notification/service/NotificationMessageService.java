@@ -25,19 +25,6 @@ public class NotificationMessageService {
         create(user, SYSTEM_SENDER_ID, NotificationType.PASSWORD_CHANGE_COMPLETED, null, user.getName());
     }
 
-    // パスワードリセット用OTP通知
-    @Transactional
-    public void createPasswordResetOtp(UsersEntity user, String otp, int expiryMinutes) {
-        create(user, user.getUserId(), NotificationType.PASSWORD_RESET_OTP, null, user.getName(), otp, expiryMinutes);
-    }
-
-    // メールアドレス変更用OTP通知
-    @Transactional
-    public void createEmailChangeOtp(UsersEntity user, String otp, int expiryMinutes) {
-        create(user, user.getUserId(), NotificationType.EMAIL_CHANGE_OTP, null, 
-            user.getName(), otp, expiryMinutes);
-    }
-
     // メールアドレス変更完了通知
     @Transactional
     public void createEmailChangeCompletion(UsersEntity user) {

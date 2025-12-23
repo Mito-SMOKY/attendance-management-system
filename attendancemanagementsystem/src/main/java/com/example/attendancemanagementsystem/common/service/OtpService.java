@@ -61,11 +61,9 @@ public class OtpService {
 
         // 通知送信（メール & サイト内）
         if (purpose == OtpPurpose.PASSWORD_RESET) {
-            notificationMessageService.createPasswordResetOtp(user, rawToken, EXPIRY_MINUTES);
             notificationEmailService.sendPasswordResetOtp(user, rawToken, EXPIRY_MINUTES);
         
         } else if (purpose == OtpPurpose.EMAIL_CHANGE) {
-            notificationMessageService.createEmailChangeOtp(user, rawToken, EXPIRY_MINUTES);
             notificationEmailService.sendEmailChangeOtp(user, targetEmail, rawToken, EXPIRY_MINUTES);
         }
     }
