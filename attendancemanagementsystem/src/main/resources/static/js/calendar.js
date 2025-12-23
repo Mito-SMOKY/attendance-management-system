@@ -133,31 +133,37 @@ function initializeCalendar() {
     const yearSelector = document.getElementById('yearSelector');
     const monthSelector = document.getElementById('monthSelector');
 
-    // モード復元
+    // --- A. 「現在の年」を取得 (プルダウンの選択肢の基準) ---
+    const todayObj = new Date();
+    const currentActualYear = todayObj.getFullYear();
+
+    // --- B. URLやサーバーからの情報を取得 (表示中のカレンダーの基準) ---
     const urlParams = new URLSearchParams(window.location.search);
     currentViewMode = urlParams.get('mode') === 'attendance' ? 'attendance' : 'schedule';
     if (viewToggleCheckbox) viewToggleCheckbox.checked = (currentViewMode === 'attendance');
 
-    // 日付復元
     let serverMonth, serverYear;
     if (typeof serverTargetMonthString === 'undefined' || !serverTargetMonthString) {
-        const d = new Date();
-        serverMonth = d.getMonth();
-        serverYear = d.getFullYear();
+        serverMonth = todayObj.getMonth();
+        serverYear = todayObj.getFullYear();
     } else {
         const d = new Date(serverTargetMonthString + "T00:00:00"); 
         serverMonth = d.getMonth(); 
         serverYear = d.getFullYear();
     }
 
-    // プルダウン生成
+    // --- C. 年プルダウン生成 (常に「現在の年」から±2年) ---
     if (yearSelector) {
         yearSelector.innerHTML = '';
-        for (let y = serverYear - 2; y <= serverYear + 2; y++) {
+        // 現在の年から-2年 〜 +2年 の固定範囲をループ
+        for (let y = currentActualYear - 2; y <= currentActualYear + 2; y++) {
             yearSelector.add(new Option(y + '年', y));
         }
+        // プルダウンの選択状態は「表示中の年」に合わせる
         yearSelector.value = serverYear;
     }
+
+    // --- D. 月プルダウン生成 ---
     if (monthSelector) {
         monthSelector.innerHTML = '';
         for (let m = 0; m < 12; m++) {
