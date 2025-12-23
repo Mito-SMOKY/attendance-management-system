@@ -49,6 +49,27 @@ public class NotificationMessageService {
             student.getName(), subjectName, ratePercent);
     }
     
+    // 公欠申請通知(承認者向け)
+    @Transactional
+    public void createOfficialAbsenceRequestNotification(UsersEntity approver, UsersEntity student, String reason) {
+        create(approver, student.getUserId(), NotificationType.OFFICIAL_ABSENCE_REQUEST, null, 
+            student.getName(), reason);
+    }
+
+    // 申請許可通知(生徒向け)
+    @Transactional
+    public void createRequestApprovedNotification(UsersEntity student, UsersEntity approver) {
+        create(student, approver.getUserId(), NotificationType.REQUEST_APPROVED, null, 
+            student.getName());
+    }
+    
+    // 申請却下通知(生徒向け)
+    @Transactional
+    public void createRequestRejectedNotification(UsersEntity student, UsersEntity approver, String rejectionReason) {
+        create(student, approver.getUserId(), NotificationType.REQUEST_REJECTED, null, 
+            student.getName(), rejectionReason);
+    }
+
     // 共通保存処理
     private void create(UsersEntity receiver, int senderId, NotificationType type, String titleArg, Object... bodyArgs) {
         try {
