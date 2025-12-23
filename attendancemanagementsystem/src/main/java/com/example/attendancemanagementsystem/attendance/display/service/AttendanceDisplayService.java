@@ -22,6 +22,7 @@ import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 
 @Service
 @Transactional(readOnly = true)
+//日次出席詳細データを提供するサービスクラス
 public class AttendanceDisplayService {
 
     private final UsersRepository usersRepository;
@@ -47,9 +48,7 @@ public class AttendanceDisplayService {
         this.classroomRepository = classroomRepository;
     }
 
-    /**
-     * 指定した日付の日次詳細データを取得する
-     */
+    //  * 指定した日付の日次詳細データを取得する
     public List<DailyAttendanceDto> getDailyAttendanceDetails(String loginId, LocalDate date) {
         List<DailyAttendanceDto> result = new ArrayList<>();
 
@@ -81,6 +80,7 @@ public class AttendanceDisplayService {
                     .filter(a -> a.getTimeTable().getTimeTableId().equals(tt.getTimeTableId()))
                     .findFirst();
 
+            // 出席状態に応じた記号を設定
             if (attOpt.isPresent()) {
                 String statusName = attOpt.get().getStatus().getStatusName();
                 if ("出席".equals(statusName)) statusSymbol = "〇";
@@ -92,7 +92,7 @@ public class AttendanceDisplayService {
 
             // DTOに追加 (コンストラクタの第一引数に subjectId を追加)
             result.add(new DailyAttendanceDto(
-                tt.getSubjectId(), // ★追加: これでHTML側でIDが使えるようになります
+                tt.getSubjectId(),
                 tt.getSlotId(),
                 subjectName,
                 classroomName,

@@ -16,6 +16,21 @@
   </button>
 </div>
 
+<!-- 共通画面などロールごとにヘッダーを変えたいときに使ってね -->
+<div th:fragment="Role-header" class="header-container">
+
+        <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
+            <div th:replace="~{fragments/_parts :: student-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+
+</div>
+
 <div th:fragment="main-header">
   <header class="main-header"></header>
 </div>

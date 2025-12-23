@@ -2,9 +2,7 @@ package com.example.attendancemanagementsystem.attendance.display.dto;
 
 import java.util.List;
 
-/**
- * 教科別詳細画面用のデータクラス
- */
+//教科別詳細画面用のデータクラス
 public class SubjectAttendanceDto {
 
     // --- ヘッダー・基本情報 ---
@@ -28,9 +26,7 @@ public class SubjectAttendanceDto {
     // --- カレンダーデータ (日別リスト) ---
     private List<DailyDetail> dailyAttendanceList;
 
-    // ========================================================================
-    // 内部クラス: 日別の詳細行
-    // ========================================================================
+    // インナークラス: 日別の詳細行
     public static class DailyDetail {
         private String dateDay;             // 日付
         private List<String> classStatuses; // ステータスリスト
@@ -52,15 +48,11 @@ public class SubjectAttendanceDto {
         public void setClassroom(String classroom) { this.classroom = classroom; }
     }
 
-    // ========================================================================
     // コンストラクタ
-    // ========================================================================
     public SubjectAttendanceDto() {
     }
 
-    // ========================================================================
     // Getter / Setter
-    // ========================================================================
     public Integer getSubjectId() { return subjectId; }
     public void setSubjectId(Integer subjectId) { this.subjectId = subjectId; }
     public String getSubjectName() { return subjectName; }

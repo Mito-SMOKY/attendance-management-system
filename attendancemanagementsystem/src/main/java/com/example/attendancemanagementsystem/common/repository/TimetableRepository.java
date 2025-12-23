@@ -35,5 +35,8 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
     //学科IDと日付範囲を指定して時間割を取得
     List<TimetableEntity> findByDepartment_DepartmentIdAndDateBetweenOrderByDateAscSlotIdAsc(
             Integer departmentId, LocalDate startDate, LocalDate endDate);
+    
+    //指定した教科の最新の時間割エンティティを取得
+    TimetableEntity findTopBySubjectIdOrderByDateDesc(Integer subjectId);
 
 }

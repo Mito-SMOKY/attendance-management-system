@@ -19,6 +19,7 @@ import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 
 @Service
 @Transactional(readOnly = true)
+//科目別出席情報一覧を提供するサービスクラス
 public class SubjectListService {
 
     private final UsersRepository usersRepository;
@@ -44,8 +45,10 @@ public class SubjectListService {
     public List<SubjectListDto> getSubjectList(String loginId) {
         List<SubjectListDto> dtoList = new ArrayList<>();
 
+        // ユーザー特定
         UsersEntity user = usersRepository.findByLoginId(loginId).orElseThrow();
 
+        // 在籍情報取得
         var enrollmentOpt = enrollmentsRepository.findByUserAndIsActiveTrue(user);
         if (enrollmentOpt.isEmpty()) {
             return dtoList;
@@ -53,8 +56,10 @@ public class SubjectListService {
         Integer deptId = enrollmentOpt.get().getDepartment().getDepartmentId();
         String courseName = enrollmentOpt.get().getDepartment().getMajor().getMajorName();
 
+        // 当該学科の時間割から科目リストを取得（重複排除）
         List<TimetableEntity> allTimetables = timetableRepository.findDistinctSubjectsByDepartment(deptId);
         
+        // 科目ごとに出席情報を集計
         Map<Integer, TimetableEntity> uniqueSubjectsMap = allTimetables.stream()
                 .collect(Collectors.toMap(
                         TimetableEntity::getSubjectId, 
@@ -62,12 +67,15 @@ public class SubjectListService {
                         (existing, replacement) -> existing
                 ));
 
+        // 各科目について出席情報を計算
         for (TimetableEntity tt : uniqueSubjectsMap.values()) {
             Integer subjectId = tt.getSubjectId();
 
+            // 科目名取得
             String subjectName = subjectRepository.findById(subjectId)
                     .map(s -> s.getSubjectName()).orElse("ID:" + subjectId);
 
+            // 担当教員名取得
             String teacherName = usersRepository.findById(tt.getUserId())
                     .map(u -> u.getName()).orElse("未定");
 
