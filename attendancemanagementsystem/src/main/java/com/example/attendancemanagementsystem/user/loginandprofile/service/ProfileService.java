@@ -37,16 +37,29 @@ public class ProfileService {
         this.subjectRepository = subjectRepository;
     }
 
-    // 1. ユーザー情報の取得
+    // 1. ユーザー情報の取得（メールアドレス追加）
     public UserProfileDto getUserProfile(String loginId) {
         UsersEntity user = usersRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        String roleName = "ゲスト";
-        if (user.getUserTypeId() == 1) roleName = "学生";
-        else if (user.getUserTypeId() == 2) roleName = "管理者";
+        String roleName = "仮アカウント";
+        if (user.getUserTypeId() == 1) roleName = "STUDENT";
+        else if (user.getUserTypeId() == 2) roleName = "ADMIN";
 
-        return new UserProfileDto(user.getName(), roleName, "Asia/Tokyo");
+        // 日本語表記用（画面表示用）
+        String displayRole = (user.getUserTypeId() == 1) ? "学生" : "管理者";
+
+        return new UserProfileDto(user.getName(), displayRole, "Asia/Tokyo", user.getEmail());
+    }
+
+    //氏名の更新処理
+    @Transactional
+    public void updateUserName(String loginId, String newName) {
+        UsersEntity user = usersRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        user.setName(newName);
+        usersRepository.save(user);
     }
 
     // 2. 教科リストの取得
@@ -54,36 +67,33 @@ public class ProfileService {
         UsersEntity user = usersRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // 教科リスト格納用
         List<ProfileSubjectDto> subjectList = new ArrayList<>();
 
-        if (user.getUserTypeId() == 1) {
-            // --- 学生の場合: 所属学科の時間割にある教科を取得 ---
+        // ユーザータイプに応じて教科リストを取得
+        if (user.getUserTypeId() == 1) { // 学生
             EnrollmentsEntity enrollment = enrollmentsRepository.findByUserAndIsActiveTrue(user)
                     .orElse(null);
-            
+
+            // 学生の場合は、現在の学期の履修科目を取得
             if (enrollment != null) {
                 Integer deptId = enrollment.getDepartment().getDepartmentId();
-                // 重複排除して教科を取得
                 List<TimetableEntity> timetables = timetableRepository.findDistinctSubjectsByDepartment(deptId);
-                
+                // 重複排除しつつ教科リストを作成
                 for (TimetableEntity tt : timetables) {
                     Integer sId = tt.getSubjectId();
                     String sName = subjectRepository.findById(sId)
                             .map(SubjectEntity::getSubjectName)
                             .orElse("不明な教科");
                     
-                    // 重複チェックしてリストに追加
                     boolean exists = subjectList.stream().anyMatch(d -> d.getSubjectID().equals(sId));
                     if (!exists) {
                         subjectList.add(new ProfileSubjectDto(sId, sName));
                     }
                 }
             }
-
-        } else if (user.getUserTypeId() == 2) {
-            // --- 管理者の場合: 担当教科テーブルから取得 ---
+        } else if (user.getUserTypeId() == 2) { // 管理者
             List<SubjectEntity> subjects = subjectRepository.findSubjectsByTeacherId(user.getUserId());
-            
             subjectList = subjects.stream()
                     .map(s -> new ProfileSubjectDto(s.getSubjectId(), s.getSubjectName()))
                     .collect(Collectors.toList());
