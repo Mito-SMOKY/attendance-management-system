@@ -41,8 +41,8 @@
   
 <th:block th:fragment="passwordToggle(inputId)">
     <i class="fa-solid fa-eye-slash toggle-password" 
-       th:id="${'toggle-' + inputId}" 
-       style="cursor: pointer;"></i>
+      th:id="${'toggle-' + inputId}" 
+      style="cursor: pointer;"></i>
 
     <script th:inline="javascript">
         (function() {
@@ -86,9 +86,9 @@
       <a th:href="@{/profile}" class="icon-link">
         <i class="fas fa-user"></i>
       </a>
-      <a href="#" class="icon-link notification">
+      <a th:href="@{/notifications}" class="icon-link notification">
         <i class="fas fa-bell"></i>
-        <span class="notification-dot"></span>
+        <span class="notification-dot" th:if="${hasUnread}"></span>
       </a>
     </div>
   </header>
@@ -109,6 +109,7 @@
           <div class="dropdown-menu">
             <a th:href="@{/admin/tmpAccount}">仮アカウント管理</a>
             <a th:href="@{/admin/master-data}">マスタデータ管理</a>
+            <a th:href="@{/admin/nfc/idle}">NFC管理</a>
             <form th:action="@{/logout}" method="post" style="display:inline;">
               <button type="submit">ログアウト</button>
             </form>
@@ -120,8 +121,9 @@
       <a th:href="@{/profile}" class="icon-link">
         <i class="fas fa-user"></i>
       </a>
-      <a href="#" class="icon-link notification">
+      <a th:href="@{/notifications}" class="icon-link notification">
         <i class="fas fa-bell"></i>
+        <span class="notification-dot" th:if="${hasUnread}"></span>
       </a>
     </div>
   </header>

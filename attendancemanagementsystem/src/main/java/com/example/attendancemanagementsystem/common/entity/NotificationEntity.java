@@ -33,6 +33,12 @@ public class NotificationEntity {
     @Column(name = "CreatedAt", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "IsRead", nullable = false)
+    private boolean isRead = false;
+
+    @Column(name = "IsBookmarked", nullable = false)
+    private boolean isBookmarked = false;
+
     // --- コンストラクタ ---
     public NotificationEntity() {}
 
@@ -85,5 +91,21 @@ public class NotificationEntity {
 
     public void setCreatedAt(LocalDateTime createdAt) { 
         this.createdAt = createdAt; 
+    }
+
+    public boolean isRead() { 
+        return isRead; 
+    }
+
+    public void setRead(boolean isRead) { 
+        this.isRead = isRead; 
+    }
+
+    public boolean isBookmarked() { 
+        return isBookmarked; 
+    }
+
+    public void setBookmarked(boolean isBookmarked) { 
+        this.isBookmarked = isBookmarked; 
     }
 }

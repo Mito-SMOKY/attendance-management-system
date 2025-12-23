@@ -12,7 +12,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    // application.properties に書いた "spring.mail.username" を自動で読み込む
+    // 送信元アドレス
     @Value("${spring.mail.username}")
     private String fromAddress;
 

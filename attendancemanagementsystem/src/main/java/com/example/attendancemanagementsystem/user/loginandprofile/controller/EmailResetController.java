@@ -15,6 +15,7 @@ import com.example.attendancemanagementsystem.common.enums.OtpPurpose;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.common.service.OtpService;
 import com.example.attendancemanagementsystem.user.notification.service.NotificationEmailService;
+import com.example.attendancemanagementsystem.user.notification.service.NotificationMessageService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -33,6 +34,9 @@ public class EmailResetController {
 
     @Autowired
     private NotificationEmailService notificationEmailService;
+
+    @Autowired
+    private NotificationMessageService notificationMessageService;
 
     // 本人確認画面
     @GetMapping("/auth")
@@ -104,8 +108,7 @@ public class EmailResetController {
             
         } catch (RuntimeException e) {
             
-            // ★重要: クールタイムのエラー処理
-            // セッションが切れていても、画面に入力されたメアドを使って復元し、verify画面へ戻す
+            // クールタイムエラーの場合
             if (e.getMessage() != null && e.getMessage().contains("時間を空けて")) {
                 
                 // セッション復元
@@ -152,9 +155,9 @@ public class EmailResetController {
                 // 検証成功 -> メールアドレス更新実行
                 user.setEmail(newEmail);
                 usersRepository.save(user);
+                notificationMessageService.createEmailChangeCompletion(user);
                 
-                // ★重要: OTP掃除 & クールタイムリセット
-                // (これで変更直後でも、またすぐに変更手続きが可能になります)
+                // トークン掃除
                 otpService.clearOtp(user);
                 
                 // 完了通知
