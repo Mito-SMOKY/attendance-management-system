@@ -40,12 +40,6 @@ public class LoginController {
         return "student/main_calendar";
     }
 
-
-    @GetMapping("/timetable")
-    public String showtimetable() {
-        return "admin/timetable";
-    }
-
     @GetMapping("/attendance-information")
     public String showattendanceinformation() {
         return "admin/attendance-information";

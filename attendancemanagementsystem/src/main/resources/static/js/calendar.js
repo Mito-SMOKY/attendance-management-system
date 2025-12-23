@@ -1,377 +1,242 @@
-// currentViewMode 変数を追加
-let currentViewMode = 'schedule'; // 'schedule' または 'attendance'
+// === 1. グローバル変数 ===
+let currentViewMode = 'schedule'; 
+let currentWeekStart;
+
+// === 2. モーダル制御関数 (定義を先に行う) ===
+function openModal(dateStr) {
+    const modal = document.getElementById('scheduleModal');
+    const modalDateEl = document.getElementById('modalDate');
+    const listContainer = document.getElementById('existing-events-list');
+
+    if (!modal || !modalDateEl) return;
+
+    // 日付の表示
+    modalDateEl.textContent = dateStr.replace(/-/g, '/') + ' の予定';
+    modalDateEl.dataset.rawDate = dateStr; // 保存用に生の日付を持っておく
+    
+    // 既存予定の表示
+    if (listContainer) {
+        const dailyEvents = (typeof calendarEventsData !== 'undefined' ? calendarEventsData : [])
+                            .filter(e => e.date === dateStr);
+        listContainer.innerHTML = dailyEvents.map(e => `
+            <div class="existing-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span>${e.title}</span>
+                <button type="button" class="delete-schedule-btn" data-id="${e.calendarId}" 
+                        style="background-color: #ff4d4d; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 4px;">
+                    削除
+                </button>
+            </div>
+        `).join('') || '<p>予定はありません</p>';
+    }
+
+    modal.style.display = 'block';
+}
+
+function closeModal() {
+    const modal = document.getElementById('scheduleModal');
+    if (modal) modal.style.display = 'none';
+}
 
 /**
- * 指定された年月のカレンダーHTMLを生成する
+ * 3. 削除処理
+ */
+function handleDeleteSchedule(button) {
+    const scheduleId = button.dataset.id;
+    if (!confirm('この予定を削除してもよろしいですか？')) return;
+
+    fetch(`/student/calendar/delete/${scheduleId}`, { method: 'DELETE' })
+    .then(response => {
+        if (response.ok) {
+            alert('予定を削除しました。');
+            window.location.reload(); // カレンダー再描画のためリロード
+        } else {
+            alert('削除に失敗しました。');
+        }
+    })
+    .catch(error => console.error('削除エラー:', error));
+}
+
+/**
+ * 4. カレンダー生成・描画ロジック
  */
 function createCalendar(month, year) {
     const monthDays = ["日", "月", "火", "水", "木", "金", "土"];
     let tableHTML = '<table class="calendar"><thead><tr>';
-    // 曜日ヘッダーの生成
     for (let i = 0; i < 7; i++) {
-        if (i === 0 || i === 6) {
-            tableHTML += `<th class="sun">${monthDays[i]}</th>`;
-        } else {
-            tableHTML += `<th>${monthDays[i]}</th>`;
-        }
+        tableHTML += `<th class="${i === 0 || i === 6 ? 'sun' : ''}">${monthDays[i]}</th>`;
     }
     tableHTML += '</tr></thead><tbody>';
+
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDay = new Date(year, month, 1).getDay();
     const daysInPrevMonth = new Date(year, month, 0).getDate();
+    const today = new Date();
+
     let dayCount = 1;
     let prevDayCount = daysInPrevMonth - firstDay + 1;
-    const dateObj = new Date();
-    const today = dateObj.getDate();
-    const currentMonth = dateObj.getMonth();
-    const currentYear = dateObj.getFullYear();
 
-    // 6週間分の行を生成
     for (let i = 0; i < 6; i++) {
         tableHTML += '<tr>';
-
-        // 7日分のセルを生成
         for (let j = 0; j < 7; j++) {
             if (i === 0 && j < firstDay) {
-                tableHTML += `<td class="mute">${prevDayCount}</td>`;
-                prevDayCount++;
+                tableHTML += `<td class="mute">${prevDayCount++}</td>`;
             } else if (dayCount > daysInMonth) {
-                let nextMonthDayCount = dayCount - daysInMonth;
-                tableHTML += `<td class="mute">${nextMonthDayCount}</td>`;
-                dayCount++;
+                tableHTML += `<td class="mute">${dayCount++ - daysInMonth}</td>`;
             } else {
-                // データ日付文字列を生成 (YYYY-MM-DD)
                 const dataDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayCount).padStart(2, '0')}`;
-
-                // currentViewMode によって描画内容を分岐
                 let eventsHtml = '';
+
                 if (currentViewMode === 'schedule') {
-                    // === 予定表モード ===
-                    if (Array.isArray(calendarEventsData)) {
-                        const dailyEvents = calendarEventsData.filter(event => event.date === dataDate);
-                        if (dailyEvents.length > 0) {
-                            eventsHtml = '<div class="schedule-list">';
-                            dailyEvents.forEach(event => {
-                                eventsHtml += `<div class="schedule-item">${event.title}</div>`; 
-                            });
-                            eventsHtml += '</div>';
-                        }
+                    const dailyEvents = (typeof calendarEventsData !== 'undefined' ? calendarEventsData : []).filter(e => e.date === dataDate);
+                    if (dailyEvents.length > 0) {
+                        eventsHtml = '<div class="schedule-list">' + 
+                            dailyEvents.map(e => `<div class="schedule-item">${e.title}</div>`).join('') + 
+                            '</div>';
                     }
                 } else {
-                    // === 出欠モード ===
-                    if (typeof attendanceRecordsData !== 'undefined' && Array.isArray(attendanceRecordsData)) {
-                        
-                        const dailyRecords = attendanceRecordsData.filter(record => record.date === dataDate);
-                        
-                        if (dailyRecords.length > 0) {
-                            let displayMark = '';
-                            let displayClass = '';
-
-                            const isAllPresent = dailyRecords.every(r => r.status === '出席');
-                            const isAllAbsent = dailyRecords.every(r => r.status === '欠席');
-                            const isAllPublic = dailyRecords.every(r => r.status === '公欠');
-
-                            if (isAllPresent) {
-                                displayMark = '〇';
-                                displayClass = 'attendance-present';
-                            } else if (isAllAbsent) {
-                                displayMark = '✕';
-                                displayClass = 'attendance-absent';
-                            } else if (isAllPublic) {
-                                displayMark = '〇';
-                                displayClass = 'attendance-public';
-                            } else {
-                                displayMark = '△';
-                                displayClass = 'attendance-late';
-                            }
-
-                            if (displayMark) {
-                                eventsHtml = `<div class="attendance-list"><span class="${displayClass}">${displayMark}</span></div>`;
-                            }
-                        }
+                    const dailyRecords = (typeof attendanceRecordsData !== 'undefined' ? attendanceRecordsData : []).filter(r => r.date === dataDate);
+                    if (dailyRecords.length > 0) {
+                        const isAllPresent = dailyRecords.every(r => r.status === '出席');
+                        const isAllAbsent = dailyRecords.every(r => r.status === '欠席');
+                        let mark = isAllPresent ? '〇' : isAllAbsent ? '✕' : '△';
+                        let cls = isAllPresent ? 'attendance-present' : isAllAbsent ? 'attendance-absent' : 'attendance-late';
+                        eventsHtml = `<div class="attendance-list"><span class="${cls}">${mark}</span></div>`;
                     }
                 }
 
-                let cellClass = '';
-                if (dayCount === today && month === currentMonth && year === currentYear) {
-                    cellClass = 'today';
-                } else if (j === 0) {
-                    cellClass = 'sun';
-                } else if (j === 6) {
-                    cellClass = 'sat';
-                }
-
-                tableHTML += `<td class="${cellClass}" data-date="${dataDate}">
-                                <div class="day-number">${dayCount}</div>
-                                ${eventsHtml}
-                                </td>`;
-                
+                const isToday = (dayCount === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                tableHTML += `<td class="${isToday ? 'today' : ''} ${j === 0 ? 'sun' : j === 6 ? 'sat' : ''}" data-date="${dataDate}">
+                                <div class="day-number">${dayCount}</div>${eventsHtml}</td>`;
                 dayCount++;
             }
         }
         tableHTML += '</tr>';
-        if (dayCount > daysInMonth && i >= 4) {
-            break;
-        }
+        if (dayCount > daysInMonth && i >= 4) break;
     }
-    tableHTML += '</tbody></table>';
-    return tableHTML;
+    return tableHTML + '</tbody></table>';
 }
 
 function renderCalendar(month, year) {
     const calendarYmEl = document.getElementById('calendar-ym'); 
     const calendarTableContainerEl = document.getElementById('calendar-table-container'); 
-    const yearInput = document.getElementById('yearInput');
-    const monthInput = document.getElementById('monthInput');
+    if (!calendarYmEl || !calendarTableContainerEl) return;
 
-    if (!calendarYmEl || !calendarTableContainerEl) {
-        return;
-    }
     calendarYmEl.textContent = `${year}年 ${month + 1}月`;
-    const tableHtml = createCalendar(month, year);
-    calendarTableContainerEl.innerHTML = tableHtml;
-
-    if (yearInput) yearInput.value = year;
-    if (monthInput) monthInput.value = month; 
+    calendarTableContainerEl.innerHTML = createCalendar(month, year);
 }
 
-
-// ===================================================================
-// ページ初期化処理 (修正箇所)
-// ===================================================================
-
+/**
+ * 5. 初期化
+ */
 function initializeCalendar() {
     const viewToggleCheckbox = document.getElementById('viewToggleCheckbox');
-    let serverMonth, serverYear;
-    
-    // 1. URLからパラメータを取得 (?date=...&mode=...)
-    const urlParams = new URLSearchParams(window.location.search);
-    const modeParam = urlParams.get('mode');
+    const yearSelector = document.getElementById('yearSelector');
+    const monthSelector = document.getElementById('monthSelector');
 
-    // 2. モードの復元処理
-    if (modeParam === 'attendance') {
-        currentViewMode = 'attendance';
-        if (viewToggleCheckbox) {
-            viewToggleCheckbox.checked = true; // トグルボタンをONにする
-        }
+    // --- A. 「現在の年」を取得 (プルダウンの選択肢の基準) ---
+    const todayObj = new Date();
+    const currentActualYear = todayObj.getFullYear();
+
+    // --- B. URLやサーバーからの情報を取得 (表示中のカレンダーの基準) ---
+    const urlParams = new URLSearchParams(window.location.search);
+    currentViewMode = urlParams.get('mode') === 'attendance' ? 'attendance' : 'schedule';
+    if (viewToggleCheckbox) viewToggleCheckbox.checked = (currentViewMode === 'attendance');
+
+    let serverMonth, serverYear;
+    if (typeof serverTargetMonthString === 'undefined' || !serverTargetMonthString) {
+        serverMonth = todayObj.getMonth();
+        serverYear = todayObj.getFullYear();
     } else {
-        currentViewMode = 'schedule';
-        if (viewToggleCheckbox) {
-            viewToggleCheckbox.checked = false;
-        }
+        const d = new Date(serverTargetMonthString + "T00:00:00"); 
+        serverMonth = d.getMonth(); 
+        serverYear = d.getFullYear();
     }
 
-    // 3. 日付の復元処理
-    if (typeof serverTargetMonthString === 'undefined' || !serverTargetMonthString) {
-        const fallbackDate = new Date();
-        serverMonth = fallbackDate.getMonth();
-        serverYear = fallbackDate.getFullYear();
-    } else {
-        const serverDate = new Date(serverTargetMonthString + "T00:00:00"); 
-        serverMonth = serverDate.getMonth(); 
-        serverYear = serverDate.getFullYear();
+    // --- C. 年プルダウン生成 (常に「現在の年」から±2年) ---
+    if (yearSelector) {
+        yearSelector.innerHTML = '';
+        // 現在の年から-2年 〜 +2年 の固定範囲をループ
+        for (let y = currentActualYear - 2; y <= currentActualYear + 2; y++) {
+            yearSelector.add(new Option(y + '年', y));
+        }
+        // プルダウンの選択状態は「表示中の年」に合わせる
+        yearSelector.value = serverYear;
+    }
+
+    // --- D. 月プルダウン生成 ---
+    if (monthSelector) {
+        monthSelector.innerHTML = '';
+        for (let m = 0; m < 12; m++) {
+            monthSelector.add(new Option((m + 1) + '月', m));
+        }
+        monthSelector.value = serverMonth;
     }
 
     renderCalendar(serverMonth, serverYear);
 }
 
-
+// === 6. イベントリスナー登録 (DOMContentLoaded) ===
 document.addEventListener('DOMContentLoaded', () => {
-
-    const yearInput = document.getElementById('yearInput');
-    const monthInput = document.getElementById('monthInput');
-    const jumpButton = document.getElementById('jumpButton');
-    const viewToggleCheckbox = document.getElementById('viewToggleCheckbox');
-    const calendarTableContainerEl = document.getElementById('calendar-table-container'); 
-
     initializeCalendar();
 
-    //表示ボタンのクリックイベント
-    if (jumpButton) {
-        jumpButton.addEventListener('click', () => {
-            const selectedYear = parseInt(yearInput.value, 10);
-            const selectedMonth = parseInt(monthInput.value, 10);
-            
-            // 現在のモードを取得
-            const currentMode = viewToggleCheckbox && viewToggleCheckbox.checked ? 'attendance' : 'schedule';
+    const yearSelector = document.getElementById('yearSelector');
+    const monthSelector = document.getElementById('monthSelector');
+    const viewToggleCheckbox = document.getElementById('viewToggleCheckbox');
+    const calendarTableContainerEl = document.getElementById('calendar-table-container');
 
-            if (!isNaN(selectedYear) && !isNaN(selectedMonth)) {
-                // URLに &mode=... を追加して遷移
-                location.href = `/student/main_calendar?month=${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}&mode=${currentMode}`;
+    // 更新ハンドラ（URL遷移）
+    const handleUpdate = () => {
+        const y = yearSelector.value;
+        const m = String(parseInt(monthSelector.value) + 1).padStart(2, '0');
+        const mode = viewToggleCheckbox && viewToggleCheckbox.checked ? 'attendance' : 'schedule';
+        location.href = `/student/main_calendar?month=${y}-${m}&mode=${mode}`;
+    };
+
+    yearSelector?.addEventListener('change', handleUpdate);
+    monthSelector?.addEventListener('change', handleUpdate);
+    viewToggleCheckbox?.addEventListener('change', handleUpdate);
+
+    // カレンダークリック
+    calendarTableContainerEl?.addEventListener('click', (event) => {
+        const targetCell = event.target.closest('td[data-date]');
+        if (targetCell) {
+            const dateStr = targetCell.dataset.date;
+            if (viewToggleCheckbox && viewToggleCheckbox.checked) {
+                window.location.href = `/student/attendance/date?date=${dateStr}`;
             } else {
-                alert("有効な年月を入力してください。");
-            }
-        });
-    }
-
-    // トグルボタンのイベントリスナー
-    if (viewToggleCheckbox) {
-        viewToggleCheckbox.addEventListener('change', () => {
-            if (viewToggleCheckbox.checked) {
-                currentViewMode = 'attendance'; 
-            } else {
-                currentViewMode = 'schedule'; 
-            }
-            const currentSelectedYear = parseInt(yearInput.value, 10);
-            const currentSelectedMonth = parseInt(monthInput.value, 10);
-            if (!isNaN(currentSelectedYear) && !isNaN(currentSelectedMonth)) {
-                renderCalendar(currentSelectedMonth, currentSelectedYear);
-            }
-        });
-    }
-    
-    // モーダル関連 & 画面遷移ロジック
-
-    const modal = document.getElementById('scheduleModal');
-    const closeButton = document.getElementById('closeButton');
-    const scheduleForm = document.getElementById('scheduleForm');
-    const modalDateEl = document.getElementById('modalDate');
-
-    function openModal(dateStr) {
-        const dateObj = new Date(dateStr + 'T00:00:00'); 
-        const year = dateObj.getFullYear();
-        const month = dateObj.getMonth() + 1;
-        const day = dateObj.getDate();
-        
-        modalDateEl.textContent = `${year}年 ${month}月 ${day}日`;
-        modalDateEl.dataset.rawDate = dateStr; 
-
-        const existingListEl = document.getElementById('existing-events-list');
-        if (existingListEl) {
-            existingListEl.innerHTML = ''; 
-            const dailyEvents = calendarEventsData.filter(event => event.date === dateStr);
-            if (dailyEvents.length > 0) {
-                dailyEvents.forEach(event => {
-                    const itemHtml = `
-                        <div class="existing-item">
-                            <button class="delete-schedule-btn" type="button" data-id="${event.calendarId}">×</button>
-                            <span>${event.title}</span>
-                        </div>
-                    `;
-                    existingListEl.innerHTML += itemHtml;
-                });
-            } else {
-                existingListEl.innerHTML = '<p>登録済みの予定はありません。</p>';
+                openModal(dateStr);
             }
         }
-        scheduleForm.reset(); 
-        modal.style.display = 'flex'; 
-    }
+    });
 
-    function closeModal() {
-        modal.style.display = 'none';
-    }
-
-    if (calendarTableContainerEl) {
-        calendarTableContainerEl.addEventListener('click', (event) => {
-            const targetCell = event.target.closest('td[data-date]');
-            if (targetCell) {
-                const dateStr = targetCell.dataset.date;
-                
-                if (currentViewMode === 'attendance') {
-                    window.location.href = `/student/attendance/date?date=${dateStr}`;
-                } else {
-                    openModal(dateStr);
-                }
-            }
-        });
-    }
-
-    function handleDeleteSchedule(button) {
-        const scheduleId = button.dataset.id;
-        
-        if (!confirm('この予定を削除してもよろしいですか？')) {
-            return; 
+    // モーダル内クリック（削除ボタンなど）
+    document.getElementById('scheduleModal')?.addEventListener('click', (event) => {
+        const deleteBtn = event.target.closest('.delete-schedule-btn');
+        if (deleteBtn) {
+            handleDeleteSchedule(deleteBtn);
+        } else if (event.target.id === 'scheduleModal') {
+            closeModal();
         }
+    });
 
-        fetch(`/student/calendar/delete/${scheduleId}`, {
-            method: 'DELETE',
-        })
-        .then(response => {
-            if (response.ok) {
-                alert('予定を削除しました。');
-                button.closest('.existing-item').remove();
+    document.getElementById('closeButton')?.addEventListener('click', closeModal);
 
-                const index = calendarEventsData.findIndex(event => event.calendarId == scheduleId); 
-                if (index > -1) {
-                    calendarEventsData.splice(index, 1);
-                }
-                const parts = modalDateEl.textContent.match(/(\d+)年 (\d+)月/);
-                if (parts) {
-                    const year = parseInt(parts[1], 10);
-                    const month = parseInt(parts[2], 10) - 1;
-                    renderCalendar(month, year);
-                }
-            } else {
-                alert('削除に失敗しました。サーバーエラーが発生しました。');
-            }
-        })
-        .catch(error => {
-            console.error('削除処理で通信エラー:', error);
-            alert('削除中に通信エラーが発生しました。');
-        });
-    }
+    // 予定追加フォーム
+    document.getElementById('scheduleForm')?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const title = document.getElementById('scheduleTitle').value;
+        const date = document.getElementById('modalDate').dataset.rawDate;
 
-    if (closeButton) {
-        closeButton.addEventListener('click', closeModal);
-    }
-    if (modal) {
-        modal.addEventListener('click', (event) => {
-            const deleteButton = event.target.closest('.delete-schedule-btn');
-            if (deleteButton) {
-                event.stopPropagation(); 
-                handleDeleteSchedule(deleteButton); 
-                return;
-            }
-            if (event.target === modal) {
-                closeModal();
-            }
-        });
-    }
-
-    if (scheduleForm) {
-        scheduleForm.addEventListener('submit', (event) => {
-            event.preventDefault(); 
-            const title = document.getElementById('scheduleTitle').value;
-            
-            const date = modalDateEl.dataset.rawDate; 
-            
-            if (!date) {
-                console.error("日付データが見つかりません。");
-                alert("日付エラーが発生しました。");
-                return;
-            }
-
-            const formData = new URLSearchParams();
-            formData.append('title', title);
-            formData.append('date', date);
-
-            fetch('/student/calendar/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: formData
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert("予定を保存しました。");
-                    window.location.reload(); 
-                } else {
-                    alert("保存に失敗しました。サーバーエラーが発生しました。");
-                }
-            })
-            .catch(error => {
-                console.error('保存処理で通信エラー:', error);
-                alert("保存中に通信エラーが発生しました。");
-            });
-        });
-    }
+        const formData = new URLSearchParams({ title, date });
+        fetch('/student/calendar/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData
+        }).then(res => res.ok ? window.location.reload() : alert("保存失敗"));
+    });
 });
 
 // BFcache対策
-window.addEventListener('pageshow', function(event) {
-    if (event.persisted) {
-        initializeCalendar();
-    }
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted) initializeCalendar();
 });

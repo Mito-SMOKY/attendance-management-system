@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('window.initialWeekStartStr', initialWeekStartStr, 'initialDateStr', initialDateStr, 'initialData?', !!initialData);
 
-    // currentUserId の初期化とイベントリスナーの設定
     let currentUserId; 
     
     const userSelect = document.getElementById('adminUserSelect');
@@ -67,9 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return date;
     }
 
-    // --------------------------------------------------------------------------
-    // ★★★ 修正ブロック: currentWeekStart の初期化 ★★★
-    // --------------------------------------------------------------------------
     let currentWeekStart;
     
     // 1. HTMLから渡された日付文字列をパース
