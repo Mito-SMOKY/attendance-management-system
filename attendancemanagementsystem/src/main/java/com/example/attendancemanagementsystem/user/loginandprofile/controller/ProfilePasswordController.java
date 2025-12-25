@@ -18,7 +18,7 @@ import com.example.attendancemanagementsystem.user.loginandprofile.service.Custo
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/profile/security/password") // URLの共通部分
+@RequestMapping("/profile/security/password")
 public class ProfilePasswordController {
 
     @Autowired
@@ -26,22 +26,23 @@ public class ProfilePasswordController {
     @Autowired
     private OtpService otpService;
 
-    // 1. 初回メール送信 & 画面遷移
+    // OTPリクエスト画面
     @GetMapping("/request-otp")
     public String requestOtpForPasswordChange(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             RedirectAttributes redirectAttributes) {
-        try {
-            UsersEntity user = usersRepository.findById(userDetails.getUserId()).orElseThrow();
-            otpService.sendOtp(user, user.getEmail(), OtpPurpose.PASSWORD_CHANGE);
-            return "redirect:/profile/security/password/verify";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "送信失敗");
-            return "redirect:/privacySetting"; 
-        }
-    }
 
-    // 2. 再送信処理
+        UsersEntity user = usersRepository.findById(userDetails.getUserId()).orElseThrow();
+
+        try {
+            otpService.sendOtp(user, user.getEmail(), OtpPurpose.PASSWORD_CHANGE);
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "メールの再送信間隔が短すぎます。既存のコードを使用してください。");
+        }
+        return "redirect:/profile/security/password/verify";
+    }
+    // 再送信処理
     @PostMapping("/resend-otp")
     public String resendOtpForPasswordChange(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -58,13 +59,13 @@ public class ProfilePasswordController {
         }
     }
 
-    // 3. OTP入力画面
+    // OTP入力画面
     @GetMapping("/verify")
     public String showPasswordOtpPage() {
         return "common/password_verify_otp";
     }
 
-    // 4. OTP検証
+    // OTP検証
     @PostMapping("/verify")
     public String verifyPasswordOtp(
             @RequestParam("otp") String otp,
@@ -83,7 +84,7 @@ public class ProfilePasswordController {
         }
     }
 
-    // 5. 新パスワード入力画面
+    // 新パスワード入力画面
     @GetMapping("/new")
     public String showNewPasswordPage(HttpSession session) {
         if (session.getAttribute("passwordChangeVerified") == null) {
@@ -92,7 +93,7 @@ public class ProfilePasswordController {
         return "common/reset_password";
     }
 
-    // 6. パスワード更新実行
+    // パスワード更新実行
     @PostMapping("/update")
     public String updatePassword(
             @RequestParam("password") String password,
@@ -121,7 +122,7 @@ public class ProfilePasswordController {
         return "redirect:/profile/security/password/complete";
     }
 
-    // 7. 完了画面
+    // 完了画面
     @GetMapping("/complete")
     public String showPasswordCompletePage() {
         return "common/update";
