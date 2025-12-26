@@ -189,7 +189,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const y = yearSelector.value;
         const m = String(parseInt(monthSelector.value) + 1).padStart(2, '0');
         const mode = viewToggleCheckbox && viewToggleCheckbox.checked ? 'attendance' : 'schedule';
-        location.href = `/student/main_calendar?month=${y}-${m}&mode=${mode}`;
+        // 現在のパス（例: /superadmin/main_calendar）を「/」で分割
+        const pathSegments = window.location.pathname.split('/'); 
+            // pathSegments[0]は空文字、pathSegments[1]にロール名（superadmin 等）が入る
+        const rolePath = pathSegments[1];
+        location.href =  `/${rolePath}/main_calendar?month=${y}-${m}&mode=${mode}`;
     };
 
     yearSelector?.addEventListener('change', handleUpdate);
@@ -202,7 +206,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (targetCell) {
             const dateStr = targetCell.dataset.date;
             if (viewToggleCheckbox && viewToggleCheckbox.checked) {
-                window.location.href = `/student/attendance/date?date=${dateStr}`;
+                // 現在のパス（例: /superadmin/main_calendar）を「/」で分割
+            const pathSegments = window.location.pathname.split('/'); 
+            // pathSegments[0]は空文字、pathSegments[1]にロール名（superadmin 等）が入る
+            const rolePath = pathSegments[1]; 
+            
+            // 動的なパスを使ってURLを組み立てる
+            window.location.href = `/${rolePath}/attendance/date?date=${dateStr}`;
             } else {
                 openModal(dateStr);
             }

@@ -66,7 +66,7 @@
     </script>
 </th:block>
 
-
+<!-- 生徒用ヘッダー -->
 <div th:fragment="student-header">
   <header class="main-header-student">
     <div class="header-left">
@@ -91,6 +91,7 @@
   </header>
 </div>
 
+<!-- 管理者用ヘッダー -->
 <div th:fragment="admin-header">
   <header class="main-header-admin">
     <div class="header-left">
@@ -99,14 +100,53 @@
     <nav class="header-nav">
       <ul>
         <li><a th:href="@{/admin/timetable}">日付</a></li>
-        <li><a href="#">教科</a></li>
-        <li><a href="#">生徒</a></li>
+        <li><a th:href="@{/admin/subjectList}">教科</a></li>
+        <li><a th:href="@{/admin/studentList}">生徒</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle">その他 ▼</a>
           <div class="dropdown-menu">
             <a th:href="@{/admin/tmpAccount}">仮アカウント管理</a>
             <a th:href="@{/admin/master-data}">マスタデータ管理</a>
             <a th:href="@{/admin/nfc/idle}">NFC管理</a>
+            <a th:href="@{/admin/timeTableList}">時間割一覧</a>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+              <button type="submit">ログアウト</button>
+            </form>
+          </div>
+        </li>
+      </ul>
+    </nav>
+    <div class="header-right">
+      <a th:href="@{/profile}" class="icon-link">
+        <i class="fas fa-user"></i>
+      </a>
+      <a th:href="@{/notifications}" class="icon-link notification">
+        <i class="fas fa-bell"></i>
+        <span class="notification-dot" th:if="${hasUnread}"></span>
+      </a>
+    </div>
+  </header>
+</div>
+
+
+<!-- 上位管理者用ヘッダー -->
+<div th:fragment="superadmin-header">
+  <header class="main-header-admin">
+    <div class="header-left">
+      <span sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
+    </div>
+    <nav class="header-nav">
+      <ul>
+        <li><a th:href="@{/admin/timetable}">日付</a></li>
+        <li><a th:href="@{/admin/subjectList}">教科</a></li>
+        <li><a th:href="@{/admin/studentList}">生徒</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle">その他 ▼</a>
+          <div class="dropdown-menu">
+            <a th:href="@{/admin/tmpAccount}">仮アカウント管理</a>
+            <a th:href="@{/admin/master-data}">マスタデータ管理</a>
+            <a th:href="@{/admin/nfc/idle}">NFC管理</a>
+            <a th:href="@{/admin/timeTableList}">時間割一覧</a>
             <form th:action="@{/logout}" method="post" style="display:inline;">
               <button type="submit">ログアウト</button>
             </form>

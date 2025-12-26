@@ -27,7 +27,7 @@
     
     /* ▼▼▼ 修正: 下線と余白の設定 ▼▼▼ */
     display: inline-block;        /* 下線の幅を文字幅に合わせる */
-    border-bottom: 3px solid #539DA4; /* 水色の下線 */
+    border-bottom: 3px solid #00bdca; /* 水色の下線 */
     padding-bottom: 5px;          /* 文字と線の隙間 */
     margin-bottom: 30px;          /* 下のボタンとの間隔 */
 }
@@ -53,7 +53,7 @@
     height: 100px;
     
     background-color: #fff;
-    color: #539DA4;
+    color: #00bdca;
     
     border: 1px solid #333;
     border-radius: 12px;

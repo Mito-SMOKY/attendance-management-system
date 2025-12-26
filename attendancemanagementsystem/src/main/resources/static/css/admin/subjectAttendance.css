@@ -14,7 +14,6 @@ body {
     padding: 0;
     font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
     font-size: 16px; 
-    background-color: #f4f4f9;
     color: #333;
 }
 
@@ -120,12 +119,13 @@ body {
 
 /* 項目名セル */
 .detail-table th {
-    background-color: #539DA4; /* 画像のような青緑色 */
+    background-color: #00acbd; /* 画像のような青緑色 */
     color: white;
     font-weight: normal;
     text-align: center;
     width: 25%; /* 4カラムのバランス */
     white-space: nowrap;
+    font-weight: bold;
 }
 
 /* データ内容セル */
@@ -174,12 +174,13 @@ body {
 
 /* ヘッダー固定 */
 .student-table thead th {
-    background-color: #539DA4;
+    background-color: #00acbd;
     color: white;
     font-weight: normal;
     position: sticky;
     top: 0;
     z-index: 1;
+    font-weight: bold;
 }
 
 .student-table tbody td {

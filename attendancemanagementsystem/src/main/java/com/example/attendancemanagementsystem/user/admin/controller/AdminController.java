@@ -1,6 +1,5 @@
 package com.example.attendancemanagementsystem.user.admin.controller;
 
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -23,16 +22,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.attendancemanagementsystem.common.entity.ClassroomEntity; // ★追加
-import com.example.attendancemanagementsystem.common.entity.Datalist;
+import com.example.attendancemanagementsystem.common.entity.ClassroomEntity;
+import com.example.attendancemanagementsystem.common.entity.Datalist; // ★追加
 import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
 import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm;
-import com.example.attendancemanagementsystem.user.admin.service.AdminClassroomService; // ★追加
-import com.example.attendancemanagementsystem.user.admin.service.AdminService;
+import com.example.attendancemanagementsystem.user.admin.service.AdminClassroomService;
+import com.example.attendancemanagementsystem.user.admin.service.AdminService; // ★追加
 import com.example.attendancemanagementsystem.user.admin.service.AdminSubjectService;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/admin")
@@ -61,14 +58,44 @@ public class AdminController {
         return "admin/timetable";
     }
 
-    @GetMapping("/home")
-    public String home() {
-        return "admin/home";
+    @GetMapping("/subjectList")
+    public String showSubjectList() {
+        return "admin/subjectList";
+    }
+
+    @GetMapping("/subjectAttendance")
+    public String showSubjectAttendance() {
+        return "admin/subjectAttendance";
+    }
+
+    @GetMapping("/studentList")
+    public String showStudentList() {
+        return "admin/studentList";
+    }
+
+    @GetMapping("/studentInfo")
+    public String showStudentInfo() {
+        return "admin/studentInfo";
+    }
+
+    @GetMapping("/timeTableList")
+    public String showtimeTableList() {
+        return "admin/timeTableList";
+    }
+
+    @GetMapping("/timeTableEdit")
+    public String showtimeTableEdit() {
+        return "admin/timeTableEdit";
     }
 
     @GetMapping("/tmpAccount")
-    public String showTmpAccountMenu() {
+    public String showTmpAccount() {
         return "admin/tmpAccount";
+    }
+
+    @GetMapping("/accountManage")
+    public String showAccountManage() {
+        return "admin/accountManage";
     }
 
     @GetMapping("/upload")

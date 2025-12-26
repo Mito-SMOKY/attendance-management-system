@@ -28,7 +28,7 @@
 }
 
 .student-timetable-header {
-    margin-top: 100px;
+    margin-top: 70px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -64,8 +64,8 @@
 
 .nav-arrow {
     background: none;
-    border: 1px solid #00cabd;
-    color: #00cabd;
+    border: 1px solid #00bdca;
+    color: #00bdca;
     padding: 4px 10px;
     margin: 0 10px;
     cursor: pointer;
@@ -80,7 +80,7 @@
 .calendar-icon {
     /* カレンダーアイコンのスタイル */
     font-size: 1em;
-    color: #00cabd;
+    color: #00bdca;
     cursor: pointer;
 }
 
@@ -104,7 +104,7 @@
 }
 
 .timetable thead th {
-    background-color: #00acbd;
+    background-color: #00bdca;
     color: white;
     font-weight: bold;
     font-size: 0.9em;
@@ -127,7 +127,7 @@
 .subject-name {
     font-size: 1.5em;
     font-weight: bold;
-    color: #00acbd;
+    color: #00bdca;
 }
 
 .classroom-name {
@@ -144,7 +144,7 @@
 
 /* 管理者ユーザー選択プルダウン */
 .selectbox-3 {
-    margin-top: 100px;
+    margin-top: 70px;
     margin-left:60px;
     display: inline-flex;
     align-items: center;
@@ -157,7 +157,7 @@
     right: 15px;
     width: 10px;
     height: 7px;
-    background-color: #00acbd;
+    background-color: #00bdca;
     clip-path: polygon(0 0, 100% 0, 50% 100%);
     content: '';
     pointer-events: none;

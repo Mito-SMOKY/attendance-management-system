@@ -44,9 +44,9 @@ body {
 
 /* 適用ボタン */
 .btn-apply {
-    background-color: #5aaeb6;
+    background-color: #00bdca;
     color: white;
-    border: 1px solid #4a9ea6;
+    border: 1px solid #00bdca;
     padding: 5px 20px;
     border-radius: 5px;
     cursor: pointer;
@@ -54,7 +54,7 @@ body {
     transition: background-color 0.3s;
 }
 .btn-apply:hover {
-    background-color: #4a9ea6;
+    background-color: #00bdca;
 }
 
 /* 入力テーブル */
@@ -75,7 +75,7 @@ body {
 
 /* 左側のヘッダーセル */
 .input-table th {
-    background-color: #5aaeb6; /* parts.cssのテーマカラー */
+    background-color: #00bdca; /* parts.cssのテーマカラー */
     color: white;
     width: 30%;
     font-weight: normal;
@@ -113,8 +113,8 @@ select, input[type="text"], input[type="date"] {
 /* セッション開始ボタン */
 .btn-start-session {
     background-color: white;
-    color: #5aaeb6;
-    border: 2px solid #5aaeb6; /* 画像に合わせて枠線をテーマカラーに */
+    color: #00bdca;
+    border: 2px solid #00bdca; /* 画像に合わせて枠線をテーマカラーに */
     padding: 15px 60px;
     font-size: 1.3rem;
     font-weight: bold;

@@ -272,6 +272,15 @@
     padding: 30px;
     border-radius: 8px;
     min-width: 300px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 650px;
+    background-color: #fefefe;
+    z-index: 2;
+    border-radius: 5px;
 }
 
 .modal-content form div {

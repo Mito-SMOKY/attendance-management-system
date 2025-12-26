@@ -3,75 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>教科一覧</title>
-    
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/admin/adminSubjectList.css}">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/common/subjectList.css}"> 
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
-
-    <div class="header-container">
-        <div th:replace="~{fragments/_parts :: header(title='出欠管理システム')}"></div>
-    </div>
     
-    <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/timetable')}"></div>
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
 
-    <div class="subject-list-container">
-        
-        <div class="page-header-wrapper">
-            <h1 class="page-title">教科一覧</h1>
-        </div>
+    <!-- 教科一覧のコンテナ -->
+    <div class="main-container">
+        <table class="subject-table">
+            <thead>
+                <tr>
+                    <th class="col-subject">教科名</th>
+                    <th class="col-teacher">担当教師</th>
+                    <th class="col-attendance">出席率</th>
+                </tr>
+            </thead>
 
-        <div class="search-filter-area">
-            
-            <form action="#" method="get" class="search-form">
-                <input type="text" class="search-input" placeholder="教科名を検索">
-            </form>
+            <tbody>
+                <tr th:each="subject : ${subjectList}">
+                    <td class="subject-info-cell">
+                        <div th:text="${subject.courseName}" class="course-name"></div>
+                        <a th:href="@{/admin/subject_attendance(subjectId=${subject.subjectId})}" 
+                            th:text="${subject.subjectName}" 
+                            class="subject-name">
+                        </a>
+                    </td>
+                    
+                    <td th:text="${subject.teacherName}" class="teacher-name-cell"></td>
+                    
+                    <td class="attendance-cell">
+                        <span th:if="${subject.isAttendanceRisk()}" class="risk-warning">&#9888;</span>
 
-            <button type="submit" class="tool-btn">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-
-            <button class="tool-btn">
-                <i class="fa-solid fa-sliders"></i>
-            </button>
-            
-        </div>
-
-        <div class="table-wrapper">
-            <table class="subject-table">
-                <colgroup>
-                    <col style="width: 100%;">
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th>教科名</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
+                        <span th:text="|${subject.attendedClasses}/${subject.totalClasses}コマ|"></span>
+                        
+                        <span th:text="|${#numbers.formatDecimal(subject.attendanceRate * 100, 0, 0)}%履修済|"></span>
+                        
+                        <!-- atenndanceRate=出席率の計算 
+                        現在までの授業数/現在までの受講数で算出-->
+                        <div class="attendance-bar-container">
+                            <div class="attendance-bar" 
+                                th:style="|width: ${#numbers.formatDecimal(subject.attendanceRate * 100, 0, 0)}%;|"
+                                th:classappend="${subject.isAttendanceRisk()} ? 'risk-bar' : ''">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
 </body>

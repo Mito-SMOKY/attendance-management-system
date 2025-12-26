@@ -42,7 +42,7 @@ body {
     margin: 0;
     
     display: inline-block;        
-    border-bottom: 3px solid #539DA4;
+    border-bottom: 3px solid #00bdca;
     padding-bottom: 5px;          
     margin-bottom: 30px;
 }
@@ -75,7 +75,7 @@ body {
    設定ボックス (青い枠線エリア)
    ========================================= */
 .settings-box {
-    border: 2px solid #6EC7D3; /* スクリーンショットに近い少し明るめの水色 */
+    border: 2px solid #00bdca; /* スクリーンショットに近い少し明るめの水色 */
     border-radius: 20px;
     padding: 30px 40px;
     margin-bottom: 40px;
@@ -127,7 +127,7 @@ body {
 
 input[type="checkbox"] {
     transform: scale(1.5); /* チェックボックスを少し大きく */
-    accent-color: #539DA4;
+    accent-color: #00bdca;
 }
 
 /* 参照ボタン付き入力欄 */
@@ -164,10 +164,10 @@ input[type="checkbox"] {
     height: 50px;
     
     /* 統一デザインの水色ボタン */
-    background-color: #539DA4; /* 写真では白ですが、他画面と統一するため水色に設定 */
+    background-color: #00bdca; /* 写真では白ですが、他画面と統一するため水色に設定 */
     color: white;
     
-    border: 1px solid #539DA4;
+    border: 1px solid #00bdca;
     border-radius: 8px;
     
     font-size: 1.2rem;
