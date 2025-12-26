@@ -65,7 +65,10 @@ public class OtpService {
         
         } else if (purpose == OtpPurpose.EMAIL_CHANGE) {
             notificationEmailService.sendEmailChangeOtp(user, targetEmail, rawToken, EXPIRY_MINUTES);
-        }
+            
+        } else if (purpose == OtpPurpose.PASSWORD_CHANGE) {
+        notificationEmailService.sendPasswordChangeOtp(user, rawToken, EXPIRY_MINUTES);
+    }
     }
 
     // OTP検証処理

@@ -1,0 +1,179 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    color: #333;
+    background-color: #fff;
+}
+
+/* =========================================
+   ヘッダー
+   ========================================= */
+.header-bar {
+    background: linear-gradient(90deg, #6CC0C8 0%, #539DA4 100%);
+    height: 70px;
+    width: 100%;
+    margin-bottom: 50px;
+}
+
+/* =========================================
+   レイアウトコンテナ
+   ========================================= */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 40px;
+    text-align: center;
+}
+
+.backbutton-container {
+    margin-bottom: 40px;
+    text-align: left;
+}
+
+/* =========================================
+   タイトル
+   ========================================= */
+.title-area {
+    margin-bottom: 60px;
+}
+
+.system-title {
+    color: #539DA4; /* 濃い青緑 */
+    font-size: 1.8rem;
+    font-weight: bold;
+    display: inline-block;
+    border-bottom: 3px solid #539DA4; /* 下線 */
+    padding-bottom: 10px;
+    margin: 0;
+}
+
+/* =========================================
+   入力フォームエリア（横並び）
+   ========================================= */
+.input-area-inline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* 入力欄とボタンの間隔 */
+    margin-bottom: 10px;
+}
+
+/* OTP入力欄 */
+.otp-input {
+    width: 300px;
+    padding: 10px;
+    font-size: 2rem; /* 文字を大きく */
+    text-align: center;
+    letter-spacing: 0.5em; /* 文字間隔を広げて _ _ _ _ _っぽく見せる */
+    border: 1px solid #707070;
+    border-radius: 8px;
+    outline: none;
+    font-family: monospace; /* 数字の幅を均等に */
+}
+
+.otp-input:focus {
+    border-color: #539DA4;
+    box-shadow: 0 0 6px rgba(83, 157, 164, 0.4);
+}
+
+.otp-input::placeholder {
+    color: #ccc;
+    letter-spacing: 0.2em;
+    font-size: 1.5rem;
+    transform: translateY(-2px);
+}
+
+/* 送信ボタン（メインカラー） */
+.submit-btn {
+    background-color: #539DA4;
+    color: white;
+    border: 1px solid #539DA4;
+    padding: 10px 30px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: bold;
+    height: 60px; /* 入力欄と高さを合わせる */
+    min-width: 100px;
+}
+
+.submit-btn:hover {
+    background-color: #428288;
+    border-color: #428288;
+}
+
+/* =========================================
+   エラーメッセージ
+   ========================================= */
+.error-container {
+    height: 40px; /* エラーが出てもレイアウトがガタつかないように */
+    margin-bottom: 40px;
+}
+
+.error-msg {
+    color: #e74c3c; /* 赤色 */
+    font-size: 1rem;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.expire-link {
+    color: #539DA4;
+    text-decoration: underline;
+    display: block;
+    margin-top: 5px;
+}
+
+/* =========================================
+   再送信エリア
+   ========================================= */
+.resend-area {
+    margin-top: 60px;
+}
+
+.resend-label {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* 再送信ボタン（白背景） */
+.resend-btn {
+    background-color: #fff;
+    color: #555;
+    border: 1px solid #707070;
+    padding: 10px 40px;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.resend-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #333;
+    color: #333;
+}
+
+/* parts.css または loginVerifyOtp.css に追加 */
+.input-error {
+    border-color: #ff4d4f !important;
+    background-color: #fff1f0;
+}
+#jsErrorMsg {
+    color: #ff4d4f;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    display: none; /* 初期状態は非表示 */
+}

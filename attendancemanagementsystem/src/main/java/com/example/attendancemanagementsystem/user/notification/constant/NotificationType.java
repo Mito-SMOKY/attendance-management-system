@@ -69,6 +69,13 @@ public enum NotificationType {
         "【申請結果】申請が却下されました",
         "%s さん\n\n提出した申請（%s）が却下されました。\n理由: %s",
         "REQUEST"
+    ),
+    // --- ID: 9 (メール専用: ProfOTP) ---
+    PASSWORD_CHANGE_OTP(
+        9,
+        "【重要】パスワード変更用認証コード", 
+        "%s さん\n\nパスワード変更の手続きを受け付けました。\n以下の認証コードを入力してください。\n\n認証コード: %s\n有効期限: %d 分\n\n※心当たりがない場合は、速やかに管理者に連絡してください。",
+        "MAIL"
     );
 
     private final int id;
