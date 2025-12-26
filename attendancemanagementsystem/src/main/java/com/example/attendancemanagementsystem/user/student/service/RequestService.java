@@ -11,16 +11,19 @@ import com.example.attendancemanagementsystem.common.entity.RequestEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.RequestRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
+import com.example.attendancemanagementsystem.user.notification.service.NotificationMessageService;
 
 @Service
 public class RequestService {
 
     private final RequestRepository requestRepository;
     private final UsersRepository usersRepository;
+    private final NotificationMessageService notificationMessageService;
 
-    public RequestService(RequestRepository requestRepository, UsersRepository usersRepository) {
+    public RequestService(RequestRepository requestRepository, UsersRepository usersRepository, NotificationMessageService notificationMessageService) {
         this.requestRepository = requestRepository;
         this.usersRepository = usersRepository;
+        this.notificationMessageService = notificationMessageService;
     }
 
     //承認者候補（管理者）のリストを取得する
@@ -53,6 +56,8 @@ public class RequestService {
         if (approverId == null) {
             throw new IllegalArgumentException("承認者が選択されていません");
         }
+        UsersEntity approver = usersRepository.findById(approverId)
+                .orElseThrow(() -> new IllegalArgumentException("承認者が見つかりません: " + approverId));
         request.setApproverId(approverId);
         
         request.setStartDate(start);
@@ -66,8 +71,8 @@ public class RequestService {
 
         // 公欠申請の対象は自分自身
         request.addTargetUser(student);
-
         requestRepository.save(request);
+        notificationMessageService.createOfficialAbsenceRequestNotification(approver, student, reason);
     }
 
     //申請を取り下げる (ソフトデリート)
