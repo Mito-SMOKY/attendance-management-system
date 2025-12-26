@@ -13,68 +13,52 @@
 </head>
 
 <body>
-
     <div class="header-container">
-
         <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
             <div th:replace="~{fragments/_parts :: student-header}"></div>
         </div>
         <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
             <div th:replace="~{fragments/_parts :: admin-header}"></div>
         </div>
-
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
     </div>
 
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: historyBackButton}"></div>
+        <div th:replace="~{fragments/_parts :: backButton(url='/profile')}"></div>
     </div>
 
-
-    <!-- プロフィール全体 -->
     <div class="profile-container">
-
-        <!-- ユーザー情報のヘッダー -->
         <div class="user-header">
-
             <div class="form-container">
-                
-                <!-- アイコン -->
                 <div class="user-icon"></div>
-            
-                <!-- 名前変更 -->
                 <div class="form-item-group" id="name-group">
                     <p class="user-role" th:text="${userData.Role}"></p>
-                    
                     <div class="label-and-button">
                         <span class="label">氏名</span>
                     </div>
-                
                     <p class="display-name-value" id="display-value" th:text="${userData.Name}"></p>
                 </div>
             </div>
         </div>
-
         
         <hr class="header-separator">
 
-        <!-- 以下コンテンツ -->
         <div class="content-wrapper">
             <div class="card user-details-card">
-                
                 <ul class="detail-list">
-
                     <div class="detail-content">
                         <h1 class="card-title-big">プライバシー設定</h1>
                     </div>
 
                     <div class="detail-content">
-                        <a href="#" class="detail-link">パスワード変更</a>
+                        <a th:href="@{/profile/security/password/request-otp}" class="detail-link">パスワード変更</a>
                     </div>
                 </ul>
             </div>
         </div>
     </div>
-
     <script th:src="@{/js/profile.js}"></script>
 </body>
 </html>

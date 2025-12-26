@@ -47,6 +47,12 @@ public class NotificationEmailService {
             user.getName());
     }
 
+    // パスワード変更用OTP送信 (ログイン後)
+    public void sendPasswordChangeOtp(UsersEntity user, String otp, int expiryMinutes) {
+            send(user, NotificationType.PASSWORD_CHANGE_OTP, null, 
+                user.getName(), otp, expiryMinutes);
+        }
+
      // 指定アドレスへ送信処理
     private void sendToAddress(String toAddress, NotificationType type, String subjectArg, Object... bodyArgs) {
         try {
