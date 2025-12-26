@@ -22,8 +22,9 @@
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
     <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
     </div>
+
 </div>
 
     <div class="profile-container">

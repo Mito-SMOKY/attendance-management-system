@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>利用者メイン</title>
+    <title>管理者メイン</title>
     <link rel="stylesheet" th:href="@{/css/common/main_calendar.css}">
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
@@ -14,7 +14,7 @@
 <body>
 
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: student-header}"></div>
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
 
     <div id="calendar" class="calendar">
@@ -32,16 +32,16 @@
             
             <!-- 出欠切り替えトグル -->
             <div class="calendar-toggle" style="display: flex; justify-content: center; align-items: center; gap: 8px;">
-                予定表
+                <!-- 予定表
                 <label class="toggle-button">
                     <input type="checkbox" id="viewToggleCheckbox"/>
                 </label>
-                出欠
+                出欠 -->
 
                 <!-- 時間割ボタン -->
 
                 <div class="tooltip-005">
-                    <a href="/student/timetable">
+                    <a href="/admin/timetable">
                         <img th:src="@{/image/timetable.png}" alt="アイコン" style="width: 40px; height: 40px; vertical-align: middle;">
                     </a>
                     <p>時間割へ</p>
