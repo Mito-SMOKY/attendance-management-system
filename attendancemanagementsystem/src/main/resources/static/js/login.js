@@ -58,24 +58,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 jsErrorMsg.style.display = 'none';
             }
 
-            const pass = passwordInput ? passwordInput.value : '';
-
-            // ★文字数チェック (8文字未満 または 24文字超)
-            if (pass.length < 8 || pass.length > 24) {
-                e.preventDefault(); // 送信ストップ
-                showError('パスワードは8文字以上、24文字以下で入力してください。');
-                return;
-            }
-
-            // ★大文字・小文字チェック
-            const hasLowerCase = /[a-z]/.test(pass);
-            const hasUpperCase = /[A-Z]/.test(pass);
-
-            if (!hasLowerCase || !hasUpperCase) {
-                e.preventDefault(); // 送信ストップ
-                showError('パスワードには大文字と小文字をそれぞれ1文字以上含めてください。');
-                return;
-            }
             
             // 問題なければボタンを無効化（連打防止）
             if (submitBtn) {
