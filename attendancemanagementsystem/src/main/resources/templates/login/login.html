@@ -1,73 +1,63 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Attendance Management System</title>
     <link rel="stylesheet" th:href="@{/css/login/login.css}" />
     <link rel="stylesheet" th:href="@{/css/parts.css}" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
-  </head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
 
-  <body>
+<body>
     <div class="header-container">
-      <div th:replace="~{fragments/_parts :: main-header}"></div>
+        <div th:replace="~{fragments/_parts :: main-header}"></div>
     </div>
 
     <div class="login-container">
-      <h2 class="title">出欠管理システム</h2>
+        <h2 class="title">出欠管理システム</h2>
 
-      <form th:action="@{/login}" method="post">
-        <div class="form-group">
-          <label class="label" for="username"
-            >ユーザーID または メールアドレス</label
-          >
-          <input
-            class="form"
-            type="text"
-            id="username"
-            name="username"
-            required
-            placeholder="例）Miyu.k1234@gmail.com"
-          />
-        </div>
+        <div id="jsErrorMsg" style="color: red; text-align: center; margin-bottom: 15px; display: none;"></div>
 
-        <div class="form-group">
-          <label class="label" for="password">パスワード</label>
-          <div class="password-wrapper">
-            <input
-              class="form"
-              type="password"
-              id="password"
-              name="password"
-              required
-              placeholder="例）password1234"
-            />
-            <div th:replace="~{fragments/_parts :: passwordToggle('password')}"></div>
+        <form th:action="@{/login}" method="post" id="loginForm">
+            
+            <div class="form-group">
+                <label class="label" for="username">ユーザーID または メールアドレス</label>
+                <input class="form" type="text" id="username" name="username" required placeholder="例）Miyu.k1234@gmail.com" />
+            </div>
 
-          </div>
-        </div>
+            <div class="form-group">
+                <label class="label" for="password">パスワード</label>
+                <div class="password-wrapper">
+                    <input class="form" type="password" id="password" name="password" 
+                          required placeholder="例）password1234"
+                          minlength="8" maxlength="24" />
+                    <i class="fa-solid fa-eye-slash toggle-password" id="togglePassword"></i>
+                </div>
+            </div>
 
-        <div th:if="${param.error}">
-          <p class="error">ユーザーIDまたはパスワードが正しくありません。</p>
-        </div>
+            <div th:if="${param.error}">
+                <p class="error">ユーザーIDまたはパスワードが正しくありません。</p>
+            </div>
 
-        <a class="forget-password" th:href="@{/password/forgot}">
-          <p class="message">パスワードをお忘れですか？</p>
-        </a>
+            <a class="forget-password" th:href="@{/password/forgot}">
+                <p class="message">パスワードをお忘れですか？</p>
+            </a>
 
-        <a class="forget-password" th:href="@{/email/auth}" style="margin-top: 10px;">
-          <p class="message">メールアドレスを変更・再設定する</p>
-        </a>
+            <a class="forget-password" th:href="@{/email/auth}" style="margin-top: 10px;">
+                <p class="message">メールアドレスを変更・再設定する</p>
+            </a>
 
-        <button type="submit" class="button">ログイン</button>
-      </form>
+            <button type="submit" id="submitBtn" class="button">ログイン</button>
+        </form>
     </div>
-        <div th:if="${param.resetSuccess}">
-          <p style="color: blue; font-weight: bold; text-align: center;">パスワードを変更しました。<br>新しいパスワードでログインしてください。</p>
-        </div>
-  </body>
+
+    <div th:if="${param.resetSuccess}">
+        <p style="color: blue; font-weight: bold; text-align: center;">
+            パスワードを変更しました。<br />新しいパスワードでログインしてください。
+        </p>
+    </div>
+
+    <script th:src="@{/js/login.js}"></script>
+</body>
 </html>

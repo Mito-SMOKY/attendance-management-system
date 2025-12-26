@@ -1,0 +1,142 @@
+@charset "UTF-8";
+
+body {
+    font-family: "Yu Gothic", "YuGothic", sans-serif;
+    margin: 0;
+    color: #333;
+    background-color: #fff;
+}
+
+.header-bar {
+    background-color: #6CC0C8;
+    height: 60px;
+    width: 100%;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+/* タイトル：文字色は黒、下線は水色 */
+.main-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333; /* ★ここを黒に変更しました */
+    margin-bottom: 30px;
+    display: inline-block;
+    border-bottom: 2px solid #6CC0C8; /* 下線 */
+    padding-bottom: 10px;
+}
+
+.description {
+    font-size: 14px;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+/* フォームレイアウト */
+.form-content {
+    display: inline-block;
+    text-align: left;
+    width: 100%;
+    max-width: 400px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.label {
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+/* 入力欄のデザイン */
+.input-text {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.input-text:focus {
+    outline: none;
+    border-color: #6CC0C8;
+}
+
+/* パスワード表示切り替え（目のアイコン）用ラッパー */
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper .input-text {
+    padding-right: 45px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6CC0C8;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+/* ボタン */
+.submit-btn {
+    display: block;
+    width: 100%;
+    max-width: 250px;
+    margin: 40px auto 0;
+    padding: 12px;
+    background-color: #6CC0C8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.submit-btn:hover {
+    opacity: 0.8;
+}
+
+/* エラーメッセージ */
+.error-msg, .js-error-msg {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+    text-align: center;
+}
+.js-error-msg {
+    display: none;
+    margin-bottom: 15px;
+    background-color: #ffe6e6;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* 戻るリンク */
+.back-link {
+    display: block;
+    margin-top: 30px;
+    text-align: center;
+    color: #6CC0C8;
+    text-decoration: none;
+    font-size: 14px;
+}
+.back-link:hover {
+    text-decoration: underline;
+}

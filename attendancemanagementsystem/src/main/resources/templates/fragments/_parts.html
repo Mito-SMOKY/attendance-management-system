@@ -41,8 +41,8 @@
   
 <th:block th:fragment="passwordToggle(inputId)">
     <i class="fa-solid fa-eye-slash toggle-password" 
-      th:id="${'toggle-' + inputId}" 
-      style="cursor: pointer;"></i>
+       th:id="${'toggle-' + inputId}" 
+       style="cursor: pointer;"></i>
 
     <script th:inline="javascript">
         (function() {
@@ -78,6 +78,9 @@
         <li><a th:href="@{/student/subject-list}">教科</a></li>
         <li><a th:href="@{/student/request_main}">申請</a></li>
       </ul>
+      <form th:action="@{/logout}" method="post" style="display:inline;">
+        <button type="submit">ログアウト</button>
+      </form>
     </nav>
     <div class="header-right">
       <a th:href="@{/profile}" class="icon-link">

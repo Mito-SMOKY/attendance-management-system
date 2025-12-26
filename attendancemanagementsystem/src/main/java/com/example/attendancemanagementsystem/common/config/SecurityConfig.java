@@ -50,7 +50,8 @@ public class SecurityConfig {
             //     .ignoringRequestMatchers("/test/**")
             //     .ignoringRequestMatchers("/api/issue/**", "/api/attendance/record/**")
             // )
-            .csrf(csrf -> csrf.disable())
+
+            .csrf(csrf -> csrf.disable()) // 全面無効化（本番環境では適切に設定すること）
             
             // 3. ログイン画面の設定
             .formLogin(login -> login
