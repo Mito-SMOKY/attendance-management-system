@@ -18,39 +18,37 @@
     </div>
 
     <div id="calendar" class="calendar">
+
         
-        <div id="calendar-ym" class="calendar-ym"></div> 
         
-        <div class="calendar-header">
+        <div class="student-calendar-header">
+
             <div class="calendar-controls">
-                <input type="number" id="yearInput" class="input">
-                <label for="yearInput">年</label>
-                <select id="monthInput" class="input">
-                    <option value="0">1月</option>
-                    <option value="1">2月</option>
-                    <option value="2">3月</option>
-                    <option value="3">4月</option>
-                    <option value="4">5月</option>
-                    <option value="5">6月</option>
-                    <option value="6">7月</option>
-                    <option value="7">8月</option>
-                    <option value="8">9月</option>
-                    <option value="9">10月</option>
-                    <option value="10">11月</option>
-                    <option value="11">12月</option>
-                </select>
-                <label for="monthInput">月</label>
-                    
-                <button id="jumpButton" class="jumpButton">表示</button>
+                <select class="input" id="yearSelector"></select>
+                <select class="input" id="monthSelector"></select>
             </div>
+
+            <div id="calendar-ym" class="calendar-ym"></div> 
             
+            <!-- 出欠切り替えトグル -->
             <div class="calendar-toggle" style="display: flex; justify-content: center; align-items: center; gap: 8px;">
                 予定表
                 <label class="toggle-button">
                     <input type="checkbox" id="viewToggleCheckbox"/>
                 </label>
                 出欠
+
+                <!-- 時間割ボタン -->
+
+                <div class="tooltip-005">
+                    <a href="/student/timetable">
+                        <img th:src="@{/image/timetable.png}" alt="アイコン" style="width: 40px; height: 40px; vertical-align: middle;">
+                    </a>
+                    <p>時間割へ</p>
+                </div>
             </div>
+
+            
         </div>
 
         <div id="calendar-table-container" class="calendar-table-container"></div>

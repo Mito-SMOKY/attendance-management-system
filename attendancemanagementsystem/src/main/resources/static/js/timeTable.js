@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('window.initialWeekStartStr', initialWeekStartStr, 'initialDateStr', initialDateStr, 'initialData?', !!initialData);
 
-    // currentUserId の初期化とイベントリスナーの設定
     let currentUserId; 
     
     const userSelect = document.getElementById('adminUserSelect');
@@ -67,9 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return date;
     }
 
-    // --------------------------------------------------------------------------
-    // ★★★ 修正ブロック: currentWeekStart の初期化 ★★★
-    // --------------------------------------------------------------------------
     let currentWeekStart;
     
     // 1. HTMLから渡された日付文字列をパース
@@ -164,12 +160,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const dateStr = formatDateYMD(startDate);
         const userId = window.currentUserId || 
-                           document.getElementById('adminUserSelect')?.value || 
-                           'admin001';
+                        document.getElementById('adminUserSelect')?.value || 
+                        'admin001';
         const apiEndpoint = `/api/timetabledata?date=${dateStr}&userId=${userId}`;
 
         console.log('fetching timetable for weekStart (mon):', dateStr);
-
+        
         fetch(apiEndpoint)
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);

@@ -9,83 +9,97 @@
     <link rel="stylesheet" th:href="@{/css/common/profile.css}">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
 
 <div class="header-container">
-
     <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
         <div th:replace="~{fragments/_parts :: student-header}"></div>
     </div>
     <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
+    <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+        <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+    </div>
 
 </div>
 
     <div class="profile-container">
+
         <div class="user-header">
-            <div class="user-icon"></div>
-            <h1 class="user-name" th:text="${userData.Name}"></h1>
-            <p class="user-role" th:text="${userData.Role}"></p>
+            <div class="form-container">
+                <div class="user-icon"></div>
+            
+                <div class="form-item-group" id="name-group">
+                    <p class="user-role" th:text="${userData.Role}"></p>
+                    <div class="label-and-button">
+                        <span class="label">氏名</span>
+                        <button class="edit-button" id="edit-button" data-target="name">編集</button>
+                        <button class="save-button hidden" id="save-button" data-target="name">確定</button> <button class="cancel-button hidden" id="cancel-button" data-target="name">キャンセル</button>
+                    </div>
+                    <p class="display-name-value" id="display-value" th:text="${userData.Name}"></p> 
+                    <input class="edit-field hidden" type="text" id="username-input" name="username" required th:value="${userData.Name}">
+                </div>
+            </div>
         </div>
         
         <hr class="header-separator">
 
         <div class="content-wrapper">
             <div class="card user-details-card">
-                <h2 class="card-title">ユーザ詳細</h2>
-                
                 <ul class="detail-list">
-                    <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
-                        <li><a href="/profile" class="detail-link">プロフィール</a></li>
+                    <h1 class="card-title-big">ユーザー詳細</h1>
+
+                    <div class="detail-content">
+                        <span class="card-title">メールアドレス</span>
+                        <a th:href="@{/profile/security/email/auth}" class="edit-button">編集</a>
+                        <p class="display-value" th:text="${userData.email}"></p>
                     </div>
 
-                    <!-- <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
-                        <li><a href="admin/profile" class="detail-link">プロフィール</a></li>
-                    </div> -->
-
-                    <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
-                        <li><a href="#" class="detail-link">プライバシー設定</a></li>
+                    <div class="detail-content">
+                        <li><a th:href="@{/privacySetting}" class="detail-link">プライバシー設定</a></li>
                     </div>
 
-                    <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
-                        <li><a href="#" class="detail-link">プライバシー設定</a></li>
-                    </div>
-
-                    <li class="timezone-item">
-                        <span class="timezone-label">タイムゾーン</span>
-                        <span class="timezone-value" th:text="${userData.Timezone}"></span>
-                    </li>
+                    <form th:action="@{/logout}" method="post">
+                        <button  class="edit-button" type="submit" style="color: crimson;">ログアウト</button>
+                    </form>
                 </ul>
             </div>
 
             <div class="card subject-details-card">
                 <h2 class="card-title">
-
                 <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
-                    <span>受講教科詳細</span>
+                    <span class="card-title-big">受講教科詳細</span>
                     </div>
                 <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
                     <span>担当教科詳細</span>
                 </div>
-
                 </h2>
 
-                <ul class="subject-list" id="subjectList">
-                    <li th:each="subject, iterStat : ${subjectData}" 
-                        th:classappend="${iterStat.index >= 5} ? 'hidden-subject' : ''">
-                        <span th:text="'[' + ${subject.SubjectID} + '] ' + ${subject.SubjectName}">
-                        </span>
-                    </li>
-                </ul>
-
-                <button id="showMoreButton" class="show-more-button">さらに表示</button>
+                <div class="read-more-4">
+                    <p>
+                        <ul class="subject-list" id="subjectList">
+                            <li th:each="subject , iterStat: ${subjectData}" >
+                                <a th:href="@{/student/subject_attendance(subjectId=${subject.SubjectID})}" class="detail-link">
+                                    <span class="display-value" th:text=" ${subject.SubjectName}"></span>
+                                </a>
+                            </li>
+                            <div th:unless="${!#lists.isEmpty(subjectData)}">
+                                <p>登録されている教科はありません。</p>
+                            </div>
+                        </ul>
+                    </p>
+                    <label>
+                        <input type="checkbox"/>
+                        さらに表示
+                    </label>
+                </div>
             </div>
         </div>
     </div>
-
     <script th:src="@{/js/profile.js}"></script>
 </body>
 </html>

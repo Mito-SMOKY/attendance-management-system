@@ -1,7 +1,6 @@
 body {
     margin: 0;
     padding-top: 80px;
-    background-color: #f9f9f9;
     font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
 }
 
@@ -12,7 +11,6 @@ body {
 
 /* 申請フォーム画面専用のレイアウト */
 .request-form-layout {
-    padding-top: 50px; /* 少し下げたい場合 */
     padding-left: 50px;
     padding-right: 50px;
     min-height: calc(100vh - 80px - 120px); 

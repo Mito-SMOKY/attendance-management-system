@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>管理者メイン</title>
+    <link rel="stylesheet" th:href="@{/css/common/main_calendar.css}">
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
+</head>
+
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+
+    <div id="calendar" class="calendar">
+
+        
+        
+        <div class="student-calendar-header">
+
+            <div class="calendar-controls">
+                <select class="input" id="yearSelector"></select>
+                <select class="input" id="monthSelector"></select>
+            </div>
+
+            <div id="calendar-ym" class="calendar-ym"></div> 
+            
+            <!-- 出欠切り替えトグル -->
+            <div class="calendar-toggle" style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+                <!-- 予定表
+                <label class="toggle-button">
+                    <input type="checkbox" id="viewToggleCheckbox"/>
+                </label>
+                出欠 -->
+
+                <!-- 時間割ボタン -->
+
+                <div class="tooltip-005">
+                    <a href="/admin/timetable">
+                        <img th:src="@{/image/timetable.png}" alt="アイコン" style="width: 40px; height: 40px; vertical-align: middle;">
+                    </a>
+                    <p>時間割へ</p>
+                </div>
+            </div>
+
+            
+        </div>
+
+        <div id="calendar-table-container" class="calendar-table-container"></div>
+    </div>
+
+    <div id="scheduleModal" class="modal-overlay">
+                <div class="modal-content">
+                    
+                    <p id="modalDate" style="font-weight: bold; font-size: 1.2rem;"></p>
+                    
+                    <hr> <h4 class="Title">登録済みの予定</h4>
+                        <div id="existing-events-list"></div>
+                    <hr> <h4 class="Title">予定の追加</h4>
+                    <form id="scheduleForm">
+                        <label for="scheduleTitle">件名:</label>
+                        <input type="text" id="scheduleTitle" required>
+
+                    <div class="modal-actions-container">
+                            <button type="submit" class="modal-actions">追加</button>
+                            <button type="button" id="closeButton" class="modal-actions">閉じる</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const calendarEventsData = /*[[${calendarEvents}]]*/ [];
+        const attendanceRecordsData = /*[[${attendanceRecords}]]*/ [];
+        const serverTargetMonthString = /*[[${targetMonthDate}]]*/ "2025-11-01";
+    </script>
+
+    <script th:src="@{/js/calendar.js}"></script>
+    
+</body>
+
+</html>

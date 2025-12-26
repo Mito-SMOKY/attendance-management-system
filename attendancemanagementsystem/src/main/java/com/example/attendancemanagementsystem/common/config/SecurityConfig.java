@@ -42,8 +42,8 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             
-            // // 2. CSRF対策を無効化 (API用)
-            // // PythonからPOSTする際にブロックされないようにする
+            // 2. CSRF対策を無効化 (API用)
+            // PythonからPOSTする際にブロックされないようにする
             // .csrf(csrf -> csrf
                 
             //     //テスト用

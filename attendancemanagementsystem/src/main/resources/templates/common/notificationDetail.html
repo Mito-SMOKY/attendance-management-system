@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お知らせ詳細</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/common/notification.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* 詳細画面用の簡易スタイル */
+        .detail-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .detail-header {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .detail-date {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        .detail-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin: 0;
+        }
+        .detail-body {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #444;
+            white-space: pre-wrap; /* 改行を反映させる */
+            min-height: 200px;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .back-btn:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header-container">
+        <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
+            <div th:replace="~{fragments/_parts :: student-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+
+    <div class="container">
+        <div class="detail-container">
+            
+            <div class="detail-header">
+                <div class="detail-date">
+                    <i class="fa-regular fa-clock"></i>
+                    <span th:text="${#temporals.format(notification.createdAt, 'yyyy/MM/dd HH:mm')}"></span>
+                </div>
+                <h1 class="detail-title" th:text="${title}">件名がここに入ります</h1>
+            </div>
+
+            <div class="detail-body" th:text="${notification.message}">
+                ここに通知の本文が表示されます。
+                改行なども反映されます。
+            </div>
+
+            <a th:href="@{/notifications}" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> 一覧に戻る
+            </a>
+
+        </div>
+    </div>
+
+</body>
+</html>

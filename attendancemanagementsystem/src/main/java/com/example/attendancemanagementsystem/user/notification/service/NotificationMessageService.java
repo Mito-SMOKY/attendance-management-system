@@ -25,19 +25,6 @@ public class NotificationMessageService {
         create(user, SYSTEM_SENDER_ID, NotificationType.PASSWORD_CHANGE_COMPLETED, null, user.getName());
     }
 
-    // パスワードリセット用OTP通知
-    @Transactional
-    public void createPasswordResetOtp(UsersEntity user, String otp, int expiryMinutes) {
-        create(user, user.getUserId(), NotificationType.PASSWORD_RESET_OTP, null, user.getName(), otp, expiryMinutes);
-    }
-
-    // メールアドレス変更用OTP通知
-    @Transactional
-    public void createEmailChangeOtp(UsersEntity user, String otp, int expiryMinutes) {
-        create(user, user.getUserId(), NotificationType.EMAIL_CHANGE_OTP, null, 
-            user.getName(), otp, expiryMinutes);
-    }
-
     // メールアドレス変更完了通知
     @Transactional
     public void createEmailChangeCompletion(UsersEntity user) {
@@ -62,6 +49,27 @@ public class NotificationMessageService {
             student.getName(), subjectName, ratePercent);
     }
     
+    // 公欠申請通知(承認者向け)
+    @Transactional
+    public void createOfficialAbsenceRequestNotification(UsersEntity approver, UsersEntity student, String reason) {
+        create(approver, student.getUserId(), NotificationType.OFFICIAL_ABSENCE_REQUEST, null, 
+            student.getName(), reason);
+    }
+
+    // 申請許可通知(生徒向け)
+    @Transactional
+    public void createRequestApprovedNotification(UsersEntity student, UsersEntity approver) {
+        create(student, approver.getUserId(), NotificationType.REQUEST_APPROVED, null, 
+            student.getName());
+    }
+    
+    // 申請却下通知(生徒向け)
+    @Transactional
+    public void createRequestRejectedNotification(UsersEntity student, UsersEntity approver, String rejectionReason) {
+        create(student, approver.getUserId(), NotificationType.REQUEST_REJECTED, null, 
+            student.getName(), rejectionReason);
+    }
+
     // 共通保存処理
     private void create(UsersEntity receiver, int senderId, NotificationType type, String titleArg, Object... bodyArgs) {
         try {

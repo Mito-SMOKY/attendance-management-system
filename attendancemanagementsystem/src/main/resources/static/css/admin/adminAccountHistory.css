@@ -68,7 +68,7 @@ body {
 
 /* ヘッダーセル */
 .history-table th {
-    background-color: #539DA4; /* ヘッダー背景色（水色） */
+    background-color: #00bdca; /* ヘッダー背景色（水色） */
     color: white;              /* 文字色（白） */
     font-weight: normal;       /* 画像を見ると太字ではないように見えるためnormal、太字がよければboldへ */
     padding: 12px 10px;

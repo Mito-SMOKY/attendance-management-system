@@ -111,7 +111,7 @@ body {
 
 /* ヘッダー */
 .manual-table th {
-    background-color: #539DA4;
+    background-color: #00bdca;
     color: white;
     padding: 10px 5px;
     border: 1px solid #999;
@@ -222,16 +222,16 @@ select.input-error, input.input-error {
     width: 40px;  
     height: 38px; 
     background-color: transparent;
-    border: 2px solid #539DA4; 
+    border: 2px solid #00bdca; 
     border-radius: 4px;
-    color: #539DA4;            
+    color: #00bdca;            
     font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .add-row-btn:hover {
-    background-color: #539DA4;
+    background-color: #00bdca;
     color: white;
 }
 
@@ -246,8 +246,8 @@ select.input-error, input.input-error {
     height: 45px;
     width: 200px;
     padding: 0 15px;
-    background-color: #539DA4;
-    border: 1px solid #539DA4;
+    background-color: #00bdca;
+    border: 1px solid #00bdca;
     border-radius: 4px;
     color: white;
     font-weight: bold;
