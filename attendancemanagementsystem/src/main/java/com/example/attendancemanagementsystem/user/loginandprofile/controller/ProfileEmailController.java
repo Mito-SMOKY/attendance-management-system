@@ -1,5 +1,8 @@
 package com.example.attendancemanagementsystem.user.loginandprofile.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
@@ -49,7 +53,6 @@ public class ProfileEmailController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
         
-        // DBから最新のユーザー情報を取得してパスワード照合
         UsersEntity user = usersRepository.findById(userDetails.getUserId()).orElseThrow();
         
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -57,7 +60,6 @@ public class ProfileEmailController {
             return "redirect:/profile/security/email/auth";
         }
 
-        // 認証成功フラグをセッションに保存
         session.setAttribute("emailChangeAuth", true);
         return "redirect:/profile/security/email/edit";
     }
@@ -71,7 +73,7 @@ public class ProfileEmailController {
         return "common/reset_email";
     }
 
-    // 4. OTP送信処理
+    // 4. OTP送信処理 (初回)
     @PostMapping("/send-otp")
     public String sendOtpForEmailChange(
             @RequestParam("newEmail") String newEmail,
@@ -79,6 +81,7 @@ public class ProfileEmailController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
+        // 既存チェック
         if (usersRepository.findByEmail(newEmail).isPresent()) {
             redirectAttributes.addFlashAttribute("error", "このメールアドレスは既に使用されています。");
             return "redirect:/profile/security/email/edit";
@@ -87,8 +90,12 @@ public class ProfileEmailController {
         try {
             UsersEntity user = usersRepository.findById(userDetails.getUserId()).orElseThrow();
             otpService.sendOtp(user, newEmail, OtpPurpose.EMAIL_CHANGE);
+            
+            // セッションに保存
             session.setAttribute("tempNewEmail", newEmail);
-            return "redirect:/profile/security/email/verify";
+            
+            // 入力画面へ
+            return "redirect:/profile/security/email/verify-otp";
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -97,8 +104,36 @@ public class ProfileEmailController {
         }
     }
 
+    // ★追加: 4.5 OTP再送信処理
+    @PostMapping("/resend-otp")
+    public String resendOtp(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+        
+        // セッションからメールアドレスを取り出す
+        String newEmail = (String) session.getAttribute("tempNewEmail");
+        if (newEmail == null) {
+            // セッション切れなら最初に戻す
+            return "redirect:/profile/security/email/edit";
+        }
+
+        UsersEntity user = usersRepository.findById(userDetails.getUserId()).orElseThrow();
+        
+        try {
+            otpService.sendOtp(user, newEmail, OtpPurpose.EMAIL_CHANGE);
+            // JSのタイマーを動かすためのフラグ
+            redirectAttributes.addFlashAttribute("message", "sent");
+        } catch (Exception e) {
+            redirectAttributes.addAttribute("error", "too_soon");
+        }
+        
+        return "redirect:/profile/security/email/verify-otp";
+    }
+
     // 5. OTP入力画面
-    @GetMapping("/verify")
+    // URLを verify-otp に統一
+    @GetMapping("/verify-otp")
     public String showEmailOtpPage(HttpSession session) {
         if (session.getAttribute("tempNewEmail") == null) {
             return "redirect:/profile/security/email/edit";
@@ -106,46 +141,54 @@ public class ProfileEmailController {
         return "common/email_verify_otp";
     }
 
-    // 6. OTP検証＆メール更新実行
-    @PostMapping("/verify")
-    public String verifyEmailOtp(
+    // 6. OTP検証＆メール更新実行 (JSON対応)
+    // URLを verify-otp に統一
+    @PostMapping("/verify-otp")
+    @ResponseBody // HTMLではなくデータを返す
+    public Map<String, Object> verifyEmailOtp(
             @RequestParam("otp") String otp,
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+            HttpSession session) {
+
+        Map<String, Object> response = new HashMap<>();
 
         String newEmail = (String) session.getAttribute("tempNewEmail");
-        if (newEmail == null) return "redirect:/profile/security/email/edit";
+        if (newEmail == null) {
+            response.put("success", true); // リダイレクトさせるためtrue扱い
+            response.put("redirectUrl", "/profile/security/email/edit");
+            return response;
+        }
 
         UsersEntity user = usersRepository.findById(userDetails.getUserId()).orElseThrow();
 
         if (otpService.verifyOtp(user, otp, OtpPurpose.EMAIL_CHANGE)) {
+            // 更新実行
             user.setEmail(newEmail);
             usersRepository.save(user);
-
-            // ② 更新完了の通知とメールを送信します
-            // user.getEmail() はすでに newEmail になっているため、変更先に送信されます
+            otpService.clearOtp(user);
+            
+            // 通知
             try {
-                // アプリ内通知 (ベルマーク)
                 notificationMessageService.createEmailChangeCompletion(user);
-                
-                // 完了メール送信
                 notificationEmailService.sendEmailChangeCompletion(user);
-                
             } catch (Exception e) {
-                e.printStackTrace(); // 通知失敗時も完了画面へ進めるようにする
+                e.printStackTrace(); 
             }
 
-            // セッション情報のクリア
             session.removeAttribute("tempNewEmail");
             session.removeAttribute("emailChangeAuth");
 
-            return "redirect:/profile/security/email/complete";
+            // 成功時のリダイレクト先をJSONで返す
+            response.put("success", true);
+            response.put("redirectUrl", "/profile/security/email/complete");
             
         } else {
-            redirectAttributes.addFlashAttribute("error", "認証コードが正しくありません。");
-            return "redirect:/profile/security/email/verify";
+            // 失敗時
+            response.put("success", false);
+            response.put("message", "invalid");
         }
+        
+        return response;
     }
 
     // 7. 完了画面
