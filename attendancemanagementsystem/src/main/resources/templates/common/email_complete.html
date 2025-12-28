@@ -3,23 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>メールアドレス変更完了</title>
+    <title>パスワード再設定完了</title>
+    
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <style>
-        body { font-family: "Yu Gothic", sans-serif; color: #333; margin: 0; text-align: center; }
-        .header-bar { background-color: #6CC0C8; height: 60px; width: 100%; margin-bottom: 100px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .title { font-size: 24px; font-weight: bold; margin-bottom: 40px; }
-        
-        .back-btn { 
-            display: inline-block; padding: 10px 30px; 
-            border: 1px solid #333; border-radius: 5px; 
-            text-decoration: none; color: #333; background-color: white;
-            cursor: pointer; transition: background 0.3s;
-            font-size: 16px; font-family: inherit;
-        }
-        .back-btn:hover { background-color: #f0f0f0; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/login/loginUpdate.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
@@ -31,18 +19,25 @@
             <div th:replace="~{fragments/_parts :: admin-header}"></div>
         </div>
         <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
-            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+            <div th:replace="~{fragments/_parts :: superadmin-header}">
         </div>
     </div>
 
     <div class="container">
-        <h2 class="title">メールアドレスの変更が完了しました</h2>
-        <p style="margin-bottom: 40px;">次回ログイン時より、新しいメールアドレスをご利用ください。</p>
+        <h2 class="title">メールアドレス変更完了</h2>
+
+        <p class="message">
+            メールアドレスの再設定が完了しました。<br>
+            新しいメールアドレスでログインしてください。
+        </p>
 
         <form th:action="@{/logout}" method="post">
-            <button type="submit" class="back-btn">ログイン画面に戻る</button>
+            <button type="submit" class="login-btn">
+                ログイン画面へ
+            </button>
         </form>
     </div>
 
+    <script th:src="@{/js/login_Update.js}"></script>
 </body>
 </html>

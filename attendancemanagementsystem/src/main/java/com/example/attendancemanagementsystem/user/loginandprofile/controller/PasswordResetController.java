@@ -49,7 +49,6 @@ public class PasswordResetController {
 
             otpService.sendOtp(user, email, OtpPurpose.PASSWORD_RESET);
             
-            // ★以前のアドバイス通り、可能ならここで userId も保存した方が安全です
             session.setAttribute("resetEmail", email);
             session.removeAttribute("isVerified");
 

@@ -4,29 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>メールアドレス変更 - 本人確認</title>
+    
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <style>
-        body { font-family: "Yu Gothic", sans-serif; margin: 0; color: #333; }
-        .header-bar { background-color: #6CC0C8; height: 60px; width: 100%; }
-        .container { max-width: 600px; margin: 0 auto; padding: 60px 20px; text-align: center; }
-        .main-title { font-size: 22px; font-weight: bold; margin-bottom: 30px; }
-        
-        .form-content { display: inline-block; text-align: left; width: 100%; max-width: 400px; }
-        .form-group { margin-bottom: 25px; }
-        .label { display: block; font-weight: bold; font-size: 14px; margin-bottom: 8px; }
-        .input-text { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #333; border-radius: 5px; box-sizing: border-box; }
-        
-        .submit-btn {
-            display: block; width: 100%; margin: 40px auto 0; padding: 12px;
-            background-color: #fff; border: 1px solid #333; border-radius: 5px;
-            font-size: 16px; cursor: pointer; transition: background 0.3s;
-        }
-        .submit-btn:hover { background-color: #f5f5f5; }
-        .error-msg { color: red; font-size: 14px; margin-top: 5px; }
-        .back-link { display: block; margin-top: 30px; text-align: right; color: #6CC0C8; text-decoration: none; border-bottom: 1px solid #6CC0C8; width: fit-content; margin-left: auto;}
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/login/loginEmailAuth.css}">
 </head>
 <body>
+    
     <div class="header-container">
         <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
             <div th:replace="~{fragments/_parts :: student-header}"></div>
@@ -35,32 +19,46 @@
             <div th:replace="~{fragments/_parts :: admin-header}"></div>
         </div>
         <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
-            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+            <div th:replace="~{fragments/_parts :: superadmin-header}">
         </div>
     </div>
 
-    <div class="container">
+    <div class="container" style="margin-top: 70px;">
+        
+        <div class="backbutton-container">
+            <div th:replace="~{fragments/_parts :: backButton(url='/profile')}"></div>
+        </div>
         <h2 class="main-title">本人確認</h2>
-        <p style="font-size:14px; margin-bottom:30px;">
+        
+        <p class="description">
             メールアドレスを変更するために、<br>ログインIDとパスワードを入力してください。
         </p>
 
-        <form th:action="@{/profile/security/email/auth}" method="post" class="form-content">
+        <div id="jsErrorMsg" class="js-error-msg"></div>
+
+        <form th:action="@{/profile/security/email/auth}" method="post" class="form-content" id="authForm">
+            
             <div class="form-group">
-                <label class="label">ログインID</label>
-                <input type="text" name="loginId" class="input-text" placeholder="ユーザーID">
+                <label class="label" for="loginId">ログインID</label>
+                <input type="text" id="loginId" name="loginId" class="input-text" 
+                    placeholder="ユーザーID" required>
             </div>
 
             <div class="form-group">
-                <label class="label">現在のパスワード</label>
-                <input type="password" name="password" class="input-text" placeholder="パスワード" required>
+                <label class="label" for="password">現在のパスワード</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" class="input-text" 
+                        placeholder="パスワード" required minlength="8" maxlength="24">
+                    <i class="fa-solid fa-eye-slash toggle-password" id="togglePassword"></i>
+                </div>
+                
                 <p th:if="${error}" th:text="${error}" class="error-msg"></p>
             </div>
 
-            <button type="submit" class="submit-btn">次へ進む</button>
+            <button type="submit" id="submitBtn" class="submit-btn">次へ進む</button>
         </form>
-
-        <a th:href="@{/profile/privacy}" class="back-link">戻る ＞</a>
     </div>
+
+    <script th:src="@{/js/login_EmailAuth.js}"></script>
 </body>
 </html>
