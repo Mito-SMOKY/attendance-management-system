@@ -19,7 +19,7 @@ public class NotificationMessageService {
     // 自動通知用ID
     private static final int SYSTEM_SENDER_ID = 1;
 
-    //パスワード変更完了通知
+    // パスワード変更完了通知
     @Transactional
     public void createPasswordChangeCompletion(UsersEntity user) {
         create(user, SYSTEM_SENDER_ID, NotificationType.PASSWORD_CHANGE_COMPLETED, null, user.getName());
@@ -73,6 +73,15 @@ public class NotificationMessageService {
     // 共通保存処理
     private void create(UsersEntity receiver, int senderId, NotificationType type, String titleArg, Object... bodyArgs) {
         try {
+            
+            //タイトル作成
+            String title = type.getSubjectTemplate();
+            
+            // titleArg（件名用引数）があり、かつテンプレートに "%s" が含まれる場合のみフォーマットする
+            if (titleArg != null && title.contains("%s")) {
+                title = String.format(title, titleArg);
+            }
+
             // 本文の作成
             String message = String.format(type.getBodyTemplate(), bodyArgs);
 
@@ -82,6 +91,7 @@ public class NotificationMessageService {
             entity.setReceiverUserId(receiver.getUserId()); // 受信者
             entity.setSenderUserId(senderId);               // 送信者
             entity.setNotificationTypeId(type.getId());     // タイプID
+            entity.setTitle(title);                         // タイトル
             entity.setMessage(message);                     // 本文
             
             notificationRepository.save(entity);

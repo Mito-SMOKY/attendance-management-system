@@ -27,6 +27,9 @@ public class NotificationEntity {
     @Column(name = "NotificationTypeID", nullable = false) 
     private Integer notificationTypeId;
 
+    @Column(name = "Title")
+    private String title;
+
     @Column(name = "Message", columnDefinition = "TEXT")
     private String message;
 
@@ -52,7 +55,6 @@ public class NotificationEntity {
         this.notificationId = notificationId; 
     }
 
-
     public Integer getReceiverUserId() { 
         return receiverUserId; 
     }
@@ -75,6 +77,14 @@ public class NotificationEntity {
 
     public void setNotificationTypeId(Integer notificationTypeId) { 
         this.notificationTypeId = notificationTypeId; 
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getMessage() { 
