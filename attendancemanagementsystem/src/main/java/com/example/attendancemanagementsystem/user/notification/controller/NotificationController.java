@@ -47,8 +47,7 @@ public class NotificationController {
 
         // 詳細情報をモデルに追加
         model.addAttribute("notification", notification);
-        model.addAttribute("title", notificationService.resolveTitle(notification.getNotificationTypeId()));
-
+        model.addAttribute("title", notification.getTitle());
         return "common/notificationDetail";
     }
 

@@ -4,27 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>パスワード再設定完了</title>
+    
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <style>
-        body { font-family: "Yu Gothic", sans-serif; color: #333; margin: 0; }
-        .header-bar { background-color: #6CC0C8; height: 60px; width: 100%; }
-        .container { max-width: 600px; margin: 0 auto; padding: 60px 20px; text-align: center; }
-        
-        .title { font-size: 24px; color: #6CC0C8; margin-bottom: 30px; font-weight: bold; }
-        .message { font-size: 16px; margin-bottom: 50px; line-height: 1.8; }
-        
-        .login-btn { 
-            display: inline-block;
-            background-color: #6CC0C8; 
-            color: white; 
-            text-decoration: none;
-            padding: 12px 60px; 
-            font-size: 16px; 
-            border-radius: 5px; 
-            transition: opacity 0.3s;
-        }
-        .login-btn:hover { opacity: 0.8; }
-    </style>
+    
+    <link rel="stylesheet" th:href="@{/css/login/loginUpdate.css}">
 </head>
 <body>
 
@@ -41,5 +24,6 @@
         <a th:href="@{/login}" class="login-btn">ログイン画面へ</a>
     </div>
 
+    <script th:src="@{/js/login_Update.js}"></script>
 </body>
 </html>

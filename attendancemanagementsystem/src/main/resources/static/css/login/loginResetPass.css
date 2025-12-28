@@ -1,0 +1,129 @@
+@charset "UTF-8";
+
+body {
+    font-family: "Yu Gothic", sans-serif;
+    color: #333;
+    margin: 0;
+    background-color: #fff;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+/* タイトル */
+.main-title {
+    margin-top: 60px;
+    margin-bottom: 40px;
+    text-align: center;
+    font-size: 24px;
+    border-bottom: 2px solid #6CC0C8;
+    display: inline-block;
+    padding-bottom: 10px;
+}
+
+form {
+    text-align: left;
+    display: inline-block;
+    width: 100%;
+}
+
+/* 入力グループ */
+.input-group {
+    margin-bottom: 25px;
+    width: 100%;
+    max-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
+    /* アイコンを絶対配置するために必要 */
+    position: relative; 
+}
+
+.input-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px;
+    padding-right: 45px; /* アイコンが重ならないように右を開ける */
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+    ime-mode: disabled; 
+}
+
+.input-field:focus {
+    border-color: #6CC0C8;
+    outline: none;
+}
+
+/* _parts.html 内のアイコンスタイル
+*/
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 40px; /* inputの高さに合わせて微調整 */
+    color: #87CEEB; /* 画像のような水色 */
+    font-size: 18px;
+    z-index: 10;
+}
+
+/* エラーメッセージ */
+.error-msg, .error-msg-container {
+    color: red;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* ボタン */
+.btn-area {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.confirm-btn {
+    background-color: #6CC0C8;
+    color: white;
+    border: none;
+    padding: 12px 0;
+    width: 200px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.confirm-btn:hover {
+    opacity: 0.8;
+}
+
+/* 右下のリンク */
+.bottom-link-area {
+    text-align: right;
+    margin-top: 20px;
+    max-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.bottom-link {
+    color: #6CC0C8;
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.bottom-link:hover {
+    text-decoration: underline;
+}

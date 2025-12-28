@@ -24,14 +24,10 @@ body {
     text-align: center;
 }
 
-/* 戻るボタン */
-.back-btn {
-    display: inline-block;
-    color: #333;
-    text-decoration: none;
-    font-size: 1rem;
-    float: left;
+/* 戻るボタン（コンテナ側での調整） */
+.backbutton-container {
     margin-bottom: 20px;
+    text-align: left;
 }
 
 /* メインタイトル */
@@ -42,30 +38,40 @@ body {
     display: inline-block;
     border-bottom: 3px solid #539DA4;
     padding-bottom: 10px;
-    margin-top: 40px;
-    margin-bottom: 60px;
-    clear: both; /* float解除 */
+    margin-bottom: 40px;
 }
 
-/* 入力エリア（HTMLのinline-blockに合わせて調整） */
+/* フォーム関連 */
+#otpForm {
+    margin-bottom: 30px;
+}
+
+/* 入力欄 */
 .otp-input {
-    width: 300px;
-    padding: 10px;
+    width: 200px;
+    height: 60px;
     font-size: 2rem;
     text-align: center;
-    letter-spacing: 0.5em;
-    border: 1px solid #707070;
+    border: 2px solid #ccc;
     border-radius: 8px;
-    outline: none;
-    font-family: monospace;
-    margin-right: 15px; /* ボタンとの間隔 */
+    margin-right: 15px;
+    letter-spacing: 0.5em;
+    box-sizing: border-box;
+    transition: all 0.2s;
 }
 
 .otp-input:focus {
     border-color: #539DA4;
-    box-shadow: 0 0 6px rgba(83, 157, 164, 0.4);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(83, 157, 164, 0.2);
 }
 
+.otp-input.input-error {
+    border-color: #ff4d4d;
+    background-color: #fff0f0;
+}
+
+/* プレースホルダー調整 */
 .otp-input::placeholder {
     color: #ccc;
     letter-spacing: 0.2em;
@@ -85,7 +91,7 @@ body {
     transition: all 0.2s;
     font-weight: bold;
     height: 60px; /* 入力欄と高さを揃える */
-    vertical-align: top; /* 高さズレ防止 */
+    vertical-align: top;
 }
 
 .confirm-btn:hover {
@@ -110,41 +116,39 @@ body {
 }
 
 .error-msg {
-    color: #e74c3c;
-    margin-top: 15px;
+    color: #ff4d4d;
     font-weight: bold;
-    font-size: 1rem;
-}
-
-/* JS操作用クラス */
-.input-error {
-    border-color: #ff4d4f !important;
-    background-color: #fff1f0;
+    margin-top: 10px;
 }
 
 /* 再送信エリア */
 .resend-area {
     margin-top: 60px;
+    border-top: 1px solid #eee;
+    padding-top: 30px;
 }
+
 .resend-area p {
-    font-size: 1rem;
-    margin-bottom: 15px;
-    color: #333;
+    color: #666;
+    margin-bottom: 10px;
 }
 
-.resend-btn {
-    background-color: #fff;
-    color: #555;
-    border: 1px solid #707070;
-    padding: 10px 40px;
-    font-size: 1rem;
-    border-radius: 6px;
+.resend-link {
+    background: none;
+    border: none;
+    color: #666;
+    text-decoration: underline;
     cursor: pointer;
-    transition: all 0.2s;
+    font-size: 0.9rem;
+    padding: 5px;
 }
 
-.resend-btn:hover {
-    background-color: #f0f0f0;
-    border-color: #333;
-    color: #333;
+.resend-link:hover {
+    color: #539DA4;
+}
+
+.resend-link:disabled {
+    color: #ccc;
+    text-decoration: none;
+    cursor: not-allowed;
 }

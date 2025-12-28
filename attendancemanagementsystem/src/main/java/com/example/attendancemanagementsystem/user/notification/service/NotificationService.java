@@ -1,6 +1,7 @@
 package com.example.attendancemanagementsystem.user.notification.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,6 @@ public class NotificationService {
 
     private static final Map<String, List<Integer>> TYPE_MAPPING = new HashMap<>();
     static {
-        
         // グループコードごとのタイプIDリストを初期化
         for (NotificationType type : NotificationType.values()) {
             // グループコードごとにIDリストを追加
@@ -50,15 +50,16 @@ public class NotificationService {
     // 検索機能
     public Map<String, Object> searchNotifications(UsersEntity user, int page, int size, String keyword, String type, String status, boolean bookmarkedOnly) {
         
-        // ページングとソート設定
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("createdAt").descending());
+        // ページングとソート設定 (JSは1始まり、Springは0始まりなので調整)
+        int pageIndex = (page > 0) ? page - 1 : 0;
+        Pageable pageable = PageRequest.of(pageIndex, size, Sort.by("createdAt").descending());
 
-        // 自分通知のみ
+        // 自分通知のみ (セキュリティ必須)
         Specification<NotificationEntity> spec = filterService.createEqualSpec("receiverUserId", user.getUserId());
 
-        // キーワード検索
+        // キーワード検索 (タイトル または 本文)
         if (keyword != null && !keyword.trim().isEmpty()) {
-            spec = spec.and(searchService.createKeywordSpec(keyword, java.util.Arrays.asList("message")));
+            spec = spec.and(searchService.createKeywordSpec(keyword, Arrays.asList("title", "message")));
         }
 
         // タイプフィルタ
@@ -75,27 +76,28 @@ public class NotificationService {
         // 実行
         Page<NotificationEntity> pageResult = notificationRepository.findAll(spec, pageable);
 
-        //整形
+        // 整形
         List<NotificationDto> content = pageResult.getContent().stream().map(this::convertToDto).collect(Collectors.toList());
+        
+        // JSが期待するキー名 (content, totalCount) に合わせる
         Map<String, Object> response = new HashMap<>();
         response.put("content", content);
         response.put("totalPages", pageResult.getTotalPages());
         response.put("totalCount", pageResult.getTotalElements());
+        
         return response;
-    }
-
-    // 通知タイトル解決
-    public String resolveTitle(Integer typeId) {
-        for (NotificationType nt : NotificationType.values()) {
-            if (nt.getId() == typeId) return nt.getSubjectTemplate();
-        }
-        return "お知らせ";
     }
 
     // DTO変換
     private NotificationDto convertToDto(NotificationEntity entity) {
-        String title = resolveTitle(entity.getNotificationTypeId());
-        return new NotificationDto(entity.getNotificationId(), title, entity.getMessage(), entity.getCreatedAt(), entity.isRead(), entity.isBookmarked());
+        return new NotificationDto(
+            entity.getNotificationId(), 
+            entity.getTitle(), 
+            entity.getMessage(), 
+            entity.getCreatedAt(), 
+            entity.isRead(), 
+            entity.isBookmarked()
+        );
     }
 
     // 既読操作 
@@ -120,13 +122,18 @@ public class NotificationService {
     @Transactional
     public NotificationEntity getDetailAndMarkAsRead(Integer notificationId, Integer userId) {
         NotificationEntity notification = notificationRepository.findById(notificationId).orElse(null);
+        // 自分宛て以外はnullを返す (セキュリティ)
         if (notification == null || !notification.getReceiverUserId().equals(userId)) return null;
-        if (!notification.isRead()) { notification.setRead(true); notificationRepository.save(notification); }
+        
+        if (!notification.isRead()) { 
+            notification.setRead(true); 
+            notificationRepository.save(notification); 
+        }
         return notification;
     }
 
     // 未読通知の有無確認
     public boolean hasUnreadNotifications(Integer userId) {
-    return notificationRepository.countByReceiverUserIdAndIsReadFalse(userId) > 0;
-}
+        return notificationRepository.countByReceiverUserIdAndIsReadFalse(userId) > 0;
+    }
 }

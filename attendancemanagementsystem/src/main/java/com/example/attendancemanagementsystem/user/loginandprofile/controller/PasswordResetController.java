@@ -1,5 +1,8 @@
 package com.example.attendancemanagementsystem.user.loginandprofile.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -7,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody; // 追加
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
@@ -45,6 +49,7 @@ public class PasswordResetController {
 
             otpService.sendOtp(user, email, OtpPurpose.PASSWORD_RESET);
             
+            // ★以前のアドバイス通り、可能ならここで userId も保存した方が安全です
             session.setAttribute("resetEmail", email);
             session.removeAttribute("isVerified");
 
@@ -52,75 +57,82 @@ public class PasswordResetController {
                 redirectAttributes.addFlashAttribute("message", "sent");
             }
 
-            return "redirect:/password/verify"; 
+            return "redirect:/password/verify-otp"; 
 
         } catch (RuntimeException e) {
-                // 再送信時の連打エラー処理
             if (e.getMessage() != null && e.getMessage().contains("時間を空けて")) {
-                
-                // セッションにメールアドレスを再設定
                 session.setAttribute("resetEmail", email);
-                
                 redirectAttributes.addAttribute("error", "too_soon");
-                return "redirect:/password/verify";
+                return "redirect:/password/verify-otp";
             }
-
-            // 本当にユーザーが見つからない場合やその他のエラー
             redirectAttributes.addFlashAttribute("error", "メールアドレスが見つかりません。");
             return "redirect:/password/forgot";
         }
     }
-    // 認証コード入力画面
-    @GetMapping("/verify")
-    public String showVerifyPage(HttpSession session) {
+
+    // 認証コード入力画面 (GET)
+    @GetMapping("/verify-otp")
+    public String showVerifyOtpForm(HttpSession session) {
         if (session.getAttribute("resetEmail") == null) {
             return "redirect:/password/forgot";
         }
         return "login/verify_otp";
     }
 
-   // 認証コード検証処理
+    //otp検証
     @PostMapping("/verify-otp")
-    public String verifyOtp(@RequestParam("otp") String inputOtp, HttpSession session, RedirectAttributes redirectAttributes) {
+    @ResponseBody 
+    public Map<String, Object> verifyOtp(
+            @RequestParam("otp") String inputOtp, 
+            HttpSession session) {
+        
+        Map<String, Object> response = new HashMap<>();
         String email = (String) session.getAttribute("resetEmail");
 
         if (email == null) {
-            return "redirect:/password/forgot";
+            response.put("success", false);
+            response.put("message", "セッションが切れました。最初からやり直してください。");
+            return response;
         }
 
-        boolean isValid;
-
+        boolean isValid = false;
         try {
             UsersEntity user = usersRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            isValid = otpService.verifyOtp(user, inputOtp, OtpPurpose.PASSWORD_RESET);
+            // 検証実行
+            isValid = otpService.verifyOtp(user, inputOtp.trim(), OtpPurpose.PASSWORD_RESET);
 
         } catch (Exception e) {
+            e.printStackTrace();
             isValid = false;
         }
 
-        if (!isValid) {
-            redirectAttributes.addAttribute("error", "invalid");
-            return "redirect:/password/verify";
+        if (isValid) {
+            // 成功時
+            session.setAttribute("isVerified", true);
+            response.put("success", true);
+            response.put("redirectUrl", "/password/new-password"); 
+        } else {
+            // 失敗時
+            response.put("success", false);
+            response.put("message", "invalid");
         }
 
-        // 認証成功
-        session.setAttribute("isVerified", true);
-        return "redirect:/password/new-password";
+        return response;
     }
-    
-    // 新パスワード入力画面
+
+    // 新パスワード入力画面 (GET)
     @GetMapping("/new-password")
     public String showNewPasswordForm(HttpSession session) {
         Boolean isVerified = (Boolean) session.getAttribute("isVerified");
         if (isVerified == null || !isVerified) {
-            return "redirect:/password/verify";
+            return "redirect:/password/verify-otp";
         }
         return "login/reset_password"; 
     }
 
-    // パスワード更新実行
+    // パスワード更新実行 (POST)
     @PostMapping("/update")
     public String updatePassword(
             @RequestParam("password") String password,
@@ -142,10 +154,8 @@ public class PasswordResetController {
         
         if (email != null) {
             try {
-                // パスワード更新
                 otpService.updatePassword(email, password);
                 
-                // セッション破棄
                 session.invalidate();
                 return "login/update"; 
 

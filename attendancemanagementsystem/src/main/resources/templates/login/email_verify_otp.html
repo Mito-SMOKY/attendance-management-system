@@ -3,78 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>メール変更 - 認証コード入力</title>
+    
+    <link rel="stylesheet" th:href="@{/css/login/loginVerifyOtp.css}">
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <style>
-        body { font-family: "Yu Gothic", sans-serif; color: #333; margin: 0; }
-        .header-bar { background-color: #6CC0C8; height: 60px; width: 100%; }
-        .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; text-align: center; }
-        
-        .back-btn { display: inline-block; padding: 5px 15px; border: 1px solid #333; border-radius: 5px; text-decoration: none; color: #333; float: left; }
-        .main-title { font-size: 20px; margin-top: 60px; margin-bottom: 40px; }
-
-        .otp-input { 
-            width: 200px; padding: 10px; font-size: 24px; text-align: center; letter-spacing: 5px;
-            border: none; border-bottom: 2px solid #ccc; outline: none; margin-right: 10px; 
-        }
-        .confirm-btn { 
-            padding: 10px 20px; font-size: 16px; background-color: #f0f0f0; 
-            border: 1px solid #ccc; border-radius: 5px; cursor: pointer; 
-        }
-        .confirm-btn:hover { background-color: #e0e0e0; }
-
-        .success-message { color: #155724; background-color: #d4edda; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
-        
-        /* 再送エリア用スタイル */
-        .resend-area { margin-top: 60px; }
-        .resend-btn { background-color: white; border: 1px solid #333; padding: 8px 30px; font-size: 14px; border-radius: 5px; cursor: pointer; }
-    </style>
 </head>
 <body>
 
     <div class="header-bar"></div>
 
     <div class="container">
-        <a th:href="@{/email/reset-email}" class="back-btn">戻る</a>
 
-        <h2 class="main-title">認証コードを入力してください</h2>
+        <div class="backbutton-container">
+            <div th:replace="~{fragments/_parts :: backButton(url='/email/reset-email')}"></div>
+        </div>
+        
+        <div style="clear: both;"></div>
 
-        <div th:if="${message == 'sent'}" class="success-message">
-            認証コードを再送信しました。<br>メールをご確認ください。
+        <h2 class="main-title">ワンタイムパスワードを入力してください</h2>
+
+        <div th:if="${message == 'sent'}" class="success-msg">
+            認証コードを再送信しました。メールをご確認ください。
         </div>
 
-        <p style="margin-bottom: 30px; font-size: 14px;">
-            新しいメールアドレスに送信された<br>6桁の認証コードを入力してください。
-        </p>
+        <form th:action="@{/email/verify-otp}" method="post" id="otpForm">
+            <input type="hidden" name="newEmail" th:value="${session.resetEmail_NewEmail}">
 
-        <form th:action="@{/email/verify-otp}" method="post">
-            <div style="display: inline-block; margin-bottom: 20px;">
-                <input type="text" name="otp" class="otp-input" maxlength="6" placeholder="______" required autocomplete="off">
-                <button type="submit" class="confirm-btn">確定</button>
+            <div style="display: inline-block;">
+                <input type="text" name="otp" id="otpInput" class="otp-input" 
+                    maxlength="6" placeholder="______" required 
+                    autocomplete="one-time-code" inputmode="numeric">
+                
+                <button type="submit" id="submitBtn" class="confirm-btn">確定</button>
             </div>
             
-            <div th:if="${param.error}" style="color: red; margin-bottom: 15px;">
+            <div id="jsErrorMsg" class="error-msg" style="display: none;"></div>
+
+            <div th:if="${param.error}" style="color: red; margin-bottom: 15px; margin-top: 15px;">
                 <p th:if="${param.error[0] == 'invalid'}">
                     認証コードが正しくありません。<br>メールを確認して再入力してください。
                 </p>
                 <p th:if="${param.error[0] == 'too_soon'}">
                     再送信の間隔が短すぎます。<br>少し時間を置いてからお試しください。
                 </p>
-                <p th:if="${param.error[0] == 'expired'}">
-                    有効期限が切れています。
-                </p>
+                <div th:if="${param.error[0] == 'expired'}">
+                    <p style="font-weight: bold;">有効期限が切れています。</p>
+                    <a th:href="@{/email/reset-email}" style="color: #007bff; text-decoration: underline;">
+                        認証コードを再発行する
+                    </a>
+                </div>
             </div>
         </form>
 
         <div class="resend-area">
             <p>メールが届かない場合</p>
-            <form th:action="@{/email/send-otp}" method="post">
+            <form th:action="@{/email/send-otp}" method="post" id="resendForm">
                 <input type="hidden" name="newEmail" th:value="${session.resetEmail_NewEmail}">
                 <input type="hidden" name="isResend" value="true">
-                <button type="submit" class="resend-btn">再送信</button>
+                <button type="submit" id="resendBtn" class="resend-btn">再送信</button>
             </form>
         </div>
-
     </div>
+
+    <script th:src="@{/js/email_VerifyOtp.js}"></script>
 </body>
 </html>
