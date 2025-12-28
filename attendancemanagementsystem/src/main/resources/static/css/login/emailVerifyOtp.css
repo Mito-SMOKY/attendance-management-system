@@ -1,165 +1,154 @@
 @charset "UTF-8";
 
+/* 基本設定 */
 body {
-    font-family: "Yu Gothic", "YuGothic", sans-serif;
-    margin: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
     color: #333;
+    margin: 0;
     background-color: #fff;
 }
 
-.header-container {
+/* ヘッダー */
+.header-bar {
+    background: linear-gradient(90deg, #6CC0C8 0%, #539DA4 100%);
+    height: 70px;
     width: 100%;
+    margin-bottom: 50px;
 }
 
+/* コンテナ */
 .container {
     max-width: 800px;
     margin: 0 auto;
-    /* ヘッダーと重ならないように上部に余白を追加 */
-    margin-top: 100px; 
-    padding: 0 20px 60px;
+    padding: 0 40px;
     text-align: center;
 }
 
-/* 戻るボタンのコンテナ位置調整 */
+/* 戻るボタン（コンテナ側での調整） */
 .backbutton-container {
-    text-align: left;
     margin-bottom: 20px;
+    text-align: left;
 }
 
 /* メインタイトル */
 .main-title {
-    font-size: 24px;
+    color: #539DA4;
+    font-size: 1.8rem;
     font-weight: bold;
-    /* ★修正: 文字色を黒に変更 */
-    color: #333;
-    margin-top: 10px;
-    margin-bottom: 40px;
     display: inline-block;
-    /* ★修正: 下線を黒に変更 */
-    border-bottom: 2px solid #333;
+    border-bottom: 3px solid #539DA4;
     padding-bottom: 10px;
-    letter-spacing: 1px;
+    margin-bottom: 40px;
 }
 
-.description-text {
+/* フォーム関連 */
+#otpForm {
     margin-bottom: 30px;
-    font-size: 14px;
-    line-height: 1.6;
 }
 
-/* フォームレイアウト */
-.otp-form {
-    margin-bottom: 60px;
-}
-
-.input-group {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    align-items: center;
-}
-
-/* 入力欄のデザイン */
+/* 入力欄 */
 .otp-input {
     width: 200px;
-    height: 45px;
-    padding: 5px 10px;
-    font-size: 20px;
+    height: 60px;
+    font-size: 2rem;
     text-align: center;
-    border: 1px solid #8DCBCB;
-    border-radius: 4px;
-    outline: none;
-    letter-spacing: 4px;
-    color: #333;
-}
-
-.otp-input::placeholder {
-    color: #ccc;
-    letter-spacing: 2px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    margin-right: 15px;
+    letter-spacing: 0.5em;
+    box-sizing: border-box;
+    transition: all 0.2s;
 }
 
 .otp-input:focus {
-    box-shadow: 0 0 5px rgba(108, 192, 200, 0.5);
-    border-color: #6CC0C8;
+    border-color: #539DA4;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(83, 157, 164, 0.2);
 }
 
-/* 確定ボタンのデザイン */
+.otp-input.input-error {
+    border-color: #ff4d4d;
+    background-color: #fff0f0;
+}
+
+/* プレースホルダー調整 */
+.otp-input::placeholder {
+    color: #ccc;
+    letter-spacing: 0.2em;
+    font-size: 1.5rem;
+    transform: translateY(-2px);
+}
+
+/* 確定ボタン */
 .confirm-btn {
-    height: 57px;
-    padding: 0 30px;
-    background-color: #5BA8B0;
+    background-color: #539DA4;
     color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: bold;
+    border: 1px solid #539DA4;
+    padding: 10px 30px;
+    font-size: 1.2rem;
+    border-radius: 8px;
     cursor: pointer;
-    transition: opacity 0.3s;
+    transition: all 0.2s;
+    font-weight: bold;
+    height: 60px; /* 入力欄と高さを揃える */
+    vertical-align: top;
 }
 
 .confirm-btn:hover {
-    opacity: 0.8;
+    background-color: #428288;
+    border-color: #428288;
 }
 
 .confirm-btn:disabled {
     background-color: #ccc;
+    border-color: #ccc;
     cursor: not-allowed;
+}
+
+/* メッセージ関連 */
+.success-msg {
+    color: #539DA4;
+    background-color: #e0f7fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.error-msg {
+    color: #ff4d4d;
+    font-weight: bold;
+    margin-top: 10px;
 }
 
 /* 再送信エリア */
 .resend-area {
-    margin-top: 40px;
+    margin-top: 60px;
+    border-top: 1px solid #eee;
+    padding-top: 30px;
 }
 
-.resend-text {
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 15px;
-}
-
-.resend-btn {
-    background-color: #fff;
-    border: 1px solid #999;
+.resend-area p {
     color: #666;
-    padding: 10px 40px;
-    font-size: 14px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.3s;
+    margin-bottom: 10px;
 }
 
-.resend-btn:hover {
-    background-color: #f5f5f5;
-    color: #333;
-}
-
-/* メッセージ関係 */
-.success-message {
-    color: #155724;
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 30px;
-    display: inline-block;
-    text-align: left;
-}
-
-.server-error-msg {
-    color: #dc3545;
-    font-size: 14px;
-    margin-top: 15px;
-    min-height: 20px;
-}
-
-.js-error-msg {
-    display: none;
-    margin-top: 10px;
-    color: #dc3545;
-    font-size: 14px;
-}
-
-.expire-link {
-    color: #5BA8B0;
+.resend-link {
+    background: none;
+    border: none;
+    color: #666;
     text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 5px;
+}
+
+.resend-link:hover {
+    color: #539DA4;
+}
+
+.resend-link:disabled {
+    color: #ccc;
+    text-decoration: none;
+    cursor: not-allowed;
 }

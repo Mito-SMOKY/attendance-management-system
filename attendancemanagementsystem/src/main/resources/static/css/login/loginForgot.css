@@ -1,0 +1,90 @@
+@charset "UTF-8";
+
+/* この画面専用のスタイル */
+body {
+    font-family: "Yu Gothic", sans-serif;
+    color: #333;
+    margin: 0;
+}
+
+/* 上部の青いバー */
+.header-bar {
+    background-color: #6CC0C8;
+    height: 60px;
+    width: 100%;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+/* 戻るボタン */
+.back-btn {
+    display: inline-block;
+    padding: 5px 15px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+    float: left;
+}
+
+.back-btn:hover {
+    background-color: #f0f0f0;
+}
+
+/* タイトルとテキスト */
+.system-title {
+    color: #6CC0C8;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 60px;
+    margin-bottom: 30px;
+}
+
+.instruction {
+    font-size: 16px;
+    margin-bottom: 40px;
+}
+
+/* フォーム周り */
+.input-group {
+    margin-bottom: 40px;
+    text-align: left;
+    display: inline-block;
+}
+
+.input-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.input-field {
+    width: 300px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #999;
+    border-radius: 5px;
+}
+
+.submit-btn {
+    background-color: white;
+    border: 1px solid #333;
+    padding: 10px 40px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.error-msg {
+    color: red;
+    margin-bottom: 20px;
+}

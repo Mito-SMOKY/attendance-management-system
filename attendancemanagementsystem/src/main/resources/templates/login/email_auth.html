@@ -13,10 +13,13 @@
 <body>
     
     <div class="header-bar">
-        
-    </div>
+        </div>
 
     <div class="container">
+        
+        <div class="backbutton-container">
+            <div th:replace="~{fragments/_parts :: backButton(url='/login')}"></div>
+        </div>
         <h2 class="main-title">本人確認</h2>
         
         <p class="description">
@@ -46,8 +49,6 @@
 
             <button type="submit" id="submitBtn" class="submit-btn">次へ進む</button>
         </form>
-
-        <a th:href="@{/login}" class="back-link">ログイン画面に戻る ＞</a>
     </div>
 
     <script th:src="@{/js/login_EmailAuth.js}"></script>

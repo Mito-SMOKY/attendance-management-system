@@ -16,6 +16,10 @@
     </div>
 
     <div class="container">
+        
+        <div class="backbutton-container">
+            <div th:replace="~{fragments/_parts :: backButton(url='/email/auth')}"></div>
+        </div>
         <h2 class="main-title">新しいメールアドレスを入力してください</h2>
 
         <div id="jsErrorMsg" class="js-error-msg"></div>
@@ -33,18 +37,15 @@
                 <input type="email" id="confirmEmail" name="confirmEmail" class="input-text" 
                     placeholder="hoge@example.com" required>
                 
-                <p id="matchError" class="error-msg">メールアドレスが一致しません</p>
+                <p id="matchError" class="error-msg" style="display: none;">メールアドレスが一致しません</p>
                 
                 <p th:if="${error}" th:text="${error}" class="server-error-msg"></p>
             </div>
 
-            <button type="submit" id="submitBtn" class="submit-btn">認証コードを送信する</button>
+            <button type="submit" id="submitBtn" class="submit-btn">送信</button>
         </form>
-
-        <a th:href="@{/email/auth}" class="back-link">戻る ＞</a>
     </div>
 
     <script th:src="@{/js/login_ResetEmail.js}"></script>
-
 </body>
 </html>
