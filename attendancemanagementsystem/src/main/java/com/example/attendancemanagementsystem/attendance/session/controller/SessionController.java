@@ -63,6 +63,12 @@ public class SessionController {
     @GetMapping
     public String showSetupPage(Model model) {
 
+        // 残っている授業の情報を画面に渡す
+        SessionEntity activeSession = sessionRepository.findFirstBySessionStatusOrderBySessionIdDesc(1);
+        if (activeSession != null) {
+            model.addAttribute("activeSession", activeSession);
+        }
+
         // 画面のセレクトボックスに必要なマスタデータを渡す
         model.addAttribute("classroomList", classroomRepository.findAll());
         model.addAttribute("subjectList", subjectRepository.findAll());
