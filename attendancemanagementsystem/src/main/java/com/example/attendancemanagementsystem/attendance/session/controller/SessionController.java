@@ -42,6 +42,7 @@ public class SessionController {
     private final AttendanceStatusRepository attendanceStatusRepository;
     private final DepartmentSubjectRepository departmentSubjectRepository;
 
+    // コンストラクタ
     public SessionController(SessionService sessionService,
                             ClassroomRepository classroomRepository,
                             SessionRepository sessionRepository,
@@ -58,32 +59,39 @@ public class SessionController {
         this.departmentSubjectRepository = departmentSubjectRepository;
     }
 
+    //セッション画面の表示
     @GetMapping
     public String showSetupPage(Model model) {
+
+        // 画面のセレクトボックスに必要なマスタデータを渡す
         model.addAttribute("classroomList", classroomRepository.findAll());
-        // JSが無効な場合などのために念のため全件渡しておく
         model.addAttribute("subjectList", subjectRepository.findAll());
         model.addAttribute("departmentList", departmentRepository.findAll());
+        
+        // 今日の日付・現在時刻をセット
         model.addAttribute("defaultDate", LocalDate.now());
         model.addAttribute("defaultTime", LocalTime.now().truncatedTo(java.time.temporal.ChronoUnit.MINUTES));
-        return "session/session"; 
+        
+        return "session/session";
     }
 
     // --- API ---
 
-    // 学年リスト取得
+    // 学年リスト取得API
     @GetMapping("/api/grades/{departmentId}")
     @ResponseBody
     public List<Integer> getGradesByDepartment(@PathVariable Integer departmentId) {
         return departmentSubjectRepository.findGradesByDepartmentId(departmentId);
     }
 
-    // 科目リスト取得
+    // 科目リスト取得API
     @GetMapping("/api/subjects/{departmentId}")
     @ResponseBody
     public List<Map<String, Object>> getSubjectsByDepartment(@PathVariable Integer departmentId) {
         List<SubjectEntity> subjects = departmentSubjectRepository.findSubjectsByDepartmentId(departmentId);
         List<Map<String, Object>> result = new ArrayList<>();
+
+        // Mapリストに変換
         for (SubjectEntity s : subjects) {
             Map<String, Object> map = new HashMap<>();
             map.put("subjectId", s.getSubjectId());
@@ -93,9 +101,12 @@ public class SessionController {
         return result;
     }
 
+    // 授業開始処理API
     @PostMapping("/start")
     @ResponseBody
     public Map<String, Object> startSession(@RequestBody Map<String, String> request) {
+
+        // 画面から送られてきたパラメータを取得
         String dateStr = request.get("date");
         String timeStr = request.get("time");
         Integer classroomId = Integer.valueOf(request.get("classroomId"));
@@ -103,10 +114,12 @@ public class SessionController {
         Integer targetGrade = Integer.valueOf(request.get("targetGrade"));
         String subjectName = request.get("subjectName");
 
+        // 日時オブジェクトの生成
         LocalDate date = LocalDate.parse(dateStr);
         LocalTime time = LocalTime.parse(timeStr);
         LocalDateTime startDateTime = LocalDateTime.of(date, time);
 
+        // セッションエンティティを作成
         SessionEntity session = new SessionEntity();
         session.setSessionDate(date);
         session.setStartTime(startDateTime);
@@ -114,6 +127,7 @@ public class SessionController {
         session.setTargetDepartmentId(targetDepartmentId);
         session.setTargetGrade(targetGrade);
         
+        // 学科情報などを取得して、備考欄(Note)に「学科 クラス 学年 : 授業名」の形式で保存
         DepartmentEntity dept = departmentRepository.findById(targetDepartmentId).orElse(null);
         String deptName = (dept != null && dept.getMajor() != null) ? dept.getMajor().getMajorName() : "不明";
         String className = (dept != null) ? dept.getClassName() : "";
@@ -121,51 +135,65 @@ public class SessionController {
         session.setNote(deptName + " " + className + " " + targetGrade + "年 : " + subjectName);
         session.setSessionStatus(1); 
 
+        // DBに保存
         SessionEntity savedSession = sessionRepository.save(session);
 
+        // 作成されたSessionIDを返す（画面遷移用）
         Map<String, Object> response = new HashMap<>();
         response.put("sessionId", savedSession.getSessionId());
         return response;
     }
 
+    // 実施中の授業画面を表示
     @GetMapping("/active/{sessionId}")
     public String showActiveSession(@PathVariable Integer sessionId, Model model) {
+
+        // IDからセッション情報を取得
         SessionEntity session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid session Id:" + sessionId));
 
+        // 教室名を取得
         ClassroomEntity classroom = classroomRepository.findById(session.getActualClassroomId())
                 .orElse(null);
         String classroomName = (classroom != null) ? classroom.getClassroomName() : "不明な教室";
 
+        // DTO作成
         Map<String, Object> sessionDto = new HashMap<>();
         sessionDto.put("sessionId", session.getSessionId());
         sessionDto.put("className", session.getNote()); 
         sessionDto.put("startTime", session.getStartTime());
         sessionDto.put("classroomName", classroomName);
 
+        // HTMLへデータを渡す
         model.addAttribute("sessionDto", sessionDto);
-        model.addAttribute("statusList", attendanceStatusRepository.findAll());
+        model.addAttribute("statusList", attendanceStatusRepository.findAll()); 
 
-        return "session/sessionActive";
+        return "session/sessionActive"; 
     }
 
+    // 出席者リスト取得API
     @GetMapping("/api/attendees/{sessionId}")
     @ResponseBody
     public List<SessionDto> getAttendees(@PathVariable Integer sessionId) {
         return sessionService.getSessionAttendees(sessionId);
     }
     
+    // 授業終了・確定処理API
     @PostMapping("/end")
     @ResponseBody
     public Map<String, String> endSession(@RequestBody EndSessionRequest request) {
+
+        // DB保存・フラグ更新
         sessionService.endSession(request.sessionId, request.changes);
+        
         Map<String, String> response = new HashMap<>();
         response.put("message", "Session ended and attendance finalized.");
         return response;
     }
 
+    // 終了リクエストを受け取るためのデータ構造（DTO）
     public static class EndSessionRequest {
         public Integer sessionId;
-        public Map<Integer, Integer> changes; 
+        public Map<Integer, Integer> changes; // キー:学生ID, 値:ステータスID
     }
 }

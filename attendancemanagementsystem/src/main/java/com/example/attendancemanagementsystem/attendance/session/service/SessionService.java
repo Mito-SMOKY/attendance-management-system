@@ -33,11 +33,12 @@ public class SessionService {
     private final StudentRepository studentRepository;
     private final AttendanceStatusRepository attendanceStatusRepository;
 
+    //コンストラクタ
     public SessionService(SessionRepository sessionRepository,
-                          EntryLogRepository entryLogRepository,
-                          AttendanceRepository attendanceRepository,
-                          StudentRepository studentRepository,
-                          AttendanceStatusRepository attendanceStatusRepository) {
+                        EntryLogRepository entryLogRepository,
+                        AttendanceRepository attendanceRepository,
+                        StudentRepository studentRepository,
+                        AttendanceStatusRepository attendanceStatusRepository) {
         this.sessionRepository = sessionRepository;
         this.entryLogRepository = entryLogRepository;
         this.attendanceRepository = attendanceRepository;
@@ -45,9 +46,7 @@ public class SessionService {
         this.attendanceStatusRepository = attendanceStatusRepository;
     }
 
-    /**
-     * 画面表示用：出席状況の取得
-     */
+    //出席状況の取得
     public List<SessionDto> getSessionAttendees(Integer sessionId) {
         SessionEntity session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
@@ -75,7 +74,7 @@ public class SessionService {
 
         List<SessionDto> result = new ArrayList<>();
         
-        // ★固定設定：遅刻は開始20分後から
+        // 遅刻時間の設定
         LocalDateTime lateBoundary = session.getStartTime().plusMinutes(20);
 
         for (StudentEntity student : allStudents) {
@@ -86,7 +85,7 @@ public class SessionService {
             dto.setStudentName(name);
             dto.setGradeClass(targetGrade + "年");
 
-            // 1. 既に保存済みのデータがある場合
+            // 既に保存済みのデータがある場合
             if (attendanceMap.containsKey(userId)) {
                 AttendanceEntity saved = attendanceMap.get(userId);
                 dto.setStatusId(saved.getStatus().getStatusId());
@@ -94,18 +93,19 @@ public class SessionService {
                 logs.stream().filter(l -> l.getUserId().equals(userId)).findFirst()
                     .ifPresent(l -> dto.setEntryTime(l.getEntryTime().format(DateTimeFormatter.ofPattern("HH:mm"))));
             } 
-            // 2. まだ保存されていない場合（リアルタイム判定）
+            // 保存されていない場合（リアルタイム判定）
             else {
                 EntryLogEntity myLog = logs.stream()
                         .filter(l -> l.getUserId().equals(userId)).findFirst().orElse(null);
 
                 if (myLog != null) {
-                    // ログあり：遅刻判定
+
+                    // 遅刻判定
                     dto.setEntryTime(myLog.getEntryTime().format(DateTimeFormatter.ofPattern("HH:mm")));
                     dto.setStatusId(myLog.getEntryTime().isAfter(lateBoundary) ? 3 : 1);
                 } else {
-                    // ログなし：連続受講チェック！
-                    // 「今の授業開始時刻」の直前（30分以内）に終わった、同じ教室の授業を探す
+                    
+                    //連続受講チェック
                     Optional<AttendanceEntity> prev = attendanceRepository.findPreviousAttendanceInSameRoom(
                             userId,
                             session.getActualClassroomId(),
@@ -128,22 +128,21 @@ public class SessionService {
     }
 
 
-    /**
-     * 授業終了処理 (一括保存)
-     */
+    
+    // 授業終了処理
     @Transactional
     public void endSession(Integer sessionId, Map<Integer, Integer> manualChanges) {
         SessionEntity session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
 
-        // 1. セッション終了
+        // セッション終了
         LocalDateTime now = LocalDateTime.now();
         session.setEndTime(now);
         session.setSessionStatus(0);
         sessionRepository.save(session);
 
-        // 2. 出席データの確定保存
-        List<SessionDto> finalStates = getSessionAttendees(sessionId); // 上記の判定ロジックを再利用
+        // 出席データの保存
+        List<SessionDto> finalStates = getSessionAttendees(sessionId);
 
         for (SessionDto dto : finalStates) {
             AttendanceEntity attendance = attendanceRepository.findBySessionIdAndStudent_UserId(sessionId, dto.getUserId())
@@ -169,10 +168,8 @@ public class SessionService {
 
             attendanceRepository.save(attendance);
         }
-
-        // 3. ログのフラグ処理（次の授業のログを食わないようにリミット設定）
         
-        // ★固定設定：授業80分 + 予備5分 = 85分までしか見ない
+        //リミット時刻 
         LocalDateTime searchLimit = session.getStartTime().plusMinutes(85);
         // 現在時刻とリミット時刻、早い方を採用
         LocalDateTime searchEnd = now.isBefore(searchLimit) ? now : searchLimit;
