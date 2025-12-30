@@ -11,53 +11,37 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
 import com.example.attendancemanagementsystem.common.entity.CalendarEntity;
-import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
-import com.example.attendancemanagementsystem.common.repository.AttendanceRepository;
 import com.example.attendancemanagementsystem.common.repository.CalendarRepository;
-import com.example.attendancemanagementsystem.common.repository.StudentRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
-import com.example.attendancemanagementsystem.user.calendar.dto.AttendanceDto;
 import com.example.attendancemanagementsystem.user.calendar.dto.CalendarDto;
-
 
 @Service
 @Transactional(readOnly = true)
 public class AdminCalendarService {
 
     private final UsersRepository usersRepository;
-    private final StudentRepository studentRepository;
-    // private final EnrollmentsRepository enrollmentsRepository;
-    // private final TimetableRepository timetableRepository;
-    private final AttendanceRepository attendanceRepository;
     private final CalendarRepository calendarRepository;
 
-    
     public AdminCalendarService(UsersRepository usersRepository,
-                        StudentRepository studentRepository,
-                        AttendanceRepository attendanceRepository,
-                        CalendarRepository calendarRepository) {
+                                CalendarRepository calendarRepository) {
         this.usersRepository = usersRepository;
-        this.studentRepository = studentRepository;
-        // this.enrollmentsRepository = enrollmentsRepository;
-        // this.timetableRepository = timetableRepository;
-        this.attendanceRepository = attendanceRepository;
         this.calendarRepository = calendarRepository;
     }
 
     /**
-     * 生徒のメインメニュー（カレンダー）に必要なデータを取得する
-     * @param loginId ログイン中のユーザーID
+     * 管理者のメインカレンダー画面に必要なデータを取得する
+     * (自身の予定のみを表示し、出席データは含めない)
+     * * @param loginId ログイン中の管理者ID
      * @param month   表示対象の月
      * @return 画面用データマップ
      */
-    public Map<String, Object> getStudentHomeData(String loginId, LocalDate month) {
+    public Map<String, Object> getAdminHomeData(String loginId, LocalDate month) {
         
         Map<String, Object> data = new HashMap<>();
 
-        // 1. ユーザー取得
+        // 1. ユーザー(管理者)取得
         Optional<UsersEntity> usersOpt = usersRepository.findByLoginId(loginId);
         if (usersOpt.isEmpty()) {
             return data; 
@@ -65,11 +49,12 @@ public class AdminCalendarService {
         UsersEntity currentUser = usersOpt.get();
         data.put("adminName", currentUser.getName());
 
-        // 2. 日付範囲
+        // 2. 日付範囲の決定 (その月の1日〜末日)
         LocalDate startDate = month.withDayOfMonth(1);
         LocalDate endDate = month.withDayOfMonth(month.lengthOfMonth());
 
         // 3. 予定(Calendar)取得
+        // 管理者自身が登録した予定のみを取得します
         List<CalendarEntity> calendarEntities = calendarRepository.findByUsersAndDateBetween(currentUser, startDate, endDate);
         
         // Entity -> DTO変換
@@ -78,26 +63,6 @@ public class AdminCalendarService {
             .collect(Collectors.toList());
             
         data.put("calendarEvents", calendarDtos);
-
-        // 4. 出席(Attendance)取得
-        Optional<StudentEntity> adminOpt = studentRepository.findByUsers(currentUser);
-            
-        if (adminOpt.isPresent()) {
-            StudentEntity currentAdmin = adminOpt.get();
-
-            List<AttendanceEntity> attendanceEntities = 
-                attendanceRepository.findByStudentAndDateRange(currentAdmin, startDate, endDate);
-
-            // ★修正: ここで AttendanceDto (日付と状態のみ) を使用
-            List<AttendanceDto> attendanceDtos = attendanceEntities.stream()
-                .map(a -> new AttendanceDto(
-                    a.getTimeTable().getDate(),    // 日付
-                    a.getStatus().getStatusName()  // "出席"などの文字
-                ))
-                .collect(Collectors.toList());
-
-            data.put("attendanceRecords", attendanceDtos);
-        }
 
         return data;
     }
@@ -108,7 +73,7 @@ public class AdminCalendarService {
     @Transactional
     public void addCalendarEvent(String loginId, String title, LocalDate date) {
         UsersEntity user = usersRepository.findByLoginId(loginId)
-                            .orElseThrow(() -> new RuntimeException("User not found"));
+                            .orElseThrow(() -> new RuntimeException("User not found: " + loginId));
         
         CalendarEntity newEvent = new CalendarEntity();
         newEvent.setUsers(user);
@@ -120,11 +85,8 @@ public class AdminCalendarService {
     /**
      * カレンダー予定を削除する
      */
-    // @Transactional
-    // public void deleteCalendarEvent(Integer calendarId) {
-    @Transactional // (readOnly = false) を明示的に設定。これによりデータの変更が可能に。
+    @Transactional
     public void deleteCalendarEvent(@NonNull Integer calendarId) {
-        // IDを指定して予定を削除する
         calendarRepository.deleteById(calendarId);
     }
 }

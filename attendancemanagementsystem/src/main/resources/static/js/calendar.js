@@ -44,7 +44,12 @@ function handleDeleteSchedule(button) {
     const scheduleId = button.dataset.id;
     if (!confirm('この予定を削除してもよろしいですか？')) return;
 
-    fetch(`/student/calendar/delete/${scheduleId}`, { method: 'DELETE' })
+    // 【修正】現在のURLパスからロール名(admin/student)を取得
+    const pathSegments = window.location.pathname.split('/');
+    const rolePath = pathSegments[1]; // 例: "admin" または "student"
+
+    // 【修正】動的なURLに対してリクエストを送信
+    fetch(`/${rolePath}/calendar/delete/${scheduleId}`, { method: 'DELETE' })
     .then(response => {
         if (response.ok) {
             alert('予定を削除しました。');
@@ -207,12 +212,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const dateStr = targetCell.dataset.date;
             if (viewToggleCheckbox && viewToggleCheckbox.checked) {
                 // 現在のパス（例: /superadmin/main_calendar）を「/」で分割
-            const pathSegments = window.location.pathname.split('/'); 
-            // pathSegments[0]は空文字、pathSegments[1]にロール名（superadmin 等）が入る
-            const rolePath = pathSegments[1]; 
-            
-            // 動的なパスを使ってURLを組み立てる
-            window.location.href = `/${rolePath}/attendance/date?date=${dateStr}`;
+                const pathSegments = window.location.pathname.split('/'); 
+                // pathSegments[0]は空文字、pathSegments[1]にロール名（superadmin 等）が入る
+                const rolePath = pathSegments[1]; 
+                
+                // 動的なパスを使ってURLを組み立てる
+                window.location.href = `/${rolePath}/attendance/date?date=${dateStr}`;
             } else {
                 openModal(dateStr);
             }
@@ -237,12 +242,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const title = document.getElementById('scheduleTitle').value;
         const date = document.getElementById('modalDate').dataset.rawDate;
 
+        // 【修正】現在のURLパスからロール名(admin/student)を取得
+        const pathSegments = window.location.pathname.split('/');
+        const rolePath = pathSegments[1]; // 例: "admin" または "student"
+
         const formData = new URLSearchParams({ title, date });
-        fetch('/student/calendar/add', {
+        
+        // 【修正】動的なURLに対してリクエストを送信
+        fetch(`/${rolePath}/calendar/add`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: formData
-        }).then(res => res.ok ? window.location.reload() : alert("保存失敗"));
+        }).then(res => {
+            if(res.ok) {
+                window.location.reload();
+            } else {
+                alert("保存失敗: " + res.status);
+            }
+        })
+        .catch(err => console.error("Error:", err));
     });
 });
 

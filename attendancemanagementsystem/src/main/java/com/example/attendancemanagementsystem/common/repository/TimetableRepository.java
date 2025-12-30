@@ -39,4 +39,6 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
     //指定した教科の最新の時間割エンティティを取得
     TimetableEntity findTopBySubjectIdOrderByDateDesc(Integer subjectId);
 
+    //指定したユーザーIDの時間割エンティティを全て取得
+    List<TimetableEntity> findByUserId(Integer userId);
 }
