@@ -18,100 +18,86 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.attendancemanagementsystem.user.calendar.service.AdminCalendarService;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/admin") // 管理者用なので /admin ベース
 public class AdminCalendarController {
 
-    private final AdminCalendarService adminService;
+    private final AdminCalendarService adminCalendarService;
 
-    public AdminCalendarController(AdminCalendarService adminService) {
-        this.adminService = adminService;
+    public AdminCalendarController(AdminCalendarService adminCalendarService) {
+        this.adminCalendarService = adminCalendarService;
     }
 
     /**
-     * * @param month "2025-11" のような形式で月の指定を受け取る (オプション)
+     * 管理者用カレンダー画面（/admin/main_calendar）を表示
      */
-    @GetMapping("/main_calendar") // (ここは /home から変更されていましたね)
-    public String home(Model model, @AuthenticationPrincipal UserDetails userDetails,
-                           @RequestParam(required = false) String month) {
+    @GetMapping("/main_calendar")
+    public String showAdminCalendar(Model model, 
+                                    @AuthenticationPrincipal UserDetails userDetails,
+                                    @RequestParam(required = false) String month) {
 
+        // 1. カレンダーヘッダー用の年月
         int currentYear = java.time.YearMonth.now().getYear();
         int currentMonth = java.time.YearMonth.now().getMonthValue();
-
-        // 💡 2. モデルに属性名 'year' と 'month' で設定
         model.addAttribute("year", currentYear);
         model.addAttribute("month", currentMonth);
-
         
-        // 1. Spring Security からログイン中のユーザーID (LoginID) を取得
+        // 2. ログインID取得
         String loginId = userDetails.getUsername();
 
-        // 2. 表示対象月を決定
+        // 3. 表示対象月を決定
         LocalDate targetMonth;
         if (month != null && !month.isEmpty()) {
-            // URLクエリ ( /home?month=2025-11 ) から月を指定
-            targetMonth = LocalDate.parse(month + "-01"); 
+            try {
+                targetMonth = LocalDate.parse(month + "-01");
+            } catch (Exception e) {
+                targetMonth = LocalDate.now().withDayOfMonth(1);
+            }
         } else {
-            // 指定がない場合は、今月を表示
             targetMonth = LocalDate.now().withDayOfMonth(1);
         }
 
-        // 3. サービスを呼び出してデータを取得
-        Map<String, Object> homeData = adminService.getStudentHomeData(loginId, targetMonth);
+        // 4. Serviceからデータ取得
+        Map<String, Object> homeData = adminCalendarService.getAdminHomeData(loginId, targetMonth);
 
-        // --- 4. データを Model に詰める ---
-        model.addAttribute("studentName", homeData.get("studentName"));
-        model.addAttribute("calendarEvents", homeData.get("calendarEvents"));
-        model.addAttribute("attendanceRecords", homeData.get("attendanceRecords"));
+        // 5. Modelにセット
+        model.addAttribute("adminName", homeData.get("adminName"));
+        model.addAttribute("calendarEvents", homeData.get("calendarEvents")); // JSで描画に使用
         model.addAttribute("displayMonth", targetMonth.getYear() + "年 " + targetMonth.getMonthValue() + "月");
-
-        // カレンダー表示に必要な月の情報も渡す
         model.addAttribute("targetMonthDate", targetMonth.toString());
         
-        return "admin/main_calendar"; // src/main/resources/templates/student/main_calendar.html を参照
+        // 管理者用カレンダーHTMLへ
+        return "admin/main_calendar"; 
     }
 
     /**
-     * 新しいカレンダー予定を追加する (JSから fetch で呼ばれる)
-     * * @param title フォームから送られた "title"
-     * @param date  フォームから送られた "date" (YYYY-MM-DD形式)
+     * 予定追加処理 (POST)
      */
     @PostMapping("/calendar/add")
     public String addCalendarEvent(@RequestParam String title,
-                                   @RequestParam LocalDate date,
-                                   @AuthenticationPrincipal UserDetails userDetails) {
+                                @RequestParam LocalDate date,
+                                @AuthenticationPrincipal UserDetails userDetails) {
         
-        // 1. ログイン中のユーザーIDを取得
         String loginId = userDetails.getUsername();
+        
+        // DB登録
+        adminCalendarService.addCalendarEvent(loginId, title, date);
 
-        // 2. サービスを呼び出してDBに保存
-        adminService.addCalendarEvent(loginId, title, date);
-
-        // 3. 処理が終わったら、メインメニューにリダイレクトする
-        // (JS側は、このリダイレクト指示(response.ok)を受けてページをリロードします)
+        // 完了後はカレンダー画面へリダイレクト
         return "redirect:/admin/main_calendar";
     }
-    // ... (中略)
 
     /**
-    * カレンダー予定を削除する（JSからの DELETEリクエストを受け付ける）
-    * @param calendarId 削除対象の予定ID (URLのパスから取得)
-    */
+     * 予定削除処理 (DELETE - JSからのFetch API用)
+     */
     @DeleteMapping("/calendar/delete/{calendarId}")
-    public ResponseEntity<Void> deleteCalendarEvent(@PathVariable(required = false) Integer calendarId) {
+    public ResponseEntity<Void> deleteCalendarEvent(@PathVariable Integer calendarId) {
         
-        // 【修正点】 calendarId が null でないかチェック
-        // @PathVariable は通常 null にならないが、安全のためチェックし、
-        // null の場合は Bad Request (400) を返す
         if (calendarId == null) {
-            return ResponseEntity.badRequest().build(); // 400 Bad Request
+            return ResponseEntity.badRequest().build();
         }
         
-         // サービスを呼び出してDBから削除を実行
-        adminService.deleteCalendarEvent(calendarId);
+        adminCalendarService.deleteCalendarEvent(calendarId);
 
-         // 削除成功 (204 No Content)
         return ResponseEntity.noContent().build();
     }
-
-
 }

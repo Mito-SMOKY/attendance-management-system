@@ -7,44 +7,37 @@
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/timeTable.css}">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
- <div class="header-container">
+    <div class="header-container">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
 
     <label class="selectbox-3">
         <select id="adminUserSelect">
             <option th:each="user : ${adminUsers}"
-            th:value="${user.id}"
-            th:text="${user.name}"
-            th:selected="${user.id == initialUserId}">
+                    th:value="${user.loginId}"
+                    th:text="${user.name}"
+                    th:selected="${user.loginId == initialUserId}">
             </option>
         </select>
     </label>
 
-    <script th:inline="javascript">
-    const initialWeekStartStr = /*[[${weekStart}]]*/ ''; 
-    const initialUserId = /*[[${initialUserId}]]*/ '';
-    /*<![CDATA[*/
-    window.initialDateStr = /*[[${initialDate}]]*/ '';
-    window.initialData = /*[[${initialData}]]*/ null;
-    /*]]>*/
-    </script>
-
-    <script th:src="@{/js/timeTable.js}" defer></script>
+    <script th:src="@{/js/admin/timetable.js}" defer></script>
     
-    <div class="timetable-container">
+    <div class="timetable-container" id="timetableContainer"
+         th:data-week-start="${weekStart}"
+         th:data-initial-date="${initialDate}"
+         th:data-initial-user-id="${initialUserId}">
         
         <div class="timetable-header">
             
             <div class="month-year-selector">
                 <select id="yearSelector"></select>
                 <select id="monthSelector"></select>
-                </div>
+            </div>
 
             <div class="week-navigation">
                 <button id="prevWeekBtn" class="nav-arrow"><</button>
@@ -53,7 +46,7 @@
             </div>
             
             <div class="tooltip-005">
-                 <a href="/admin/main_calendar">
+                <a href="/admin/main_calendar">
                     <img th:src="@{/image/calendar.png}" alt="アイコン" style="width: 40px; height: 40px; vertical-align: middle;">
                 </a>
                 <p>カレンダーへ</p>
@@ -72,9 +65,6 @@
             </table>
         </div>
     </div>
-    
-    
-    
 
 </body>
 </html>

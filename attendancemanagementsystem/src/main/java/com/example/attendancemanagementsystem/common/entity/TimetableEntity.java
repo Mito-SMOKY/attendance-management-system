@@ -27,7 +27,7 @@ public class TimetableEntity {
     @Column(name = "Date")
     private LocalDate date;
 
-    @Column(name = "SlotID")
+    @Column(name = "SlotID") // コマ（1限、2限...）
     private Integer slotId; 
 
     @Column(name = "UserID")
@@ -48,6 +48,16 @@ public class TimetableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DepartmentID") 
     private DepartmentEntity department;
+
+    //科目情報の取得用 (読み取り専用)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SubjectID", insertable = false, updatable = false)
+    private SubjectEntity subject;
+
+    // 教室情報の取得用 (読み取り専用)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ClassroomID", insertable = false, updatable = false)
+    private ClassroomEntity classroom;
 
     // Timetable(1) 対 Attendance(多)
     @OneToMany(mappedBy = "timeTable", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -120,6 +130,24 @@ public class TimetableEntity {
 
     public void setDepartment(DepartmentEntity department) {
         this.department = department;
+    }
+
+    // ★追加: SubjectEntityのGetter/Setter
+    public SubjectEntity getSubject() {
+        return subject;
+    }
+
+    public void setSubject(SubjectEntity subject) {
+        this.subject = subject;
+    }
+
+    // ★追加: ClassroomEntityのGetter/Setter
+    public ClassroomEntity getClassroom() {
+        return classroom;
+    }
+
+    public void setClassroom(ClassroomEntity classroom) {
+        this.classroom = classroom;
     }
 
     public List<AttendanceEntity> getAttendances() {
