@@ -1,6 +1,7 @@
 package com.example.attendancemanagementsystem.common.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional; // 追加
 
@@ -76,4 +77,18 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
        int countByStatusTotal(@Param("studentId") Integer studentId, 
               @Param("subjectId") Integer subjectId, 
               @Param("statusId") Integer statusId);
+
+       //「指定した時間の直前に、同じ教室で終わった授業の出席データ」を探すメソッド
+       @Query("SELECT a FROM AttendanceEntity a, SessionEntity s " +
+              "WHERE a.sessionId = s.sessionId " +
+              "AND a.student.userId = :userId " +
+              "AND s.actualClassroomId = :classroomId " +
+              "AND s.endTime BETWEEN :rangeStart AND :rangeEnd " +
+              "AND (a.status.statusId = 1 OR a.status.statusId = 3)") 
+       Optional<AttendanceEntity> findPreviousAttendanceInSameRoom(
+              @Param("userId") Integer userId,
+              @Param("classroomId") Integer classroomId,
+              @Param("rangeStart") LocalDateTime rangeStart,
+              @Param("rangeEnd") LocalDateTime rangeEnd
+       );
 }
