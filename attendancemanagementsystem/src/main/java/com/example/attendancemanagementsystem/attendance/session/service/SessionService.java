@@ -1,13 +1,17 @@
 package com.example.attendancemanagementsystem.attendance.session.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.attendancemanagementsystem.attendance.session.dto.SessionDto;
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
 import com.example.attendancemanagementsystem.common.entity.AttendanceStatusEntity;
 import com.example.attendancemanagementsystem.common.entity.EntryLogEntity;
@@ -25,16 +29,14 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final EntryLogRepository entryLogRepository;
     private final AttendanceRepository attendanceRepository;
-    
-    // IDからエンティティを検索するために追加したリポジトリ
     private final StudentRepository studentRepository; 
     private final AttendanceStatusRepository attendanceStatusRepository; 
 
     public SessionService(SessionRepository sessionRepository,
-                        EntryLogRepository entryLogRepository,
-                        AttendanceRepository attendanceRepository,
-                        StudentRepository studentRepository,
-                        AttendanceStatusRepository attendanceStatusRepository) {
+                          EntryLogRepository entryLogRepository,
+                          AttendanceRepository attendanceRepository,
+                          StudentRepository studentRepository,
+                          AttendanceStatusRepository attendanceStatusRepository) {
         this.sessionRepository = sessionRepository;
         this.entryLogRepository = entryLogRepository;
         this.attendanceRepository = attendanceRepository;
@@ -43,68 +45,123 @@ public class SessionService {
     }
 
     /**
-     * 授業を終了し、ログから出席データを生成して保存する
+     * 画面表示用
      */
-    @Transactional
-    public void endSession(Integer sessionId) {
-        // 1. セッション終了処理
+    public List<SessionDto> getSessionAttendees(Integer sessionId) {
         SessionEntity session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
-        LocalDateTime now = LocalDateTime.now();
-        session.setEndTime(now);
-        session.setSessionStatus(0); // 終了ステータス
-        sessionRepository.save(session);
 
-        // 遅刻ライン算出 (開始時間 + 20分)
+        // 現在の「年度」を計算 (4月始まりの年度)
+        int currentYear = LocalDate.now().getYear();
+        if (LocalDate.now().getMonthValue() < 4) currentYear--; 
+        
+        Integer targetGrade = session.getTargetGrade();
+        if (targetGrade == null) targetGrade = 1; 
+
+        // ★修正: リポジトリの新しいメソッドを使用
+        List<StudentEntity> allStudents = studentRepository.findByDepartmentAndGrade(
+                session.getTargetDepartmentId(), 
+                targetGrade,
+                currentYear
+        );
+
+        LocalDateTime searchStart = session.getStartTime().minusMinutes(30);
+        List<EntryLogEntity> logs = entryLogRepository.findByClassroomIdAndEntryTimeBetween(
+                session.getActualClassroomId(), searchStart, LocalDateTime.now()
+        );
+
+        List<AttendanceEntity> existingAttendances = attendanceRepository.findBySessionId(sessionId);
+        Map<Integer, AttendanceEntity> attendanceMap = existingAttendances.stream()
+                .collect(Collectors.toMap(a -> a.getStudent().getUserId(), a -> a));
+
+        List<SessionDto> result = new ArrayList<>();
         int lateLimitMinutes = 20; 
         LocalDateTime lateBoundary = session.getStartTime().plusMinutes(lateLimitMinutes);
 
-        // 2. ログ取得 (開始30分前〜現在)
-        LocalDateTime searchStart = session.getStartTime().minusMinutes(30);
-        List<EntryLogEntity> logs = entryLogRepository.findByClassroomIdAndEntryTimeBetween(
-                session.getActualClassroomId(), searchStart, now
-        );
+        for (StudentEntity student : allStudents) {
+            SessionDto dto = new SessionDto();
+            Integer userId = student.getUserId();
 
-        // 重複処理防止用セット
-        Set<Integer> processedUserIds = new HashSet<>();
-
-        for (EntryLogEntity log : logs) {
-            Integer userId = log.getUserId();
-            // すでに処理済みのユーザーならスキップ
-            if (processedUserIds.contains(userId)) continue;
-
-            // ★ID(数字)を使って、DBから「学生オブジェクト」を取得
-            StudentEntity student = studentRepository.findById(userId).orElse(null);
+            dto.setUserId(userId);
             
-            // 学生マスタにいないIDの場合はスキップ
-            if (student == null) continue;
+            // StudentEntityの構造に合わせて名前取得 (getUsers()経由)
+            String name = (student.getUsers() != null) ? student.getUsers().getName() : "Unknown";
+            dto.setStudentName(name);
+            
+            dto.setGradeClass(targetGrade + "年"); 
 
-            // ステータスIDの決定（遅刻判定: 2=遅刻, 1=出席）
-            int statusId = log.getEntryTime().isAfter(lateBoundary) ? 3 : 1;
-            
-            // ★ID(数字)を使って、DBから「ステータスオブジェクト」を取得
-            AttendanceStatusEntity status = attendanceStatusRepository.findById(statusId).orElse(null);
-            
-            // ステータスマスタにデータがないとエラーになるためチェック（必要ならエラーログ等を出す）
-            if (status == null) {
-                System.out.println("Error: StatusID " + statusId + " not found in DB.");
-                continue; 
+            if (attendanceMap.containsKey(userId)) {
+                AttendanceEntity saved = attendanceMap.get(userId);
+                // StatusEntityからIDを取得
+                dto.setStatusId(saved.getStatus().getStatusId());
+                dto.setEntryTime("--:--"); 
+                logs.stream().filter(l -> l.getUserId().equals(userId)).findFirst()
+                    .ifPresent(l -> dto.setEntryTime(l.getEntryTime().format(DateTimeFormatter.ofPattern("HH:mm"))));
+            } else {
+                EntryLogEntity myLog = logs.stream()
+                        .filter(l -> l.getUserId().equals(userId)).findFirst().orElse(null);
+
+                if (myLog != null) {
+                    dto.setEntryTime(myLog.getEntryTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+                    dto.setStatusId(myLog.getEntryTime().isAfter(lateBoundary) ? 3 : 1);
+                } else {
+                    dto.setEntryTime("--:--");
+                    dto.setStatusId(2); 
+                }
+            }
+            result.add(dto);
+        }
+        return result;
+    }
+
+    /**
+     * updateStatus (未使用)
+     */
+    public void updateStatus(Integer sessionId, Integer userId, Integer newStatusId) {
+    }
+
+    /**
+     * 授業終了処理 (一括保存)
+     */
+    @Transactional
+    public void endSession(Integer sessionId, Map<Integer, Integer> manualChanges) {
+        SessionEntity session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+
+        session.setEndTime(LocalDateTime.now());
+        session.setSessionStatus(0);
+        sessionRepository.save(session);
+
+        List<SessionDto> finalStates = getSessionAttendees(sessionId);
+        
+        for (SessionDto dto : finalStates) {
+            AttendanceEntity attendance = attendanceRepository.findBySessionIdAndStudent_UserId(sessionId, dto.getUserId())
+                    .orElse(new AttendanceEntity());
+
+            if (attendance.getAttendanceId() == null) {
+                attendance.setSessionId(sessionId);
+                StudentEntity student = studentRepository.findById(dto.getUserId()).orElse(null);
+                if (student == null) continue;
+                attendance.setStudent(student);
+                attendance.setCreatedAt(LocalDateTime.now());
             }
 
-            // --- ご希望の書き方でエンティティを作成 ---
-            AttendanceEntity attendance = new AttendanceEntity();
+            // 確定ロジック
+            Integer tempStatusId = dto.getStatusId();
             
-            attendance.setStudent(student);         // 学生エンティティをセット
-            attendance.setStatusId(status);         // ステータスエンティティをセット
-            attendance.setSessionId(sessionId);     // セッションIDをセット
-            attendance.setCreatedAt(LocalDateTime.now());
-            attendance.setTimeTable(null);          // 時間割は今回使わないのでnull
-            
-            // DBへ保存 (INSERT)
-            attendanceRepository.save(attendance);
-            // ----------------------------------
+            if (manualChanges != null && manualChanges.containsKey(dto.getUserId())) {
+                tempStatusId = manualChanges.get(dto.getUserId());
+            }
 
-            processedUserIds.add(userId);
+            // ラムダ式内で使うためにfinalな変数にする
+            Integer statusIdToFind = tempStatusId;
+
+            AttendanceStatusEntity status = attendanceStatusRepository.findById(statusIdToFind)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid Status ID: " + statusIdToFind));
+            
+            attendance.setStatusId(status);
+
+            attendanceRepository.save(attendance);
         }
     }
 }

@@ -3,9 +3,7 @@ package com.example.attendancemanagementsystem.attendance.session.controller;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,17 +17,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.attendancemanagementsystem.attendance.session.dto.SessionDto;
 import com.example.attendancemanagementsystem.attendance.session.service.SessionService;
 import com.example.attendancemanagementsystem.common.entity.ClassroomEntity;
-import com.example.attendancemanagementsystem.common.entity.EntryLogEntity;
+import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.entity.SessionEntity;
 import com.example.attendancemanagementsystem.common.entity.SubjectEntity;
-import com.example.attendancemanagementsystem.common.entity.UsersEntity;
+import com.example.attendancemanagementsystem.common.repository.AttendanceStatusRepository;
 import com.example.attendancemanagementsystem.common.repository.ClassroomRepository;
-import com.example.attendancemanagementsystem.common.repository.EntryLogRepository;
+import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
+import com.example.attendancemanagementsystem.common.repository.DepartmentSubjectRepository;
 import com.example.attendancemanagementsystem.common.repository.SessionRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
-import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 
 @Controller
 @RequestMapping("/session")
@@ -38,86 +37,89 @@ public class SessionController {
     private final SessionService sessionService;
     private final ClassroomRepository classroomRepository;
     private final SessionRepository sessionRepository;
-    private final EntryLogRepository entryLogRepository;
-    private final UsersRepository usersRepository;
-    // 追加: 教科情報を取得するため
+    private final DepartmentRepository departmentRepository;
     private final SubjectRepository subjectRepository;
+    private final AttendanceStatusRepository attendanceStatusRepository;
+    private final DepartmentSubjectRepository departmentSubjectRepository;
 
     public SessionController(SessionService sessionService,
                             ClassroomRepository classroomRepository,
                             SessionRepository sessionRepository,
-                            EntryLogRepository entryLogRepository,
-                            UsersRepository usersRepository,
-                            SubjectRepository subjectRepository) {
+                            DepartmentRepository departmentRepository,
+                            SubjectRepository subjectRepository,
+                            AttendanceStatusRepository attendanceStatusRepository,
+                            DepartmentSubjectRepository departmentSubjectRepository) {
         this.sessionService = sessionService;
         this.classroomRepository = classroomRepository;
         this.sessionRepository = sessionRepository;
-        this.entryLogRepository = entryLogRepository;
-        this.usersRepository = usersRepository;
+        this.departmentRepository = departmentRepository;
         this.subjectRepository = subjectRepository;
+        this.attendanceStatusRepository = attendanceStatusRepository;
+        this.departmentSubjectRepository = departmentSubjectRepository;
     }
 
-    /**
-     * 1. 授業開始設定画面を表示 (GET)
-     */
     @GetMapping
     public String showSetupPage(Model model) {
-        // 1. 教室リスト取得
-        List<ClassroomEntity> classrooms = classroomRepository.findAll();
-        
-        // 2. 教科リスト取得 (DBから)
-        List<SubjectEntity> subjects = subjectRepository.findAll();
-
-        // 3. コースリスト (仮実装: DBにCourseEntityがある場合はRepositoryから取得してください)
-        List<String> courses = List.of("情報工学科 1年", "情報工学科 2年", "情報工学科 3年", "AIシステム科");
-
-        // 4. 初期値の設定
-        model.addAttribute("classroomList", classrooms);
-        model.addAttribute("subjectList", subjects);
-        model.addAttribute("courseList", courses);
-        
-        // 日付: 本日
+        model.addAttribute("classroomList", classroomRepository.findAll());
+        // JSが無効な場合などのために念のため全件渡しておく
+        model.addAttribute("subjectList", subjectRepository.findAll());
+        model.addAttribute("departmentList", departmentRepository.findAll());
         model.addAttribute("defaultDate", LocalDate.now());
-        
-        // 時間: 現在時刻 (本来はTimeTableRepositoryから現在の時限を取得してセットするとベスト)
         model.addAttribute("defaultTime", LocalTime.now().truncatedTo(java.time.temporal.ChronoUnit.MINUTES));
-
         return "session/session"; 
     }
 
-    /**
-     * 2. セッション開始処理 (API / POST)
-     */
+    // --- API ---
+
+    // 学年リスト取得
+    @GetMapping("/api/grades/{departmentId}")
+    @ResponseBody
+    public List<Integer> getGradesByDepartment(@PathVariable Integer departmentId) {
+        return departmentSubjectRepository.findGradesByDepartmentId(departmentId);
+    }
+
+    // 科目リスト取得
+    @GetMapping("/api/subjects/{departmentId}")
+    @ResponseBody
+    public List<Map<String, Object>> getSubjectsByDepartment(@PathVariable Integer departmentId) {
+        List<SubjectEntity> subjects = departmentSubjectRepository.findSubjectsByDepartmentId(departmentId);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (SubjectEntity s : subjects) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("subjectId", s.getSubjectId());
+            map.put("subjectName", s.getSubjectName());
+            result.add(map);
+        }
+        return result;
+    }
+
     @PostMapping("/start")
     @ResponseBody
-    public Map<String, Object> startSession(@RequestBody Map<String, Object> request) {
-        // 画面からの入力を取得
-        String subjectIdStr = (String) request.get("subjectId"); // IDで来るか名前にするかによる
-        String courseName = (String) request.get("courseName");
-        String dateStr = (String) request.get("date");
-        String timeStr = (String) request.get("time");
-        Integer classroomId = Integer.parseInt(request.get("classroomId").toString());
+    public Map<String, Object> startSession(@RequestBody Map<String, String> request) {
+        String dateStr = request.get("date");
+        String timeStr = request.get("time");
+        Integer classroomId = Integer.valueOf(request.get("classroomId"));
+        Integer targetDepartmentId = Integer.valueOf(request.get("targetDepartmentId"));
+        Integer targetGrade = Integer.valueOf(request.get("targetGrade"));
+        String subjectName = request.get("subjectName");
 
-        // Subject情報の取得 (IDで検索して名前を取得、あるいは画面から名前を送る)
-        SubjectEntity subject = subjectRepository.findById(Integer.parseInt(subjectIdStr)).orElse(null);
-        String subjectName = (subject != null) ? subject.getSubjectName() : "不明な教科";
-
-        // 日時の結合
         LocalDate date = LocalDate.parse(dateStr);
         LocalTime time = LocalTime.parse(timeStr);
         LocalDateTime startDateTime = LocalDateTime.of(date, time);
 
-        // セッション保存
         SessionEntity session = new SessionEntity();
         session.setSessionDate(date);
         session.setStartTime(startDateTime);
         session.setActualClassroomId(classroomId);
+        session.setTargetDepartmentId(targetDepartmentId);
+        session.setTargetGrade(targetGrade);
         
-        // Noteカラムに「コース名 - 教科名」の形式で保存して識別できるようにする
-        // (SessionEntityに専用カラムがないため)
-        session.setNote(courseName + " : " + subjectName);
+        DepartmentEntity dept = departmentRepository.findById(targetDepartmentId).orElse(null);
+        String deptName = (dept != null && dept.getMajor() != null) ? dept.getMajor().getMajorName() : "不明";
+        String className = (dept != null) ? dept.getClassName() : "";
         
-        session.setSessionStatus(1);
+        session.setNote(deptName + " " + className + " " + targetGrade + "年 : " + subjectName);
+        session.setSessionStatus(1); 
 
         SessionEntity savedSession = sessionRepository.save(session);
 
@@ -126,15 +128,6 @@ public class SessionController {
         return response;
     }
 
-    // ... (showActiveSession, endSession, getAttendees メソッドは変更なしのため省略。以前のまま維持してください) ...
-    // 必要であれば前の回答のコードを含めますが、長くなるので省略しています。
-    // showActiveSession, endSession, getAttendees はそのまま残してください。
-    
-    // --- 省略されたメソッドの再掲が必要なら指示してください ---
-
-    /**
-     * 3. 実施中画面を表示 (GET) - 変更なし
-     */
     @GetMapping("/active/{sessionId}")
     public String showActiveSession(@PathVariable Integer sessionId, Model model) {
         SessionEntity session = sessionRepository.findById(sessionId)
@@ -146,51 +139,33 @@ public class SessionController {
 
         Map<String, Object> sessionDto = new HashMap<>();
         sessionDto.put("sessionId", session.getSessionId());
-        sessionDto.put("className", session.getNote());
+        sessionDto.put("className", session.getNote()); 
         sessionDto.put("startTime", session.getStartTime());
         sessionDto.put("classroomName", classroomName);
 
         model.addAttribute("sessionDto", sessionDto);
+        model.addAttribute("statusList", attendanceStatusRepository.findAll());
 
         return "session/sessionActive";
     }
 
+    @GetMapping("/api/attendees/{sessionId}")
+    @ResponseBody
+    public List<SessionDto> getAttendees(@PathVariable Integer sessionId) {
+        return sessionService.getSessionAttendees(sessionId);
+    }
+    
     @PostMapping("/end")
     @ResponseBody
-    public Map<String, String> endSession(@RequestBody Map<String, Integer> request) {
-        Integer sessionId = request.get("sessionId");
-        sessionService.endSession(sessionId);
+    public Map<String, String> endSession(@RequestBody EndSessionRequest request) {
+        sessionService.endSession(request.sessionId, request.changes);
         Map<String, String> response = new HashMap<>();
-        response.put("message", "Session ended and attendance calculated.");
+        response.put("message", "Session ended and attendance finalized.");
         return response;
     }
 
-    @GetMapping("/api/attendees/{sessionId}")
-    @ResponseBody
-    public List<Map<String, Object>> getAttendees(@PathVariable Integer sessionId) {
-        SessionEntity session = sessionRepository.findById(sessionId).orElse(null);
-        if (session == null) return List.of();
-
-        LocalDateTime start = session.getStartTime().minusMinutes(30);
-        LocalDateTime now = LocalDateTime.now();
-
-        List<EntryLogEntity> logs = entryLogRepository.findByClassroomIdAndEntryTimeBetween(
-            session.getActualClassroomId(), start, now
-        );
-
-        List<Map<String, Object>> result = new ArrayList<>();
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-
-        for (EntryLogEntity log : logs) {
-            UsersEntity user = usersRepository.findById(log.getUserId()).orElse(null);
-            Map<String, Object> map = new HashMap<>();
-            map.put("studentId", log.getUserId());
-            map.put("name", (user != null) ? user.getName() : "Unknown");
-            map.put("entryTime", log.getEntryTime().format(timeFormatter));
-            map.put("status", "入室済み");
-            result.add(map);
-        }
-        Collections.reverse(result);
-        return result;
+    public static class EndSessionRequest {
+        public Integer sessionId;
+        public Map<Integer, Integer> changes; 
     }
 }
