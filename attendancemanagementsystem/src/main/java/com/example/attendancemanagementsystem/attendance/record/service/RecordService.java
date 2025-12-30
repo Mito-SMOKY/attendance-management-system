@@ -1,68 +1,45 @@
 package com.example.attendancemanagementsystem.attendance.record.service;
 
-import com.example.attendancemanagementsystem.attendance.record.dto.RecordDTO;
-import com.example.attendancemanagementsystem.attendance.record.dto.VerifiedRecordDto;
-import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
-import com.example.attendancemanagementsystem.common.entity.AttendanceStatusEntity;
-import com.example.attendancemanagementsystem.common.entity.CardsEntity;
-import com.example.attendancemanagementsystem.common.entity.ClassroomEntity;
-import com.example.attendancemanagementsystem.common.entity.StudentEntity;
-import com.example.attendancemanagementsystem.common.repository.AttendanceRepository;
-import com.example.attendancemanagementsystem.common.repository.AttendanceStatusRepository; // ★追加
-import com.example.attendancemanagementsystem.common.repository.CardsRepository;
-import com.example.attendancemanagementsystem.common.repository.ClassroomRepository;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
+import com.example.attendancemanagementsystem.attendance.record.dto.RecordDTO;
+import com.example.attendancemanagementsystem.attendance.record.dto.VerifiedRecordDto; 
+import com.example.attendancemanagementsystem.common.entity.CardsEntity;
+import com.example.attendancemanagementsystem.common.entity.ClassroomEntity;
+import com.example.attendancemanagementsystem.common.entity.EntryLogEntity;
+import com.example.attendancemanagementsystem.common.repository.CardsRepository;
+import com.example.attendancemanagementsystem.common.repository.ClassroomRepository;
+import com.example.attendancemanagementsystem.common.repository.EntryLogRepository;
 
 @Service
 public class RecordService {
 
-    private final CardsRepository cardsRepository;
+    private final CardsRepository cardsRepository; 
     private final DecryptionService decryptionService;
-    private final AttendanceRepository attendanceRepository;
+    private final EntryLogRepository entryLogRepository;
     private final ClassroomRepository classroomRepository;
-    private final AttendanceStatusRepository attendanceStatusRepository;
 
-    // コンストラクタ
-    public RecordService(CardsRepository cardsRepository, 
+    public RecordService(CardsRepository cardsRepository,
                         DecryptionService decryptionService,
-                        AttendanceRepository attendanceRepository,
-                        ClassroomRepository classroomRepository,
-                        AttendanceStatusRepository attendanceStatusRepository) {
+                        EntryLogRepository entryLogRepository,
+                        ClassroomRepository classroomRepository) {
         this.cardsRepository = cardsRepository;
         this.decryptionService = decryptionService;
-        this.attendanceRepository = attendanceRepository;
+        this.entryLogRepository = entryLogRepository;
         this.classroomRepository = classroomRepository;
-        this.attendanceStatusRepository = attendanceStatusRepository;
     }
 
+     // NFCスキャンデータを受け取り、チェックを行った上で入室ログを保存する
     @Transactional
     public VerifiedRecordDto processAttendanceScan(RecordDTO recordDTO) {
-
-        // 復号処理
-        String encryptedHex = recordDTO.getUserId();
-        String originalUserIdString = decryptionService.decryptUserId(encryptedHex);
-        Integer originalUserId = Integer.parseInt(originalUserIdString);
-
-        // カードID検証
-        String cardId = recordDTO.getCardId();
-        CardsEntity card = cardsRepository.findByCardId(cardId)
-                .orElseThrow(() -> new IllegalArgumentException("未登録のカードです: " + cardId));
-
-        if (!Boolean.TRUE.equals(card.getIsActive())) {
-            throw new IllegalStateException("無効化されたカードです。");
-        }
-        if (!card.getUserId().equals(originalUserId)) {
-            throw new IllegalStateException("カード所有者とデータが不一致です(偽造の疑い)。");
-        }
-
-        // 時刻変換
+        // タイムスタンプの取得
         LocalDateTime scanTime;
         try {
-            if (recordDTO.getReadTime() != null) {
+            if (recordDTO.getReadTime() != null && !recordDTO.getReadTime().isEmpty()) {
                 scanTime = LocalDateTime.parse(recordDTO.getReadTime());
             } else {
                 scanTime = LocalDateTime.now();
@@ -71,41 +48,45 @@ public class RecordService {
             scanTime = LocalDateTime.now();
         }
 
-        // セキュリティチェック
-        String readerMacAddress = recordDTO.getReaderId();
-        if (readerMacAddress == null || readerMacAddress.isEmpty()) {
-            throw new SecurityException("不正なアクセス: ReaderIDがありません。");
+        // カードIDの存在チェック 
+        String cardId = recordDTO.getCardId();
+        if (cardId == null || cardId.isEmpty()) {
+            throw new IllegalArgumentException("Card ID is empty");
         }
+        
+        //　新規カード登録へ
+        Optional<CardsEntity> cardOpt = cardsRepository.findByCardId(cardId);
+        if (cardOpt.isEmpty()) {
+            throw new IllegalArgumentException("未登録のカードです: " + cardId);
+        }
+
+        // リーダー(教室)の特定とセキュリティチェック
+        String readerMacAddress = recordDTO.getReaderId();
         Optional<ClassroomEntity> classroomOpt = classroomRepository.findByMacAddress(readerMacAddress);
         if (classroomOpt.isEmpty()) {
             throw new SecurityException("未登録のリーダー(MAC: " + readerMacAddress + ")からのアクセスは拒否されました。");
         }
-        System.out.println("認証OK: " + classroomOpt.get().getClassroomName() + " (MAC: " + readerMacAddress + ")");
-
-        // DB保存処理
-        AttendanceEntity attendance = new AttendanceEntity();
         
-        // ユーザーセット
-        StudentEntity studentRef = new StudentEntity();
-        studentRef.setUserId(originalUserId); 
-        attendance.setStudent(studentRef);
+        // ユーザーIDの復号
+        String encryptedUserId = recordDTO.getUserId();
+        String originalUserIdStr = decryptionService.decryptUserId(encryptedUserId);
+        Integer userId = Integer.parseInt(originalUserIdStr);
 
-        attendance.setCreatedAt(scanTime);
-        
-        //リポジトリからステータス(ID=1:出席)を取得してセット
-        AttendanceStatusEntity status = attendanceStatusRepository.findById(1)
-            .orElseThrow(() -> new IllegalStateException("ステータスID=1 がDBに見つかりません。"));
-        
-        attendance.setStatusId(status);
+        // EntryLogEntityの保存
+        EntryLogEntity entryLog = new EntryLogEntity();
+        entryLog.setUserId(userId);
+        entryLog.setClassroomId(classroomOpt.get().getClassroomId());
+        entryLog.setEntryTime(scanTime);
+        entryLog.setIsProcessed(0); // 未処理
 
-        attendanceRepository.save(attendance);
+        entryLogRepository.save(entryLog);
 
         // 結果返却
         return new VerifiedRecordDto(
-                originalUserId,
+                userId,
                 cardId,
                 scanTime,
-                recordDTO.getReaderId()
+                readerMacAddress
         );
     }
 }

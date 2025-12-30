@@ -2,6 +2,7 @@ package com.example.attendancemanagementsystem.common.repository;
 
 import java.time.LocalDate;
 import java.util.List; 
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,6 +16,9 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
 
        //生徒に紐づく出欠情報（複数）を検索
        List<AttendanceEntity> findByStudent(StudentEntity student);
+
+       //同じ授業で既に登録済みかチェックする
+       boolean existsBySessionIdAndStudent_UserId(Integer sessionId, Integer userId);
 
        //生徒と日付範囲で出欠情報を検索(カレンダー表示用)
        @Query("SELECT a FROM AttendanceEntity a " +
