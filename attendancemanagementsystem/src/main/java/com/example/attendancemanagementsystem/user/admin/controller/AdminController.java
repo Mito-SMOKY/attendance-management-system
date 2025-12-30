@@ -53,11 +53,6 @@ public class AdminController {
         return 3;
     }
 
-    @GetMapping("/timetable")
-    public String showTimetablePage() {
-        return "admin/timetable";
-    }
-
     @GetMapping("/subjectList")
     public String showSubjectList() {
         return "admin/subjectList";
