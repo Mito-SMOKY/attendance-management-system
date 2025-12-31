@@ -5,9 +5,12 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -18,8 +21,9 @@ public class SessionEntity {
     @Column(name = "SessionID")
     private Integer sessionId;
 
-    @Column(name = "TimeTableID")
-    private Integer timeTableId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TimeTableID") // DBのカラム名
+    private TimetableEntity timetable;
 
     @Column(name = "ActualClassroomID")
     private Integer actualClassroomId;
@@ -55,12 +59,12 @@ public class SessionEntity {
         this.sessionId = sessionId;
     }
 
-    public Integer getTimeTableId() {
-        return timeTableId;
+    public TimetableEntity getTimetable() {
+        return timetable;
     }
 
-    public void setTimeTableId(Integer timeTableId) {
-        this.timeTableId = timeTableId;
+    public void setTimetable(TimetableEntity timetable) {
+        this.timetable = timetable;
     }
 
     public Integer getActualClassroomId() {

@@ -2,10 +2,12 @@ package com.example.attendancemanagementsystem.common.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.entity.TimetableEntity;
 
@@ -41,4 +43,7 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
 
     //指定したユーザーIDの時間割エンティティを全て取得
     List<TimetableEntity> findByUserId(Integer userId);
+    
+    //指定したユーザIDの時間割エンティティの特定のコマを取得
+    List<TimetableEntity> findByUserIdAndDate(Integer userId, LocalDate date);
 }
