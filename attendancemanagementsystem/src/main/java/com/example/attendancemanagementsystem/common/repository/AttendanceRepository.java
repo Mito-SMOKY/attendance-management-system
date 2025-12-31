@@ -1,7 +1,9 @@
 package com.example.attendancemanagementsystem.common.repository;
 
 import java.time.LocalDate;
-import java.util.List; 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +19,12 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
        //生徒に紐づく出欠情報（複数）を検索
        List<AttendanceEntity> findByStudent(StudentEntity student);
 
+       // セッションIDに紐づく全ての出席データを取得
+       List<AttendanceEntity> findBySessionId(Integer sessionId);
+
+       // 特定のセッションと生徒の出席データを取得（手動更新用）
+       Optional<AttendanceEntity> findBySessionIdAndStudent_UserId(Integer sessionId, Integer userId);
+
        //同じ授業で既に登録済みかチェックする
        boolean existsBySessionIdAndStudent_UserId(Integer sessionId, Integer userId);
 
@@ -29,29 +37,28 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
               @Param("startDate") LocalDate startDate,
               @Param("endDate") LocalDate endDate);
 
-       //カレンダー等の既存ロジック用（現状維持）
+       //カレンダー等の既存ロジック用
        @Query("SELECT COUNT(a) FROM AttendanceEntity a " +
               "WHERE a.student.userId = :userId " + 
               "AND a.timeTable.subjectId = :subjectId " +
               "AND a.status.statusId IN (1, 3, 4)") 
        int countAttendedClassesBySubject(@Param("userId") Integer userId, @Param("subjectId") Integer subjectId);
        
-       //有効出席数カウント (出席+公欠)
+       //有効出席数カウント
        @Query("SELECT COUNT(a) FROM AttendanceEntity a " +
               "WHERE a.student.userId = :userId " +
               "AND a.timeTable.subjectId = :subjectId " +
-           "AND a.status.statusId IN (1, 4)") // 1:出席, 4:公欠
+              "AND a.status.statusId IN (1, 4)") 
        int countEffectiveAttendance(@Param("userId") Integer userId, @Param("subjectId") Integer subjectId);
 
-       //出席停止数カウント (分母から引くため)
+       //出席停止数カウント
        @Query("SELECT COUNT(a) FROM AttendanceEntity a " +
               "WHERE a.student.userId = :userId " +
               "AND a.timeTable.subjectId = :subjectId " +
-              "AND a.status.statusId = 6") // 6:出席停止
+              "AND a.status.statusId = 6") 
        int countSuspensions(@Param("userId") Integer userId, @Param("subjectId") Integer subjectId);
 
-       //指定した生徒・期間・教科の出席データを取得
-       //(これが無いと SubjectAttendanceDetailService でエラーになります)
+       //詳細取得用
        @Query("SELECT a FROM AttendanceEntity a " +
               "WHERE a.student = :student " +
               "AND a.timeTable.date BETWEEN :startDate AND :endDate " +
@@ -62,7 +69,7 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
               @Param("endDate") LocalDate endDate, 
               @Param("subjectId") Integer subjectId);
        
-       //指定した生徒・教科・ステータスの出席数をカウント(SubjectAttendanceServiceの全期間計算用)
+       //集計用
        @Query("SELECT COUNT(a) FROM AttendanceEntity a " +
               "WHERE a.student.userId = :studentId " +
               "AND a.timeTable.subjectId = :subjectId " +
@@ -71,4 +78,17 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
               @Param("subjectId") Integer subjectId, 
               @Param("statusId") Integer statusId);
 
+       //「指定した時間の直前に、同じ教室で終わった授業の出席データ」を探すメソッド
+       @Query("SELECT a FROM AttendanceEntity a, SessionEntity s " +
+              "WHERE a.sessionId = s.sessionId " +
+              "AND a.student.userId = :userId " +
+              "AND s.actualClassroomId = :classroomId " +
+              "AND s.endTime BETWEEN :rangeStart AND :rangeEnd " +
+              "AND (a.status.statusId = 1 OR a.status.statusId = 3)") 
+       Optional<AttendanceEntity> findPreviousAttendanceInSameRoom(
+              @Param("userId") Integer userId,
+              @Param("classroomId") Integer classroomId,
+              @Param("rangeStart") LocalDateTime rangeStart,
+              @Param("rangeEnd") LocalDateTime rangeEnd
+       );
 }
