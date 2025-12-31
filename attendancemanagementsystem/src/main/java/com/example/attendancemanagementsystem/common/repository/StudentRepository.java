@@ -12,7 +12,7 @@ import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 
 @Repository
-public interface StudentRepository extends JpaRepository<StudentEntity, Integer> {
+public interface StudentRepository extends JpaRepository<StudentEntity, Integer>, JpaSpecificationExecutor<StudentEntity> {
 
     // UsersEntity をもとに StudentEntity を検索するメソッド
     Optional<StudentEntity> findByUsers(UsersEntity users);

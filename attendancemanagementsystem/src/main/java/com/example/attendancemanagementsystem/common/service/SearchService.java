@@ -8,8 +8,9 @@ import java.util.Map;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 @Service
 public class SearchService {
@@ -74,5 +75,19 @@ public class SearchService {
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+    // 補助メソッド: RootからPathを取得（ネスト対応）
+    private <T> Path<String> getPath(Root<T> root, String attributeName) {
+        Path<?> path = root;
+        if (attributeName.contains(".")) {
+            for (String part : attributeName.split("\\.")) {
+                path = path.get(part);
+            }
+        } else {
+            path = path.get(attributeName);
+        }
+        @SuppressWarnings("unchecked")
+        Path<String> stringPath = (Path<String>) path;
+        return stringPath;
     }
 }
