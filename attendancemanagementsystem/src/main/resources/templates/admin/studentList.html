@@ -16,7 +16,6 @@
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
     
-    
     <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url='/timetable')}"></div>
     </div>
@@ -27,15 +26,15 @@
 
         <div class="search-filter-area">
             
-            <form action="#" method="get" class="search-form">
-                <input type="text" class="search-input" placeholder="検索キーワードを入力">
+            <form class="search-form" onsubmit="return false;">
+                <input type="text" id="searchInput" class="search-input" placeholder="検索キーワードを入力">
             </form>
 
-            <button type="submit" class="tool-btn search-btn">
+            <button type="button" id="searchBtn" class="tool-btn search-btn">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
 
-            <button class="tool-btn filter-btn">
+            <button type="button" class="tool-btn filter-btn">
                 <i class="fa-solid fa-sliders"></i>
             </button>
             
@@ -44,7 +43,12 @@
         <div class="table-wrapper">
             <table class="student-table">
                 <colgroup>
-                    <col style="width: 15%;"> <col style="width: 30%;"> <col style="width: 10%;"> <col style="width: 10%;"> <col style="width: 35%;"> </colgroup>
+                    <col style="width: 15%;"> 
+                    <col style="width: 30%;"> 
+                    <col style="width: 10%;"> 
+                    <col style="width: 10%;"> 
+                    <col style="width: 35%;"> 
+                </colgroup>
                 <thead>
                     <tr>
                         <th>学籍番号</th>
@@ -54,58 +58,16 @@
                         <th>氏名</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                <tbody id="studentTableBody">
                 </tbody>
             </table>
         </div>
 
-        <div class="pagination">
-            <a href="#" class="page-link">＜</a>
-            <a href="#" class="page-link active">1</a>
-            <a href="#" class="page-link">2</a>
-            <a href="#" class="page-link">3</a>
-            <a href="#" class="page-link">4</a>
-            <a href="#" class="page-link">5</a>
-            <span class="page-dots">...</span>
-            <a href="#" class="page-link">＞</a>
-        </div>
+        <div id="pagination" class="pagination"></div>
 
     </div>
+
+    <script th:src="@{/js/admin/studentList.js}"></script>
 
 </body>
 </html>
