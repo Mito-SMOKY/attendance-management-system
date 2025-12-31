@@ -21,9 +21,9 @@ public class SessionEntity {
     @Column(name = "SessionID")
     private Integer sessionId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TimeTableID") // DBのカラム名
-    private TimetableEntity timetable;
+    @ManyToOne
+    @JoinColumn(name = "TimeTableID") 
+    private TimetableEntity timeTable;
 
     @Column(name = "ActualClassroomID")
     private Integer actualClassroomId;
@@ -59,12 +59,12 @@ public class SessionEntity {
         this.sessionId = sessionId;
     }
 
-    public TimetableEntity getTimetable() {
-        return timetable;
+    public TimetableEntity getTimeTable() {
+        return timeTable;
     }
 
-    public void setTimetable(TimetableEntity timetable) {
-        this.timetable = timetable;
+    public void setTimeTable(TimetableEntity timeTable) {
+        this.timeTable = timeTable;
     }
 
     public Integer getActualClassroomId() {

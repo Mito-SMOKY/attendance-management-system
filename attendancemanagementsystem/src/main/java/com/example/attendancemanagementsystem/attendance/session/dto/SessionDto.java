@@ -1,7 +1,5 @@
 package com.example.attendancemanagementsystem.attendance.session.dto;
 
-import java.time.LocalDateTime;
-
 import lombok.Data;
 
 @Data
@@ -12,7 +10,9 @@ public class SessionDto {
     private String entryTime;   
     private String className;   
     private String classroomName;
-    private LocalDateTime startTime;
+    private String startTime;
     private String gradeClass;
     private Integer statusId;
+    private Integer actualClassroomId;
+    private Integer sessionStatus;
 }

@@ -2,6 +2,7 @@ package com.example.attendancemanagementsystem.attendance.session.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import com.example.attendancemanagementsystem.common.entity.AttendanceStatusEnti
 import com.example.attendancemanagementsystem.common.entity.EntryLogEntity;
 import com.example.attendancemanagementsystem.common.entity.SessionEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
+import com.example.attendancemanagementsystem.common.entity.TimeSlotEntity;
 import com.example.attendancemanagementsystem.common.entity.TimetableEntity;
 import com.example.attendancemanagementsystem.common.repository.AttendanceRepository;
 import com.example.attendancemanagementsystem.common.repository.AttendanceStatusRepository;
@@ -50,117 +52,124 @@ public class SessionService {
         this.timetableRepository = timetableRepository;
     }
 
-    // 現在時刻から自動入力対象の時間割データを特定する
-    public Optional<TimetableEntity> findCurrentScheduledLesson(Integer teacherUserId) {
-
-        // 現在の日時を取得
-        LocalDateTime now = LocalDateTime.now();
-
-        // 今日の日付を取得
-        LocalDate today = now.toLocalDate();
+    // 画面で指定された「日付」と「科目」から時間割を特定するメソッド
+        public Optional<TimetableEntity> findTimetableBySchedule(Integer teacherUserId, LocalDate date, Integer subjectId) {
         
-        // 講師IDと日付に基づき今日の時間割を取得
-        List<TimetableEntity> todaysLessons = timetableRepository.findByUserIdAndDate(teacherUserId, today);
+        // その日の講師の授業を全て取得
+        List<TimetableEntity> todaysLessons = timetableRepository.findByUserIdAndDate(teacherUserId, date);
+        
+        // 科目IDが一致するものを探して返す
+        return todaysLessons.stream()
+                .filter(lesson -> lesson.getSubjectId() != null && lesson.getSubjectId().equals(subjectId))
+                .findFirst();
+    }
 
-        // 現在時刻が授業枠に収まっているものを抽出する
+    // 現在時刻から時間割データを特定する
+    public Optional<TimetableEntity> findCurrentScheduledLesson(Integer teacherUserId) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalTime currentTime = now.toLocalTime();
+        LocalDate today = now.toLocalDate();
+        List<TimetableEntity> todaysLessons = timetableRepository.findByUserIdAndDate(teacherUserId, today);
+        
+        // 現在時刻が「授業開始15分前 ～ 授業終了」の範囲に含まれるものを探す
         return todaysLessons.stream().filter(lesson -> {
-            return true; 
+            TimeSlotEntity slot = lesson.getTimeSlot();
+            if (slot == null) return false;
+            LocalTime start = slot.getStartTime();
+            LocalTime end = slot.getEndTime();
+            if (start == null || end == null) return false;
+            return currentTime.isAfter(start.minusMinutes(15)) && currentTime.isBefore(end);
         }).findFirst();
     }
 
-    // 出席状況の取得
+    // 出席状況を取得する
     public List<SessionDto> getSessionAttendees(Integer sessionId) {
 
-        // セッションを取得し存在しない場合はエラーを投げる
+        // セッション情報を取得
         SessionEntity session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
-
-        // 年度を計算する（4月始まりに対応）
+        
+        // 学年を計算（4月より前なら前年度として扱う）
         int currentYear = LocalDate.now().getYear();
         if (LocalDate.now().getMonthValue() < 4) currentYear--;
-
-        // 対象学年を取得
         Integer targetGrade = session.getTargetGrade() != null ? session.getTargetGrade() : 1;
-
-        // 対象学科・学年の全学生を取得
+        
+        // 対象となる学科・学年の生徒全員を取得
         List<StudentEntity> allStudents = studentRepository.findByDepartmentAndGrade(
                 session.getTargetDepartmentId(), targetGrade, currentYear
         );
-
-        // 授業開始15分前から現在までの入室ログを検索
+        
+        // タッチログの検索範囲を設定（授業開始15分前から現在まで）
         LocalDateTime searchStart = session.getStartTime().minusMinutes(15);
         List<EntryLogEntity> logs = entryLogRepository.findByClassroomIdAndEntryTimeBetween(
                 session.getActualClassroomId(), searchStart, LocalDateTime.now()
         );
-
-        // 既存の保存済み出席データを取得
+        
+        // 既にDBに保存されている出席情報があれば取得
         List<AttendanceEntity> existingAttendances = attendanceRepository.findBySessionId(sessionId);
-
-        // 学生IDをキーとしたマップに変換
         Map<Integer, AttendanceEntity> attendanceMap = existingAttendances.stream()
                 .collect(Collectors.toMap(a -> a.getStudent().getUserId(), a -> a));
-
+        
         List<SessionDto> result = new ArrayList<>();
-
-        // 遅刻の境界時刻（開始20分後）を設定
+        
+        // 遅刻と判定する境界線（授業開始 + 20分）
         LocalDateTime lateBoundary = session.getStartTime().plusMinutes(20);
 
+        // 生徒一人ひとりについてループ処理
         for (StudentEntity student : allStudents) {
             SessionDto dto = new SessionDto();
             Integer userId = student.getUserId();
             dto.setUserId(userId);
-
-            // 学生名を設定
             String name = (student.getUsers() != null) ? student.getUsers().getName() : "Unknown";
             dto.setStudentName(name);
             dto.setGradeClass(targetGrade + "年");
-
-            // 既に保存済みのデータがある場合
+            
+            // 既に出席情報が保存されている場合（確定後の再表示など）
             if (attendanceMap.containsKey(userId)) {
                 AttendanceEntity saved = attendanceMap.get(userId);
                 dto.setStatusId(saved.getStatus().getStatusId());
                 dto.setEntryTime("--:--");
-
-                // 最新の入室時刻をログから抽出
+                
+                // ログがあれば時間を表示
                 logs.stream().filter(l -> l.getUserId().equals(userId)).findFirst()
                     .ifPresent(l -> dto.setEntryTime(l.getEntryTime().format(DateTimeFormatter.ofPattern("HH:mm"))));
             } 
 
-            // 保存されていない場合はリアルタイムで判定
+            // まだ保存されていない場合
             else {
+
+                // この生徒のタッチログを探す
                 EntryLogEntity myLog = logs.stream()
                         .filter(l -> l.getUserId().equals(userId)).findFirst().orElse(null);
-
+                
                 if (myLog != null) {
 
-                    // 入室時刻を設定
+                    // ログがある場合：時間によってステータスを自動判定
                     dto.setEntryTime(myLog.getEntryTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-
-                    // 欠席の境界時刻（開始30分後）を設定
+                    
                     LocalDateTime absentBoundary = session.getStartTime().plusMinutes(30);
-
-                    // 入室時刻に基づき欠席・遅刻・出席を判定
-                    if (myLog.getEntryTime().isAfter(absentBoundary)) {
-                        dto.setStatusId(2); 
-                    } else if (myLog.getEntryTime().isAfter(lateBoundary)) {
-                        dto.setStatusId(3); 
-                    } else {
-                        dto.setStatusId(1); 
+                    
+                    if (myLog.getEntryTime().isAfter(absentBoundary)) { 
+                        dto.setStatusId(2); // 30分以上遅刻は「欠席」扱い
+                    } else if (myLog.getEntryTime().isAfter(lateBoundary)) { 
+                        dto.setStatusId(3); // 20分以上遅刻は「遅刻」
+                    } else { 
+                        dto.setStatusId(1); // それ以外は「出席」
                     }
                 } else {
 
-                    // 前の授業からの連続受講をチェック
+                    // ログがない場合：連続授業の判定
                     Optional<AttendanceEntity> prev = attendanceRepository.findPreviousAttendanceInSameRoom(
                             userId, session.getActualClassroomId(),
                             session.getStartTime().minusMinutes(30), session.getStartTime()
                     );
-
-                    if (prev.isPresent()) {
+                    
+                    if (prev.isPresent()) { 
                         dto.setEntryTime("(連続)"); 
-                        dto.setStatusId(1);
-                    } else {
-                        dto.setEntryTime("--:--");
-                        dto.setStatusId(2);
+                        dto.setStatusId(1); // 連続授業なら出席扱い
+                    } else { 
+                        dto.setEntryTime("--:--"); 
+                        dto.setStatusId(2); // ログも連続記録もなければ「欠席」
                     }
                 }
             }
@@ -169,77 +178,79 @@ public class SessionService {
         return result;
     }
 
-    // 授業終了処理
+    // 授業終了処理メソッド
     @Transactional
     public void endSession(Integer sessionId, Map<Integer, Integer> manualChanges) {
 
-        // セッションを取得
+        // セッション情報を取得
         SessionEntity session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
-
-        // セッションの終了時刻と状態を更新して保存
+        
+        // 時間割を取得する
+        TimetableEntity timeTable = session.getTimeTable();
         LocalDateTime now = LocalDateTime.now();
         session.setEndTime(now);
-        session.setSessionStatus(0);
+        session.setSessionStatus(0); 
         sessionRepository.save(session);
 
-        // 最終的な出席状況を取得
+        // 最終的な出席状況を取得（手動変更があれば適用するため）
         List<SessionDto> finalStates = getSessionAttendees(sessionId);
-
+        
         for (SessionDto dto : finalStates) {
 
-            // 出席レコードを取得または新規作成
+            // 既存の出席データがあれば取得、なければ新規作成
             AttendanceEntity attendance = attendanceRepository.findBySessionIdAndStudent_UserId(sessionId, dto.getUserId())
                     .orElse(new AttendanceEntity());
-
-            // 新規レコードの場合は初期設定を行う
+            
             if (attendance.getAttendanceId() == null) {
+                // 新規作成時の設定
                 attendance.setSessionId(sessionId);
-
-                // セッションに紐づく時間割エンティティをセット
-                attendance.setTimeTable(session.getTimetable());
+                
+                //  時間割が存在する場合のみセットする
+                if (timeTable != null) {
+                    attendance.setTimeTable(timeTable);
+                }
+                
                 StudentEntity student = studentRepository.findById(dto.getUserId()).orElse(null);
-                if (student == null) continue;
+                if (student == null) continue; 
                 attendance.setStudent(student);
                 attendance.setCreatedAt(now);
             }
-
-            // 手動変更があれば優先してステータスを決定
+            
+            // ステータスの決定（手動変更があればそれを優先）
             Integer finalStatusId = dto.getStatusId();
             if (manualChanges != null && manualChanges.containsKey(dto.getUserId())) {
                 finalStatusId = manualChanges.get(dto.getUserId());
             }
-
-            // ステータスをセットして保存
+            
+            // ステータスIDからエンティティを取得してセット
             AttendanceStatusEntity status = attendanceStatusRepository.findById(finalStatusId)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid Status ID"));
             attendance.setStatusId(status);
-
+            
+            // 保存実行
             attendanceRepository.save(attendance);
         }
         
-        // 授業に関連する未処理ログのクリーンアップを実行
+        // 使用したタッチログを「処理済み」にする
         processRemainingLogs(session, now);
     }
 
-    // 授業時間内の入室ログを処理済みにマークする
+    // ログの後処理メソッド
     private void processRemainingLogs(SessionEntity session, LocalDateTime now) {
 
-        // 判定リミット時刻を計算
+        // ログの検索終了時刻を設定
         LocalDateTime searchLimit = session.getStartTime().plusMinutes(85);
-        
-        // リミットと現在の早い方を検索終了時刻にする
         LocalDateTime searchEnd = now.isBefore(searchLimit) ? now : searchLimit;
-
-        // 授業開始15分前からリミットまでのログを検索
+        
+        // 対象範囲のログを取得
         List<EntryLogEntity> logs = entryLogRepository.findByClassroomIdAndEntryTimeBetween(
-            session.getActualClassroomId(),
-            session.getStartTime().minusMinutes(15),
-            searchEnd
+            session.getActualClassroomId(), session.getStartTime().minusMinutes(15), searchEnd
         );
-
-        // 未処理のログをすべて処理済みに更新
+        
         for (EntryLogEntity log : logs) {
+            
+            // まだ未処理のログであれば、処理済み(1)に更新
             if (log.getIsProcessed() == null || log.getIsProcessed() == 0) {
                 log.setIsProcessed(1);
                 log.setProcessedAt(now);

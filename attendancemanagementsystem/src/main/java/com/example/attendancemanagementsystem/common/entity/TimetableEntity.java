@@ -27,7 +27,7 @@ public class TimetableEntity {
     @Column(name = "Date")
     private LocalDate date;
 
-    @Column(name = "SlotID") // コマ（1限、2限...）
+    @Column(name = "SlotID") 
     private Integer slotId; 
 
     @Column(name = "UserID")
@@ -59,6 +59,10 @@ public class TimetableEntity {
     @JoinColumn(name = "ClassroomID", insertable = false, updatable = false)
     private ClassroomEntity classroom;
 
+    @ManyToOne
+    @JoinColumn(name = "SlotID", insertable = false, updatable = false)
+    private TimeSlotEntity timeSlot;
+
     // Timetable(1) 対 Attendance(多)
     @OneToMany(mappedBy = "timeTable", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AttendanceEntity> attendances;
@@ -82,6 +86,14 @@ public class TimetableEntity {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public TimeSlotEntity getTimeSlot() {
+        return timeSlot;
+    }
+
+    public void setTimeSlot(TimeSlotEntity timeSlot) {
+        this.timeSlot = timeSlot;
     }
 
     public Integer getSlotId() {
