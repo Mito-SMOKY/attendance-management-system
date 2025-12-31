@@ -6,12 +6,44 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         body { background-color: #f8f9fa; }
-        .setup-card { max-width: 600px; margin: 40px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .setup-card { max-width: 700px; margin: 40px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .form-label { font-weight: bold; }
     </style>
 </head>
 <body>
 
+<div th:if="${activeSession != null}" id="activeSessionOverlay" 
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; justify-content: center; align-items: center;">
+    
+    <div style="background: white; padding: 40px; border-radius: 10px; width: 550px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+        <h2 style="color: #dc3545; margin-bottom: 20px; font-weight: bold;">⚠️ 前回の授業が終了していません</h2>
+        
+        <p style="margin-bottom: 20px; font-size: 1.1em; color: #555;">
+            以下の授業が「実施中」のまま残っています。<br>
+            新しい授業を始める前に、この授業を処理してください。
+        </p>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 30px; text-align: left; border-left: 5px solid #dc3545;">
+            <p style="margin: 0 0 10px 0;"><strong>授業内容:</strong> <span th:text="${activeSession.note}" style="font-size: 1.2em;">学科情報</span></p>
+            <p style="margin: 0;"><strong>開始日時:</strong> <span th:text="${#temporals.format(activeSession.startTime, 'yyyy/MM/dd HH:mm')}">日時</span></p>
+        </div>
+
+        <div style="display: flex; gap: 15px; justify-content: center;">
+            <button onclick="forceEndSession()" 
+                    class="btn btn-secondary btn-lg" style="width: 200px;">
+                強制終了して次へ
+            </button>
+            
+            <a th:href="@{/session/active/{id}(id=${activeSession.sessionId})}"
+                class="btn btn-success btn-lg" style="width: 200px;">
+                画面に戻って確認
+            </a>
+        </div>
+        <p style="margin-top: 15px; font-size: 0.9em; color: #888;">
+            ※「強制終了」を選ぶと、現在のログで出席を確定します。
+        </p>
+    </div>
+</div>
 <div class="container">
     <div class="setup-card">
         <h2 class="text-center mb-4">授業を開始する</h2>
@@ -26,87 +58,188 @@
                 </div>
                 <div class="col-md-6">
                     <label for="time" class="form-label">開始時間</label>
-                    <input type="time" class="form-control" id="time" required 
+                    <input type="time" class="form-control" id="time" required
                         th:value="${defaultTime}">
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label for="courseName" class="form-label">対象コース</label>
-                <select class="form-select" id="courseName" required>
-                    <option value="" selected disabled>コースを選択してください</option>
-                    <option th:each="course : ${courseList}"
-                            th:value="${course}"
-                            th:text="${course}">
-                    </option>
-                </select>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="targetDepartment" class="form-label">対象学科</label>
+                    <select class="form-select" id="targetDepartment" onchange="updateOptions()" required>
+                        <option th:each="dept : ${departmentList}" 
+                                th:value="${dept.departmentId}" 
+                                th:text="${dept.major.majorName + ' ' + dept.className}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="targetGrade" class="form-label">対象学年</label>
+                    <select class="form-select" id="targetGrade" required>
+                        <option value="">読込中...</option>
+                    </select>
+                </div>
             </div>
 
             <div class="mb-3">
-                <label for="subjectId" class="form-label">授業科目</label>
+                <label for="subjectId" class="form-label">科目</label>
                 <select class="form-select" id="subjectId" required>
-                    <option value="" selected disabled>科目を選択してください</option>
-                    <option th:each="subject : ${subjectList}"
-                            th:value="${subject.subjectId}"
-                            th:text="${subject.subjectName} + ' (' + ${subject.totalCredits} + '単位)'">
-                    </option>
+                    <option value="">読込中...</option>
                 </select>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-4">
                 <label for="classroomId" class="form-label">使用教室</label>
                 <select class="form-select" id="classroomId" required>
-                    <option value="" selected disabled>教室を選択してください</option>
-                    <option th:each="room : ${classroomList}"
-                            th:value="${room.classroomId}"
-                            th:text="${room.classroomName}">
+                    <option th:each="room : ${classroomList}" 
+                        th:value="${room.classroomId}" 
+                        th:text="${room.classroomName}">
                     </option>
                 </select>
             </div>
 
-            <div class="d-grid gap-2 mt-4">
-                <button type="submit" class="btn btn-primary btn-lg">
-                    セッションを開始 (Pop-up)
-                </button>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">セッション開始</button>
             </div>
         </form>
     </div>
 </div>
 
-<script>
-document.getElementById('startSessionForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    
+    // APIのベースURLをThymeleafで生成
+    const API_BASE = /*[[@{/session/api}]]*/ '/session/api';
+    const SESSION_START_URL = /*[[@{/session/start}]]*/ '/session/start';
+    const SESSION_ACTIVE_URL_BASE = /*[[@{/session/active/}]]*/ '/session/active/';
 
-    // フォームの値を取得
-    const data = {
-        date: document.getElementById('date').value,
-        time: document.getElementById('time').value,
-        courseName: document.getElementById('courseName').value,
-        subjectId: document.getElementById('subjectId').value,
-        classroomId: document.getElementById('classroomId').value
-    };
+    // ★追加: 強制終了処理を行う関数
+    function forceEndSession() {
+        // activeSessionがnullの場合はこのスクリプトブロック自体がエラーにならないように注意が必要ですが、
+        // HTML側でth:ifを使っているので安全です。ただし変数は埋め込む必要があります。
+        /*[+
+        const activeSessionId = [[${activeSession != null ? activeSession.sessionId : null}]];
+        +]*/
+        
+        if(!activeSessionId) return;
 
-    // サーバー送信
-    fetch('/session/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        if (!response.ok) throw new Error('セッション作成に失敗しました');
-        return response.json();
-    })
-    .then(data => {
-        // ポップアップを開く
-        const url = `/session/active/${data.sessionId}`;
-        window.open(url, 'SessionWindow_' + data.sessionId, 'width=1000,height=800,scrollbars=yes,resizable=yes');
+        if(!confirm("前回の授業を終了し、出席を確定しますか？\n(ログに基づいて自動集計されます)")) {
+            return;
+        }
+
+        // 終了APIを叩く
+        fetch('/session/end', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                sessionId: activeSessionId,
+                changes: {} // 手動変更なし
+            })
         })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('エラーが発生しました: ' + error.message);
+        .then(response => response.json())
+        .then(data => {
+            alert("前回の授業を終了しました。");
+            // 画面をリロードしてモーダルを消す
+            window.location.href = "/session"; 
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("終了処理に失敗しました。");
+        });
+    }
+
+    function updateOptions() {
+        const deptId = document.getElementById('targetDepartment').value;
+        if (!deptId) return;
+
+        // 1. 学年の更新
+        fetch(`${API_BASE}/grades/${deptId}`)
+            .then(res => res.json())
+            .then(grades => {
+                const gradeSelect = document.getElementById('targetGrade');
+                gradeSelect.innerHTML = '';
+                if (grades.length === 0) {
+                    gradeSelect.innerHTML = '<option value="">学年なし</option>';
+                } else {
+                    grades.forEach(g => {
+                        const opt = document.createElement('option');
+                        opt.value = g;
+                        opt.textContent = g + '年';
+                        gradeSelect.appendChild(opt);
+                    });
+                }
+            })
+            .catch(err => console.error("Grade fetch error:", err));
+
+        // 2. 科目の更新
+        fetch(`${API_BASE}/subjects/${deptId}`)
+            .then(res => res.json())
+            .then(subjects => {
+                const subjectSelect = document.getElementById('subjectId');
+                subjectSelect.innerHTML = '';
+                if (subjects.length === 0) {
+                    subjectSelect.innerHTML = '<option value="">科目なし</option>';
+                } else {
+                    subjects.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.subjectId;
+                        opt.textContent = s.subjectName;
+                        subjectSelect.appendChild(opt);
+                    });
+                }
+            })
+            .catch(err => console.error("Subject fetch error:", err));
+    }
+
+    document.getElementById('startSessionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const subjectSelect = document.getElementById('subjectId');
+        if (subjectSelect.selectedIndex < 0) {
+            alert("科目を選択してください");
+            return;
+        }
+        const selectedSubjectName = subjectSelect.options[subjectSelect.selectedIndex].text;
+
+        const data = {
+            date: document.getElementById('date').value,
+            time: document.getElementById('time').value,
+            classroomId: document.getElementById('classroomId').value,
+            targetDepartmentId: document.getElementById('targetDepartment').value,
+            targetGrade: document.getElementById('targetGrade').value,
+            subjectId: document.getElementById('subjectId').value,
+            subjectName: selectedSubjectName
+        };
+
+        fetch(SESSION_START_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('セッション作成に失敗しました');
+            return response.json();
+        })
+        .then(data => {
+            const url = SESSION_ACTIVE_URL_BASE + data.sessionId;
+            const width = 1000;
+            const height = 800;
+            const left = (window.screen.width - width) / 2;
+            const top = (window.screen.height - height) / 2;
+            window.open(url, 'SessionWindow_' + data.sessionId, 
+                `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('開始に失敗しました: ' + error.message);
+        });
     });
-});
+
+    // 初期表示時に実行
+    window.addEventListener('DOMContentLoaded', updateOptions);
+    /*]]>*/
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

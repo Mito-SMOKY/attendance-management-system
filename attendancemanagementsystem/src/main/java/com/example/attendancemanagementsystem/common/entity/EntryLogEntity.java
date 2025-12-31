@@ -33,4 +33,56 @@ public class EntryLogEntity {
 
     @Column(name = "ProcessedAt")
     private LocalDateTime processedAt;
+
+    public EntryLogEntity() {}
+
+    // --- Getter / Setter ---
+
+    public Integer getEntryLogId() {
+        return entryLogId;
+    }
+
+    public void setEntryLogId(Integer entryLogId) {
+        this.entryLogId = entryLogId;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public Integer getClassroomId() {
+        return classroomId;
+    }
+
+    public void setClassroomId(Integer classroomId) {
+        this.classroomId = classroomId;
+    }
+
+    public LocalDateTime getEntryTime() {
+        return entryTime;
+    }
+
+    public void setEntryTime(LocalDateTime entryTime) {
+        this.entryTime = entryTime;
+    }
+
+    public Integer getIsProcessed() {
+        return isProcessed;
+    }
+
+    public void setIsProcessed(Integer isProcessed) {
+        this.isProcessed = isProcessed;
+    }
+
+    public LocalDateTime getProcessedAt() {
+        return processedAt;
+    }
+
+    public void setProcessedAt(LocalDateTime processedAt) {
+        this.processedAt = processedAt;
+    }
 }
