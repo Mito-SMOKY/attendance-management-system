@@ -62,7 +62,10 @@
                 </div>
             </div>
             <div class="col-md-6 text-end">
-                <button id="endSessionBtn" class="btn btn-danger btn-lg px-5">授業を終了して確定</button>
+                <button id="cancelSessionBtn" class="btn btn-outline-danger me-2">
+                    <i class="bi bi-trash"></i> 破棄 (保存せず終了)
+                </button>
+                <button id="endSessionBtn" class="btn btn-primary">授業終了・保存</button>
             </div>
         </div>
         
@@ -226,6 +229,35 @@
         const now = new Date();
         lastUpdatedLabel.textContent = `最終更新: ${now.toLocaleTimeString()}`;
     }
+
+    // 授業破棄（キャンセル）処理
+    document.getElementById('cancelSessionBtn').addEventListener('click', function() {
+        if (!confirm('この授業セッションを破棄しますか？\n出席データは保存されず、この操作は取り消せません。')) {
+            return;
+        }
+
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        this.disabled = true;
+
+        fetch('/session/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: sessionId })
+        })
+        .then(res => {
+            if(res.ok) {
+                alert('セッションを破棄しました。');
+                window.close(); // ウィンドウを閉じる
+            } else {
+                throw new Error('破棄処理に失敗しました');
+            }
+        })
+        .catch(err => {
+            alert(err.message);
+            document.getElementById('loadingOverlay').style.display = 'none';
+            this.disabled = false;
+        });
+    });
 
     // 終了時に変更内容(localChanges)をまとめて送信
     document.getElementById('endSessionBtn').addEventListener('click', function() {
