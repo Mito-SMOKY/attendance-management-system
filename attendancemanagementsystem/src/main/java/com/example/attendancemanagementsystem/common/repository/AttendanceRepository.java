@@ -84,17 +84,18 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
               @Param("subjectId") Integer subjectId, 
               @Param("statusId") Integer statusId);
 
-       //「指定した時間の直前に、同じ教室で終わった授業の出席データ」を探すメソッド
+       //「同じ教室で終わった出席データ」を探すメソッド
+      // AttendanceRepository.java の該当箇所を以下に差し替えてください
+
        @Query("SELECT a FROM AttendanceEntity a, SessionEntity s " +
-              "WHERE a.sessionId = s.sessionId " +
+              "WHERE a.sessionId = s.sessionId " + 
               "AND a.student.userId = :userId " +
               "AND s.actualClassroomId = :classroomId " +
-              "AND s.endTime BETWEEN :rangeStart AND :rangeEnd " +
-              "AND (a.status.statusId = 1 OR a.status.statusId = 3)") 
-       Optional<AttendanceEntity> findPreviousAttendanceInSameRoom(
-              @Param("userId") Integer userId,
-              @Param("classroomId") Integer classroomId,
-              @Param("rangeStart") LocalDateTime rangeStart,
-              @Param("rangeEnd") LocalDateTime rangeEnd
+              "AND s.endTime BETWEEN :start AND :end")
+       Optional<AttendanceEntity> findContinuousAttendance(
+              @Param("userId") Integer userId, 
+              @Param("classroomId") Integer classroomId, 
+              @Param("start") LocalDateTime start, 
+              @Param("end") LocalDateTime end
        );
 }

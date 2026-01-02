@@ -157,8 +157,7 @@ public class SessionController {
         DepartmentEntity dept = departmentRepository.findById(targetDepartmentId).orElse(null);
         String deptName = (dept != null && dept.getMajor() != null) ? dept.getMajor().getMajorName() : "不明";
         String className = (dept != null) ? dept.getClassName() : "";
-        session.setNote(deptName + " " + className + " " + targetGrade + "年 : " + subjectName);
-        session.setSessionStatus(1); 
+        String generatedNote = deptName + " " + className + " " + targetGrade + "年 : " + subjectName; 
 
         // ログインユーザーの特定
         Integer teacherUserId = null;
@@ -175,16 +174,16 @@ public class SessionController {
         }
 
         //  時間割データの検索と紐付け
-        Optional<TimetableEntity> scheduledLesson = sessionService.findTimetableBySchedule(teacherUserId, date, subjectId);
-        
-        if (scheduledLesson.isPresent()) {
-            session.setTimeTable(scheduledLesson.get());
-        } else {
-            session.setTimeTable(null);
-        }
-
-        // 保存
-        SessionEntity savedSession = sessionRepository.save(session);
+        SessionEntity savedSession = sessionService.startSession(
+        teacherUserId,
+        subjectId,
+        date,           // 元コードで解析した日付
+        startDateTime,  // 元コードで解析した日時
+        classroomId,
+        targetDepartmentId,
+        targetGrade,
+        generatedNote  // 元コードで作った備考文字列
+        );
 
         Map<String, Object> response = new HashMap<>();
         response.put("sessionId", savedSession.getSessionId());
