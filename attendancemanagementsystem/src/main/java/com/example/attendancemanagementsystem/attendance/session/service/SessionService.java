@@ -249,7 +249,7 @@ public class SessionService {
         );
         
         for (EntryLogEntity log : logs) {
-            
+
             // まだ未処理のログであれば、処理済み(1)に更新
             if (log.getIsProcessed() == null || log.getIsProcessed() == 0) {
                 log.setIsProcessed(1);
@@ -257,5 +257,16 @@ public class SessionService {
                 entryLogRepository.save(log);
             }
         }
+    }
+
+    //セッションのキャンセル処理
+    @Transactional
+    public void cancelSession(Integer sessionId) {
+
+        // このセッションに紐づく出席データが万が一存在すれば先に削除
+        attendanceRepository.deleteBySessionId(sessionId);
+        
+        // セッション自体を削除
+        sessionRepository.deleteById(sessionId);
     }
 }

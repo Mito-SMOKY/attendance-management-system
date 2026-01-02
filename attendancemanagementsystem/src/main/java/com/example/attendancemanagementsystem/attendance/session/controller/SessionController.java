@@ -230,6 +230,17 @@ public class SessionController {
         return response;
     }
 
+    @PostMapping("/cancel")
+    @ResponseBody
+    public Map<String, String> cancelSession(@RequestBody Map<String, Integer> payload) {
+        Integer sessionId = payload.get("sessionId");
+        sessionService.cancelSession(sessionId);
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Session cancelled and deleted.");
+        return response;
+    }
+
     public static class EndSessionRequest {
         public Integer sessionId;
         public Map<Integer, Integer> changes;

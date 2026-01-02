@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
@@ -27,6 +29,10 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
 
        //同じ授業で既に登録済みかチェックする
        boolean existsBySessionIdAndStudent_UserId(Integer sessionId, Integer userId);
+
+       //セッションの削除処理
+       @Transactional 
+       void deleteBySessionId(Integer sessionId);
 
        //生徒と日付範囲で出欠情報を検索(カレンダー表示用)
        @Query("SELECT a FROM AttendanceEntity a " +
