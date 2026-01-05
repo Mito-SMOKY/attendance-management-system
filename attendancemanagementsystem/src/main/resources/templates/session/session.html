@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>セッション設定画面</title>
+    <link rel="stylesheet" href="/css/admin/session.css">
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
+</head>
+
+<body>
+
+<div class="header-container">
+    <div th:replace="~{fragments/_parts :: admin-header}"></div>
+</div>
+
+<div class="backbutton-container">
+     <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
+</div>
+
+
+<div class="container">
+    <div class="setting-table">
+        <h2 class="table-label">授業を開始する</h2>
+        
+        <form id="startSessionForm">
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="date" class="form-label">日付</label>
+                    <input type="date" class="form-control" id="date" required 
+                        th:value="${defaultDate}">
+                </div>
+                <div class="col-md-6">
+                    <label for="time" class="form-label">開始時間</label>
+                    <input type="time" class="form-control" id="time" required 
+                        th:value="${defaultTime}">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="courseName" class="form-label">対象コース</label>
+                <select class="form-select" id="courseName" required>
+                    <option value="" selected disabled>コースを選択してください</option>
+                    <option th:each="course : ${courseList}"
+                            th:value="${course}"
+                            th:text="${course}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="subjectId" class="form-label">授業科目</label>
+                <select class="form-select" id="subjectId" required>
+                    <option value="" selected disabled>科目を選択してください</option>
+                    <option th:each="subject : ${subjectList}"
+                            th:value="${subject.subjectId}"
+                            th:text="${subject.subjectName} + ' (' + ${subject.totalCredits} + '単位)'">
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="classroomId" class="form-label">教室</label>
+                <select class="form-select" id="classroomId" required>
+                    <option value="" selected disabled>教室を選択してください</option>
+                    <option th:each="room : ${classroomList}"
+                            th:value="${room.classroomId}"
+                            th:text="${room.classroomName}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="btn-container">
+                <button type="submit" class="session-start-btn">
+                    セッションを開始
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/js/session_menu.js"></script>
+
+</body>
+</html>

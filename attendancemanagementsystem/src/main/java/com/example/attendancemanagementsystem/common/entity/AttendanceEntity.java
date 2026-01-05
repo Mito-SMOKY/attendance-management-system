@@ -2,8 +2,6 @@ package com.example.attendancemanagementsystem.common.entity;
 
 import java.time.LocalDateTime;
 
-// import javax.swing.plaf.TreeUI;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -23,6 +21,9 @@ public class AttendanceEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "AttendanceID")
     private Integer attendanceId;
+
+    @Column(name = "SessionID")
+    private Integer sessionId;
 
     // AttendanceStatus との紐づけ
     @ManyToOne(fetch = FetchType.LAZY)
@@ -61,6 +62,15 @@ public class AttendanceEntity {
     public void setAttendanceId(Integer attendanceId) {
         this.attendanceId = attendanceId;
     }
+
+    public Integer getSessionId() { 
+        return sessionId; 
+    }
+
+    public void setSessionId(Integer sessionId) { 
+        this.sessionId = sessionId; 
+    }
+
     public AttendanceStatusEntity getStatus() {
         return status;
     }
