@@ -2,6 +2,7 @@ package com.example.attendancemanagementsystem.attendance.session.dto;
 
 import lombok.Data;
 
+// セッション情報のDTO
 @Data
 public class SessionDto {
     private Integer sessionId;
