@@ -1,83 +1,49 @@
 <!DOCTYPE html>
-<html lang="ja">
-
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>session</title>
+    <title>セッション設定画面</title>
+    <link rel="stylesheet" href="/css/admin/session.css">
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
-    
-
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
 </head>
 
 <body>
-
-    <div class="header-container">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
-    </div>
-    
-    
-    <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/')}"></div>
-    </div>
-
-    <div class="container">
-        
-        <div class="apply-btn-container">
-            <button class="btn-apply">適用</button>
+    <div class="setting-wrapper">
+        <div class="header-actions">
+            <button type="button" class="btn-apply">適用</button>
         </div>
 
-        <table class="input-table">
+        <table class="setting-table">
             <tr>
                 <th>教科名</th>
-                <td>
-                    <select>
-                        <option>システム構築</option>
-                        <option>プログラミング</option>
-                    </select>
-                </td>
+                <td><select id="subject-select"></select></td>
             </tr>
             <tr>
                 <th>コース</th>
-                <td>
-                    <select>
-                        <option>SE・マスター</option>
-                        <option>IT・エキスパート</option>
-                    </select>
-                </td>
+                <td><select id="course-select"></select></td>
             </tr>
             <tr>
                 <th>教室</th>
-                <td>
-                    <select>
-                        <option>231</option>
-                        <option>232</option>
-                    </select>
-                </td>
+                <td><select id="classroom-select"></select></td>
             </tr>
             <tr>
                 <th>授業時間</th>
-                <td>
-                    <input type="text" class="time-input">
-                    <span> : </span>
-                    <input type="text" class="time-input">
+                <td class="time-input-cell">
+                    <input type="number" id="period-input" value="1" min="1" max="7"> 限目
                 </td>
             </tr>
             <tr>
                 <th>日付</th>
-                <td>
-                    <input type="text" placeholder="YYYY/MM/DD">
-                </td>
+                <td><input type="date" id="date-input"></td>
             </tr>
         </table>
 
-        <div class="footer-action">
-            <button class="btn-start-session">セッションを開始</button>
+        <div class="footer-actions">
+            <button type="button" id="btn-start-session" class="btn-start">セッションを開始</button>
         </div>
-        
     </div>
-
+    <script src="/js/session_menu.js"></script>
 </body>
 </html>
