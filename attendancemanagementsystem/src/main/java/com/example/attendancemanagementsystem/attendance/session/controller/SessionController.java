@@ -57,6 +57,7 @@ public class SessionController {
                             DepartmentSubjectRepository departmentSubjectRepository,
                             UsersRepository usersRepository) {
         this.sessionService = sessionService;
+        this.classroomRepository = classroomRepository;
         this.sessionRepository = sessionRepository;
         this.departmentRepository = departmentRepository;
         this.subjectRepository = subjectRepository;
@@ -111,6 +112,7 @@ public class SessionController {
     public List<Integer> getGradesByDepartment(@PathVariable Integer departmentId) {
         return departmentSubjectRepository.findGradesByDepartmentId(departmentId);
     }
+    
 
     // 科目リストAPI
     @GetMapping("/api/subjects/{departmentId}")
@@ -140,6 +142,11 @@ public class SessionController {
         Integer targetGrade = Integer.valueOf(request.get("targetGrade"));
         String subjectName = request.get("subjectName");
         Integer subjectId = Integer.valueOf(request.get("subjectId")); 
+        LocalDate date = LocalDate.parse(dateStr);
+        LocalTime time = LocalTime.parse(timeStr);
+        LocalDateTime startDateTime = LocalDateTime.of(date, time);
+
+        // セッション情報の仮組み
         SessionEntity session = new SessionEntity();
         session.setSessionDate(date);
         session.setStartTime(startDateTime);
