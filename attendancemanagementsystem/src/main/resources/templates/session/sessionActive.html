@@ -14,24 +14,25 @@
             position: sticky; top: 0; z-index: 1000;
         }
         .stat-card {
-            background: white; border-radius: 8px; padding: 15px;
+            background: white; border-radius: 8px; padding: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center;
+            height: 100%;
         }
-        .stat-number { font-size: 2em; font-weight: bold; color: #0d6efd; }
+        .stat-label { font-size: 0.85em; color: #666; font-weight: bold; }
+        .stat-number { font-size: 1.8em; font-weight: bold; color: #0d6efd; }
         
         .student-table-container { 
-            margin-top: 20px; 
-            background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            margin-top: 20px; background: white; padding: 20px; 
+            border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
         }
 
-        .status-absent { background-color: #ffebe6 !important; }
-        .status-late { background-color: #fff8e1 !important; } 
-        .status-present { background-color: #e8f5e9 !important; }
+        /* ステータス別行カラー定義 */
+        .status-absent { background-color: #ffebe6 !important; }    /* 2:欠席 */
+        .status-late { background-color: #fff8e1 !important; }      /* 3:遅刻 */
+        .status-present { background-color: #e8f5e9 !important; }   /* 1:出席 */
+        .status-official { background-color: #e3f2fd !important; }  /* 4:公欠 */
+        .status-suspended { background-color: #f3e5f5 !important; } /* 6:停止 */
 
-        /* 変更があった行を少し強調 */
         .status-changed { border-left: 5px solid #ffc107; }
 
         #loadingOverlay {
@@ -52,7 +53,7 @@
 
 <div class="active-header">
     <div class="container-fluid">
-        <div class="row align-items-center">
+        <div class="row align-items-center mb-3">
             <div class="col-md-6">
                 <h4 class="mb-0 text-secondary">現在進行中の授業</h4>
                 <h2 class="mb-0" th:text="${sessionDto.className}">授業名</h2>
@@ -62,18 +63,17 @@
                 </div>
             </div>
             <div class="col-md-6 text-end">
-                <button id="cancelSessionBtn" class="btn btn-outline-danger me-2">
-                    <i class="bi bi-trash"></i> 破棄 (保存せず終了)
-                </button>
+                <button id="cancelSessionBtn" class="btn btn-outline-danger me-2">破棄</button>
                 <button id="endSessionBtn" class="btn btn-primary">授業終了・保存</button>
             </div>
         </div>
         
-        <div class="row mt-3 g-2">
-            <div class="col-3"><div class="stat-card"><div>総数</div><div id="countTotal" class="stat-number">-</div></div></div>
-            <div class="col-3"><div class="stat-card"><div>出席</div><div id="countPresent" class="stat-number text-success">-</div></div></div>
-            <div class="col-3"><div class="stat-card"><div>遅刻</div><div id="countLate" class="stat-number text-warning">-</div></div></div>
-            <div class="col-3"><div class="stat-card"><div>欠席</div><div id="countAbsent" class="stat-number text-danger">-</div></div></div>
+        <div class="row g-2 row-cols-5">
+            <div class="col"><div class="stat-card"><div class="stat-label">総数</div><div id="countTotal" class="stat-number text-secondary">-</div></div></div>
+            <div class="col"><div class="stat-card"><div class="stat-label">出席</div><div id="countPresent" class="stat-number text-success">-</div></div></div>
+            <div class="col"><div class="stat-card"><div class="stat-label">遅刻</div><div id="countLate" class="stat-number text-warning">-</div></div></div>
+            <div class="col"><div class="stat-card"><div class="stat-label">公欠・停止</div><div id="countOfficial" class="stat-number text-info">-</div></div></div>
+            <div class="col"><div class="stat-card"><div class="stat-label">欠席</div><div id="countAbsent" class="stat-number text-danger">-</div></div></div>
         </div>
     </div>
 </div>
@@ -84,15 +84,14 @@
             <h5 class="mb-0">出席状況一覧</h5>
             <small id="lastUpdated" class="text-muted">更新中...</small>
         </div>
-        
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
                         <th style="width: 10%">学籍番号</th>
                         <th style="width: 25%">氏名</th>
-                        <th style="width: 20%">入室時間</th>
-                        <th style="width: 25%">ステータス (変更可)</th>
+                        <th style="width: 15%">入室時間</th>
+                        <th style="width: 30%">ステータス (変更可)</th>
                         <th style="width: 20%">状態</th>
                     </tr>
                 </thead>
@@ -103,277 +102,11 @@
 </div>
 
 <script th:inline="javascript">
-    /*<![CDATA[*/
-
-    // 安全にデータを取得
-    const sessionId = /*[[${sessionDto.sessionId}]]*/ 0;
-    
-    // ★修正: Thymeleafのループを使って確実にJSON配列を作る
-    const STATUS_OPTIONS = [
-        /*[# th:each="status : ${statusList}"]*/
-        {
-            statusId: /*[[${status.statusId}]]*/ 1,
-            statusName: /*[[${status.statusName}]]*/ '出席'
-        },
-        /*[/]*/
-    ];
-
-    const attendeeListBody = document.getElementById('attendeeListBody');
-    const lastUpdatedLabel = document.getElementById('lastUpdated');
-
-    // 手動変更を一時保存するオブジェクト
-    let localChanges = {}; // key: userId, value: statusId
-
-    function fetchAttendees() {
-        if (!sessionId) return;
-        fetch(`/session/api/attendees/${sessionId}`)
-            .then(res => res.json())
-            .then(data => {
-                renderTable(data);
-                updateTimestamp();
-            })
-            .catch(err => console.error("データ取得エラー:", err));
-    }
-
-    function renderTable(attendees) {
-        let html = '';
-        
-        // 集計用カウンタ
-        let counts = { 1:0, 2:0, 3:0, total: attendees.length };
-
-        attendees.forEach(student => {
-            // 手動変更があればそれを優先して表示・集計する
-            let displayStatusId = student.statusId;
-            let isChanged = false;
-
-            if (localChanges.hasOwnProperty(student.userId)) {
-                displayStatusId = localChanges[student.userId];
-                isChanged = true;
-            }
-
-            // 集計 (1:出席, 2:欠席, 3:遅刻 と仮定)
-            if ([1,2,3].includes(displayStatusId)) counts[displayStatusId]++;
-            
-            // 行の色
-            let rowClass = '';
-            if (isChanged) rowClass = 'status-changed '; // 変更済みマーク
-            
-            if (displayStatusId === 2) rowClass += 'status-absent';
-            else if (displayStatusId === 3) rowClass += 'status-late';
-            else if (displayStatusId === 1) rowClass += 'status-present';
-
-            // プルダウン生成
-            let selectHtml = `<select class="form-select form-select-sm" 
-                                    onchange="changeStatus(${student.userId}, this.value)"
-                                    style="background-color: rgba(255,255,255,0.7);">`;
-            
-            STATUS_OPTIONS.forEach(opt => {
-                const selected = (opt.statusId === displayStatusId) ? 'selected' : '';
-                selectHtml += `<option value="${opt.statusId}" ${selected}>${opt.statusName}</option>`;
-            });
-            selectHtml += `</select>`;
-
-            // ステータス名取得
-            const statusName = getStatusName(displayStatusId);
-
-            html += `
-                <tr class="${rowClass}">
-                    <td>${student.userId}</td>
-                    <td class="fw-bold">${student.studentName}</td>
-                    <td>${student.entryTime ? student.entryTime : '<span class="text-muted">-</span>'}</td>
-                    <td>${selectHtml}</td>
-                    <td>
-                        <span class="badge ${getBadgeClass(displayStatusId)}">
-                            ${statusName}
-                        </span>
-                        ${isChanged ? '<small class="text-muted ms-1">(未保存)</small>' : ''}
-                    </td>
-                </tr>
-            `;
-        });
-        attendeeListBody.innerHTML = html;
-        updateStats(counts);
-    }
-
-    // サーバーへ送らず、ローカル変数に保存するだけ
-    window.changeStatus = function(userId, newStatusId) {
-        localChanges[userId] = parseInt(newStatusId);
-        // 即座に再取得して画面反映
-        fetchAttendees(); 
+    window.SESSION_CONFIG = {
+        sessionId: /*[[${sessionDto.sessionId}]]*/ null,
+        statusOptions: /*[[${statusList}]]*/ []
     };
-
-    function updateStats(counts) {
-        document.getElementById('countTotal').textContent = counts.total;
-        document.getElementById('countPresent').textContent = counts[1] || 0; // 出席
-        document.getElementById('countLate').textContent = counts[3] || 0;    // 遅刻
-        document.getElementById('countAbsent').textContent = counts[2] || 0;  // 欠席
-    }
-
-    function getStatusName(id) {
-        const found = STATUS_OPTIONS.find(o => o.statusId === id);
-        return found ? found.statusName : '不明';
-    }
-
-    function getBadgeClass(id) {
-        switch(id) {
-            case 1: return 'bg-success'; 
-            case 2: return 'bg-danger'; 
-            case 3: return 'bg-warning text-dark';
-            case 4: return 'bg-info text-dark'; // 公欠
-            case 6: return 'bg-secondary'; // 出席停止
-            default: return 'bg-secondary';
-        }
-    }
-
-    function updateTimestamp() {
-        const now = new Date();
-        lastUpdatedLabel.textContent = `最終更新: ${now.toLocaleTimeString()}`;
-    }
-
-    // 授業破棄（キャンセル）処理
-    document.getElementById('cancelSessionBtn').addEventListener('click', function() {
-        if (!confirm('この授業セッションを破棄しますか？\n出席データは保存されず、この操作は取り消せません。')) {
-            return;
-        }
-
-        document.getElementById('loadingOverlay').style.display = 'flex';
-        this.disabled = true;
-
-        fetch('/session/cancel', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sessionId: sessionId })
-        })
-        .then(res => {
-            if(res.ok) {
-                alert('セッションを破棄しました。');
-                window.close(); // ウィンドウを閉じる
-            } else {
-                throw new Error('破棄処理に失敗しました');
-            }
-        })
-        .catch(err => {
-            alert(err.message);
-            document.getElementById('loadingOverlay').style.display = 'none';
-            this.disabled = false;
-        });
-    });
-
-    // 終了時に変更内容(localChanges)をまとめて送信
-    document.getElementById('endSessionBtn').addEventListener('click', function() {
-        if (!confirm('授業を終了しますか？\nここまでの変更内容を保存して確定します。')) return;
-
-        document.getElementById('loadingOverlay').style.display = 'flex';
-        this.disabled = true;
-
-        const payload = {
-            sessionId: sessionId,
-            changes: localChanges
-        };
-
-        fetch('/session/end', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        })
-        .then(res => {
-            if(res.ok) {
-                alert('出席を確定しました。');
-                window.close();
-            } else {
-                throw new Error('確定処理に失敗しました');
-            }
-        })
-        .catch(err => {
-            alert(err.message);
-            document.getElementById('loadingOverlay').style.display = 'none';
-            this.disabled = false;
-        });
-    });
-
-    setInterval(fetchAttendees, 3000);
-    fetchAttendees();
-
-    /*]]>*/
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>セッションアクティブ画面</title>
-    <link rel="stylesheet" href="/css/admin/session.css">
-    <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
-</head>
-
-<body>
-
-<div id="loadingOverlay">
-    <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-</div>
-
-<div class="container mt-4">
-    <div class="active-header rounded mb-4">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <span class="badge bg-success mb-2">実施中</span>
-                <h2 class="mb-0 fw-bold">
-                    <span th:text="${sessionDto.className}">科目名</span>
-                </h2>
-                <div class="text-muted mt-1">
-                    <i class="bi bi-clock"></i> 開始時刻: <span th:text="${#temporals.format(sessionDto.startTime, 'HH:mm')}">10:00</span>
-                    <span class="mx-2">|</span>
-                    <i class="bi bi-geo-alt"></i> 教室: <span th:text="${sessionDto.classroomName}">教室A</span>
-                </div>
-            </div>
-            
-            <div>
-                <button id="endSessionBtn" 
-                        class="btn btn-danger btn-lg shadow-sm"
-                        th:data-session-id="${sessionDto.sessionId}">
-                    授業を終了して集計
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div class="student-list">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0">
-                出席状況（リアルタイム）
-                <span class="badge bg-secondary ms-2" id="studentCount">0名</span>
-            </h4>
-            <div class="text-end">
-                <small class="text-muted me-2" id="lastUpdated">更新中...</small>
-                <button class="btn btn-outline-primary btn-sm" onclick="fetchAttendees()">
-                    手動更新
-                </button>
-            </div>
-        </div>
-        
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>学籍番号/ID</th>
-                    <th>氏名</th>
-                    <th>入室時間</th>
-                    <th>状態</th>
-                </tr>
-            </thead>
-            <tbody id="attendeeList">
-                <tr>
-                    <td colspan="4" class="text-center text-muted py-4">
-                        データを読み込んでいます...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div> -->
-</div>
-
-<script src="/js/session.js"></script>
-
+<script th:src="@{/js/session.js}"></script>
 </body>
 </html>

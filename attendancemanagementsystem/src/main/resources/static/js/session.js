@@ -1,104 +1,211 @@
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // --- 1. 変数定義 ---
-    const endBtn = document.getElementById('endSessionBtn');
-    // ThymeleafからセッションIDを取得
-    const sessionId = endBtn.getAttribute('data-session-id');
-    const tableBody = document.getElementById('attendeeList');
-    const countBadge = document.getElementById('studentCount');
+/**
+ * 授業実施中 画面制御ロジック
+ */
+(function() {
+    // HTML側で定義された設定を取得
+    const config = window.SESSION_CONFIG || { sessionId: 0, statusOptions: [] };
+    const sessionId = config.sessionId;
+    const ALL_STATUS_OPTIONS = config.statusOptions;
+
+    // 先生が手動で変更可能なステータス
+    const SELECTABLE_STATUS_IDS = [1, 2, 3];
+
+    const attendeeListBody = document.getElementById('attendeeListBody');
     const lastUpdatedLabel = document.getElementById('lastUpdated');
 
-    // --- 2. リアルタイム更新機能 (Poll) ---
-    
-    window.fetchAttendees = function() {
-        if(!sessionId) return;
+    // 手動変更の一時保存用オブジェクト
+    let localChanges = {}; 
 
+    /**
+     * 出席者データの取得
+     */
+    function fetchAttendees() {
+        if (!sessionId) return;
         fetch(`/session/api/attendees/${sessionId}`)
-            .then(response => {
-                if (!response.ok) throw new Error("Network response was not ok");
-                return response.json();
-            })
+            .then(res => res.json())
             .then(data => {
-                updateTable(data);
+                // セッションステータスチェック (1:授業中 以外なら終了)
+                if (data.status !== undefined && data.status !== 1) {
+                    alert('この授業は終了、または破棄されました。\n画面を閉じます。');
+                    window.close(); 
+                    return;
+                }
+
+                // リスト描画 (新旧API構造に対応)
+                const list = data.attendees ? data.attendees : data;
+                renderTable(list);
                 updateTimestamp();
             })
-            .catch(error => {
-                console.error('Polling error:', error);
-                // エラーが出ても画面を壊さないように静かに無視するか、コンソールに出すだけにする
-            });
-    };
+            .catch(err => console.error("データ取得エラー:", err));
+    }
 
-    function updateTable(data) {
-        // データが空の場合
-        if (data.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">まだ入室者はいません</td></tr>`;
-            countBadge.textContent = "0名";
-            return;
-        }
+    /**
+     * テーブルのレンダリング
+     */
+    function renderTable(attendees) {
+        if(!Array.isArray(attendees)) return;
 
-        // テーブルの中身を再構築
         let html = '';
-        data.forEach(row => {
+        let counts = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, total: attendees.length };
+
+        attendees.forEach(student => {
+            let displayStatusId = student.statusId;
+            let isChanged = false;
+
+            // ローカル（未保存）の変更があればそちらを優先
+            if (localChanges.hasOwnProperty(student.userId)) {
+                displayStatusId = localChanges[student.userId];
+                isChanged = true;
+            }
+
+            if (counts.hasOwnProperty(displayStatusId)) counts[displayStatusId]++;
+
+            // 行のデザイン判定
+            let rowClass = isChanged ? 'status-changed ' : '';
+            if (displayStatusId === 1) rowClass += 'status-present';
+            else if (displayStatusId === 2) rowClass += 'status-absent';
+            else if (displayStatusId === 3) rowClass += 'status-late';
+            else if (displayStatusId === 4) rowClass += 'status-official';
+            else if (displayStatusId === 6) rowClass += 'status-suspended';
+
+            // ステータス選択プルダウンの生成
+            let selectHtml = `<select class="form-select form-select-sm" 
+                                    onchange="APP.changeStatus(${student.userId}, this.value)"
+                                    style="background-color: rgba(255,255,255,0.7); cursor: pointer;">`;
+            
+            ALL_STATUS_OPTIONS.forEach(opt => {
+                if (SELECTABLE_STATUS_IDS.includes(opt.statusId) || opt.statusId === displayStatusId) {
+                    const selected = (opt.statusId === displayStatusId) ? 'selected' : '';
+                    selectHtml += `<option value="${opt.statusId}" ${selected}>${opt.statusName}</option>`;
+                }
+            });
+            selectHtml += `</select>`;
+
+            const statusName = getStatusName(displayStatusId);
+
             html += `
-                <tr class="fade-in">
-                    <td>${row.studentId}</td>
-                    <td class="fw-bold">${row.name}</td>
-                    <td>${row.entryTime}</td>
-                    <td><span class="badge bg-info text-dark">${row.status}</span></td>
+                <tr class="${rowClass}">
+                    <td>${student.userId}</td>
+                    <td class="fw-bold">${student.studentName}</td>
+                    <td>${student.entryTime ? student.entryTime : '<span class="text-muted">-</span>'}</td>
+                    <td>${selectHtml}</td>
+                    <td>
+                        <span class="badge ${getBadgeClass(displayStatusId)}">${statusName}</span>
+                        ${isChanged ? '<small class="text-muted ms-1">未保存</small>' : ''}
+                    </td>
                 </tr>
             `;
         });
-        
-        // 既存のHTMLと比較して変更がある場合だけ書き換えるのがベストですが、
-        // 簡易実装としてinnerHTMLを上書きします
-        tableBody.innerHTML = html;
-        countBadge.textContent = `${data.length}名`;
+        attendeeListBody.innerHTML = html;
+        updateStats(counts);
+    }
+
+    /**
+     * ステータス名取得ヘルパー
+     */
+    function getStatusName(id) {
+        const found = ALL_STATUS_OPTIONS.find(o => o.statusId === id);
+        return found ? found.statusName : '不明';
+    }
+
+    /**
+     * バッジクラス判定
+     */
+    function getBadgeClass(id) {
+        switch(id) {
+            case 1: return 'bg-success';      
+            case 2: return 'bg-danger';       
+            case 3: return 'bg-warning text-dark'; 
+            case 4: return 'bg-info text-dark';
+            case 5: return 'bg-light text-dark border';
+            case 6: return 'bg-secondary';
+            default: return 'bg-secondary';
+        }
+    }
+
+    /**
+     * 統計数値の更新
+     */
+    function updateStats(counts) {
+        document.getElementById('countTotal').textContent = counts.total;
+        document.getElementById('countPresent').textContent = counts[1]; 
+        document.getElementById('countLate').textContent = counts[3];    
+        document.getElementById('countAbsent').textContent = counts[2];  
+        const officialCount = (counts[4] || 0) + (counts[5] || 0) + (counts[6] || 0);
+        document.getElementById('countOfficial').textContent = officialCount;
     }
 
     function updateTimestamp() {
         const now = new Date();
-        const timeStr = now.toLocaleTimeString();
-        lastUpdatedLabel.textContent = `最終更新: ${timeStr}`;
+        lastUpdatedLabel.textContent = `最終更新: ${now.toLocaleTimeString()}`;
     }
 
-    // ★ 3秒ごとに自動更新を開始 ★
-    // (setIntervalはウィンドウが閉じられると自動で止まります)
-    setInterval(fetchAttendees, 3000);
-
-    // 初回実行
-    fetchAttendees();
-
-
-    // --- 3. 終了ボタンの処理 (以前と同じ) ---
-    endBtn.addEventListener('click', function() {
-        if (!confirm('本当に授業を終了しますか？\n終了すると出席扱いが確定します。')) {
-            return;
+    // 外部から呼び出せるようにグローバルな名前空間に公開
+    window.APP = {
+        changeStatus: function(userId, newStatusId) {
+            localChanges[userId] = parseInt(newStatusId);
+            fetchAttendees(); // 再描画
         }
+    };
 
-        // UIのロック
+    // --- イベントリスナー登録 ---
+
+    // 破棄ボタン
+    document.getElementById('cancelSessionBtn').addEventListener('click', function() {
+        if (!confirm('この授業セッションを破棄しますか？\n出席データは保存されず、この操作は取り消せません。')) return;
+        
         document.getElementById('loadingOverlay').style.display = 'flex';
-        endBtn.disabled = true;
+        this.disabled = true;
+
+        fetch('/session/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: sessionId })
+        })
+        .then(res => {
+            if(res.ok) {
+                alert('セッションを破棄しました。');
+                window.close();
+            } else { throw new Error('破棄処理に失敗しました'); }
+        })
+        .catch(err => {
+            alert(err.message);
+            document.getElementById('loadingOverlay').style.display = 'none';
+            this.disabled = false;
+        });
+    });
+
+    // 授業終了ボタン
+    document.getElementById('endSessionBtn').addEventListener('click', function() {
+        if (!confirm('授業を終了しますか？\nここまでの変更内容を保存して確定します。')) return;
+
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        this.disabled = true;
 
         fetch('/session/end', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ sessionId: parseInt(sessionId) })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sessionId: sessionId,
+                changes: localChanges,
+                endStatus: 2 // 2=正常終了
+            })
         })
-        .then(response => {
-            if (response.ok) {
-                alert('お疲れ様でした！授業を終了しました。');
-                window.close(); // ウィンドウを閉じる
-            } else {
-                throw new Error('サーバーエラーが発生しました');
-            }
+        .then(res => {
+            if(res.ok) {
+                alert('出席を確定しました。');
+                window.close();
+            } else { throw new Error('確定処理に失敗しました'); }
         })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('終了処理に失敗しました。');
+        .catch(err => {
+            alert(err.message);
             document.getElementById('loadingOverlay').style.display = 'none';
-            endBtn.disabled = false;
+            this.disabled = false;
         });
     });
-});
+
+    // 初期実行と定期更新
+    fetchAttendees();
+    setInterval(fetchAttendees, 3000);
+
+})();
