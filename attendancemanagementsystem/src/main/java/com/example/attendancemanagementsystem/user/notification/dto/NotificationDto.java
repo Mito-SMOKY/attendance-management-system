@@ -3,6 +3,7 @@ package com.example.attendancemanagementsystem.user.notification.dto;
 import java.time.LocalDateTime;
 
 public class NotificationDto {
+    private String userName;
     private Integer notificationId;
     private String title;
     private String message;
@@ -10,7 +11,8 @@ public class NotificationDto {
     private boolean read;
     private boolean bookmarked;
 
-    public NotificationDto(Integer id, String title, String msg, LocalDateTime date, boolean read, boolean bookmarked) {
+    public NotificationDto(String userName, Integer id, String title, String msg, LocalDateTime date, boolean read, boolean bookmarked) {
+        this.userName = userName;
         this.notificationId = id;
         this.title = title;
         this.message = msg;
@@ -20,6 +22,14 @@ public class NotificationDto {
     }
 
     // --- Getter / Setter ---
+
+    public String getUserName() {
+         return userName; 
+    }
+
+    public void setUserName(String userName) {
+         this.userName = userName; 
+    }
 
     public Integer getNotificationId() { 
         return notificationId; 
@@ -66,4 +76,6 @@ public class NotificationDto {
     public void setBookmarked(boolean bookmarked) { 
         this.bookmarked = bookmarked; 
     }
+
+    
 }
