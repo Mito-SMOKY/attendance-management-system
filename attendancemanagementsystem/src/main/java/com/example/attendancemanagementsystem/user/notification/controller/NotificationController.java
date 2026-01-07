@@ -5,8 +5,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,26 +35,19 @@ public class NotificationController {
 
     // 通知詳細画面 
     @GetMapping("/notification/detail")
-    public String viewNotificationDetail(
-            @RequestParam("id") Integer id, 
-            Model model, 
-            @AuthenticationPrincipal UserDetails userDetails) { 
-        
-        if (userDetails == null) return "redirect:/login";
-
-        String loginId = userDetails.getUsername();
-        UsersEntity user = usersRepository.findByLoginId(loginId).orElse(null);
+    public String viewNotificationDetail(@RequestParam("id") Integer id, Model model, Authentication authentication) {
+        UsersEntity user = getCurrentUser(authentication);
         if (user == null) return "redirect:/login";
 
         NotificationEntity notification = notificationService.getDetailAndMarkAsRead(id, user.getUserId());
+
         if (notification == null) {
             return "redirect:/notifications"; 
         }
 
-        model.addAttribute("userData", user); 
+        // 詳細情報をモデルに追加
         model.addAttribute("notification", notification);
         model.addAttribute("title", notification.getTitle());
-        
         return "common/notificationDetail";
     }
 

@@ -7,7 +7,6 @@
 let currentPage = 1; // 現在表示しているページ番号
 const PAGE_SIZE = 10; // 1ページに表示する件数
 const SESSION_KEY = 'notification_search_state'; // 画面の状態を保存するときのキー名
-const displayName = document.getElementById('display-value');
 
 /**
  * 画面が読み込まれた最初に動く処理

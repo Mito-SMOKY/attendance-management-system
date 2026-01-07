@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.attendancemanagementsystem.common.entity.NotificationEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.NotificationRepository;
-import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.common.service.FilterService;
 import com.example.attendancemanagementsystem.common.service.SearchService;
 import com.example.attendancemanagementsystem.user.notification.constant.NotificationType;
@@ -37,9 +36,6 @@ public class NotificationService {
     @Autowired
     private FilterService filterService;
 
-    @Autowired
-    private UsersRepository usersRepository;
-
     private static final Map<String, List<Integer>> TYPE_MAPPING = new HashMap<>();
     static {
         // グループコードごとのタイプIDリストを初期化
@@ -53,29 +49,35 @@ public class NotificationService {
 
     // 検索機能
     public Map<String, Object> searchNotifications(UsersEntity user, int page, int size, String keyword, String type, String status, boolean bookmarkedOnly) {
+        
+        // ページングとソート設定 (JSは1始まり、Springは0始まりなので調整)
         int pageIndex = (page > 0) ? page - 1 : 0;
         Pageable pageable = PageRequest.of(pageIndex, size, Sort.by("createdAt").descending());
 
-        // 1. フィルタ条件の構築
+        // 自分通知のみ (セキュリティ必須)
         Specification<NotificationEntity> spec = filterService.createEqualSpec("receiverUserId", user.getUserId());
 
+        // キーワード検索 (タイトル または 本文)
         if (keyword != null && !keyword.trim().isEmpty()) {
             spec = spec.and(searchService.createKeywordSpec(keyword, Arrays.asList("title", "message")));
         }
 
+        // タイプフィルタ
         spec = spec.and(filterService.createMappedInSpec(type, "notificationTypeId", TYPE_MAPPING));
-        spec = spec.and(filterService.createBooleanStatusSpec(status, "isRead", "read", "unread"));
+        spec = spec.and(filterService.createBooleanStatusSpec(status, "read", "read", "unread"));
 
+        // ブックマークフィルタ
         if (bookmarkedOnly) {
             spec = spec.and(filterService.createEqualSpec("isBookmarked", true));
         }
-        
+
+        // 実行
         Page<NotificationEntity> pageResult = notificationRepository.findAll(spec, pageable);
 
-        List<NotificationDto> content = pageResult.getContent().stream()
-            .map(entity -> convertToDto(entity, user.getName())) // ログインユーザー名を渡す
-            .collect(Collectors.toList());
+        // 整形
+        List<NotificationDto> content = pageResult.getContent().stream().map(this::convertToDto).collect(Collectors.toList());
         
+        // JSが期待するキー名 (content, totalCount) に合わせる
         Map<String, Object> response = new HashMap<>();
         response.put("content", content);
         response.put("totalPages", pageResult.getTotalPages());
@@ -85,9 +87,8 @@ public class NotificationService {
     }
 
     // DTO変換
-    private NotificationDto convertToDto(NotificationEntity entity, String userName) {
+    private NotificationDto convertToDto(NotificationEntity entity) {
         return new NotificationDto(
-            userName,
             entity.getNotificationId(), 
             entity.getTitle(), 
             entity.getMessage(), 
@@ -95,12 +96,6 @@ public class NotificationService {
             entity.isRead(), 
             entity.isBookmarked()
         );
-    }
-
-    public String getUserName(String loginId) {
-        UsersEntity user = usersRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return (user.getName());
     }
 
     // 既読操作 
