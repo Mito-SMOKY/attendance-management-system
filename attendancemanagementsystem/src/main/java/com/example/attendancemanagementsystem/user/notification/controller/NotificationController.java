@@ -40,20 +40,27 @@ public class NotificationController {
     public String viewNotificationDetail(
             @RequestParam("id") Integer id, 
             Model model, 
-            @AuthenticationPrincipal UserDetails userDetails) { 
+            @AuthenticationPrincipal UserDetails userDetails) { // Authenticationは不要なので整理
         
         if (userDetails == null) return "redirect:/login";
 
+        // 1. ログインユーザー情報を取得
         String loginId = userDetails.getUsername();
         UsersEntity user = usersRepository.findByLoginId(loginId).orElse(null);
         if (user == null) return "redirect:/login";
 
+        // 2. 通知詳細を取得し既読にする
         NotificationEntity notification = notificationService.getDetailAndMarkAsRead(id, user.getUserId());
         if (notification == null) {
             return "redirect:/notifications"; 
         }
 
+        // 3. 【重要】HTMLとの整合性をとる
+        // HTMLで ${userData.userName} と書く場合、userData というキーで 
+        // getUserName() メソッドを持つオブジェクト（UserEntity）を渡します。
         model.addAttribute("userData", user); 
+        
+        // 通知データ本体
         model.addAttribute("notification", notification);
         model.addAttribute("title", notification.getTitle());
         

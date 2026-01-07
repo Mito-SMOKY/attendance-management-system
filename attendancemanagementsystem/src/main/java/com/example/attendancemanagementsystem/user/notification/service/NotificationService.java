@@ -64,14 +64,18 @@ public class NotificationService {
         }
 
         spec = spec.and(filterService.createMappedInSpec(type, "notificationTypeId", TYPE_MAPPING));
+
+        // ★注意：Entityのフィールド名が "isRead" か "read" かでここが変わります
         spec = spec.and(filterService.createBooleanStatusSpec(status, "read", "read", "unread"));
 
         if (bookmarkedOnly) {
             spec = spec.and(filterService.createEqualSpec("bookmarked", true));
         }
-        
+
+        // 2. 実行
         Page<NotificationEntity> pageResult = notificationRepository.findAll(spec, pageable);
 
+        // 3. 整形 (convertToDtoにユーザー情報を渡すように改良)
         List<NotificationDto> content = pageResult.getContent().stream()
             .map(entity -> convertToDto(entity, user.getName())) // ログインユーザー名を渡す
             .collect(Collectors.toList());
