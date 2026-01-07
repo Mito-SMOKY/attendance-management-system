@@ -27,10 +27,10 @@
 }
 
 .detail-body {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     line-height: 1.8;
     color: #444;
-    white-space: pre-wrap; /* 改行を反映させる */
+    white-space: pre-wrap; 
     min-height: 200px;
 }
 
@@ -38,7 +38,7 @@
     display: inline-block;
     margin-top: 30px;
     padding: 10px 20px;
-    background-color: #6c757d;
+    background-color: #00acbd;
     color: white;
     text-decoration: none;
     border-radius: 5px;
@@ -47,4 +47,9 @@
 
 .back-btn:hover {
     background-color: #5a6268;
+}
+
+.display-name-value{
+    font-size: 1.2em;
+    margin-bottom: 20px;
 }

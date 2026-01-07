@@ -64,10 +64,10 @@ public class NotificationService {
         }
 
         spec = spec.and(filterService.createMappedInSpec(type, "notificationTypeId", TYPE_MAPPING));
-        spec = spec.and(filterService.createBooleanStatusSpec(status, "read", "read", "unread"));
+        spec = spec.and(filterService.createBooleanStatusSpec(status, "isRead", "read", "unread"));
 
         if (bookmarkedOnly) {
-            spec = spec.and(filterService.createEqualSpec("bookmarked", true));
+            spec = spec.and(filterService.createEqualSpec("isBookmarked", true));
         }
         
         Page<NotificationEntity> pageResult = notificationRepository.findAll(spec, pageable);
