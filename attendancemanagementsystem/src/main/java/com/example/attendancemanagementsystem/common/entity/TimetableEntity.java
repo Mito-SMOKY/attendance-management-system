@@ -63,10 +63,6 @@ public class TimetableEntity {
     @JoinColumn(name = "SlotID", insertable = false, updatable = false)
     private TimeSlotEntity timeSlot;
 
-    // Timetable(1) 対 Attendance(多)
-    @OneToMany(mappedBy = "timeTable", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<AttendanceEntity> attendances;
-
     // --- constructor ---
     public TimetableEntity() {
     }
@@ -160,13 +156,5 @@ public class TimetableEntity {
 
     public void setClassroom(ClassroomEntity classroom) {
         this.classroom = classroom;
-    }
-
-    public List<AttendanceEntity> getAttendances() {
-        return attendances;
-    }
-
-    public void setAttendances(List<AttendanceEntity> attendances) {
-        this.attendances = attendances;
     }
 }

@@ -16,6 +16,7 @@
         .stat-card {
             background: white; border-radius: 8px; padding: 15px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center;
+            height: 100%;
         }
         .stat-number { font-size: 2em; font-weight: bold; color: #0d6efd; }
         
@@ -24,218 +25,272 @@
             background: white; 
             padding: 20px; 
             border-radius: 8px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
-
-        .status-absent { background-color: #ffebe6 !important; }
-        .status-late { background-color: #fff8e1 !important; } 
-        .status-present { background-color: #e8f5e9 !important; }
-
-        /* 変更があった行を少し強調 */
-        .status-changed { border-left: 5px solid #ffc107; }
-
-        #loadingOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.8); z-index: 9999;
-            display: none; align-items: center; justify-content: center;
+        
+        /* ステータス別の色定義 */
+        .status-btn-1 { background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; } /* 出席 */
+        .status-btn-2 { background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7; } /* 欠席 */
+        .status-btn-3 { background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5; } /* 遅刻 */
+        .status-btn-4 { background-color: #e2e3e5; color: #41464b; border: 1px solid #d3d6d8; } /* 公欠・その他 */
+        .status-btn-7 { background-color: #cff4fc; color: #055160; border: 1px solid #b6effb; } /* 早退 (New) */
+        
+        /* 選択中のスタイル */
+        .status-active { 
+            font-weight: bold; 
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); 
+            border-color: #0d6efd; 
+            transform: scale(1.05);
+            z-index: 1;
         }
     </style>
 </head>
 <body>
 
-<div id="loadingOverlay">
-    <div class="text-center">
-        <div class="spinner-border text-primary" role="status"></div>
-        <h4 class="mt-3">データを確定中...</h4>
+<div class="active-header d-flex justify-content-between align-items-center">
+    <div>
+        <h2 class="m-0">
+            <span th:text="${sessionDto.gradeClass}"></span>: 
+            <span th:text="${sessionDto.subjectName}"></span>
+        </h2>
+        <div class="text-muted mt-1">
+            <span class="me-3">📅 <span th:text="${sessionDto.startTime}"></span> 開始</span>
+            <span>📍 <span th:text="${sessionDto.classroomName}"></span></span>
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        <button id="cancelSessionBtn" class="btn btn-outline-danger">授業キャンセル</button>
+        <button id="endSessionBtn" class="btn btn-primary px-4">授業終了・確定</button>
     </div>
 </div>
 
-<div class="active-header">
-    <div class="container-fluid">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <h4 class="mb-0 text-secondary">現在進行中の授業</h4>
-                <h2 class="mb-0" th:text="${sessionDto.className}">授業名</h2>
-                <div class="text-muted mt-1">
-                    <span th:text="${sessionDto.classroomName}">教室</span> | 
-                    開始: <span th:text="${#temporals.format(sessionDto.startTime, 'HH:mm')}">00:00</span>
-                </div>
-            </div>
-            <div class="col-md-6 text-end">
-                <button id="cancelSessionBtn" class="btn btn-outline-danger me-2">
-                    <i class="bi bi-trash"></i> 破棄 (保存せず終了)
-                </button>
-                <button id="endSessionBtn" class="btn btn-primary">授業終了・保存</button>
+<div class="container pb-5">
+    
+    <div class="row mt-4 g-2">
+        <div class="col">
+            <div class="stat-card">
+                <div class="text-muted">総人数</div>
+                <div class="stat-number" id="countTotal">-</div>
             </div>
         </div>
-        
-        <div class="row mt-3 g-2">
-            <div class="col-3"><div class="stat-card"><div>総数</div><div id="countTotal" class="stat-number">-</div></div></div>
-            <div class="col-3"><div class="stat-card"><div>出席</div><div id="countPresent" class="stat-number text-success">-</div></div></div>
-            <div class="col-3"><div class="stat-card"><div>遅刻</div><div id="countLate" class="stat-number text-warning">-</div></div></div>
-            <div class="col-3"><div class="stat-card"><div>欠席</div><div id="countAbsent" class="stat-number text-danger">-</div></div></div>
+        <div class="col">
+            <div class="stat-card">
+                <div class="text-muted">出席</div>
+                <div class="stat-number text-success" id="countPresent">-</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="stat-card">
+                <div class="text-muted">遅刻</div>
+                <div class="stat-number text-warning" id="countLate">-</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="stat-card">
+                <div class="text-muted">早退</div>
+                <div class="stat-number text-info" id="countEarly">-</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="stat-card">
+                <div class="text-muted">欠席</div>
+                <div class="stat-number text-danger" id="countAbsent">-</div>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="container-fluid pb-5">
     <div class="student-table-container">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">出席状況一覧</h5>
-            <small id="lastUpdated" class="text-muted">更新中...</small>
+            <h4 class="m-0">出席状況一覧</h4>
+            <span class="badge bg-secondary" id="lastUpdated">更新: --:--:--</span>
         </div>
-        
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 10%">学籍番号</th>
-                        <th style="width: 25%">氏名</th>
-                        <th style="width: 20%">入室時間</th>
-                        <th style="width: 25%">ステータス (変更可)</th>
-                        <th style="width: 20%">状態</th>
-                    </tr>
-                </thead>
-                <tbody id="attendeeListBody"></tbody>
-            </table>
-        </div>
+
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 25%">名前</th>
+                    <th style="width: 15%">入室時間</th>
+                    <th style="width: 60%">ステータス変更</th>
+                </tr>
+            </thead>
+            <tbody id="attendeesTableBody">
+            </tbody>
+        </table>
     </div>
+</div>
+
+<div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:2000; justify-content:center; align-items:center;">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
 </div>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-
-    // 安全にデータを取得
     const sessionId = /*[[${sessionDto.sessionId}]]*/ 0;
+    /*]]>*/
+
+    const API_ATTENDEES_URL = '/session/api/attendees/' + sessionId;
     
-    // ★修正: Thymeleafのループを使って確実にJSON配列を作る
-    const STATUS_OPTIONS = [
-        /*[# th:each="status : ${statusList}"]*/
-        {
-            statusId: /*[[${status.statusId}]]*/ 1,
-            statusName: /*[[${status.statusName}]]*/ '出席'
-        },
-        /*[/]*/
-    ];
+    // ブラウザ保存用のキー（セッションIDごとに区別）
+    const STORAGE_KEY = 'attendance_changes_' + sessionId;
 
-    const attendeeListBody = document.getElementById('attendeeListBody');
-    const lastUpdatedLabel = document.getElementById('lastUpdated');
+    // 教員が変更可能なステータスID（並び順：出席→遅刻→早退→欠席）
+    const EDITABLE_STATUS_IDS = [1, 3, 7, 2];
 
-    // 手動変更を一時保存するオブジェクト
-    let localChanges = {}; // key: userId, value: statusId
+    // ステータスマスタ定義
+    const STATUS_MAP = {
+        1: { name: '出席', cls: 'status-btn-1' },
+        2: { name: '欠席', cls: 'status-btn-2' },
+        3: { name: '遅刻', cls: 'status-btn-3' },
+        4: { name: '公欠', cls: 'status-btn-4' },
+        5: { name: '公欠候補', cls: 'status-btn-4' },
+        6: { name: '出席停止', cls: 'status-btn-4' },
+        7: { name: '早退', cls: 'status-btn-7' } // ★追加
+    };
 
+    // 初期化：localStorageから復元を試みる
+    let localChanges = {};
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            localChanges = JSON.parse(saved);
+        }
+    } catch (e) {
+        console.error('Failed to load local changes', e);
+        localChanges = {};
+    }
+
+    // --- 変更保存用の便利関数 ---
+    function saveLocalChanges() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(localChanges));
+    }
+
+    // 定期更新処理
     function fetchAttendees() {
-        if (!sessionId) return;
-        fetch(`/session/api/attendees/${sessionId}`)
+        fetch(API_ATTENDEES_URL)
             .then(res => res.json())
             .then(data => {
                 renderTable(data);
-                updateTimestamp();
+                updateStats(data);
+                document.getElementById('lastUpdated').innerText = '更新: ' + new Date().toLocaleTimeString();
             })
-            .catch(err => console.error("データ取得エラー:", err));
+            .catch(err => console.error('Fetch error:', err));
     }
 
+    // テーブル描画ロジック
     function renderTable(attendees) {
-        let html = '';
+        const tbody = document.getElementById('attendeesTableBody');
+        tbody.innerHTML = '';
         
-        // 集計用カウンタ
-        let counts = { 1:0, 2:0, 3:0, total: attendees.length };
+        let hasAutoUpdate = false;
 
         attendees.forEach(student => {
-            // 手動変更があればそれを優先して表示・集計する
-            let displayStatusId = student.statusId;
-            let isChanged = false;
+            const tr = document.createElement('tr');
+            
+            // 現在のステータスIDを特定（手動変更があればそれを優先）
+            let currentStatusId = localChanges[student.userId] || student.statusId;
 
-            if (localChanges.hasOwnProperty(student.userId)) {
-                displayStatusId = localChanges[student.userId];
-                isChanged = true;
+            // 【自動判定】手動変更がなく、未設定で、入室時間があれば自動で「出席(1)」にする
+            if (!localChanges[student.userId] && !student.statusId && student.entryTime && student.entryTime !== '--:--') {
+                currentStatusId = 1;
+                localChanges[student.userId] = 1; 
+                hasAutoUpdate = true; // 保存トリガーON
             }
 
-            // 集計 (1:出席, 2:欠席, 3:遅刻 と仮定)
-            if ([1,2,3].includes(displayStatusId)) counts[displayStatusId]++;
+            // --- 名前カラム ---
+            const nameTd = document.createElement('td');
+            nameTd.innerHTML = `<strong>${student.studentName}</strong><br><small class="text-muted">${student.gradeClass}</small>`;
             
-            // 行の色
-            let rowClass = '';
-            if (isChanged) rowClass = 'status-changed '; // 変更済みマーク
-            
-            if (displayStatusId === 2) rowClass += 'status-absent';
-            else if (displayStatusId === 3) rowClass += 'status-late';
-            else if (displayStatusId === 1) rowClass += 'status-present';
+            // --- 時間カラム ---
+            const timeTd = document.createElement('td');
+            timeTd.innerText = student.entryTime || '--:--';
 
-            // プルダウン生成
-            let selectHtml = `<select class="form-select form-select-sm" 
-                                    onchange="changeStatus(${student.userId}, this.value)"
-                                    style="background-color: rgba(255,255,255,0.7);">`;
-            
-            STATUS_OPTIONS.forEach(opt => {
-                const selected = (opt.statusId === displayStatusId) ? 'selected' : '';
-                selectHtml += `<option value="${opt.statusId}" ${selected}>${opt.statusName}</option>`;
+            // --- アクションカラム ---
+            const actionTd = document.createElement('td');
+            const dFlex = document.createElement('div');
+            dFlex.className = 'd-flex align-items-center';
+
+            const btnGroup = document.createElement('div');
+            btnGroup.className = 'btn-group';
+
+            // ボタン生成（定義順：出席・遅刻・早退・欠席）
+            EDITABLE_STATUS_IDS.forEach(sId => {
+                const btn = document.createElement('button');
+                const info = STATUS_MAP[sId];
+                
+                btn.type = 'button';
+                btn.className = `btn btn-sm ${info.cls}`;
+                btn.innerText = info.name;
+                
+                // 現在選択中ならアクティブ化
+                if (sId === currentStatusId) {
+                    btn.classList.add('status-active');
+                }
+
+                btn.onclick = () => {
+                    localChanges[student.userId] = sId;
+                    saveLocalChanges(); // ★クリック時にブラウザに保存
+                    renderTable(attendees);
+                    updateStats(attendees); // ボタン押したら即座に集計も更新
+                };
+                btnGroup.appendChild(btn);
             });
-            selectHtml += `</select>`;
+            
+            dFlex.appendChild(btnGroup);
 
-            // ステータス名取得
-            const statusName = getStatusName(displayStatusId);
+            // 特殊ステータス（公欠など、ボタンにないもの）の場合のバッジ表示
+            // ※ボタン(EDITABLE_STATUS_IDS)に含まれていないIDが選ばれている場合
+            if (!EDITABLE_STATUS_IDS.includes(currentStatusId) && STATUS_MAP[currentStatusId]) {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-secondary ms-3';
+                badge.innerText = `現在: ${STATUS_MAP[currentStatusId].name}`;
+                dFlex.appendChild(badge);
+            }
 
-            html += `
-                <tr class="${rowClass}">
-                    <td>${student.userId}</td>
-                    <td class="fw-bold">${student.studentName}</td>
-                    <td>${student.entryTime ? student.entryTime : '<span class="text-muted">-</span>'}</td>
-                    <td>${selectHtml}</td>
-                    <td>
-                        <span class="badge ${getBadgeClass(displayStatusId)}">
-                            ${statusName}
-                        </span>
-                        ${isChanged ? '<small class="text-muted ms-1">(未保存)</small>' : ''}
-                    </td>
-                </tr>
-            `;
+            actionTd.appendChild(dFlex);
+
+            tr.appendChild(nameTd);
+            tr.appendChild(timeTd);
+            tr.appendChild(actionTd);
+            tbody.appendChild(tr);
         });
-        attendeeListBody.innerHTML = html;
-        updateStats(counts);
-    }
 
-    // サーバーへ送らず、ローカル変数に保存するだけ
-    window.changeStatus = function(userId, newStatusId) {
-        localChanges[userId] = parseInt(newStatusId);
-        // 即座に再取得して画面反映
-        fetchAttendees(); 
-    };
-
-    function updateStats(counts) {
-        document.getElementById('countTotal').textContent = counts.total;
-        document.getElementById('countPresent').textContent = counts[1] || 0; // 出席
-        document.getElementById('countLate').textContent = counts[3] || 0;    // 遅刻
-        document.getElementById('countAbsent').textContent = counts[2] || 0;  // 欠席
-    }
-
-    function getStatusName(id) {
-        const found = STATUS_OPTIONS.find(o => o.statusId === id);
-        return found ? found.statusName : '不明';
-    }
-
-    function getBadgeClass(id) {
-        switch(id) {
-            case 1: return 'bg-success'; 
-            case 2: return 'bg-danger'; 
-            case 3: return 'bg-warning text-dark';
-            case 4: return 'bg-info text-dark'; // 公欠
-            case 6: return 'bg-secondary'; // 出席停止
-            default: return 'bg-secondary';
+        // 自動判定で変更があった場合、ブラウザに保存する
+        if (hasAutoUpdate) {
+            saveLocalChanges();
         }
     }
 
-    function updateTimestamp() {
-        const now = new Date();
-        lastUpdatedLabel.textContent = `最終更新: ${now.toLocaleTimeString()}`;
+    // 集計ロジック（早退を追加）
+    function updateStats(attendees) {
+        let present = 0, absent = 0, late = 0, early = 0;
+        
+        attendees.forEach(s => {
+            let sid = localChanges[s.userId] || s.statusId;
+            if (sid === 1) present++;
+            else if (sid === 2) absent++;
+            else if (sid === 3) late++;
+            else if (sid === 7) early++; // ★早退カウント
+        });
+        
+        document.getElementById('countTotal').innerText = attendees.length;
+        document.getElementById('countPresent').innerText = present;
+        document.getElementById('countAbsent').innerText = absent;
+        document.getElementById('countLate').innerText = late;
+        document.getElementById('countEarly').innerText = early;
     }
 
-    // 授業破棄（キャンセル）処理
+    // 親画面を更新して自分を閉じる共通関数
+    function refreshParentAndClose() {
+        if (window.opener && !window.opener.closed) {
+            window.opener.location.reload();
+        }
+        window.close();
+    }
+
+    // キャンセルボタン
     document.getElementById('cancelSessionBtn').addEventListener('click', function() {
-        if (!confirm('この授業セッションを破棄しますか？\n出席データは保存されず、この操作は取り消せません。')) {
-            return;
-        }
-
+        if (!confirm('本当に授業を取り消しますか？\n出席データは削除されます。')) return;
+        
         document.getElementById('loadingOverlay').style.display = 'flex';
         this.disabled = true;
 
@@ -246,8 +301,9 @@
         })
         .then(res => {
             if(res.ok) {
-                alert('セッションを破棄しました。');
-                window.close(); // ウィンドウを閉じる
+                localStorage.removeItem(STORAGE_KEY);
+                alert('授業をキャンセルしました。');
+                refreshParentAndClose();
             } else {
                 throw new Error('破棄処理に失敗しました');
             }
@@ -259,7 +315,7 @@
         });
     });
 
-    // 終了時に変更内容(localChanges)をまとめて送信
+    // 確定終了ボタン
     document.getElementById('endSessionBtn').addEventListener('click', function() {
         if (!confirm('授業を終了しますか？\nここまでの変更内容を保存して確定します。')) return;
 
@@ -278,8 +334,9 @@
         })
         .then(res => {
             if(res.ok) {
+                localStorage.removeItem(STORAGE_KEY);
                 alert('出席を確定しました。');
-                window.close();
+                refreshParentAndClose();
             } else {
                 throw new Error('確定処理に失敗しました');
             }
@@ -291,11 +348,16 @@
         });
     });
 
-    setInterval(fetchAttendees, 3000);
-    fetchAttendees();
+    // 初回読み込み & ポーリング開始
+    if (sessionId && sessionId > 0) {
+        fetchAttendees();
+        setInterval(fetchAttendees, 3000);
+    } else {
+        console.error("セッションIDが無効なため、通信を停止しました。");
+        alert("授業データの読み込みに失敗しました。画面を閉じてやり直してください。");
+    }
 
-    /*]]>*/
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

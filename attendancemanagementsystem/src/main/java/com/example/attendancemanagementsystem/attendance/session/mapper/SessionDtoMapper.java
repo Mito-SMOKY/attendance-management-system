@@ -15,11 +15,20 @@ public class SessionDtoMapper {
 
     private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm");
 
+    // 既存メソッド: 生徒1人分の行データを作成
     public SessionDto toDto(SessionEntity session, EnrollmentsEntity enrollment, EntryLogEntity log, AttendanceEntity attendance) {
         
         SessionDto dto = new SessionDto();
-        
-        // 生徒情報のセット
+        dto.setSessionId(session.getSessionId());
+
+        // 科目名
+        if (session.getSubject() != null) {
+            dto.setSubjectName(session.getSubject().getSubjectName());
+        } else {
+            dto.setSubjectName("未設定");
+        }
+
+        // 生徒情報
         if (enrollment.getStudent() != null && enrollment.getStudent().getUsers() != null) {
             dto.setUserId(enrollment.getStudent().getUserId());
             dto.setStudentName(enrollment.getStudent().getUsers().getName());
@@ -28,29 +37,72 @@ public class SessionDtoMapper {
             dto.setStudentName("Unknown");
         }
 
-        // 学年・クラス情報のセット
+        // 学年・クラス
         String deptName = (enrollment.getDepartment() != null) ? enrollment.getDepartment().getClassName() : "";
-        dto.setGradeClass(enrollment.getGrade() + "年" + deptName + "組"); // 例: "2年A組"
+        dto.setGradeClass(enrollment.getGrade() + "年" + deptName); 
 
-        // 授業情報のセット
-        dto.setActualClassroomId(session.getActualClassroomId());
-        dto.setSessionStatus(session.getSessionStatus());
+        // 教室情報
+        mapClassroomInfo(session, dto);
+        
+        dto.setSessionFlag(session.getSessionFlag());
+        
+        // 開始時間
+        if (session.getStartTime() != null) {
+            dto.setStartTime(session.getStartTime().format(TIME_FMT));
+        }
 
-        // 入室時間のセット（ログがあれば時間を、なければハイフンを表示）
+        // 入室時間ログ
         if (log != null) {
             dto.setEntryTime(log.getEntryTime().format(TIME_FMT));
         } else {
             dto.setEntryTime("--:--");
         }
 
-        // 5出席ステータスのセット
-        if (attendance != null) {
+        // 出席ステータス
+        if (attendance != null && attendance.getStatus() != null) {
+            // ステータスID (1:出席, 2:欠席など) をセット
             dto.setStatusId(attendance.getStatus().getStatusId());
         } else {
-            // ログがあれば出席(1)、なければ欠席(2)として仮表示
-            dto.setStatusId(log != null ? 1 : 2);
+            dto.setStatusId(null); 
         }
+        
+        dto.setSessionFlag(session.getSessionFlag());
 
         return dto;
+    }
+
+    // ★追加: セッションヘッダー表示用（生徒情報なしで変換）
+    public SessionDto toDto(SessionEntity session) {
+        SessionDto dto = new SessionDto();
+        dto.setSessionId(session.getSessionId());
+
+        if (session.getSubject() != null) {
+            dto.setSubjectName(session.getSubject().getSubjectName());
+        } else {
+            dto.setSubjectName("未設定");
+        }
+        
+        // 簡易的な学年表示
+        if (session.getTargetGrade() != null) {
+            dto.setGradeClass(session.getTargetGrade() + "年");
+        }
+
+        mapClassroomInfo(session, dto);
+        
+        dto.setSessionFlag(session.getSessionFlag());
+        
+        if (session.getStartTime() != null) {
+            dto.setStartTime(session.getStartTime().format(TIME_FMT));
+        }
+        
+        return dto;
+    }
+
+    // 共通処理切り出し
+    private void mapClassroomInfo(SessionEntity session, SessionDto dto) {
+        if (session.getClassroom() != null) {
+            dto.setActualClassroomId(session.getClassroom().getClassroomId());
+            dto.setClassroomName(session.getClassroom().getClassroomName());
+        }
     }
 }

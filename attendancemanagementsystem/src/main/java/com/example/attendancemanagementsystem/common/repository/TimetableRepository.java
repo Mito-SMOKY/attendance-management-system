@@ -2,6 +2,8 @@ package com.example.attendancemanagementsystem.common.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -46,4 +48,23 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
     
     //指定したユーザIDの時間割エンティティの特定のコマを取得
     List<TimetableEntity> findByUserIdAndDate(Integer userId, LocalDate date);
+    
+    //指定したユーザIDの時間割エンティティの特定の日付・時限のエンティティを取得
+    Optional<TimetableEntity> findByUserIdAndDateAndSlotId(Integer userId, LocalDate date, Integer slotId);
+
+    // 指定したユーザID・日付・時限のシンプルな時間割データを取得
+    @Query(value = "SELECT " +
+            "  t.SubjectID as subjectId, " +
+            "  t.ClassroomID as classroomId, " +
+            "  t.DepartmentID as departmentId " +  
+            "FROM timetable t " +
+            "WHERE t.UserID = :userId " +
+            "  AND t.Date = :date " +
+            "  AND t.SlotID = :slotId " +
+            "LIMIT 1", nativeQuery = true)
+    Map<String, Object> findSimpleTimetableData(
+        @Param("userId") Integer userId, 
+        @Param("date") LocalDate date, 
+        @Param("slotId") Integer slotId
+    );
 }
