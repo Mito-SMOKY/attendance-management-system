@@ -64,9 +64,7 @@ public class NotificationService {
 
         // タイプフィルタ
         spec = spec.and(filterService.createMappedInSpec(type, "notificationTypeId", TYPE_MAPPING));
-
-        // ステータスフィルタ
-        spec = spec.and(filterService.createBooleanStatusSpec(status, "isRead", "read", "unread"));
+        spec = spec.and(filterService.createBooleanStatusSpec(status, "read", "read", "unread"));
 
         // ブックマークフィルタ
         if (bookmarkedOnly) {
