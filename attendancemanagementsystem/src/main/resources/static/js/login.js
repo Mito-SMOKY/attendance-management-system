@@ -90,3 +90,48 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+window.addEventListener('load', () => {
+    const body = document.body;
+    const splash = document.getElementById('splash');
+
+    // 1. セッションに「再生済みフラグ」があるか確認
+    const hasPlayed = sessionStorage.getItem('animationPlayed');
+
+    if (hasPlayed) {
+        // --- 【スキップ処理】フラグがある場合は、すべてを即座に表示 ---
+        if (splash) splash.style.display = 'none';
+        body.classList.remove('loading');
+        body.classList.add('header-active', 'loaded', 'show-static', 'animation-done');
+        
+    } else {
+        // --- 【通常処理】フラグがない場合は、いつものアニメーションを実行 ---
+        
+        // ヘッダー表示
+        setTimeout(() => body.classList.add('header-active'), 100); 
+
+        // 波紋待機後の移動開始
+        setTimeout(() => {
+            body.classList.add('loaded'); 
+
+            setTimeout(() => {
+                body.classList.add('show-static');
+
+                setTimeout(() => {
+                    body.classList.add('animation-done'); 
+                    
+                    if(splash) splash.style.opacity = '0';
+
+                    setTimeout(() => {
+                        if(splash) splash.style.display = 'none';
+                        body.classList.remove('loading');
+                        
+                        // ★アニメーションが最後まで終わったら「再生済み」フラグをセット
+                        sessionStorage.setItem('animationPlayed', 'true');
+
+                    },500);
+                },); // 静止時間
+            }, 1200);
+        }, 2200);
+    }
+});
