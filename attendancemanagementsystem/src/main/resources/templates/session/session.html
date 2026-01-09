@@ -80,193 +80,201 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 py-2 mt-3 fs-5">授業を開始する</button>
+                <button type="button" onclick="startSession()" class="btn btn-primary w-100 py-2 mt-3 fs-5">授業を開始する</button>
             </form>
         </div>
     </div>
 
-        <script th:inline="javascript">
-    // 共通：セレクトボックスリセット
-            function resetSelect(el, txt) {
-                el.innerHTML = `<option value="">${txt}</option>`;
-                el.disabled = true;
-            }
+    <script th:inline="javascript">
+        // 共通：セレクトボックスリセット
+        function resetSelect(el, txt) {
+            el.innerHTML = `<option value="">${txt}</option>`;
+            el.disabled = true;
+        }
 
-            // 1. 学科 -> コース
-            async function loadCourses() {
-                const majorId = document.getElementById('majorSelect').value;
-                const courseSelect = document.getElementById('courseSelect');
+        // 1. 学科 -> コース
+        async function loadCourses() {
+            const majorId = document.getElementById('majorSelect').value;
+            const courseSelect = document.getElementById('courseSelect');
+            
+            resetSelect(courseSelect, 'コースを選択');
+            resetSelect(document.getElementById('gradeSelect'), '先にコースを選択');
+            resetSelect(document.getElementById('classSelect'), '先に学年を選択');
+
+            if (!majorId) return;
+
+            try {
+                const res = await fetch('/session/api/options/courses?majorId=' + majorId);
+                const courses = await res.json();
                 
-                // リセット処理
-                resetSelect(courseSelect, 'コースを選択');
-                resetSelect(document.getElementById('gradeSelect'), '先にコースを選択');
-                resetSelect(document.getElementById('classSelect'), '先に学年を選択');
-
-                if (!majorId) return;
-
-                try {
-                    const res = await fetch('/session/api/options/courses?majorId=' + majorId);
-                    const courses = await res.json();
-                    
-                    courses.forEach(c => {
-                        courseSelect.add(new Option(c.courseName, c.courseId));
-                    });
-                    courseSelect.disabled = false;
-                    
-                    // 1つしかない場合は自動選択（手動操作時のみ便利）
-                    if (courses.length === 1) {
-                        courseSelect.value = courses[0].courseId;
-                        await loadGrades(); 
-                    }
-                } catch (e) {
-                    console.error("Error loading courses:", e);
+                courses.forEach(c => {
+                    courseSelect.add(new Option(c.courseName, c.courseId));
+                });
+                courseSelect.disabled = false;
+                
+                if (courses.length === 1) {
+                    courseSelect.value = courses[0].courseId;
+                    await loadGrades(); 
                 }
+            } catch (e) {
+                console.error("Error loading courses:", e);
             }
+        }
 
-            // 2. コース -> 学年
-            async function loadGrades() {
-                const courseId = document.getElementById('courseSelect').value;
-                const gradeSelect = document.getElementById('gradeSelect');
+        // 2. コース -> 学年
+        async function loadGrades() {
+            const courseId = document.getElementById('courseSelect').value;
+            const gradeSelect = document.getElementById('gradeSelect');
+            
+            resetSelect(gradeSelect, '学年を選択');
+            resetSelect(document.getElementById('classSelect'), '先に学年を選択');
+
+            if (!courseId) return;
+
+            try {
+                const res = await fetch('/session/api/options/grades?courseId=' + courseId);
+                const grades = await res.json();
                 
-                resetSelect(gradeSelect, '学年を選択');
-                resetSelect(document.getElementById('classSelect'), '先に学年を選択');
-
-                if (!courseId) return;
-
-                try {
-                    const res = await fetch('/session/api/options/grades?courseId=' + courseId);
-                    const grades = await res.json();
-                    
-                    grades.forEach(g => {
-                        gradeSelect.add(new Option(g + '年', g));
-                    });
-                    gradeSelect.disabled = false;
-                } catch (e) {
-                    console.error("Error loading grades:", e);
-                }
+                grades.forEach(g => {
+                    gradeSelect.add(new Option(g + '年', g));
+                });
+                gradeSelect.disabled = false;
+            } catch (e) {
+                console.error("Error loading grades:", e);
             }
+        }
 
-            // 3. 学年 -> クラス
-            async function loadClasses() {
-                const courseId = document.getElementById('courseSelect').value;
-                const grade = document.getElementById('gradeSelect').value;
-                const classSelect = document.getElementById('classSelect');
+        // 3. 学年 -> クラス
+        async function loadClasses() {
+            const courseId = document.getElementById('courseSelect').value;
+            const grade = document.getElementById('gradeSelect').value;
+            const classSelect = document.getElementById('classSelect');
+            
+            resetSelect(classSelect, 'クラスを選択');
+
+            if (!courseId || !grade) return;
+
+            try {
+                const res = await fetch(`/session/api/options/classes?courseId=${courseId}&grade=${grade}`);
+                const classes = await res.json();
                 
-                resetSelect(classSelect, 'クラスを選択');
-
-                if (!courseId || !grade) return;
-
-                try {
-                    const res = await fetch(`/session/api/options/classes?courseId=${courseId}&grade=${grade}`);
-                    const classes = await res.json();
-                    
-                    classes.forEach(c => {
-                        // value には departmentId (数値) をセット
-                        classSelect.add(new Option(c.className + '組', c.departmentId));
-                    });
-                    classSelect.disabled = false;
-                } catch (e) {
-                    console.error("Error loading classes:", e);
-                }
+                classes.forEach(c => {
+                    classSelect.add(new Option(c.className + '組', c.departmentId));
+                });
+                classSelect.disabled = false;
+            } catch (e) {
+                console.error("Error loading classes:", e);
             }
+        }
 
-            // 4. 時間割自動入力（★ここを強力に修正しました）
-            async function autoFillTimetable() {
-                const userId = document.getElementById('userId').value;
-                const date = document.getElementById('sessionDate').value;
-                const slotId = document.getElementById('slotId').value;
+        // 4. 時間割自動入力
+        async function autoFillTimetable() {
+            const userId = document.getElementById('userId').value;
+            const date = document.getElementById('sessionDate').value;
+            const slotId = document.getElementById('slotId').value;
+            
+            if (!date || !slotId) return;
+
+            try {
+                const res = await fetch(`/session/api/timetable/get?userId=${userId}&date=${date}&slotId=${slotId}`);
+                if (!res.ok) return;
                 
-                if (!date || !slotId) return;
+                const data = await res.json();
+                console.log("取得データ:", data);
 
-                try {
-                    const res = await fetch(`/session/api/timetable/get?userId=${userId}&date=${date}&slotId=${slotId}`);
-                    if (!res.ok) {
-                        console.log("No timetable data found or error.");
-                        return;
-                    }
-                    const data = await res.json();
-                    
-                    console.log("取得データ:", data); // デバッグ用
+                if (data.subjectId) document.getElementById('subjectId').value = data.subjectId;
+                if (data.classroomId) document.getElementById('classroomId').value = data.classroomId;
 
-                    // 科目・教室（あればセット）
-                    if (data.subjectId) document.getElementById('subjectId').value = data.subjectId;
-                    if (data.classroomId) document.getElementById('classroomId').value = data.classroomId;
+                if (data.majorId) {
+                    document.getElementById('majorSelect').value = data.majorId;
+                    await loadCourses(); 
 
-                    // --- ここから連動プルダウンのチェーン処理 ---
-                    
-                    // 1. 学科 (Major) セット
-                    if (data.majorId) {
-                        document.getElementById('majorSelect').value = data.majorId;
-                        
-                        // コース一覧を読み込むまで待つ
-                        await loadCourses(); 
+                    if (data.courseId) {
+                        document.getElementById('courseSelect').value = data.courseId; 
+                        await loadGrades();
 
-                        // 2. コース (Course) セット
-                        if (data.courseId) {
-                            // selectの中にそのIDがあるか確認してからセット
-                            const courseSelect = document.getElementById('courseSelect');
-                            // 型違い(String vs Number)を防ぐため文字列変換して比較・セット
-                            courseSelect.value = data.courseId; 
+                        if (data.grade) {
+                            document.getElementById('gradeSelect').value = data.grade;
+                            await loadClasses();
 
-                            // 学年一覧を読み込むまで待つ
-                            await loadGrades();
-
-                            // 3. 学年 (Grade) セット
-                            if (data.grade) {
-                                const gradeSelect = document.getElementById('gradeSelect');
-                                gradeSelect.value = data.grade;
-
-                                // クラス一覧を読み込むまで待つ
-                                await loadClasses();
-
-                                // 4. クラス (DepartmentId) セット
-                                if (data.departmentId) {
-                                    const classSelect = document.getElementById('classSelect');
-                                    classSelect.value = data.departmentId;
-                                }
+                            if (data.departmentId) {
+                                document.getElementById('classSelect').value = data.departmentId;
                             }
                         }
                     }
-                } catch (e) {
-                    console.error("Auto-fill error:", e);
                 }
+            } catch (e) {
+                console.error("Auto-fill error:", e);
+            }
+        }
+
+        // ★★★ 5. 送信処理（ここが修正のメイン） ★★★
+        function startSession() {
+            const form = document.getElementById('startSessionForm');
+
+            // 1. バリデーションチェック（入力漏れがあればここで止まる）
+            if (!form.checkValidity()) {
+                form.reportValidity(); // ブラウザ標準の「入力してください」を表示
+                return;
             }
 
-            // 5. 送信処理
-            document.getElementById('startSessionForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const deptId = document.getElementById('classSelect').value;
+            // 2. ポップアップウィンドウを「通信前に」開く
+            const windowName = 'attendanceWin_' + Date.now();
+            const newWindow = window.open('about:blank', windowName, 'width=1100,height=850,popup=yes');
 
-                const payload = {
-                    date: document.getElementById('sessionDate').value,
-                    slotId: parseInt(document.getElementById('slotId').value),
-                    subjectId: parseInt(document.getElementById('subjectId').value),
-                    classroomId: parseInt(document.getElementById('classroomId').value),
-                    departmentId: deptId ? parseInt(deptId) : null,
-                    targetGrade: parseInt(document.getElementById('gradeSelect').value)
-                };
+            if (newWindow) {
+                newWindow.document.write('<html><body style="display:flex;justify-content:center;align-items:center;height:100vh;"><h3>準備中...</h3></body></html>');
+            } else {
+                alert('ポップアップがブロックされました。ブラウザ設定を確認してください。');
+                return;
+            }
 
-                fetch('/session/start', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                })
-                .then(res => {
-                    if (!res.ok) throw new Error("Server returned " + res.status);
-                    return res.json();
-                })
-                .then(d => {
-                    if (d.sessionId) {
-                        window.open('/session/active/' + d.sessionId, 'attendanceWin', 'width=1100,height=850');
-                        location.reload();
-                    }
-                })
-                .catch(err => {
-                    alert('授業の開始に失敗しました。\n' + err.message);
-                    console.error(err);
-                });
+            // 3. データ作成とFetch
+            const deptId = document.getElementById('classSelect').value;
+            const payload = {
+                date: document.getElementById('sessionDate').value,
+                slotId: parseInt(document.getElementById('slotId').value),
+                subjectId: parseInt(document.getElementById('subjectId').value),
+                classroomId: parseInt(document.getElementById('classroomId').value),
+                departmentId: deptId ? parseInt(deptId) : null,
+                targetGrade: parseInt(document.getElementById('gradeSelect').value)
+            };
+
+            fetch('/session/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(async res => {
+                // エラー時処理
+                if (!res.ok) {
+                    const text = await res.text();
+                    const errorMsg = text || "サーバー側でエラーが発生しました (" + res.status + ")";
+                    
+                    // ウィンドウを閉じる
+                    newWindow.close(); 
+
+                    // 409 Conflict (重複) などのエラー表示
+                    alert(errorMsg); 
+                    return null;
+                }
+                return res.json();
+            })
+            .then(d => {
+                if (d && d.sessionId) {
+                    // 成功時：ウィンドウのURLを更新
+                    newWindow.location.href = '/session/active/' + d.sessionId;
+                    
+                    // 親画面のリロード
+                    setTimeout(() => location.reload(), 500);
+                }
+            })
+            .catch(err => {
+                if (!newWindow.closed) newWindow.close();
+                console.error(err);
+                alert('通信エラーが発生しました。\n' + err.message);
             });
-        </script>
+        }
+    </script>
 </body>
 </html>

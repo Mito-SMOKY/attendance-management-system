@@ -72,20 +72,43 @@ public class SessionService {
 
     /**
      * 授業開始処理
+     * 変更点:
+     * 1. 「違う時限」の授業が進行中の場合のみエラーにする
+     * 2. 「同じ時限」であれば複数クラスの作成を許可する
      */
     @Transactional
     public SessionEntity startSession(Integer userId, Integer subjectId, LocalDate date, Integer slotId, 
                                       Integer classroomId, Integer departmentId, Integer targetGrade) {
         
-        // 重複チェック
-        List<SessionEntity> existingSessions = sessionRepository.findByUserIdAndDateAndSlotId(userId, date, slotId);
-        if (!existingSessions.isEmpty()) {
-            SessionEntity session = existingSessions.get(0);
-            if (!session.getSessionFlag()) {
-                return session; 
+        // 1. このユーザーの「現在進行中(Active)」の全セッションを取得
+        List<SessionEntity> activeSessions = sessionRepository.findActiveSessionsByUserId(userId);
+
+        for (SessionEntity active : activeSessions) {
+            
+            // A. 「違う時限」の授業が進行中かチェック (ここが重要)
+            if (!active.getTimeSlot().getSlotId().equals(slotId)) {
+                throw new IllegalStateException("終了していない他時限(" + active.getTimeSlot().getSlotId() + "限)の授業があります。先に終了させてください。");
             }
+
+            // B. 「全く同じ授業（再開）」かチェック
+            boolean isExactMatch = active.getSessionDate().equals(date) 
+                                && active.getTimeSlot().getSlotId().equals(slotId)
+                                && active.getDepartment().getDepartmentId().equals(departmentId)
+                                && active.getClassroom().getClassroomId().equals(classroomId)
+                                && active.getSubject().getSubjectId().equals(subjectId);
+
+            if (isExactMatch) {
+                // 条件が完全一致するなら、既存のセッションを返して「再開」扱いにする
+                return active;
+            }
+            
+            // C. 「同じ時限」だが「違う授業(クラスや科目が違う)」の場合
+            // ループを継続（何もしない）。
+            // エラーを投げずにループを抜ければ、下の新規作成処理に進むため、2つ目の授業が作られる。
         }
         
+        // --- 以下、新規作成ロジック (提供コードのまま) ---
+
         TimeSlotEntity timeSlot = timeSlotRepository.findById(slotId).orElseThrow();
         SubjectEntity subject = subjectRepository.findById(subjectId).orElseThrow();
         ClassroomEntity classroom = classroomRepository.findById(classroomId).orElseThrow();
@@ -101,7 +124,7 @@ public class SessionService {
         session.setClassroom(classroom);
         session.setDepartment(department); 
         session.setTargetGrade(targetGrade);
-        session.setSessionFlag(false); 
+        session.setSessionFlag(false); // 授業中フラグ
 
         timetableRepository.findByUserIdAndDateAndSlotId(userId, date, slotId)
                 .ifPresent(session::setTimeTable);
@@ -110,7 +133,7 @@ public class SessionService {
     }
 
     /**
-     * 出席者リスト表示
+     * 出席者リスト表示 (変更なし)
      */
     @Transactional(readOnly = true)
     public List<SessionDto> getSessionAttendees(Integer sessionId) {
@@ -126,10 +149,10 @@ public class SessionService {
         // 2. ログ取得
         List<EntryLogEntity> logs = entryLogService.getLogsForEndSession(session, now);
 
-        // ★追加: 直前の授業（同教室）の出席状況を取得
+        // 3. 直前の授業（同教室）の出席状況を取得
         Map<Integer, Integer> prevStatusMap = getPreviousSessionStatusMap(session);
 
-        // 3. 判定ロジック
+        // 4. 判定ロジック
         List<SessionDto> result = new ArrayList<>();
         LocalDateTime baseTime = session.getStartTime();
         LocalDateTime lateBoundary = baseTime.plusMinutes(20);
@@ -152,23 +175,20 @@ public class SessionService {
                     dto.setStatusId(1); 
                 }
             } else {
-                // 連続授業判定 (前回ステータスを参照)
+                // 連続授業判定
                 if (prevStatusMap.containsKey(studentId)) {
                     Integer prevStatus = prevStatusMap.get(studentId);
                     if (prevStatus == 2) {
-                        // 前回欠席なら、今回も欠席
                         dto.setStatusId(2);
                         dto.setEntryTime("--:-- --");
                     } else if (prevStatus == 6) {
-                        dto.setStatusId(6); // 出席停止
+                        dto.setStatusId(6);
                         dto.setEntryTime("--:-- --");
                     } else {
-                        // 前回出席/遅刻なら、連続出席とみなす
                         dto.setStatusId(1); 
                         dto.setEntryTime("(連続)");
                     }
                 } else {
-                    // 直前の記録なし / 教室が違う -> 欠席
                     dto.setStatusId(2); 
                     dto.setEntryTime("--:-- --");
                 }
@@ -179,8 +199,7 @@ public class SessionService {
     }
 
     /**
-     * Helper: 直前の授業のStatusMapを取得
-     * 条件：同日・同科目・同部門・同日・同教室
+     * Helper: 直前の授業のStatusMapを取得 (変更なし)
      */
     private Map<Integer, Integer> getPreviousSessionStatusMap(SessionEntity currentSession) {
         Map<Integer, Integer> map = new HashMap<>();
@@ -198,9 +217,9 @@ public class SessionService {
         if (prevSessionOpt.isPresent()) {
             SessionEntity prevSession = prevSessionOpt.get();
 
-            // ★教室の一致チェック
+            // 教室の一致チェック
             boolean isSameClassroom = prevSession.getClassroom().getClassroomId()
-                                        .equals(currentSession.getClassroom().getClassroomId());
+                                            .equals(currentSession.getClassroom().getClassroomId());
 
             if (isSameClassroom) {
                 List<AttendanceEntity> prevAttendances = attendanceRepository.findBySessionId(prevSession.getSessionId());
@@ -213,7 +232,7 @@ public class SessionService {
     }
 
     /**
-     * 授業終了処理
+     * 授業終了処理 (変更なし)
      */
     @Transactional
     public void endSession(Integer sessionId, Map<Integer, Integer> manualChanges) {
@@ -229,6 +248,21 @@ public class SessionService {
         sessionRepository.save(session);
     }
 
+    /**
+     * ★追加: 強制終了処理
+     * ポップアップから呼び出し、出席判定を行わずに授業を「終了済み」にする
+     */
+    @Transactional
+    public void forceEndSession(Integer sessionId) {
+        SessionEntity session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+        
+        session.setEndTime(LocalDateTime.now());
+        session.setSessionFlag(true); // 実施中(false) -> 終了(true)
+        
+        sessionRepository.save(session);
+    }
+
     @Transactional
     public void cancelSession(Integer sessionId) {
         attendanceRepository.deleteBySessionId(sessionId);
@@ -239,8 +273,16 @@ public class SessionService {
         return sessionRepository.findById(sessionId).orElseThrow();
     }
 
+    public List<SessionEntity> findActiveSessionsByUserId(Integer userId) {
+        return sessionRepository.findActiveSessionsByUserId(userId);
+    }
+
     public Optional<SessionEntity> findActiveSessionByUserId(Integer userId) {
-        List<SessionEntity> sessions = sessionRepository.findActiveSessionsByUserId(userId);
-        return sessions.isEmpty() ? Optional.empty() : Optional.of(sessions.get(0));
+        List<SessionEntity> sessions = findActiveSessionsByUserId(userId);
+        if (sessions.isEmpty()) {
+            return Optional.empty();
+        }
+        // 複数ある場合は、とりあえず先頭のものを返す
+        return Optional.of(sessions.get(0));
     }
 }

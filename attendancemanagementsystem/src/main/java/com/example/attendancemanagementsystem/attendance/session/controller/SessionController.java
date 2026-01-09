@@ -2,12 +2,13 @@ package com.example.attendancemanagementsystem.attendance.session.controller;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList; // 追加
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -87,8 +88,10 @@ public class SessionController {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         model.addAttribute("userId", user.getUserId());
+        
+        // アクティブセッションがあればモデルに追加（HTML側でポップアップ表示に使用）
         sessionService.findActiveSessionByUserId(user.getUserId())
-                .ifPresent(s -> model.addAttribute("myActiveSession", s));
+                .ifPresent(s -> model.addAttribute("activeSession", s));
         
         model.addAttribute("subjectList", subjectRepository.findAll());
         model.addAttribute("classroomList", classroomRepository.findAll());
@@ -117,23 +120,56 @@ public class SessionController {
 
     @PostMapping("/start")
     @ResponseBody
-    public Map<String, Object> startSession(@RequestBody StartSessionDto request, Principal principal) {
-        UsersEntity user = usersRepository.findByLoginId(principal.getName())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        
-        SessionEntity session = sessionService.startSession(
-            user.getUserId(), 
-            request.getSubjectId(), 
-            request.getDate(), 
-            request.getSlotId(),
-            request.getClassroomId(), 
-            request.getDepartmentId(), 
-            request.getTargetGrade()
-        );
+    public ResponseEntity<?> startSession(@RequestBody StartSessionDto request, Principal principal) {
+        try {
+            UsersEntity user = usersRepository.findByLoginId(principal.getName())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            
+            SessionEntity session = sessionService.startSession(
+                user.getUserId(), 
+                request.getSubjectId(), 
+                request.getDate(), 
+                request.getSlotId(),
+                request.getClassroomId(), 
+                request.getDepartmentId(), 
+                request.getTargetGrade()
+            );
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("sessionId", session.getSessionId());
-        return response;
+            Map<String, Object> response = new HashMap<>();
+            response.put("sessionId", session.getSessionId());
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalStateException e) {
+            // Serviceで投げた「違う時限の授業が進行中」というエラーをキャッチ
+            // 409 Conflict とエラーメッセージを返す (JS側でalert表示に使用)
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("システムエラーが発生しました: " + e.getMessage());
+        }
+    }
+
+    // ★追加: 強制終了API (HTMLのポップアップから呼ばれる)
+    @PostMapping("/api/force-end")
+    @ResponseBody
+    public ResponseEntity<String> forceEndSession(@RequestBody Map<String, Integer> payload) {
+        Integer sessionId = payload.get("sessionId");
+        if (sessionId == null) {
+            return ResponseEntity.badRequest().body("Session ID is required");
+        }
+        
+        try {
+            sessionService.forceEndSession(sessionId);
+            return ResponseEntity.ok("Force ended successfully");
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error forcing end session: " + e.getMessage());
+        }
     }
 
     @GetMapping("/active/{sessionId}")
@@ -189,7 +225,7 @@ public class SessionController {
         return List.of();
     }
 
-    // ② コース(Course) -> 学年(Grade)  (★以前消えていたので追加！)
+    // ② コース(Course) -> 学年(Grade)
     @GetMapping("/api/options/grades")
     @ResponseBody
     public List<Integer> getGrades(@RequestParam("courseId") Integer courseId) {
@@ -203,17 +239,14 @@ public class SessionController {
             @RequestParam("courseId") Integer courseId, 
             @RequestParam("grade") Integer grade) {
         
-        // 1. リポジトリからデータを取得 (Object配列のリスト)
         List<Object[]> results = enrollmentsRepository.findDistinctDepartmentIdAndClass(courseId, grade);
         
-        // 2. 返却用のリストを作成
         List<Map<String, Object>> responseList = new ArrayList<>();
 
-        // 3. データをMapに変換してリストに追加
         for (Object[] row : results) {
             Map<String, Object> map = new HashMap<>();
-            map.put("departmentId", row[0]); // ID
-            map.put("className", row[1]);    // 名前
+            map.put("departmentId", row[0]);
+            map.put("className", row[1]);
             responseList.add(map);
         }
 
