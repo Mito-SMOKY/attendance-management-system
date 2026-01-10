@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+.container { 
+    max-width: 800px; 
+    margin-top: 30px; 
+}
+
+.card-header { 
+    background-color: #f8f9fa; 
+    font-weight: bold; 
+}
+
+.form-label { 
+    font-weight: bold; 
+}

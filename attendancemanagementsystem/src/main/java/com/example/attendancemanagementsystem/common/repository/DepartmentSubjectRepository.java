@@ -13,10 +13,19 @@ import com.example.attendancemanagementsystem.common.entity.SubjectEntity;
 
 @Repository
 public interface DepartmentSubjectRepository extends JpaRepository<DepartmentSubject, DepartmentSubjectKey> {
+
+    // 学科IDにもとづく学年の取得
     @Query("SELECT DISTINCT d.grade FROM DepartmentSubject d WHERE d.id.departmentId = :departmentId ORDER BY d.grade ASC")
     List<Integer> findGradesByDepartmentId(@Param("departmentId") Integer departmentId);
 
+    // 学科IDにもとづく科目の取得
     @Query("SELECT DISTINCT d.subject FROM DepartmentSubject d WHERE d.id.departmentId = :departmentId ORDER BY d.subject.subjectName ASC")
     List<SubjectEntity> findSubjectsByDepartmentId(@Param("departmentId") Integer departmentId);
+
+    // コースIDにもとづくクラス名の取得
+    @Query("SELECT DISTINCT d.className FROM DepartmentEntity d " +
+        "WHERE d.major.course.courseId = :courseId " +
+        "ORDER BY d.className")
+    List<String> findClassNamesByCourseId(@Param("courseId") Integer courseId);
     
 }
