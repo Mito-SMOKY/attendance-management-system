@@ -41,14 +41,15 @@ public class SessionAttendanceService {
         this.sessionRepository = sessionRepository;
     }
 
+    // 出席情報の登録
     @Transactional
     public void registerAttendance(SessionEntity session, List<EntryLogEntity> logs, Map<Integer, Integer> manualChanges) {
         
-        // ステータスマスタをMap化
+        // 出席ステータスをMapで取得
         Map<Integer, AttendanceStatusEntity> statusMap = attendanceStatusRepository.findAll().stream()
                 .collect(Collectors.toMap(AttendanceStatusEntity::getStatusId, Function.identity()));
         
-        // 履修生を取得 (DepartmentIdとGradeで絞り込み)
+        // 履修生を取得 
         List<EnrollmentsEntity> enrollments = enrollmentsRepository.findByDepartmentIdAndGrade(
             session.getDepartment().getDepartmentId(), 
             session.getTargetGrade()
@@ -56,14 +57,16 @@ public class SessionAttendanceService {
 
         // 判定基準時間
         LocalDateTime baseTime = session.getStartTime();
-        LocalDateTime lateBoundary = baseTime.plusMinutes(20);   // 20分まで
-        LocalDateTime absentBoundary = baseTime.plusMinutes(30); // 30分まで
+        LocalDateTime lateBoundary = baseTime.plusMinutes(20);   
+        LocalDateTime absentBoundary = baseTime.plusMinutes(30); 
 
-        // ★追加ロジック: 直前の授業（同教室）の出席状況を取得
+        // 直前授業の出席状況マップを取得
         Map<Integer, Integer> prevStatusMap = getPreviousSessionStatusMap(session);
 
+        // 出席情報を作成・保存
         List<AttendanceEntity> attendancesToSave = new ArrayList<>();
 
+        // 各履修生について出席情報を作成
         for (EnrollmentsEntity enrollment : enrollments) {
             Integer studentId = enrollment.getStudent().getUserId();
             AttendanceEntity attendance = new AttendanceEntity();
@@ -72,16 +75,16 @@ public class SessionAttendanceService {
 
             Integer statusId;
 
-            // 1. 手動変更がある場合を最優先
+            // 出席ステータス判定ロジック
             if (manualChanges != null && manualChanges.containsKey(studentId)) {
                 statusId = manualChanges.get(studentId);
             } 
             else {
-                // 2. 入室ログ判定
+
+                // 入室ログ確認
                 EntryLogEntity myLog = logs.stream()
                     .filter(l -> l.getUserId().equals(studentId))
                     .findFirst().orElse(null);
-
                 if (myLog != null) {
                     if (myLog.getEntryTime().isAfter(absentBoundary)) {
                         statusId = 2; // 欠席
@@ -91,8 +94,8 @@ public class SessionAttendanceService {
                         statusId = 1; // 出席
                     }
                 } else {
-                    // 3. 連続授業判定 (ログがない場合)
-                    // 直前の授業（同教室）があれば、そのステータスを引き継ぐ
+                    
+                    // 入室ログなしの場合、直前授業のステータスを参照
                     if (prevStatusMap.containsKey(studentId)) {
                         Integer prevStatus = prevStatusMap.get(studentId);
                         if (prevStatus == 2) {
@@ -108,7 +111,7 @@ public class SessionAttendanceService {
                 }
             }
 
-            // Entity設定
+            // ステータスエンティティを設定
             AttendanceStatusEntity statusEntity = statusMap.get(statusId);
             if (statusEntity == null) statusEntity = statusMap.get(2); // デフォルト欠席
             
@@ -120,14 +123,11 @@ public class SessionAttendanceService {
         attendanceRepository.saveAll(attendancesToSave);
     }
 
-    /**
-     * 同じ日・同じ教科・同じ学科・同じ学年の「一つ前のコマ」の出席状況を取得するヘルパーメソッド
-     * ※「同じ教室」である場合のみデータを返す
-     */
+    // 直前授業の出席状況マップを取得するメソッド
     private Map<Integer, Integer> getPreviousSessionStatusMap(SessionEntity currentSession) {
         Map<Integer, Integer> map = new HashMap<>();
 
-        // 1. 同日の同条件（学科・学年・科目・日付）のセッションを検索
+        // 同じ日付・学年・科目・学科のセッションを取得
         List<SessionEntity> sameDaySessions = sessionRepository.findByDepartmentAndTargetGradeAndSubjectAndSessionDate(
                 currentSession.getDepartment(),
                 currentSession.getTargetGrade(),
@@ -135,12 +135,12 @@ public class SessionAttendanceService {
                 currentSession.getSessionDate()
         );
 
-        // 2. 現在のコマ(SlotId)より小さい中で最大のものを探す（＝直前の授業）
+        // 直前の授業を特定
         Optional<SessionEntity> prevSessionOpt = sameDaySessions.stream()
                 .filter(s -> s.getTimeSlot().getSlotId() < currentSession.getTimeSlot().getSlotId())
                 .max(Comparator.comparingInt(s -> s.getTimeSlot().getSlotId()));
 
-        // 3. 直前の授業があり、かつ「同じ教室」である場合のみ引き継ぎ対象とする
+        // 教室が同じ場合のみ出席状況を取得
         if (prevSessionOpt.isPresent()) {
             SessionEntity prevSession = prevSessionOpt.get();
 
@@ -148,6 +148,7 @@ public class SessionAttendanceService {
             boolean isSameClassroom = prevSession.getClassroom().getClassroomId()
                                         .equals(currentSession.getClassroom().getClassroomId());
 
+            // 同じ教室の場合、出席状況をマップに格納
             if (isSameClassroom) {
                 List<AttendanceEntity> prevAttendances = attendanceRepository.findBySessionId(prevSession.getSessionId());
                 for (AttendanceEntity att : prevAttendances) {
@@ -155,7 +156,6 @@ public class SessionAttendanceService {
                 }
             }
         }
-
         return map;
     }
 }

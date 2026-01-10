@@ -3,278 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <title>授業開始設定</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        body { background-color: #f8f9fa; }
-        .setup-card { max-width: 800px; margin: 40px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .section-title { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; color: #555; }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link th:href="@{/css/session/session.css}" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div class="setup-card">
-            <h2 class="text-center mb-4 text-primary">授業開始設定</h2>
-            
-            <form id="startSessionForm">
-                <input type="hidden" id="userId" th:value="${userId}">
 
-                <h5 class="section-title">日時・場所・科目</h5>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">日付</label>
-                        <input type="date" id="sessionDate" class="form-control" th:value="${defaultDate}" required onchange="autoFillTimetable()">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">時限</label>
-                        <select id="slotId" class="form-select" required onchange="autoFillTimetable()">
-                            <option value="" disabled selected>時限を選択</option>
-                            <option th:each="slot : ${timeSlotList}" th:value="${slot.slotId}" th:text="${slot.slotId} + '限'"></option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">科目</label>
-                        <select id="subjectId" class="form-select" required>
-                            <option value="">科目を選択</option>
-                            <option th:each="sub : ${subjectList}" th:value="${sub.subjectId}" th:text="${sub.subjectName}"></option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">実施教室</label>
-                        <select id="classroomId" class="form-select" required>
-                            <option value="">教室を選択</option>
-                            <option th:each="room : ${classroomList}" th:value="${room.classroomId}" th:text="${room.classroomName}"></option>
-                        </select>
-                    </div>
-                </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">出席管理システム</a>
+        </div>
+    </nav>
 
-                <h5 class="section-title mt-4">対象クラス (学科→コース→学年→クラス)</h5>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">① 学科 (Major)</label>
-                        <select id="majorSelect" class="form-select" required onchange="loadCourses()">
-                            <option value="" selected disabled>学科を選択</option>
-                            <option th:each="m : ${majorList}" th:value="${m.majorId}" th:text="${m.majorName}"></option>
-                        </select>
+    <div class="container pb-5 mb-5">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                授業設定
+            </div>
+            <div class="card-body">
+                <form id="startSessionForm">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="date" class="form-label">日付</label>
+                            <input type="date" id="date" class="form-control" th:value="${defaultDate}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="slotId" class="form-label">時限</label>
+                            <select id="slotId" class="form-select" required>
+                                <option value="" disabled selected>選択してください</option>
+                                <option th:each="slot : ${timeSlotList}" 
+                                        th:value="${slot.slotId}" 
+                                        th:text="${slot.slotId} + '限 (' + ${slot.startTime} + '-' + ${slot.endTime} + ')'"></option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">② コース (Course)</label>
-                        <select id="courseSelect" class="form-select" disabled required onchange="loadGrades()">
-                            <option value="">先に学科を選択</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">③ 学年 (Grade)</label>
-                        <select id="gradeSelect" class="form-select" disabled required onchange="loadClasses()">
-                            <option value="">先にコースを選択</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">④ クラス (Class)</label>
-                        <select id="classSelect" class="form-select" disabled required>
-                            <option value="">先に学年を選択</option>
-                        </select>
-                    </div>
-                </div>
 
-                <button type="button" onclick="startSession()" class="btn btn-primary w-100 py-2 mt-3 fs-5">授業を開始する</button>
-            </form>
+                    <hr>
+
+                    <h5 class="mb-3">対象クラス選択</h5>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="majorId" class="form-label">学科 (Major)</label>
+                            <select id="majorId" class="form-select">
+                                <option value="" selected>選択してください</option>
+                                <option th:each="m : ${majorList}" th:value="${m.majorId}" th:text="${m.majorName}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="courseId" class="form-label">コース (Course)</label>
+                            <select id="courseId" class="form-select" disabled>
+                                <option value="" selected>学科を選択してください</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="grade" class="form-label">学年</label>
+                            <select id="grade" class="form-select" disabled>
+                                <option value="" selected>コースを選択してください</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="departmentId" class="form-label">クラス (Class)</label>
+                            <select id="departmentId" class="form-select" disabled>
+                                <option value="" selected>学年を選択してください</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="subjectId" class="form-label">科目</label>
+                            <select id="subjectId" class="form-select" required>
+                                <option value="" disabled selected>選択してください</option>
+                                <option th:each="sub : ${subjectList}" th:value="${sub.subjectId}" th:text="${sub.subjectName}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="classroomId" class="form-label">教室</label>
+                            <select id="classroomId" class="form-select" required>
+                                <option value="" disabled selected>選択してください</option>
+                                <option th:each="room : ${classroomList}" th:value="${room.classroomId}" th:text="${room.classroomName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="button" class="btn btn-secondary me-md-2" onclick="fillTimetable()">時間割から反映 (任意)</button>
+                        <button type="button" class="btn btn-primary" onclick="startSession()">授業開始</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <script th:inline="javascript">
-        // 共通：セレクトボックスリセット
-        function resetSelect(el, txt) {
-            el.innerHTML = `<option value="">${txt}</option>`;
-            el.disabled = true;
-        }
-
-        // 1. 学科 -> コース
-        async function loadCourses() {
-            const majorId = document.getElementById('majorSelect').value;
-            const courseSelect = document.getElementById('courseSelect');
-            
-            resetSelect(courseSelect, 'コースを選択');
-            resetSelect(document.getElementById('gradeSelect'), '先にコースを選択');
-            resetSelect(document.getElementById('classSelect'), '先に学年を選択');
-
-            if (!majorId) return;
-
-            try {
-                const res = await fetch('/session/api/options/courses?majorId=' + majorId);
-                const courses = await res.json();
-                
-                courses.forEach(c => {
-                    courseSelect.add(new Option(c.courseName, c.courseId));
-                });
-                courseSelect.disabled = false;
-                
-                if (courses.length === 1) {
-                    courseSelect.value = courses[0].courseId;
-                    await loadGrades(); 
-                }
-            } catch (e) {
-                console.error("Error loading courses:", e);
-            }
-        }
-
-        // 2. コース -> 学年
-        async function loadGrades() {
-            const courseId = document.getElementById('courseSelect').value;
-            const gradeSelect = document.getElementById('gradeSelect');
-            
-            resetSelect(gradeSelect, '学年を選択');
-            resetSelect(document.getElementById('classSelect'), '先に学年を選択');
-
-            if (!courseId) return;
-
-            try {
-                const res = await fetch('/session/api/options/grades?courseId=' + courseId);
-                const grades = await res.json();
-                
-                grades.forEach(g => {
-                    gradeSelect.add(new Option(g + '年', g));
-                });
-                gradeSelect.disabled = false;
-            } catch (e) {
-                console.error("Error loading grades:", e);
-            }
-        }
-
-        // 3. 学年 -> クラス
-        async function loadClasses() {
-            const courseId = document.getElementById('courseSelect').value;
-            const grade = document.getElementById('gradeSelect').value;
-            const classSelect = document.getElementById('classSelect');
-            
-            resetSelect(classSelect, 'クラスを選択');
-
-            if (!courseId || !grade) return;
-
-            try {
-                const res = await fetch(`/session/api/options/classes?courseId=${courseId}&grade=${grade}`);
-                const classes = await res.json();
-                
-                classes.forEach(c => {
-                    classSelect.add(new Option(c.className + '組', c.departmentId));
-                });
-                classSelect.disabled = false;
-            } catch (e) {
-                console.error("Error loading classes:", e);
-            }
-        }
-
-        // 4. 時間割自動入力
-        async function autoFillTimetable() {
-            const userId = document.getElementById('userId').value;
-            const date = document.getElementById('sessionDate').value;
-            const slotId = document.getElementById('slotId').value;
-            
-            if (!date || !slotId) return;
-
-            try {
-                const res = await fetch(`/session/api/timetable/get?userId=${userId}&date=${date}&slotId=${slotId}`);
-                if (!res.ok) return;
-                
-                const data = await res.json();
-                console.log("取得データ:", data);
-
-                if (data.subjectId) document.getElementById('subjectId').value = data.subjectId;
-                if (data.classroomId) document.getElementById('classroomId').value = data.classroomId;
-
-                if (data.majorId) {
-                    document.getElementById('majorSelect').value = data.majorId;
-                    await loadCourses(); 
-
-                    if (data.courseId) {
-                        document.getElementById('courseSelect').value = data.courseId; 
-                        await loadGrades();
-
-                        if (data.grade) {
-                            document.getElementById('gradeSelect').value = data.grade;
-                            await loadClasses();
-
-                            if (data.departmentId) {
-                                document.getElementById('classSelect').value = data.departmentId;
-                            }
-                        }
-                    }
-                }
-            } catch (e) {
-                console.error("Auto-fill error:", e);
-            }
-        }
-
-        // ★★★ 5. 送信処理（ここが修正のメイン） ★★★
-        function startSession() {
-            const form = document.getElementById('startSessionForm');
-
-            // 1. バリデーションチェック（入力漏れがあればここで止まる）
-            if (!form.checkValidity()) {
-                form.reportValidity(); // ブラウザ標準の「入力してください」を表示
-                return;
-            }
-
-            // 2. ポップアップウィンドウを「通信前に」開く
-            const windowName = 'attendanceWin_' + Date.now();
-            const newWindow = window.open('about:blank', windowName, 'width=1100,height=850,popup=yes');
-
-            if (newWindow) {
-                newWindow.document.write('<html><body style="display:flex;justify-content:center;align-items:center;height:100vh;"><h3>準備中...</h3></body></html>');
-            } else {
-                alert('ポップアップがブロックされました。ブラウザ設定を確認してください。');
-                return;
-            }
-
-            // 3. データ作成とFetch
-            const deptId = document.getElementById('classSelect').value;
-            const payload = {
-                date: document.getElementById('sessionDate').value,
-                slotId: parseInt(document.getElementById('slotId').value),
-                subjectId: parseInt(document.getElementById('subjectId').value),
-                classroomId: parseInt(document.getElementById('classroomId').value),
-                departmentId: deptId ? parseInt(deptId) : null,
-                targetGrade: parseInt(document.getElementById('gradeSelect').value)
-            };
-
-            fetch('/session/start', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(async res => {
-                // エラー時処理
-                if (!res.ok) {
-                    const text = await res.text();
-                    const errorMsg = text || "サーバー側でエラーが発生しました (" + res.status + ")";
+    <div class="modal fade" id="conflictModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">未終了の授業があります</h5>
+                </div>
+                <div class="modal-body">
+                    <p id="conflictMessage">他の授業が終了していません。</p>
+                    <p>どちらの操作を行いますか？</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" onclick="openConflictSession()">
+                        未終了の画面を開く
+                    </button>
                     
-                    // ウィンドウを閉じる
-                    newWindow.close(); 
+                    <button type="button" class="btn btn-danger" onclick="forceEndSession()">
+                        強制終了して新規作成
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    // 409 Conflict (重複) などのエラー表示
-                    alert(errorMsg); 
-                    return null;
-                }
-                return res.json();
-            })
-            .then(d => {
-                if (d && d.sessionId) {
-                    // 成功時：ウィンドウのURLを更新
-                    newWindow.location.href = '/session/active/' + d.sessionId;
-                    
-                    // 親画面のリロード
-                    setTimeout(() => location.reload(), 500);
-                }
-            })
-            .catch(err => {
-                if (!newWindow.closed) newWindow.close();
-                console.error(err);
-                alert('通信エラーが発生しました。\n' + err.message);
-            });
-        }
-    </script>
+<input type="hidden" id="conflictSessionId">
+<input type="hidden" id="activeSessionId" th:value="${activeSession != null ? activeSession.sessionId : ''}">
+<input type="hidden" id="userId" th:value="${userId}">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/session/session.js}"></script>
 </body>
 </html>

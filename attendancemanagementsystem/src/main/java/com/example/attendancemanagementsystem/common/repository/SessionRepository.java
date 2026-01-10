@@ -13,11 +13,12 @@ import com.example.attendancemanagementsystem.common.entity.SessionEntity;
 import com.example.attendancemanagementsystem.common.entity.SubjectEntity;
 
 @Repository
-public interface SessionRepository extends JpaRepository<SessionEntity, Integer>{
-    //実施中の授業を探すメソッド
+public interface SessionRepository extends JpaRepository<SessionEntity, Integer> {
+
+    // 実施中の授業を探すメソッド (単一取得用)
     SessionEntity findFirstBySessionFlagOrderBySessionIdDesc(boolean sessionFlag);
 
-    // 教員のユーザIDにもとづく実施中セッションの取得
+    //教員のユーザIDにもとづく実施中セッションの取得 (複数返却可)
     @Query("SELECT s FROM SessionEntity s WHERE s.userId = :userId AND s.sessionFlag = false")
     List<SessionEntity> findActiveSessionsByUserId(@Param("userId") Integer userId);
 
@@ -29,6 +30,7 @@ public interface SessionRepository extends JpaRepository<SessionEntity, Integer>
         @Param("slotId") Integer slotId
     );
 
+    // 前回の授業状態を確認するため等に使用
     List<SessionEntity> findByDepartmentAndTargetGradeAndSubjectAndSessionDate(
         DepartmentEntity department, 
         Integer targetGrade, 

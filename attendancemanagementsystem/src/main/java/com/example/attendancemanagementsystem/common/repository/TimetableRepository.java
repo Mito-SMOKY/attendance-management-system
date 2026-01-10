@@ -16,17 +16,17 @@ import com.example.attendancemanagementsystem.common.entity.TimetableEntity;
 @Repository
 public interface TimetableRepository extends JpaRepository<TimetableEntity, Integer> {
 
-    // 既存: 学科と日付の範囲 (startDate から endDate まで) で時間割を検索
+    // 学科と日付範囲で時間割を取得
     List<TimetableEntity> findByDepartmentAndDateBetween(DepartmentEntity department, LocalDate startDate, LocalDate endDate);
 
     // メソッド名の "_DepartmentID" は、TimetableEntity内の departmentフィールドの中にある DepartmentID を指します
     List<TimetableEntity> findByDateAndDepartment_DepartmentIdOrderBySlotId(LocalDate date, Integer departmentId);
 
-    // ① その学科の「科目」一覧を取得
+    // 特定の学科に関連する科目の取得
     @Query("SELECT DISTINCT t FROM TimetableEntity t WHERE t.department.departmentId = :deptId")
     List<TimetableEntity> findDistinctSubjectsByDepartment(@Param("deptId") Integer deptId);
 
-    // ② 特定の学科・科目で、今日までに実施された授業コマ数をカウント
+    // 特定の学科・科目で、今日までに実施された授業コマ数をカウント
     @Query("SELECT COUNT(t) FROM TimetableEntity t " +
         "WHERE t.department.departmentId = :deptId " +
         "AND t.subjectId = :subjectId " +
@@ -52,19 +52,28 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
     //指定したユーザIDの時間割エンティティの特定の日付・時限のエンティティを取得
     Optional<TimetableEntity> findByUserIdAndDateAndSlotId(Integer userId, LocalDate date, Integer slotId);
 
-    // 指定したユーザID・日付・時限のシンプルな時間割データを取得
-    @Query(value = "SELECT " +
-            "  t.SubjectID as subjectId, " +
-            "  t.ClassroomID as classroomId, " +
-            "  t.DepartmentID as departmentId " +  
-            "FROM timetable t " +
-            "WHERE t.UserID = :userId " +
-            "  AND t.Date = :date " +
-            "  AND t.SlotID = :slotId " +
-            "LIMIT 1", nativeQuery = true)
+    // 指定した教員・日付・時間帯の簡易時間割情報を取得
+    @Query("SELECT new map(" +
+        "  sub.subjectId as subjectId, " +
+        "  room.classroomId as classroomId, " +
+        "  dept.departmentId as departmentId, " +
+        "  ds.grade as targetGrade, " +       
+        "  m.majorId as majorId, " +
+        "  c.courseId as courseId " +
+        ") " +
+        "FROM TimetableEntity t " +
+        "JOIN t.subject sub " +               
+        "JOIN t.classroom room " +            
+        "JOIN t.department dept " +           
+        "JOIN dept.major m " +
+        "LEFT JOIN m.course c " +
+        "JOIN DepartmentSubject ds ON ds.department = dept AND ds.subject = sub " +
+        "WHERE t.userId = :userId " +         
+        "AND t.date = :date " +               
+        "AND t.slotId = :slotId")            
     Map<String, Object> findSimpleTimetableData(
-        @Param("userId") Integer userId, 
-        @Param("date") LocalDate date, 
-        @Param("slotId") Integer slotId
+            @Param("userId") Integer userId, 
+            @Param("date") LocalDate date, 
+            @Param("slotId") Integer slotId
     );
 }

@@ -57,17 +57,17 @@ public class SessionController {
     private final MajorRepository majorRepository;
 
     public SessionController(SessionService sessionService,
-                             SessionDtoMapper sessionDtoMapper,
-                             ClassroomRepository classroomRepository,
-                             SubjectRepository subjectRepository,
-                             AttendanceStatusRepository attendanceStatusRepository,
-                             UsersRepository usersRepository,
-                             TimeSlotRepository timeSlotRepository,
-                             EnrollmentsRepository enrollmentsRepository,
-                             TimetableRepository timetableRepository,
-                             DepartmentRepository departmentRepository,
-                             CourseRepository courseRepository,
-                             MajorRepository majorRepository) {
+                            SessionDtoMapper sessionDtoMapper,
+                            ClassroomRepository classroomRepository,
+                            SubjectRepository subjectRepository,
+                            AttendanceStatusRepository attendanceStatusRepository,
+                            UsersRepository usersRepository,
+                            TimeSlotRepository timeSlotRepository,
+                            EnrollmentsRepository enrollmentsRepository,
+                            TimetableRepository timetableRepository,
+                            DepartmentRepository departmentRepository,
+                            CourseRepository courseRepository,
+                            MajorRepository majorRepository) {
         this.sessionService = sessionService;
         this.sessionDtoMapper = sessionDtoMapper;
         this.classroomRepository = classroomRepository;
@@ -82,17 +82,16 @@ public class SessionController {
         this.majorRepository = majorRepository;
     }
 
+    // 初期表示
     @GetMapping
     public String showSetupPage(Model model, Principal principal) {
+
+        // ログイン中のユーザ情報を取得
         UsersEntity user = usersRepository.findByLoginId(principal.getName())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        // モデルに必要なデータを追加
         model.addAttribute("userId", user.getUserId());
-        
-        // アクティブセッションがあればモデルに追加（HTML側でポップアップ表示に使用）
-        sessionService.findActiveSessionByUserId(user.getUserId())
-                .ifPresent(s -> model.addAttribute("activeSession", s));
-        
         model.addAttribute("subjectList", subjectRepository.findAll());
         model.addAttribute("classroomList", classroomRepository.findAll());
         model.addAttribute("timeSlotList", timeSlotRepository.findAll());
@@ -102,15 +101,15 @@ public class SessionController {
         return "session/session";
     }
 
+    // 時間割反映API
     @GetMapping("/api/timetable/get")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getTimetable(
             @RequestParam("userId") Integer userId,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam("slotId") Integer slotId) {
-
-        Map<String, Object> result = timetableRepository.findSimpleTimetableData(userId, date, slotId);
         
+        Map<String, Object> result = timetableRepository.findSimpleTimetableData(userId, date, slotId);
         if (result != null && !result.isEmpty()) {
             return ResponseEntity.ok(result);
         } else {
@@ -118,10 +117,13 @@ public class SessionController {
         }
     }
 
+    // 授業開始API
     @PostMapping("/start")
     @ResponseBody
     public ResponseEntity<?> startSession(@RequestBody StartSessionDto request, Principal principal) {
         try {
+
+            // ログイン中のユーザ情報を取得
             UsersEntity user = usersRepository.findByLoginId(principal.getName())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
             
@@ -135,13 +137,14 @@ public class SessionController {
                 request.getTargetGrade()
             );
 
+            // 成功したらセッションIDを返す
             Map<String, Object> response = new HashMap<>();
             response.put("sessionId", session.getSessionId());
             return ResponseEntity.ok(response);
 
         } catch (IllegalStateException e) {
-            // Serviceで投げた「違う時限の授業が進行中」というエラーをキャッチ
-            // 409 Conflict とエラーメッセージを返す (JS側でalert表示に使用)
+            
+            // 既に実施中のセッションがある場合
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(e.getMessage());
@@ -153,15 +156,18 @@ public class SessionController {
         }
     }
 
-    // ★追加: 強制終了API (HTMLのポップアップから呼ばれる)
+    // 強制終了API
     @PostMapping("/api/force-end")
     @ResponseBody
     public ResponseEntity<String> forceEndSession(@RequestBody Map<String, Integer> payload) {
+
+        // セッションIDをペイロードから取得
         Integer sessionId = payload.get("sessionId");
         if (sessionId == null) {
             return ResponseEntity.badRequest().body("Session ID is required");
         }
         
+        // 強制終了処理を実行
         try {
             sessionService.forceEndSession(sessionId);
             return ResponseEntity.ok("Force ended successfully");
@@ -172,50 +178,85 @@ public class SessionController {
         }
     }
 
+    // 実施中授業画面表示
     @GetMapping("/active/{sessionId}")
     public String showActiveSession(@PathVariable Integer sessionId, Model model) {
+
+        // セッション情報を取得してDTOに変換
         SessionEntity session = sessionService.getSession(sessionId);
         SessionDto sessionDto = sessionDtoMapper.toDto(session);
 
+        // モデルに追加
         model.addAttribute("sessionDto", sessionDto);
         model.addAttribute("statusList", attendanceStatusRepository.findAll()); 
 
         return "session/sessionActive"; 
     }
 
+    // 出席者リスト取得API
     @GetMapping("/api/attendees/{sessionId}")
     @ResponseBody
     public List<SessionDto> getAttendees(@PathVariable Integer sessionId) {
         return sessionService.getSessionAttendees(sessionId);
     }
     
+    // 実施中セッション確認API
+    @GetMapping("/api/active/check")
+    @ResponseBody
+    public ResponseEntity<Map<String, Integer>> checkActiveSession(@RequestParam("userId") Integer userId) {
+        
+        // 実施中セッションをユーザIDで検索
+        return sessionService.findActiveSessionByUserId(userId)
+            .map(session -> {
+
+                // 見つかった場合: セッションIDを返す
+                Map<String, Integer> response = new HashMap<>();
+                response.put("sessionId", session.getSessionId());
+                return ResponseEntity.ok(response);
+            })
+            .orElseGet(() -> {
+                
+                // 見つからなかった場合: 404を返す
+                return ResponseEntity.notFound().build();
+            });
+    }
+    
+    // 授業終了API
     @PostMapping("/end")
     @ResponseBody
     public Map<String, String> endSession(@RequestBody EndSessionDto request) {
+
+        // 授業終了処理を実行
         sessionService.endSession(request.getSessionId(), request.getChanges());
         Map<String, String> response = new HashMap<>();
         response.put("message", "Session ended.");
         return response;
     }
 
+    // 授業取消API
     @PostMapping("/cancel")
     @ResponseBody
     public Map<String, String> cancelSession(@RequestBody Map<String, Integer> payload) {
+
+        // セッションIDをペイロードから取得
         Integer sessionId = payload.get("sessionId");
         sessionService.cancelSession(sessionId);
+
+        // 処理完了メッセージを返す
         Map<String, String> response = new HashMap<>();
         response.put("message", "Session cancelled.");
         return response;
     }
 
-    // --- 連動プルダウン用API ---
-
-    // ① 学科(Major) -> コース(Course)
+    // 学科 -> コース
     @GetMapping("/api/options/courses")
     @ResponseBody
     public List<Map<String, Object>> getCourses(@RequestParam("majorId") Integer majorId) {
+
+        // 指定された学科IDからコース情報を取得
         MajorEntity major = majorRepository.findById(majorId).orElse(null);
         
+        // コース情報をマップ形式で返す
         if (major != null && major.getCourse() != null) {
             Map<String, Object> courseMap = new HashMap<>();
             courseMap.put("courseId", major.getCourse().getCourseId());
@@ -225,24 +266,27 @@ public class SessionController {
         return List.of();
     }
 
-    // ② コース(Course) -> 学年(Grade)
+    // コース -> 学年
     @GetMapping("/api/options/grades")
     @ResponseBody
     public List<Integer> getGrades(@RequestParam("courseId") Integer courseId) {
+
+        // 指定されたコースIDから学年一覧を取得して返す
         return enrollmentsRepository.findDistinctGradesByCourseId(courseId);
     }
 
-    // ③ コース(Course) + 学年(Grade) -> クラス(IDと名前)
+    // コース + 学年 -> クラス
     @GetMapping("/api/options/classes")
     @ResponseBody
     public List<Map<String, Object>> getClasses(
             @RequestParam("courseId") Integer courseId, 
             @RequestParam("grade") Integer grade) {
         
+        // 指定されたコースIDと学年から学科IDとクラス名の組み合わせを取得
         List<Object[]> results = enrollmentsRepository.findDistinctDepartmentIdAndClass(courseId, grade);
-        
         List<Map<String, Object>> responseList = new ArrayList<>();
-
+        
+        // 結果をマップ形式に変換してリストに追加
         for (Object[] row : results) {
             Map<String, Object> map = new HashMap<>();
             map.put("departmentId", row[0]);
