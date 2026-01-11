@@ -51,7 +51,7 @@ public enum NotificationType {
     OFFICIAL_ABSENCE_REQUEST(
         6,
         "【公欠申請】申請が届きました", 
-        "承認者殿\n\n%s さんから公欠申請が提出されました。\n理由: %s\n\n詳細を確認して承認または却下を行ってください。",
+        "%s先生へ\n\n%s さんから公欠申請が提出されました。\n理由: %s\n\n詳細を確認して承認または却下を行ってください。",
         "REQUEST"
     ),
 
