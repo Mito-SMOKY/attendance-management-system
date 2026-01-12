@@ -28,7 +28,7 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 
 @Service
-@Transactional(readOnly = true) // ★追加: 検索時のデータ読み込みを安定させる
+@Transactional(readOnly = true)
 public class AdminStudentListService {
 
     @Autowired
@@ -43,14 +43,11 @@ public class AdminStudentListService {
     @Autowired
     private CourseRepository courseRepository;
 
-    /**
-     * ★修正版: 検索フィルター用の選択肢（学科一覧・コース一覧）を取得する
-     * エンティティをそのまま返すとJSON変換でエラーになるため、Mapに詰め替えて返す
-     */
+    // フィルター選択肢(学科・コース一覧)取得
     public Map<String, Object> getFilterOptions() {
         Map<String, Object> options = new HashMap<>();
         
-        // 学科一覧 (MajorEntity -> Map)
+        // 学科一覧 
         List<Map<String, Object>> majors = majorRepository.findAll().stream().map(m -> {
             Map<String, Object> map = new HashMap<>();
             map.put("majorId", m.getMajorId());
@@ -59,7 +56,7 @@ public class AdminStudentListService {
         }).collect(Collectors.toList());
         options.put("majors", majors);
         
-        // コース一覧 (CourseEntity -> Map)
+        // コース一覧 
         List<Map<String, Object>> courses = courseRepository.findAll().stream().map(c -> {
             Map<String, Object> map = new HashMap<>();
             map.put("courseId", c.getCourseId());
@@ -71,34 +68,33 @@ public class AdminStudentListService {
         return options;
     }
 
-    /**
-     * 生徒一覧を検索・取得し、画面表示用に整形して返す
-     */
+    // 生徒一覧検索
     public Map<String, Object> searchStudents(int page, int size, String keyword, 
                                             Integer departmentId, Integer grade, Integer courseId) {
 
         // --- 1. 検索条件 (Specification) の構築 ---
         Specification<StudentEntity> spec = Specification.where(null);
 
-        // A. キーワード検索
+        // キーワード検索
         if (keyword != null && !keyword.isEmpty()) {
             List<String> targetColumns = Arrays.asList("users.name", "users.loginId");
-            // SearchServiceを利用
+            
+            // キーワード検索スペックの作成
             Specification<StudentEntity> searchSpec = searchService.createKeywordSpec(keyword, targetColumns);
             spec = spec.and(searchSpec);
         }
 
-        // B. フィルター検索 (EnrollmentsテーブルをJOIN)
+        // フィルター検索 
         if (departmentId != null || grade != null || courseId != null) {
             spec = spec.and((root, query, cb) -> {
                 query.distinct(true);
                 Join<StudentEntity, EnrollmentsEntity> joinEnrollments = root.join("enrollments", JoinType.INNER);
                 List<Predicate> predicates = new ArrayList<>();
 
-                // 条件: 有効な在籍情報
+                // 有効な在籍情報
                 predicates.add(cb.equal(joinEnrollments.get("isActive"), true));
 
-                // フィルター: 学科ID (MajorIDとして検索)
+                // フィルター: 学科ID
                 if (departmentId != null) {
                     predicates.add(cb.equal(
                         joinEnrollments.get("department").get("major").get("majorId"), 
@@ -123,11 +119,11 @@ public class AdminStudentListService {
             });
         }
 
-        // --- 2. ページングと検索実行 ---
+        // ページング付きデータ取得 
         Pageable pageable = PageRequest.of(page, size, Sort.by("userId").ascending());
         Page<StudentEntity> studentPage = studentRepository.findAll(spec, pageable);
 
-        // --- 3. データ整形 ---
+        // データ整形
         List<Map<String, Object>> students = studentPage.getContent().stream().map(student -> {
             Map<String, Object> map = new HashMap<>();
             
@@ -140,6 +136,7 @@ public class AdminStudentListService {
             String deptAndCourseName = "-";
             String classroomName = "-";
 
+            // 最新の有効な在籍情報を取得
             List<EnrollmentsEntity> enrollments = student.getEnrollments();
             if (enrollments != null) {
                 EnrollmentsEntity activeEnrollment = enrollments.stream()
@@ -147,6 +144,7 @@ public class AdminStudentListService {
                     .max((e1, e2) -> e1.getEnrollmentsId().compareTo(e2.getEnrollmentsId()))
                     .orElse(null);
 
+                // 在籍情報が存在する場合に各情報を設定
                 if (activeEnrollment != null) {
                     if (activeEnrollment.getGrade() != null) gradeStr = activeEnrollment.getGrade() + "年";
                     if (activeEnrollment.getDepartment() != null) {
@@ -155,24 +153,30 @@ public class AdminStudentListService {
                         
                         String dName = "";
                         String cName = "";
+
+                        // 学科・コース名の取得
                         if (activeEnrollment.getDepartment().getMajor() != null) {
                             dName = activeEnrollment.getDepartment().getMajor().getMajorName();
                             if (activeEnrollment.getDepartment().getMajor().getCourse() != null) {
                                 cName = activeEnrollment.getDepartment().getMajor().getCourse().getCourseName();
                             }
                         }
+                        // 学科・コース名の結合
                         if (!dName.isEmpty()) {
-                            deptAndCourseName = !cName.isEmpty() ? dName + " / " + cName : dName;
+                            deptAndCourseName = !cName.isEmpty() ? dName +("・") +cName : dName;
                         }
                     }
                 }
             }
+
+            // マップに設定
             map.put("grade", gradeStr);
             map.put("department", deptAndCourseName);
             map.put("classroom", classroomName);
             return map;
         }).collect(Collectors.toList());
 
+        // レスポンス生成
         Map<String, Object> response = new HashMap<>();
         response.put("content", students);
         response.put("totalPages", studentPage.getTotalPages());

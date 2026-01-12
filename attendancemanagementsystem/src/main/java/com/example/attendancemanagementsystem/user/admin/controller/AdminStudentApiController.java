@@ -31,7 +31,7 @@ public class AdminStudentApiController {
         return adminStudentService.searchStudents(page, size, keyword, departmentId, grade, courseId);
     }
 
-    // フィルター選択肢(学科・コース一覧)取得API
+    // フィルター選択肢取得API
     @GetMapping("/search-options")
     public Map<String, Object> getSearchOptions() {
         return adminStudentService.getFilterOptions();
