@@ -1,144 +1,218 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     // --- 設定 ---
-    const API_ENDPOINT = '/admin/api/students'; // データを取得するAPIのURL（※適宜合わせてください）
-    const PAGE_SIZE = 10; // 1ページあたりの表示件数
+    const API_ENDPOINT = '/admin/api/students';
+    const OPTION_API_ENDPOINT = '/admin/api/search-options';
+    const PAGE_SIZE = 10;
+    const PAGINATION_SIDE_PAGES = 1; // 現在のページの左右に何ページ表示するか（1なら前後1つずつ）
 
     // --- 要素の取得 ---
     const tableBody = document.getElementById('studentTableBody');
     const paginationContainer = document.getElementById('pagination');
-    const searchInput = document.getElementById('searchInput');
+    
+    // 検索・フィルター要素
+    const searchInput = document.getElementById('keywordSearch'); 
     const searchBtn = document.getElementById('searchBtn');
+    const departmentSelect = document.getElementById('departmentFilter');
+    const courseSelect = document.getElementById('courseFilter');
+
+    // --- CSRF対策 ---
+    const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+    const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+    const csrfToken = csrfTokenMeta ? csrfTokenMeta.content : '';
+    const csrfHeader = csrfHeaderMeta ? csrfHeaderMeta.content : '';
 
     // --- 状態管理 ---
     let currentPage = 0;
     let currentKeyword = '';
 
-    // --- 初期表示 ---
+    // --- グローバル関数定義 ---
+    window.executeSearch = function() {
+        if (searchInput) {
+            currentKeyword = searchInput.value.trim();
+        }
+        currentPage = 0;
+        fetchData(0);
+    };
+
+    // --- 初期化処理 ---
+    fetchFilterOptions();
     fetchData(0);
 
     // --- イベントリスナー ---
-    
-    // 検索ボタンクリック
     if (searchBtn) {
-        searchBtn.addEventListener('click', () => {
-            executeSearch();
-        });
+        searchBtn.addEventListener('click', window.executeSearch);
     }
 
-    // 検索窓でのEnterキー
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                e.preventDefault(); // フォーム送信を防ぐ
-                executeSearch();
+                e.preventDefault();
+                window.executeSearch();
             }
         });
     }
 
-    // 検索実行処理
-    function executeSearch() {
-        currentKeyword = searchInput.value.trim();
-        currentPage = 0; // 検索時は1ページ目に戻す
-        fetchData(0);
+    // --- フィルター選択肢生成 ---
+    async function fetchFilterOptions() {
+        try {
+            const response = await fetch(OPTION_API_ENDPOINT);
+            if (!response.ok) {
+                console.warn('Filter options API not found or error.');
+                return;
+            }
+            const data = await response.json();
+            
+            if (departmentSelect && data.majors) {
+                departmentSelect.innerHTML = '<option value="">全ての学科</option>';
+                data.majors.forEach(major => {
+                    const option = document.createElement('option');
+                    option.value = major.majorId;
+                    option.textContent = major.majorName;
+                    departmentSelect.appendChild(option);
+                });
+            }
+
+            if (courseSelect && data.courses) {
+                courseSelect.innerHTML = '<option value="">全てのコース</option>';
+                data.courses.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course.courseId;
+                    option.textContent = course.courseName;
+                    courseSelect.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching filter options:', error);
+        }
     }
 
-    // --- データ取得処理 ---
-    function fetchData(page) {
-        // クエリパラメータの構築
-        const params = new URLSearchParams({
-            page: page,
-            size: PAGE_SIZE,
-            keyword: currentKeyword
-        });
-
-        fetch(`${API_ENDPOINT}?${params.toString()}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('API request failed');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Spring DataのPageオブジェクトの構造を想定
-                // data.content: リストデータ, data.totalPages: 総ページ数, data.number: 現在ページ
-                const list = data.content || data.students || []; // APIの返し方に合わせて調整可能なように記述
-                const totalPages = data.totalPages || 0;
-                const pageNum = typeof data.number !== 'undefined' ? data.number : page;
-
-                renderTable(list);
-                renderPagination(pageNum, totalPages);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">データの取得に失敗しました</td></tr>';
+    // --- データ取得関数 ---
+    async function fetchData(pageIndex) {
+        try {
+            const params = new URLSearchParams({
+                page: pageIndex,
+                size: PAGE_SIZE
             });
+
+            if (currentKeyword) params.append('keyword', currentKeyword);
+
+            if (departmentSelect && departmentSelect.value) {
+                params.append('departmentId', departmentSelect.value);
+            }
+            if (courseSelect && courseSelect.value) {
+                params.append('courseId', courseSelect.value);
+            }
+
+            const gradeRadio = document.querySelector('input[name="gradeFilter"]:checked');
+            if (gradeRadio && gradeRadio.value) {
+                params.append('grade', gradeRadio.value);
+            }
+
+            const headers = { 'Content-Type': 'application/json' };
+            if (csrfToken && csrfHeader) {
+                headers[csrfHeader] = csrfToken;
+            }
+
+            const response = await fetch(`${API_ENDPOINT}?${params.toString()}`, {
+                method: 'GET',
+                headers: headers
+            });
+
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            
+            const data = await response.json();
+            
+            renderTable(data.content);
+            renderPagination(data.totalPages, data.number);
+            currentPage = data.number;
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            tableBody.innerHTML = '<tr><td colspan="5" style="color:red; padding:20px;">データの取得に失敗しました</td></tr>';
+        }
     }
 
-    // --- テーブル描画処理 ---
-    function renderTable(list) {
+    // --- テーブル描画関数 ---
+    function renderTable(students) {
         tableBody.innerHTML = '';
 
-        if (list.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">データが見つかりません</td></tr>';
+        if (!students || students.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5" style="padding:20px;">該当する生徒が見つかりません</td></tr>';
             return;
         }
 
-        list.forEach(student => {
-            const row = document.createElement('tr');
-            
-            // APIから返ってくるJSONのキー名に合わせてください
-            // ここでは一般的な名前(loginId, name, grade, department, classroom)を想定
-            const loginId = escapeHtml(student.loginId || '-');
-            const dept = escapeHtml(student.department || '-');
-            const grade = escapeHtml(student.grade || '-');
-            const cls = escapeHtml(student.classroom || '-');
-            const name = escapeHtml(student.name || '-');
+        students.forEach(student => {
+            const tr = document.createElement('tr');
 
-            row.innerHTML = `
-                <td>${loginId}</td>
-                <td>${dept}</td>
-                <td>${grade}</td>
-                <td>${cls}</td>
-                <td>${name}</td>
-            `;
-            tableBody.appendChild(row);
+            const idCell = document.createElement('td');
+            idCell.textContent = escapeHtml(student.loginId || ''); 
+            tr.appendChild(idCell);
+
+            const deptCell = document.createElement('td');
+            deptCell.textContent = escapeHtml(student.department || '-');
+            tr.appendChild(deptCell);
+
+            const gradeCell = document.createElement('td');
+            gradeCell.textContent = escapeHtml(student.grade || '-');
+            tr.appendChild(gradeCell);
+
+            const classCell = document.createElement('td');
+            classCell.textContent = escapeHtml(student.classroom || '-');
+            tr.appendChild(classCell);
+
+            const nameCell = document.createElement('td');
+            const link = document.createElement('a');
+            link.href = `/admin/attendance/${student.userId}`; 
+            link.textContent = student.name;
+            link.classList.add('student-name-link');
+            nameCell.appendChild(link);
+            tr.appendChild(nameCell);
+
+            tableBody.appendChild(tr);
         });
     }
 
-    // --- ページネーション描画処理 ---
-    function renderPagination(current, total) {
+    // --- ★ページネーション描画関数 (修正版) ---
+    function renderPagination(totalPages, currentPageIndex) { // currentPageIndexは0始まり
         paginationContainer.innerHTML = '';
+        if (totalPages <= 1) return;
 
-        if (total <= 1) return; // 1ページしかないならページネーション非表示
+        // APIは0始まりだが、表示は1始まりで計算する
+        const current = currentPageIndex + 1;
+        const sidePages = PAGINATION_SIDE_PAGES;
 
-        // 「前へ」ボタン
-        const prevLink = createPageItem('＜', current - 1, current > 0);
-        paginationContainer.appendChild(prevLink);
+        // ＜ (前へ) ボタン
+        paginationContainer.appendChild(createPageItem('＜', currentPageIndex - 1, currentPageIndex > 0));
 
-        // ページ番号 (簡易的に前後2ページを表示するロジック)
-        let start = Math.max(0, current - 2);
-        let end = Math.min(total - 1, current + 2);
+        // ページ番号ボタンの生成ロジック
+        let lastAddedPage = 0;
 
-        // 端の調整
-        if (start === 0) {
-            end = Math.min(total - 1, 4); // 最初の方なら最大5個表示
-        }
-        if (end === total - 1) {
-            start = Math.max(0, total - 5); // 最後の方なら最大5個表示
-        }
+        for (let i = 1; i <= totalPages; i++) {
+            // 条件: 最初(1) OR 最後(totalPages) OR 現在地の周辺
+            if (i === 1 || i === totalPages || (i >= current - sidePages && i <= current + sidePages)) {
+                
+                // 直前に追加したページとの間に隙間がある場合、'...' を追加
+                if (lastAddedPage !== 0 && i > lastAddedPage + 1) {
+                    const dots = document.createElement('span');
+                    dots.textContent = '...';
+                    dots.className = 'page-dots';
+                    paginationContainer.appendChild(dots);
+                }
 
-        for (let i = start; i <= end; i++) {
-            const item = createPageItem(i + 1, i, true);
-            if (i === current) {
-                item.classList.add('active'); // CSSで .active スタイルが当たります
+                // ボタン作成 (APIへは i-1 を渡す)
+                const item = createPageItem(i, i - 1, true);
+                if (i === current) {
+                    item.classList.add('active');
+                }
+                paginationContainer.appendChild(item);
+                
+                lastAddedPage = i;
             }
-            paginationContainer.appendChild(item);
         }
 
-        // 「次へ」ボタン
-        const nextLink = createPageItem('＞', current + 1, current < total - 1);
-        paginationContainer.appendChild(nextLink);
+        // ＞ (次へ) ボタン
+        paginationContainer.appendChild(createPageItem('＞', currentPageIndex + 1, currentPageIndex < totalPages - 1));
     }
 
     function createPageItem(text, pageIndex, enabled) {
@@ -159,9 +233,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return a;
     }
 
-    // XSS対策用エスケープ
     function escapeHtml(str) {
-        if (str == null) return '';
+        if (!str) return '';
         return String(str)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')

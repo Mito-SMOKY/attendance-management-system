@@ -14,7 +14,6 @@ import com.example.attendancemanagementsystem.user.admin.service.AdminStudentLis
 @RequestMapping("/admin/api")
 public class AdminStudentApiController {
 
-    // ビジネスロジック用Serviceを注入
     @Autowired
     private AdminStudentListService adminStudentService;
 
@@ -23,9 +22,18 @@ public class AdminStudentApiController {
     public Map<String, Object> getStudents(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "keyword", required = false) String keyword) {
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "departmentId", required = false) Integer departmentId,
+            @RequestParam(name = "grade", required = false) Integer grade,
+            @RequestParam(name = "courseId", required = false) Integer courseId
+            ) {
 
-        // ビジネスロジックは全てServiceに委譲
-        return adminStudentService.searchStudents(page, size, keyword);
+        return adminStudentService.searchStudents(page, size, keyword, departmentId, grade, courseId);
+    }
+
+    // フィルター選択肢(学科・コース一覧)取得API
+    @GetMapping("/search-options")
+    public Map<String, Object> getSearchOptions() {
+        return adminStudentService.getFilterOptions();
     }
 }
