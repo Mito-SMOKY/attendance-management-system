@@ -11,7 +11,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 
@@ -37,7 +36,7 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
        //生徒と日付範囲で出欠情報を検索(カレンダー表示用)
        @Query("SELECT a FROM AttendanceEntity a " +
               "WHERE a.student = :student " +
-              "AND a.timeTable.date BETWEEN :startDate AND :endDate")
+              "AND a.timetable.date BETWEEN :startDate AND :endDate")
        List<AttendanceEntity> findByStudentAndDateRange(
               @Param("student") StudentEntity student,
               @Param("startDate") LocalDate startDate,
@@ -46,29 +45,29 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
        //カレンダー等の既存ロジック用
        @Query("SELECT COUNT(a) FROM AttendanceEntity a " +
               "WHERE a.student.userId = :userId " + 
-              "AND a.timeTable.subjectId = :subjectId " +
+              "AND a.timetable.subjectId = :subjectId " +
               "AND a.status.statusId IN (1, 3, 4)") 
        int countAttendedClassesBySubject(@Param("userId") Integer userId, @Param("subjectId") Integer subjectId);
        
        //有効出席数カウント
        @Query("SELECT COUNT(a) FROM AttendanceEntity a " +
               "WHERE a.student.userId = :userId " +
-              "AND a.timeTable.subjectId = :subjectId " +
+              "AND a.timetable.subjectId = :subjectId " +
               "AND a.status.statusId IN (1, 4)") 
        int countEffectiveAttendance(@Param("userId") Integer userId, @Param("subjectId") Integer subjectId);
 
        //出席停止数カウント
        @Query("SELECT COUNT(a) FROM AttendanceEntity a " +
               "WHERE a.student.userId = :userId " +
-              "AND a.timeTable.subjectId = :subjectId " +
+              "AND a.timetable.subjectId = :subjectId " +
               "AND a.status.statusId = 6") 
        int countSuspensions(@Param("userId") Integer userId, @Param("subjectId") Integer subjectId);
 
        //詳細取得用
        @Query("SELECT a FROM AttendanceEntity a " +
               "WHERE a.student = :student " +
-              "AND a.timeTable.date BETWEEN :startDate AND :endDate " +
-              "AND a.timeTable.subjectId = :subjectId")
+              "AND a.timetable.date BETWEEN :startDate AND :endDate " +
+              "AND a.timetable.subjectId = :subjectId")
        List<AttendanceEntity> findByStudentAndDateRangeAndSubject(
               @Param("student") StudentEntity student, 
               @Param("startDate") LocalDate startDate, 
@@ -78,7 +77,7 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
        //集計用
        @Query("SELECT COUNT(a) FROM AttendanceEntity a " +
               "WHERE a.student.userId = :studentId " +
-              "AND a.timeTable.subjectId = :subjectId " +
+              "AND a.timetable.subjectId = :subjectId " +
               "AND a.status.id = :statusId")
        int countByStatusTotal(@Param("studentId") Integer studentId, 
               @Param("subjectId") Integer subjectId, 
