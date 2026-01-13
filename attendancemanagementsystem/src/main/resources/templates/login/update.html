@@ -11,7 +11,9 @@
 </head>
 <body>
 
-    <div class="header-bar"></div>
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: main-header}"></div>
+    </div>
 
     <div class="container">
         <h2 class="title">パスワード変更完了</h2>
