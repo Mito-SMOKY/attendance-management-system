@@ -128,7 +128,7 @@ public class SubjectAttendanceService {
                 String statusSymbol = "-";
                 // 当日の出席記録を検索
                 AttendanceEntity att = attendances.stream()
-                        .filter(a -> a.getTimeTable().getTimeTableId().equals(tt.getTimeTableId()))
+                        .filter(a -> a.getTimetable().getTimetableId().equals(tt.getTimetableId()))
                         .findFirst().orElse(null);
 
                 if (att != null) {

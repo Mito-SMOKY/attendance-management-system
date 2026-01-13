@@ -1,268 +1,95 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>教室マスタ</title>
 
-    <link rel="stylesheet" th:href="@{/css/parts.css}" />
-    <link rel="stylesheet" th:href="@{/css/admin/adminMdClassroom.css}" />
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
-  </head>
-  <body>
+    <link rel="stylesheet" th:href="@{/css/common/parts.css}" />
+    <link rel="stylesheet" th:href="@{/css/md/mdClassroom.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
     <div class="header-container">
-      <div
-        th:replace="~{fragments/_parts :: admin-header}"
-      ></div>
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
 
     <div class="backbutton-container">
-      <div
-        th:replace="~{fragments/_parts :: backButton(url='/admin/master-data')}"
-      ></div>
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/master-data')}"></div>
     </div>
 
-    <form
-      th:action="@{/admin/master/classroom/save}"
-      method="post"
-      id="masterForm"
-    >
-      <div class="classroom-container">
-        <div class="page-header-wrapper">
-          <h1 class="page-title">教室マスタ</h1>
+    <form th:action="@{/admin/master/classroom/save}" method="post" id="masterForm">
+        <div class="classroom-container">
+            <div class="page-header-wrapper">
+                <h1 class="page-title">教室マスタ</h1>
+            </div>
+
+            <div th:if="${successMessage}" style="color: green; text-align: center; margin-bottom: 10px">
+                <span th:text="${successMessage}"></span>
+            </div>
+            <div th:if="${errorMessage}" style="color: red; text-align: center; margin-bottom: 10px">
+                <span th:text="${errorMessage}"></span>
+            </div>
+
+            <div class="filter-area">
+                <button type="button" class="edit-btn" onclick="toggleEditMode()">
+                    編集
+                </button>
+            </div>
+
+            <div class="error-message-area">
+                <span id="errorMsgRequired" class="error-text" style="display: none">※教室名は必須入力です。</span>
+                <span id="errorMsgDuplicate" class="error-text" style="display: none">※入力された教室名は既に使用されています。</span>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="classroom-table" id="classroomTable">
+                    <colgroup>
+                        <col style="width: 40%" />
+                        <col style="width: 50%" />
+                        <col style="width: 10%" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>教室名</th>
+                            <th>MACアドレス</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="room : ${classroomList}">
+                            <input type="hidden" name="classroomId" th:value="${room.classroomId}" />
+
+                            <td>
+                                <span class="view-mode" th:text="${room.classroomName}"></span>
+                                <input type="text" class="form-input edit-mode" style="display: none"
+                                    name="classroomName" th:value="${room.classroomName}" placeholder="教室名 (例: 201)" />
+                            </td>
+
+                            <td>
+                                <span class="view-mode" th:text="${room.macAddress}"></span>
+                                <input type="text" class="form-input edit-mode" style="display: none" 
+                                    name="macAddress" th:value="${room.macAddress}" placeholder="AA:BB:CC:11:22:33" />
+                            </td>
+
+                            <td>
+                                <button type="button" class="delete-btn" onclick="deleteRow(this)" style="display: none">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="add-btn-wrapper" style="display: none">
+                <button type="button" class="add-row-btn" onclick="addClassroomRow()">
+                    ＋
+                </button>
+            </div>
         </div>
-
-        <div
-          th:if="${successMessage}"
-          style="color: green; text-align: center; margin-bottom: 10px"
-        >
-          <span th:text="${successMessage}"></span>
-        </div>
-        <div
-          th:if="${errorMessage}"
-          style="color: red; text-align: center; margin-bottom: 10px"
-        >
-          <span th:text="${errorMessage}"></span>
-        </div>
-
-        <div class="filter-area">
-          <button type="button" class="edit-btn" onclick="toggleEditMode()">
-            編集
-          </button>
-        </div>
-
-        <div class="error-message-area">
-          <span id="errorMsgRequired" class="error-text" style="display: none"
-            >※教室名は必須入力です。</span
-          >
-          <span id="errorMsgDuplicate" class="error-text" style="display: none"
-            >※入力された教室名は既に使用されています。</span
-          >
-        </div>
-
-        <div class="table-wrapper">
-          <table class="classroom-table" id="classroomTable">
-            <colgroup>
-              <col style="width: 40%" />
-              <col style="width: 50%" />
-              <col style="width: 10%" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>教室名</th>
-                <th>MACアドレス</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="room : ${classroomList}">
-                <input
-                  type="hidden"
-                  name="classroomId"
-                  th:value="${room.classroomId}"
-                />
-
-                <td>
-                  <span
-                    class="view-mode"
-                    th:text="${room.classroomName}"
-                  ></span>
-                  <input
-                    type="text"
-                    class="form-input edit-mode"
-                    style="display: none"
-                    name="classroomName"
-                    th:value="${room.classroomName}"
-                    placeholder="教室名 (例: 201)"
-                  />
-                </td>
-
-                <td>
-                  <span class="view-mode" th:text="${room.macAddress}"></span>
-                  <input
-                    type="text"
-                    class="form-input edit-mode"
-                    style="display: none"
-                    name="macAddress"
-                    th:value="${room.macAddress}"
-                    placeholder="AA:BB:CC:11:22:33"
-                  />
-                </td>
-
-                <td>
-                  <button
-                    type="button"
-                    class="delete-btn"
-                    onclick="deleteRow(this)"
-                    style="display: none"
-                  >
-                    <i class="fa-solid fa-trash-can"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="add-btn-wrapper" style="display: none">
-          <button type="button" class="add-row-btn" onclick="addClassroomRow()">
-            ＋
-          </button>
-        </div>
-      </div>
     </form>
 
-    <script>
-      function toggleEditMode() {
-        const body = document.body;
-        const btn = document.querySelector(".edit-btn");
-        const form = document.getElementById("masterForm");
-        const errorMsgReq = document.getElementById("errorMsgRequired");
-        const errorMsgDup = document.getElementById("errorMsgDuplicate");
-
-        // 編集モード関連の要素
-        const viewModes = document.querySelectorAll(".view-mode");
-        const editModes = document.querySelectorAll(".edit-mode"); // input要素
-        const deleteBtns = document.querySelectorAll(".delete-btn");
-        const addBtnWrapper = document.querySelector(".add-btn-wrapper");
-
-        if (body.classList.contains("editing-mode")) {
-          // --- 適用（保存）ボタン押下時 ---
-
-          // バリデーション
-          if (!validateData()) {
-            return;
-          }
-
-          if (!confirm("変更を保存しますか？")) {
-            return;
-          }
-
-          // フォーム送信
-          form.submit();
-        } else {
-          // --- 編集ボタン押下時 ---
-          body.classList.add("editing-mode");
-          btn.textContent = "適用";
-
-          // 表示切り替え
-          viewModes.forEach((el) => (el.style.display = "none"));
-          editModes.forEach((el) => (el.style.display = "block"));
-          deleteBtns.forEach((el) => (el.style.display = "inline-block"));
-          addBtnWrapper.style.display = "block";
-
-          errorMsgReq.style.display = "none";
-          errorMsgDup.style.display = "none";
-        }
-      }
-
-      function addClassroomRow() {
-        const tableBody = document.querySelector("#classroomTable tbody");
-        const newRow = document.createElement("tr");
-
-        // 新規行にはIDがないのでhidden inputは不要（またはvalue=""）
-        newRow.innerHTML = `
-                <td>
-                    <input type="text" class="form-input" name="classroomName" placeholder="教室名 (例: 201)">
-                </td>
-                <td>
-                    <input type="text" class="form-input" name="macAddress" placeholder="AA:BB:CC:11:22:33">
-                </td>
-                <td>
-                    <button type="button" class="delete-btn" onclick="deleteRow(this)">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </td>
-            `;
-
-        tableBody.appendChild(newRow);
-      }
-
-      function deleteRow(btn) {
-        if (confirm("この行を削除しますか？")) {
-          const row = btn.closest("tr");
-          row.remove();
-        }
-      }
-
-      function validateData() {
-        const rows = document.querySelectorAll("#classroomTable tbody tr");
-        const names = new Map();
-        let hasEmptyError = false;
-        let hasDuplicateError = false;
-
-        // エラー表示リセット
-        document.getElementById("errorMsgRequired").style.display = "none";
-        document.getElementById("errorMsgDuplicate").style.display = "none";
-        document
-          .querySelectorAll(".input-error")
-          .forEach((el) => el.classList.remove("input-error"));
-
-        rows.forEach((row, index) => {
-          const nameInput = row.querySelector('input[name="classroomName"]');
-          if (!nameInput) return; // 削除済みなどで要素がない場合
-
-          const valName = nameInput.value.trim();
-
-          // 必須チェック
-          if (valName === "") {
-            hasEmptyError = true;
-            nameInput.classList.add("input-error");
-          } else {
-            // 重複チェック
-            if (names.has(valName)) {
-              hasDuplicateError = true;
-              nameInput.classList.add("input-error");
-
-              // 先に見つかった重複元も赤くする
-              const prevRowIndex = names.get(valName);
-              const prevRow = rows[prevRowIndex];
-              const prevInput = prevRow.querySelector(
-                'input[name="classroomName"]'
-              );
-              if (prevInput) prevInput.classList.add("input-error");
-            } else {
-              names.set(valName, index);
-            }
-          }
-        });
-
-        if (hasEmptyError) {
-          document.getElementById("errorMsgRequired").style.display =
-            "inline-block";
-          return false;
-        }
-        if (hasDuplicateError) {
-          document.getElementById("errorMsgDuplicate").style.display =
-            "inline-block";
-          return false;
-        }
-        return true;
-      }
-    </script>
-  </body>
+    <script th:src="@{/js/mdClassroom.js}"></script>
+</body>
 </html>

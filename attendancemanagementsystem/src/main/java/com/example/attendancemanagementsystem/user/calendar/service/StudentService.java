@@ -91,7 +91,7 @@ public class StudentService {
             // ★修正: ここで AttendanceDto (日付と状態のみ) を使用
             List<AttendanceDto> attendanceDtos = attendanceEntities.stream()
                 .map(a -> new AttendanceDto(
-                    a.getTimeTable().getDate(),    // 日付
+                    a.getTimetable().getDate(),    // 日付
                     a.getStatus().getStatusName()  // "出席"などの文字
                 ))
                 .collect(Collectors.toList());
