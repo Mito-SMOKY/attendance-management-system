@@ -1,0 +1,135 @@
+/* --- 1. レイアウト初期化 --- */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100%;
+}
+
+body.loading {
+    overflow: hidden;
+}
+
+/* --- 2. 背景（白幕）の設定 --- */
+#splash {
+    position: fixed;
+    inset: 0;
+    background: #ffffff;
+    /* スタティックロゴより上、スプラッシュロゴより下 */
+    z-index: 9990; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* 最後に消える時の時間 */
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+
+/* ★重要：以前あった body.loaded #splash { opacity: 0; } は削除済み */
+/* これにより、ロゴ移動中も背景の白が維持されます */
+
+/* --- 3. ヘッダーのスライドイン --- */
+.main-header {
+    z-index: 10005 !important;
+    transform: translateX(-100%);
+    transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+body.header-active .main-header {
+    transform: translateX(0);
+}
+
+/* --- 4. スプラッシュロゴ（動く方）の設定 --- */
+.splash-logo-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000; /* 最前面 */
+    
+    /* 移動:transform 消去:opacity */
+    transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 2.5s ease !important;
+    opacity: 1;
+}
+
+.splash-logo {
+    width: 400px;
+    opacity: 0;
+    transform: translateY(15px);
+    animation: logoAppear 0.5s ease forwards;
+}
+
+@keyframes logoAppear {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 5. 波紋アニメーション --- */
+.ripple {
+    /* (省略：変更なし) */
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100px; height: 100px; border: 2px solid #00bcd4; border-radius: 50%; opacity: 0; animation: ripple-out 1.5s ease-out forwards;
+}
+.ripple:nth-child(1) { animation-delay: 0.6s; }
+.ripple:nth-child(2) { animation-delay: 0.9s; }
+.ripple:nth-child(3) { animation-delay: 1.2s; }
+@keyframes ripple-out {
+    0% { width: 100px; height: 100px; opacity: 0; } 30% { opacity: 0.5; } 100% { width: 600px; height: 600px; opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* --- 6. ログイン画面の要素 --- */
+.static-logo {
+    opacity: 0;
+    width: 400px;
+    height: auto; 
+    vertical-align: middle;
+    margin-bottom: 80px;
+    /* 着地時に裏で即座に表示させるため、transitionは短く */
+    transition: opacity 0.1s ease;
+}
+.fade-in-form {
+    opacity: 0;
+    transform: translateY(30px);
+    /* フォームは背景が消えるのと合わせてゆっくり出す */
+    transition: opacity 0.5s ease, transform 1.0s ease;
+}
+
+/* --- 7. アニメーション実行フェーズ --- */
+
+/* フェーズ1: 移動開始 (loaded) */
+/* body.loaded .splash-logo-container {
+    transform: translate(-50%, -250px) scale(1);
+    /* ここでは opacity を変えないので、移動中もくっきり表示される 
+} */
+
+.splash-logo-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 初期位置 */
+    z-index: 10000;
+    /* transitionの設定はそのまま維持 */
+    transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.8s ease !important;
+}
+
+/* フェーズ2: 着地＆静止中 (show-static) */
+/* 白背景の裏側で、実体ロゴをこっそり表示状態にする */
+body.show-static .static-logo {
+    opacity: 1;
+}
+
+/* フェーズ3: 入れ替え開始 (animation-done) */
+/* 2秒静止後、スプラッシュロゴと白背景を同時に消していく */
+body.animation-done .splash-logo-container,
+body.animation-done #splash {
+    opacity: 0 !important;
+}
+
+/* 同時にフォームも表示開始 */
+body.animation-done .fade-in-form {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+body.animation-done {
+    overflow: auto;
+}
+
+/* sessionStorage.clear() */
