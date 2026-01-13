@@ -77,7 +77,7 @@ public class AttendanceDisplayService {
             
             Optional<AttendanceEntity> attOpt = attendanceRepository.findByStudentAndDateRange(student, date, date)
                     .stream()
-                    .filter(a -> a.getTimeTable().getTimeTableId().equals(tt.getTimeTableId()))
+                    .filter(a -> a.getTimetable().getTimetableId().equals(tt.getTimetableId()))
                     .findFirst();
 
             // 出席状態に応じた記号を設定

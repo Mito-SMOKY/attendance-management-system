@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>臨時対応登録</title>
+    
+    <link rel="stylesheet" th:href="@{/css/common/parts.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/emergency/sadminEmergencyMain.css}">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/menu')}"></div>
+    </div>
+
+    <div class="main-container">
+        <h1 class="page-title">臨時対応</h1>
+
+        <form id="emergencyForm" th:action="@{/admin/emergency/save}" method="post">
+            <div class="table-wrapper">
+                <table class="input-table">
+                    <tr>
+                        <th>日付</th>
+                        <td class="date-cell">
+                            <div class="date-selection-wrapper">
+                                <div class="date-selection">
+                                    <select id="startYear" name="startYear" class="date-select"><option value="">--</option></select>
+                                    <span>年</span>
+                                    <select id="startMonth" name="startMonth" class="date-select"><option value="">--</option></select>
+                                    <span>月</span>
+                                    <select id="startDay" name="startDay" class="date-select"><option value="">--</option></select>
+                                    <span>日</span>
+                                </div>
+                                
+                                <span class="range-separator">～</span>
+                                
+                                <div class="date-selection">
+                                    <select id="endYear" name="endYear" class="date-select"><option value="">--</option></select>
+                                    <span>年</span>
+                                    <select id="endMonth" name="endMonth" class="date-select"><option value="">--</option></select>
+                                    <span>月</span>
+                                    <select id="endDay" name="endDay" class="date-select"><option value="">--</option></select>
+                                    <span>日</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>種類</th>
+                        <td>
+                            <select id="typeSelect" name="type">
+                                <option value="">選択してください</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>コース</th>
+                        <td>
+                            <select id="courseSelect" name="course">
+                                <option value="">選択してください</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>学年</th>
+                        <td>
+                            <select id="gradeSelect" name="grade">
+                                <option value="">選択してください</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>クラス</th>
+                        <td>
+                            <select id="classSelect" name="class">
+                                <option value="">選択してください</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>コマ</th>
+                        <td>
+                            <select id="periodSelect" name="period">
+                                <option value="">選択してください</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>備考</th>
+                        <td>
+                            <input type="text" id="remarksInput" name="remarks" class="text-input" placeholder="例）大雪特別警報により臨時休校">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>通知</th>
+                        <td>
+                            <div class="toggle-wrapper">
+                                <label class="toggle-label">対象ユーザーに通知する</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="notifyToggle" name="notify">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="button-area">
+                <button type="button" id="confirmBtn" class="confirm-btn">確定</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="confirmationModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2 class="modal-title">対応詳細</h2>
+            <div class="modal-card">
+                <h3 id="modalTypeTitle" class="modal-type-header"></h3>
+                <div class="modal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">日付</span>
+                        <span class="detail-value">
+                            : <span id="modalDateStart"></span> ～ <span id="modalDateEnd"></span>
+                        </span>
+                    </div>
+                    <div class="detail-row"><span class="detail-label">対象コース</span><span class="detail-value">: <span id="modalCourse"></span></span></div>
+                    <div class="detail-row"><span class="detail-label">対象学年</span><span class="detail-value">: <span id="modalGrade"></span></span></div>
+                    <div class="detail-row"><span class="detail-label">対象クラス</span><span class="detail-value">: <span id="modalClass"></span></span></div>
+                    <div class="detail-row"><span class="detail-label">対象コマ</span><span class="detail-value">: <span id="modalPeriod"></span></span></div>
+                    <div class="detail-row spacer-top"><span class="detail-label">備考</span><span class="detail-value">: <span id="modalRemarks"></span></span></div>
+                    <div class="detail-row"><span class="detail-label">お知らせ</span><span class="detail-value">: <span id="modalNotify"></span></span></div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" id="modalSubmitBtn" class="modal-btn submit">確定</button>
+                    <button type="button" id="modalCancelBtn" class="modal-btn cancel">戻る</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/sadminEmergencyMain.js}"></script>
+</body>
+</html>
