@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ファイルアップロード</title>
     
-    <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/admin/adminCsvUpload.css}">
+    <link rel="stylesheet" th:href="@{/css/common/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/account/csvUpload.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -32,6 +32,8 @@
             <div class="file-input-wrapper">
                 <label for="csvFile" class="file-label-btn">ファイルを選択</label>
                 <input type="file" id="csvFile" name="file" accept=".csv" class="file-input-hidden" onchange="updateFileName(this)">
+                
+                <span id="fileNameDisplay" style="margin-left: 10px;">選択されていません</span>
             </div>
 
             <p id="errorMsg" style="color: red; font-weight: bold; margin-top: 10px; display: none;">
@@ -44,35 +46,7 @@
 
     </div>
 
-    <script>
-        // ファイル名表示の更新と、エラーメッセージのクリア
-        function updateFileName(input) {
-            const display = document.getElementById('fileNameDisplay');
-            const errorMsg = document.getElementById('errorMsg');
-
-            if (input.files && input.files.length > 0) {
-                display.textContent = input.files[0].name;
-                // ファイルが選ばれたらエラーメッセージを消す
-                errorMsg.style.display = 'none';
-            } else {
-                display.textContent = '選択されていません';
-            }
-        }
-
-        // 送信時のチェック
-        document.getElementById('uploadForm').addEventListener('submit', function(event) {
-            const input = document.getElementById('csvFile');
-            const errorMsg = document.getElementById('errorMsg');
-
-            // ファイルが選択されていない場合
-            if (!input.files || input.files.length === 0) {
-                // 送信をキャンセル
-                event.preventDefault();
-                // エラーメッセージを表示
-                errorMsg.style.display = 'block';
-            }
-        });
-    </script>
+    <script th:src="@{/js/csvUpload.js}"></script>
 
 </body>
 </html>

@@ -36,8 +36,8 @@ public class AttendanceEntity {
     // 変数名を 'timeTable' にすることで getTimeTable() が生成されます
     @ManyToOne(fetch = FetchType.LAZY)
     // @JoinColumn(name = "TimeTableID", nullable = false) 
-    @JoinColumn(name = "TimeTableID", nullable = true) 
-    private TimetableEntity timeTable;
+    @JoinColumn(name = "TimetableID", nullable = true) 
+    private TimetableEntity timetable;
 
     // UserID (Student) との紐づけ
     @ManyToOne(fetch = FetchType.LAZY)
@@ -87,12 +87,12 @@ public class AttendanceEntity {
         this.createdAt = createdAt;
     }
 
-    public TimetableEntity getTimeTable() {
-        return timeTable;
+    public TimetableEntity getTimetable() {
+        return timetable;
     }
 
-    public void setTimeTable(TimetableEntity timeTable) {
-        this.timeTable = timeTable;
+    public void setTimetable(TimetableEntity timetable) {
+        this.timetable = timetable;
     }
 
     public StudentEntity getStudent() {
