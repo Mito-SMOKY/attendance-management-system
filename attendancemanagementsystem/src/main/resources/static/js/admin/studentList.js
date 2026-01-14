@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const nameCell = document.createElement('td');
             const link = document.createElement('a');
-            link.href = `/admin/attendance/${student.userId}`; 
+            link.href = `/admin/student/info/${student.userId}`; 
             link.textContent = student.name;
             link.classList.add('student-name-link');
             nameCell.appendChild(link);

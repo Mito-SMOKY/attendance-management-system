@@ -22,10 +22,13 @@ public interface DepartmentSubjectRepository extends JpaRepository<DepartmentSub
     @Query("SELECT DISTINCT d.subject FROM DepartmentSubject d WHERE d.id.departmentId = :departmentId ORDER BY d.subject.subjectName ASC")
     List<SubjectEntity> findSubjectsByDepartmentId(@Param("departmentId") Integer departmentId);
 
-    // コースIDにもとづくクラス名の取得
-    @Query("SELECT DISTINCT d.className FROM DepartmentEntity d " +
-        "WHERE d.major.course.courseId = :courseId " +
-        "ORDER BY d.className")
-    List<String> findClassNamesByCourseId(@Param("courseId") Integer courseId);
+    // 学科ID・学年にもとづく科目の取得
+    @Query("SELECT DISTINCT ds.subject FROM DepartmentSubject ds " +
+        "WHERE ds.id.departmentId = :departmentId " +
+        "AND ds.grade = :grade " +
+        "ORDER BY ds.subject.subjectName ASC")
+    List<SubjectEntity> findSubjectsByDepartmentIdAndGrade(
+            @Param("departmentId") Integer departmentId, 
+            @Param("grade") Integer grade);
     
 }

@@ -37,4 +37,8 @@ public interface SessionRepository extends JpaRepository<SessionEntity, Integer>
         SubjectEntity subject, 
         LocalDate sessionDate
     );
+
+    // 指定期間内のセッションを取得
+    @Query("SELECT s FROM SessionEntity s WHERE s.sessionDate BETWEEN :startDate AND :endDate ORDER BY s.sessionDate, s.timeSlot.slotId")
+    List<SessionEntity> findBySessionDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }

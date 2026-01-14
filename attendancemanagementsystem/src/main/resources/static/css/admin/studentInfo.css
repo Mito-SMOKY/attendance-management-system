@@ -286,7 +286,8 @@ a.backbutton:hover {
 .schedule-table th,
 .schedule-table td {
     border: 1px solid #999;
-    padding: 10px 5px;
+    /* padding: 10px 5px; ← これを削除し、セル全体を塗りつぶせるように0にする */
+    padding: 0;
     vertical-align: middle;
 }
 
@@ -304,12 +305,19 @@ a.backbutton:hover {
     height: 70px;
 }
 
+/* セル内のコンテンツラッパー */
 .cell-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 5px;
+    
+    /* セル全体に広げる設定 */
+    width: 100%;
+    height: 100%;
+    padding: 5px; /* 文字が端にくっつきすぎないように少し余白 */
+    box-sizing: border-box;
 }
 
 .subject-name {
@@ -317,21 +325,80 @@ a.backbutton:hover {
     font-size: 1rem;
 }
 
+/* ステータスタグ (○×などの文字) */
+/* 以前の丸い背景スタイルを解除し、シンプルな文字表示にします */
 .status-tag {
     display: inline-block;
-    font-size: 0.8rem;
-    padding: 3px 12px;
-    border-radius: 15px;
-    color: white;
-    font-weight: normal;
-    min-width: 60px;
+    font-size: 1.1rem; /* 少し大きく */
+    font-weight: bold;
+    color: inherit; /* 親要素の色を引き継ぐ */
+    
+    /* 背景色リセット */
+    background-color: transparent; 
+    padding: 0;
+    border-radius: 0;
+    min-width: auto;
 }
 
-/* ステータス色 */
-.bg-present { background-color: #66BB6A; }
-.bg-sick { background-color: #EF5350; }
-.bg-late { background-color: #FFCA28; color: #333; }
-.bg-early { background-color: #FFA726; }
-.bg-suspend { background-color: #78909C; }
-.bg-public { background-color: #42A5F5; }
-.bg-other { background-color: #AB47BC; }
+/* --- studentInfo.css に以下を追加・修正 --- */
+
+/* テーブル自体への設定 */
+.student-table { /* ← HTML側のtableタグについているクラス名に合わせてください */
+    width: 100%;
+    table-layout: fixed; /* ★重要：これを指定するとセルの幅が均等に固定されます */
+    border-collapse: collapse;
+}
+
+/* 1列目（日付・曜日）の設定 */
+.student-table th:first-child,
+.student-table td:first-child {
+    width: 12%;       /* 日付列の幅を固定（お好みで調整してください） */
+    white-space: nowrap; /* 日付が折り返されないようにする */
+    text-align: center;
+}
+
+/* 2列目以降（1限～4限...）の設定 */
+.student-table th:not(:first-child),
+.student-table td:not(:first-child) {
+    /* 幅を指定しない、または width: auto にしておくと、
+       table-layout: fixed の効果で、残りのスペースを「均等」に分け合います */
+    width: auto; 
+    
+    /* 必要に応じて中身の表示調整 */
+    vertical-align: top;
+    padding: 8px;
+}
+
+/* テーブルの列幅計算を「固定」モードにする */
+.schedule-table {
+    width: 100%;
+    table-layout: fixed; /* これが重要：コンテンツ量に関係なく幅を決める */
+    border-collapse: collapse;
+}
+
+/* 1列目（日付列）の幅を固定する */
+/* th.date-col がHTMLにあるためそれを利用 */
+.schedule-table th.date-col {
+    width: 100px; /* 日付が入るのに十分な幅を指定 */
+}
+
+/* 全てのセル（th, td）に対する設定 */
+.schedule-table th,
+.schedule-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    word-wrap: break-word; /* 長い授業名でも枠を押し広げずに改行させる */
+    overflow-wrap: break-word;
+}
+
+/* ステータスごとの背景色・文字色設定
+   (div.cell-content に適用してセル全体の色を変えます)
+   背景は薄いパステルカラー、文字は濃い色で見やすくしています
+*/
+.bg-present { background-color: #E8F5E9; color: #333; } /* 出席: 薄緑背景 + 濃緑文字 */
+.bg-sick    { background-color: #FFEBEE; color: #333; } /* 欠席: 薄赤背景 + 濃赤文字 */
+.bg-late    { background-color: #FFFDE7; color: #333; } /* 遅刻: 薄黄背景 + 濃橙文字 */
+.bg-early   { background-color: #FFF3E0; color: #333; } /* 早退: 薄橙背景 + 濃茶文字 */
+.bg-suspend { background-color: #ECEFF1; color: #333; } /* 出停: 薄灰背景 + 濃灰文字 */
+.bg-public  { background-color: #E3F2FD; color: #333; } /* 公欠: 薄青背景 + 濃青文字 */
+.bg-other   { background-color: #F3E5F5; color: #333; } /* その他: 薄紫背景 + 濃紫文字 */
