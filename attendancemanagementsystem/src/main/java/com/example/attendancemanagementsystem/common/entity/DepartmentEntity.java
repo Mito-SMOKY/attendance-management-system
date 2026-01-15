@@ -18,9 +18,16 @@ public class DepartmentEntity {
     @Column(name = "DepartmentId")
     private Integer departmentId;
 
+    // @ManyToOne
+    // @JoinColumn(name = "MajorID")
+    // private MajorEntity major;
+
+    @Column(name = "CourseID")
+    private Integer courseId;
+
     @ManyToOne
-    @JoinColumn(name = "MajorID")
-    private MajorEntity major;
+    @JoinColumn(name = "CourseID", insertable = false, updatable = false)
+    private CourseEntity course;
 
     @Column(name = "Class")
     private String className; // DBカラム名 "Class" に対応
@@ -38,19 +45,37 @@ public class DepartmentEntity {
         this.departmentId = departmentId;
     }
 
-    public MajorEntity getMajor() {
-        return major;
-    }
+    // public MajorEntity getMajor() {
+    //     return major;
+    // }
 
-    public void setMajor(MajorEntity major) {
-        this.major = major;
-    }
+    // public void setMajor(MajorEntity major) {
+    //     this.major = major;
+    // }
 
-    public String getClassName() {
-        return className;
-    }
+    public CourseEntity getCourse() { return course; }
+    public void setCourse(CourseEntity course) { this.course = course; }
 
-    public void setClassName(String className) {
-        this.className = className;
-    }
+    public Integer getCourseId() { return courseId; }
+    public void setCourseId(Integer courseId) { this.courseId = courseId; }
+
+    public String getClassName() { return className; }
+    public void setClassName(String className) { this.className = className; }
 }
+
+    //     public CourseEntity getCourse() {
+    //     return course;
+    // }
+
+    // public void setCourse(CourseEntity course) {
+    //     this.course = course;
+    // }
+
+    // public String getClassName() {
+    //     return className;
+    // }
+
+    // public void setClassName(String className) {
+    //     this.className = className;
+    // }
+

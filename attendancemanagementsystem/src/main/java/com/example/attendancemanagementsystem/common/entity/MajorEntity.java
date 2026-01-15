@@ -1,6 +1,11 @@
 package com.example.attendancemanagementsystem.common.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "major")
@@ -14,8 +19,8 @@ public class MajorEntity {
     @Column(name = "MajorName")
     private String majorName;
 
-    @Column(name = "CourseID")
-    private Integer courseId;
+    // @Column(name = "CourseID")
+    // private Integer courseId;
 
     // --- constructor ---
     public MajorEntity() {}
@@ -27,6 +32,6 @@ public class MajorEntity {
     public String getMajorName() { return majorName; }
     public void setMajorName(String majorName) { this.majorName = majorName; }
 
-    public Integer getCourseId() { return courseId; }
-    public void setCourseId(Integer courseId) { this.courseId = courseId; }
+//     public Integer getCourseId() { return courseId; }
+//     public void setCourseId(Integer courseId) { this.courseId = courseId; }
 }

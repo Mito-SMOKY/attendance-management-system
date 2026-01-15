@@ -5,19 +5,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.attendancemanagementsystem.common.entity.CourseEntity;
 import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.entity.DepartmentSubject;
 import com.example.attendancemanagementsystem.common.entity.DepartmentSubjectKey;
-import com.example.attendancemanagementsystem.common.entity.MajorEntity;
 import com.example.attendancemanagementsystem.common.entity.SubjectEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
+import com.example.attendancemanagementsystem.common.repository.CourseRepository;
 import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
 import com.example.attendancemanagementsystem.common.repository.DepartmentSubjectRepository;
-import com.example.attendancemanagementsystem.common.repository.MajorRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectFacultyRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
@@ -31,7 +32,8 @@ public class AdminSubjectService {
     @Autowired private DepartmentSubjectRepository departmentSubjectRepository;
     @Autowired private UsersRepository usersRepository;
     @Autowired private SubjectFacultyRepository subjectFacultyRepository;
-    @Autowired private MajorRepository majorRepository;
+    // @Autowired private MajorRepository majorRepository;
+    @Autowired private CourseRepository courseRepository; // 追加
 
     // --- 教科一覧取得（情報マスタ画面用） ---
     public List<SubjectMatrixRowDTO> getSubjectInfoList() {
@@ -55,15 +57,17 @@ public class AdminSubjectService {
                 dto.setGrade(rel.getGrade());
                 if (rel.getDepartment() != null) {
                     dto.setClassName(rel.getDepartment().getClassName());
-                    if (rel.getDepartment().getMajor() != null) {
-                        dto.setMajorName(rel.getDepartment().getMajor().getMajorName());
+
+
+                    if (rel.getDepartment().getCourse() != null) {
+                        dto.setCourseName(rel.getDepartment().getCourse().getCourseName());
                     }
                 }
             } else {
                 // 紐づけがない場合
                 dto.setGrade(null);
                 dto.setClassName("-");
-                dto.setMajorName("-");
+                dto.setCourseName("-");
             }
 
             // 教師情報のセット
@@ -93,8 +97,8 @@ public class AdminSubjectService {
     }
 
     // --- コース一覧取得 ---
-    public List<MajorEntity> getAllMajors() {
-        return majorRepository.findAll();
+    public List<CourseEntity> getAllcourses() {
+        return courseRepository.findAll();
     }
 
     // --- 全クラス一覧取得 ---
@@ -151,12 +155,11 @@ public class AdminSubjectService {
         DepartmentEntity dept = departmentRepository.findById(departmentId)
             .orElseThrow(() -> new RuntimeException("指定されたクラスが見つかりません"));
         
-        String majorName = dept.getMajor().getMajorName();
+        String courseName = dept.getCourse().getCourseName();
         String className = dept.getClassName();
         String gradeStr = grade + "年";
 
-        String fullName = String.format("%s %s %s %s", gradeStr, majorName, className, rawSubjectName);
-
+        String fullName = String.format("%s %s %s %s", gradeStr, courseName, className, rawSubjectName);
         SubjectEntity subject = new SubjectEntity();
         subject.setSubjectName(fullName);
         subject.setRequiredCredits(1);
@@ -186,7 +189,7 @@ public class AdminSubjectService {
             List<String> subjectNames, 
             List<Integer> teacherIds, 
             List<Integer> courseCounts,
-            List<Integer> majorIds,        // ★この行を追加してください
+            List<Integer> courseIds,        // ★この行を追加してください
             List<Integer> departmentIds,
             List<Integer> grades) {
     
@@ -311,11 +314,11 @@ public class AdminSubjectService {
     }
 
     // ★追加: 循環参照を避けるために、IDと名前だけのMapリストを作る
-    public List<Map<String, Object>> getSimpleMajorList() {
-        return majorRepository.findAll().stream().map(m -> {
+    public List<Map<String, Object>> getSimpleCourseList() {
+        return courseRepository.findAll().stream().map(c -> {
             Map<String, Object> map = new HashMap<>();
-            map.put("majorId", m.getMajorId());
-            map.put("majorName", m.getMajorName());
+            map.put("courseId", c.getCourseId());
+            map.put("courseName", c.getCourseName());
             return map;
         }).collect(Collectors.toList());
     }

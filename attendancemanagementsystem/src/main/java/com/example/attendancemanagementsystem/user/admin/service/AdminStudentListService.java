@@ -20,6 +20,7 @@ import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.repository.StudentRepository;
 import com.example.attendancemanagementsystem.common.service.SearchService;
 
+
 @Service
 public class AdminStudentListService {
 
@@ -90,8 +91,8 @@ public class AdminStudentListService {
                         if (activeEnrollment.getDepartment().getClassName() != null) {
                             classroomName = activeEnrollment.getDepartment().getClassName();
                         }
-                        if (activeEnrollment.getDepartment().getMajor() != null) {
-                            deptName = activeEnrollment.getDepartment().getMajor().getMajorName();
+                        if (activeEnrollment.getDepartment().getCourse() != null) {
+                            deptName = activeEnrollment.getDepartment().getCourse().getCourseName();
                         }
                     }
                 }

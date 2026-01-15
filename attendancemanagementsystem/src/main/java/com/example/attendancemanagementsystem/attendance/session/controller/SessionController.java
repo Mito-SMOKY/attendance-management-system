@@ -155,7 +155,7 @@ public class SessionController {
         
         // 備考欄の作成
         DepartmentEntity dept = departmentRepository.findById(targetDepartmentId).orElse(null);
-        String deptName = (dept != null && dept.getMajor() != null) ? dept.getMajor().getMajorName() : "不明";
+        String deptName = (dept != null && dept.getCourse() != null) ? dept.getCourse().getCourseName() : "不明";
         String className = (dept != null) ? dept.getClassName() : "";
         String generatedNote = deptName + " " + className + " " + targetGrade + "年 : " + subjectName; 
 

@@ -54,7 +54,7 @@ public class SubjectListService {
             return dtoList;
         }
         Integer deptId = enrollmentOpt.get().getDepartment().getDepartmentId();
-        String courseName = enrollmentOpt.get().getDepartment().getMajor().getMajorName();
+        String courseName = enrollmentOpt.get().getDepartment().getCourse().getCourseName();
 
         // 当該学科の時間割から科目リストを取得（重複排除）
         List<TimetableEntity> allTimetables = timetableRepository.findDistinctSubjectsByDepartment(deptId);

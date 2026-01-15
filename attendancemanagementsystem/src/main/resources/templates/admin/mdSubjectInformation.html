@@ -17,9 +17,7 @@
   </head>
   <body>
     <div class="header-container">
-      <div
-        th:replace="~{fragments/_parts :: admin-header}"
-      ></div>
+      <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
 
     <div class="backbutton-container">
@@ -84,14 +82,14 @@
                 />
 
                 <td>
-                  <span class="view-mode" th:text="${info.majorName}"></span>
-                  <select class="edit-mode" name="majorId">
+                  <span class="view-mode" th:text="${info.courseName}"></span>
+                  <select class="edit-mode" name="courseId">
                     <option value="">選択</option>
                     <option
-                      th:each="major : ${majorList}"
-                      th:value="${major.majorId}"
-                      th:text="${major.majorName}"
-                      th:selected="${major.majorName == info.majorName}"
+                      th:each="course : ${courseList}"
+                      th:value="${course.courseId}"
+                      th:text="${course.courseName}"
+                      th:selected="${course.courseName == info.courseName}"
                     ></option>
                   </select>
                 </td>
@@ -184,8 +182,10 @@
       /*<![CDATA[*/
       // Controllerから渡されたリストをJS変数に格納
       const teacherOptions = /*[[${teacherList}]]*/ [];
-      const majorOptions = /*[[${majorList}]]*/ [];
+      // 変数名を変更
+      const courseOptions = /*[[${courseList}]]*/ [];
       const departmentOptions = /*[[${departmentList}]]*/ [];
+
       const gradeOptions = /*[[${gradeList}]]*/ [];
       /*]]>*/
     </script>
@@ -238,7 +238,8 @@
 
         rows.forEach((row) => {
           // 各入力項目の取得
-          const major = row.querySelector('select[name="majorId"]');
+          // const major = row.querySelector('select[name="majorId"]');
+          const course = row.querySelector('select[name="courseId"]');
           const dept = row.querySelector('select[name="departmentId"]');
           const grade = row.querySelector('select[name="grade"]');
           const subjectName = row.querySelector('input[name="subjectName"]');
@@ -246,13 +247,13 @@
           const count = row.querySelector('input[name="courseCount"]');
 
           // もし要素が見つからない場合はスキップ（削除済み行など）
-          if (!major || !dept || !grade || !subjectName || !teacher || !count)
+          if (!course || !dept || !grade || !subjectName || !teacher || !count)
             return;
 
           // チェック処理 (値が空文字ならエラー)
           // ※ trim() は空白スペースのみの入力を防ぐため
-          if (major.value === "") {
-            major.classList.add("input-error");
+          if (course.value === "") {
+            course.classList.add("input-error");
             isValid = false;
           }
           if (dept.value === "") {
@@ -293,10 +294,10 @@
         }
 
         // コースプルダウン生成
-        let majorOpts = '<option value="">コース選択</option>';
-        if (majorOptions) {
-          majorOptions.forEach((m) => {
-            majorOpts += `<option value="${m.majorId}">${m.majorName}</option>`;
+        let courseOpts = '<option value="">コース選択</option>';
+        if (courseOptions) {
+          courseOptions.forEach((c) => {
+            courseOpts += `<option value="${c.courseId}">${c.courseName}</option>`;
           });
         }
 
@@ -319,7 +320,7 @@
         // 行のHTMLを構築（すべて編集モードの入力フォームを表示）
         newRow.innerHTML = `
             <td>
-                <select class="edit-mode" name="majorId">${majorOpts}</select>
+                <select class="edit-mode" name="majorId">${courseOpts}</select>
             </td>
             <td>
                 <select class="edit-mode" name="departmentId">${deptOpts}</select>

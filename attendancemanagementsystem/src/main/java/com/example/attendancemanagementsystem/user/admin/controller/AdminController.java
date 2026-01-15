@@ -282,7 +282,7 @@ public class AdminController {
         
         // ドロップダウン用には「軽量版メソッド」を使う
         model.addAttribute("teacherList", adminSubjectService.getSimpleTeacherList());       // ← 変更
-        model.addAttribute("majorList", adminSubjectService.getSimpleMajorList());           // ← 変更
+        model.addAttribute("courseList", adminSubjectService.getSimpleCourseList());           // ← 変更
         model.addAttribute("departmentList", adminSubjectService.getSimpleDepartmentList()); // ← 変更
         //これDB参照してない可用性0ゾーン
         model.addAttribute("gradeList", java.util.Arrays.asList(1, 2, 3)); 

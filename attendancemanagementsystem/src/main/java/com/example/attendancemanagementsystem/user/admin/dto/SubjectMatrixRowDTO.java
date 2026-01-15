@@ -13,12 +13,12 @@ public class SubjectMatrixRowDTO {
     private Integer courseCount;
 
     // 入力フォーム用 (Serviceの登録メソッドで使用)
-    private Integer majorId;
+    private Integer courseId;
     private Integer departmentId;
     private String rawSubjectName;
 
     // ★追加: 情報マスタ一覧表示用フィールド
-    private String majorName;
+    private String courseName;
     private String className;
 
     public SubjectMatrixRowDTO() {}
@@ -45,8 +45,8 @@ public class SubjectMatrixRowDTO {
     public Integer getCourseCount() { return courseCount; }
     public void setCourseCount(Integer courseCount) { this.courseCount = courseCount; }
 
-    public Integer getMajorId() { return majorId; }
-    public void setMajorId(Integer majorId) { this.majorId = majorId; }
+    public Integer getCourseId() { return courseId; }
+    public void setCourseId(Integer courseId) { this.courseId = courseId; }
 
     public Integer getDepartmentId() { return departmentId; }
     public void setDepartmentId(Integer departmentId) { this.departmentId = departmentId; }
@@ -55,8 +55,8 @@ public class SubjectMatrixRowDTO {
     public void setRawSubjectName(String rawSubjectName) { this.rawSubjectName = rawSubjectName; }
 
     // ★追加分のGetter/Setter
-    public String getMajorName() { return majorName; }
-    public void setMajorName(String majorName) { this.majorName = majorName; }
+    public String getCourseName() { return courseName; }
+    public void setCourseName(String courseName) { this.courseName = courseName; }
 
     public String getClassName() { return className; }
     public void setClassName(String className) { this.className = className; }
