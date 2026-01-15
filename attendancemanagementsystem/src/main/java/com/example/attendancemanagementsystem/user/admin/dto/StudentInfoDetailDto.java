@@ -2,15 +2,16 @@ package com.example.attendancemanagementsystem.user.admin.dto;
 
 import java.util.List;
 
-// Lombokなし
+// 学生の詳細情報表示用DTO
 public class StudentInfoDetailDto {
-    private Integer studentId; // ★Integerに修正
+    private Integer studentId; 
     private String name;
     private String currentMonth;
     private List<String> periodHeaders;
     private List<SubjectSimpleDto> subjectList;
     private AttendanceSummaryDto summary;
     private List<DailyScheduleDto> scheduleList;
+    private List<String> selectableMonths;
 
     // --- Getters & Setters ---
     public Integer getStudentId() { return studentId; }
@@ -34,11 +35,13 @@ public class StudentInfoDetailDto {
     public List<DailyScheduleDto> getScheduleList() { return scheduleList; }
     public void setScheduleList(List<DailyScheduleDto> scheduleList) { this.scheduleList = scheduleList; }
 
+    public List<String> getSelectableMonths() { return selectableMonths; }
+    public void setSelectableMonths(List<String> selectableMonths) { this.selectableMonths = selectableMonths; }
 
-    // --- Inner Static Classes ---
 
+    // 科目リスト用のシンプルDTO
     public static class SubjectSimpleDto {
-        private Integer subjectId; // ★Integerに修正
+        private Integer subjectId; 
         private String subjectName;
 
         public Integer getSubjectId() { return subjectId; }
@@ -48,6 +51,7 @@ public class StudentInfoDetailDto {
         public void setSubjectName(String subjectName) { this.subjectName = subjectName; }
     }
 
+    // 出席状況の集計用DTO
     public static class AttendanceSummaryDto {
         private int attendanceCount = 0;
         private int absenceCount = 0;
@@ -70,6 +74,7 @@ public class StudentInfoDetailDto {
         public void setPublicAbsenceCount(int publicAbsenceCount) { this.publicAbsenceCount = publicAbsenceCount; }
     }
 
+    // 日別スケジュール用DTO
     public static class DailyScheduleDto {
         private String dateStr;
         private boolean isAbsentDay;
@@ -83,6 +88,7 @@ public class StudentInfoDetailDto {
         public void setPeriods(List<PeriodDetailDto> periods) { this.periods = periods; }
     }
 
+    // 各時間帯の詳細DTO
     public static class PeriodDetailDto {
         private int period;
         private String subjectName;

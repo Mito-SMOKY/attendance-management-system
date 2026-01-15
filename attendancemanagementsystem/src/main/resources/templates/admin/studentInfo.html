@@ -9,8 +9,12 @@
     <link rel="stylesheet" th:href="@{/css/admin/studentInfo.css}">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <meta name="_csrf" th:content="${_csrf?.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
 </head>
 <body>
+    <input type="hidden" id="studentIdHidden" th:value="${student.studentId}">
 
     <div class="header-container">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
@@ -31,21 +35,28 @@
             <div class="left-sidebar-area">
                 
                 <div class="student-name-display">
-                    <span th:text="${studentInfo.name}">○○ ××</span> さん
-                    </div>
+                    <span th:text="${student.name}">○○ ××</span> さん
+                </div>
 
-                <form class="sidebar-search-form" onsubmit="return false;">
-                    <input type="text" id="subjectSearchInput" class="sidebar-search-input" placeholder="教科名を検索" onkeyup="filterSubjects()">
-                    <button type="button" class="sidebar-search-btn">
+                <div class="sidebar-search-form">
+                    <input type="text" id="subjectSearchInput" 
+                           class="sidebar-search-input" 
+                           placeholder="教科名を検索" 
+                           th:value="${subjectKeyword}"
+                           onkeydown="if(event.key === 'Enter') searchSubject()">
+                    <button type="button" class="sidebar-search-btn" onclick="searchSubject()">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
-                </form>
+                </div>
 
                 <div class="subject-list-box">
                     <div class="sidebar-title">受講教科一覧</div>
                     <ul class="subject-list" id="subjectListUl">
-                        <li th:each="subject : ${studentInfo.subjectList}" class="subject-item">
+                        <li th:each="subject : ${student.subjectList}" class="subject-item">
                             <a href="#" th:text="${subject.subjectName}">教科名</a>
+                        </li>
+                        <li th:if="${#lists.isEmpty(student.subjectList)}" class="subject-item" style="color: #999; padding: 5px;">
+                            該当なし
                         </li>
                     </ul>
                 </div>
@@ -53,15 +64,23 @@
 
             <div class="attendance-detail-main">
                 
-                <div class="attendance-controls">
+                <div class="attendance-controls" style="display: flex; align-items: center; gap: 10px;">
                     <form id="monthForm">
-                        <input type="month" id="monthPicker" name="month" 
-                               class="month-select" 
-                               th:value="${targetMonth}" 
-                               onchange="changeMonth(this.value)">
+                        <select id="monthPicker" name="month" class="month-select" onchange="changeMonth()">
+                            <option th:each="m : ${student.selectableMonths}"
+                                    th:value="${m}"
+                                    th:text="${m}"
+                                    th:selected="${m == currentYearMonth}">
+                                2026-01
+                            </option>
+                        </select>
                     </form>
                     
-                    <button class="edit-btn" type="button" onclick="alert('編集機能は開発中です')">編集</button>
+                    <button id="editBtn" class="edit-btn" type="button" onclick="toggleEditMode()">編集</button>
+                    <button id="saveBtn" class="edit-btn" type="button" onclick="saveChanges()" 
+                            style="display:none; background-color: #28a745; color: white; border: none;">
+                        保存
+                    </button>
                 </div>
 
                 <table class="status-summary-table">
@@ -79,12 +98,12 @@
                     <tbody>
                         <tr>
                             <td>日数</td>
-                            <td th:text="${studentInfo.summary.attendanceCount} + '日'">0日</td>
-                            <td th:text="${studentInfo.summary.absenceCount} + '日'" style="color: #EF5350;">0日</td>
-                            <td th:text="${studentInfo.summary.lateCount} + '日'">0日</td>
-                            <td th:text="${studentInfo.summary.earlyLeaveCount} + '日'">0日</td>
-                            <td th:text="${studentInfo.summary.suspensionCount} + '日'">0日</td>
-                            <td th:text="${studentInfo.summary.publicAbsenceCount} + '日'">0日</td>
+                            <td th:text="${student.summary.attendanceCount} + '日'">0日</td>
+                            <td th:text="${student.summary.absenceCount} + '日'" style="color: #EF5350;">0日</td>
+                            <td th:text="${student.summary.lateCount} + '日'">0日</td>
+                            <td th:text="${student.summary.earlyLeaveCount} + '日'">0日</td>
+                            <td th:text="${student.summary.suspensionCount} + '日'">0日</td>
+                            <td th:text="${student.summary.publicAbsenceCount} + '日'">0日</td>
                         </tr>
                     </tbody>
                 </table>
@@ -97,28 +116,46 @@
                         <thead>
                             <tr>
                                 <th>日付</th>
-                                <th th:each="header : ${studentInfo.periodHeaders}" th:text="${header}">1限目</th>
+                                <th th:each="header : ${student.periodHeaders}" th:text="${header}">1限目</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="day : ${studentInfo.scheduleList}">
+                            <tr th:each="day : ${student.scheduleList}"
+                                th:classappend="${day.absentDay} ? 'absent-row' : ''"> 
+                                
                                 <td th:text="${day.dateStr}">1/1(月)</td>
+                                
                                 <td th:each="period : ${day.periods}">
                                     <div th:if="${period.hasClass}" 
-                                        class="cell-content"
-                                        th:classappend="${period.statusClass}">
-                                        
-                                        <span class="subject-name" th:text="${period.subjectName}">教科名</span>
-                                        
-                                        <span class="status-tag" th:text="${period.statusIcon}">
-                                            〇
-                                        </span>
+                                         class="cell-content"
+                                         th:classappend="${period.statusClass}">
+                                         
+                                         <div class="view-mode">
+                                             <span class="subject-name" th:text="${period.subjectName}">教科名</span>
+                                             <span class="status-tag" th:text="${period.statusIcon}">〇</span>
+                                         </div>
+
+                                         <div class="edit-mode" style="display: none;">
+                                             <div style="font-size: 0.75rem; margin-bottom: 2px;" th:text="${period.subjectName}">教科</div>
+                                             <select class="status-select" 
+                                                     th:data-date="${day.dateStr}" 
+                                                     th:data-period="${period.period}"
+                                                     style="width: 100%; font-size: 0.9rem; padding: 2px;">
+                                                 <option value="出席" th:selected="${period.statusIcon == '○'}">出席</option>
+                                                 <option value="欠席" th:selected="${period.statusIcon == '×'}">欠席</option>
+                                                 <option value="遅刻" th:selected="${period.statusIcon == '△'}">遅刻</option>
+                                                 <option value="早退" th:selected="${period.statusIcon == '早'}">早退</option>
+                                                 <option value="公欠" th:selected="${period.statusIcon == '公'}">公欠</option>
+                                                 <option value="出席停止" th:selected="${period.statusIcon == '停'}">出停</option>
+                                             </select>
+                                         </div>
+
                                     </div>
     
-    <div th:unless="${period.hasClass}" class="cell-content" style="color: #ccc;">
-        -
-    </div>
-</td>
+                                    <div th:unless="${period.hasClass}" class="cell-content" style="color: #ccc; background-color: transparent;">
+                                        -
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -127,41 +164,123 @@
         </div>
     </div>
 
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        // URLパスから現在のIDを取得するロジックに変更
-        // (th:inline で studentId を埋め込むと null の場合にエラーになることがあるため)
-        function getCurrentStudentId() {
-            const pathParts = window.location.pathname.split('/');
-            return pathParts[pathParts.length - 1]; // URLの最後の部分をIDとする
+    <script>
+    // --- 月変更 ---
+    function changeMonth() {
+        const month = document.getElementById('monthPicker').value;
+        const currentUrl = new URL(window.location.href);
+        if (month) {
+            currentUrl.searchParams.set('month', month);
+        } else {
+            currentUrl.searchParams.delete('month');
         }
+        window.location.href = currentUrl.toString();
+    }
 
-        // 月変更処理
-        function changeMonth(newMonthVal) {
-            if (!newMonthVal) return;
-            const studentId = getCurrentStudentId();
-            // 遷移先URLを作成
-            window.location.href = `/admin/student/info/${studentId}?month=${newMonthVal}`;
+    // --- 教科検索 ---
+    function searchSubject() {
+        const keyword = document.getElementById('subjectSearchInput').value;
+        const currentUrl = new URL(window.location.href);
+        if (keyword) {
+            currentUrl.searchParams.set('searchSubject', keyword);
+        } else {
+            currentUrl.searchParams.delete('searchSubject');
         }
+        window.location.href = currentUrl.toString();
+    }
 
-        // 左サイドバーの教科検索フィルタ
-        function filterSubjects() {
-            const input = document.getElementById('subjectSearchInput');
-            const filter = input.value.toUpperCase();
-            const ul = document.getElementById("subjectListUl");
-            const li = ul.getElementsByTagName('li');
+    // --- 編集機能 ---
+    let isEditing = false;
 
-            for (let i = 0; i < li.length; i++) {
-                const a = li[i].getElementsByTagName("a")[0];
-                const txtValue = a.textContent || a.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    li[i].style.display = "";
-                } else {
-                    li[i].style.display = "none";
-                }
+    function toggleEditMode() {
+        isEditing = !isEditing;
+        
+        const viewElements = document.querySelectorAll('.view-mode');
+        const editElements = document.querySelectorAll('.edit-mode');
+        const editBtn = document.getElementById('editBtn');
+        const saveBtn = document.getElementById('saveBtn');
+
+        if (isEditing) {
+            // 編集モードON
+            viewElements.forEach(el => el.style.display = 'none');
+            editElements.forEach(el => el.style.display = 'block');
+            
+            editBtn.textContent = 'キャンセル';
+            editBtn.style.backgroundColor = '#6c757d'; // グレー
+            editBtn.style.color = '#fff';
+            saveBtn.style.display = 'block';
+        } else {
+            // 編集モードOFF
+            viewElements.forEach(el => el.style.display = 'block');
+            editElements.forEach(el => el.style.display = 'none');
+            
+            editBtn.textContent = '編集';
+            editBtn.style.backgroundColor = ''; // 元に戻す
+            editBtn.style.color = '';
+            saveBtn.style.display = 'none';
+        }
+    }
+
+    async function saveChanges() {
+        if (!confirm('変更を保存しますか？')) return;
+
+        const studentId = document.getElementById('studentIdHidden').value;
+        const selects = document.querySelectorAll('.status-select');
+        const updates = [];
+
+        selects.forEach(select => {
+            // 日付文字列 "2026 / 01 / 15 (木)" から "2026-01-15" を抽出
+            const rawDate = select.dataset.date;
+            // 正規表現で yyyy / MM / dd を取り出す
+            const match = rawDate.match(/(\d{4})\s*\/\s*(\d{2})\s*\/\s*(\d{2})/);
+            
+            if (match) {
+                const formattedDate = `${match[1]}-${match[2]}-${match[3]}`;
+                
+                updates.push({
+                    date: formattedDate,
+                    period: parseInt(select.dataset.period),
+                    status: select.value
+                });
             }
+        });
+
+        const payload = {
+            studentId: parseInt(studentId),
+            updates: updates
+        };
+
+        try {
+            // CSRFトークン取得 (Spring Security使用時用)
+            // const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+            // const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+            
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            // if (csrfToken && csrfHeader) {
+            //     headers[csrfHeader] = csrfToken;
+            // }
+
+            const response = await fetch('/admin/student/student-info/update', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert('保存しました');
+                location.reload();
+            } else {
+                alert('保存に失敗しました');
+                console.error(await response.text());
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('通信エラーが発生しました');
         }
-        /*]]>*/
+    }
     </script>
 </body>
 </html>

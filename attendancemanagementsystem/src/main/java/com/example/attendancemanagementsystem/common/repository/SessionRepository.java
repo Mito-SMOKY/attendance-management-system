@@ -41,4 +41,7 @@ public interface SessionRepository extends JpaRepository<SessionEntity, Integer>
     // 指定期間内のセッションを取得
     @Query("SELECT s FROM SessionEntity s WHERE s.sessionDate BETWEEN :startDate AND :endDate ORDER BY s.sessionDate, s.timeSlot.slotId")
     List<SessionEntity> findBySessionDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    // 特定の日付と時間帯に基づくセッションの取得
+    SessionEntity findBySessionDateAndTimeSlotSlotId(LocalDate sessionDate, Integer slotId);
 }
