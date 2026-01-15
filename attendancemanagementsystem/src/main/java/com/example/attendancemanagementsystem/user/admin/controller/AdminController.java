@@ -2,7 +2,6 @@ package com.example.attendancemanagementsystem.user.admin.controller;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +22,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.attendancemanagementsystem.common.entity.ClassroomEntity; // ★追加
-import com.example.attendancemanagementsystem.common.entity.Datalist;
-import com.example.attendancemanagementsystem.user.admin.dto.MasterDataResponse;
+import com.example.attendancemanagementsystem.common.entity.ClassroomEntity;
+import com.example.attendancemanagementsystem.common.entity.Datalist; // ★追加
 import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
-import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm; // ★追加
+import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm;
 import com.example.attendancemanagementsystem.user.admin.service.AdminClassroomService;
-import com.example.attendancemanagementsystem.user.admin.service.AdminService;
-import com.example.attendancemanagementsystem.user.admin.service.AdminSubjectService; // ★追加
+import com.example.attendancemanagementsystem.user.admin.service.AdminService; // ★追加
+import com.example.attendancemanagementsystem.user.admin.service.AdminSubjectService;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
 @Controller
@@ -395,7 +393,7 @@ public class AdminController {
     }
 
     // --- 保存処理 (POST) ---
-    // ★修正: こちらも合わせてURLを変更 (/mdSubjectInformation/save → /master/SubjectInformation/save)
+    // こちらも合わせてURLを変更 (/mdSubjectInformation/save → /master/SubjectInformation/save)
     @PostMapping("/master/SubjectInformation/save")
     public String saveSubjectInformation(
             @RequestParam(name = "subjectId", required = false) List<Integer> subjectIds,

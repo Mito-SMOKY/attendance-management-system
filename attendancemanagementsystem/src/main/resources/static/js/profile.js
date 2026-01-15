@@ -70,12 +70,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 displayName.textContent = newName;
                 originalName = newName;
                 
-                // ▼▼▼ ここを追加しました！(ヘッダーの更新処理) ▼▼▼
+                // 2. ヘッダー部分の名前更新
                 const headerNameElement = document.getElementById('header-user-name');
                 if (headerNameElement) {
                     headerNameElement.textContent = newName;
                 }
-                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+                
 
                 // UIを戻す
                 toggleEditMode(false);
