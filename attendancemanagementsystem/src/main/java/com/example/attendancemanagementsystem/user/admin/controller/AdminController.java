@@ -27,10 +27,12 @@ import com.example.attendancemanagementsystem.common.entity.Datalist; // ★追�
 import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
 import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm;
 import com.example.attendancemanagementsystem.user.admin.service.AdminClassroomService;
-import com.example.attendancemanagementsystem.user.admin.service.AdminService; // ★追加
-import com.example.attendancemanagementsystem.user.admin.service.AdminSubjectService;
+import com.example.attendancemanagementsystem.user.admin.service.AdminCourseService;
+import com.example.attendancemanagementsystem.user.admin.service.AdminDepartmentService;
+import com.example.attendancemanagementsystem.user.admin.service.AdminMajorService;
+import com.example.attendancemanagementsystem.user.admin.service.AdminService;
+import com.example.attendancemanagementsystem.user.admin.service.AdminSubjectService; // ★追加
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
-
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
@@ -43,6 +45,16 @@ public class AdminController {
 
     @Autowired
     private AdminClassroomService adminClassroomService; // ★追加
+
+    @Autowired
+    private AdminDepartmentService adminDepartmentService; // ★追加
+
+    @Autowired
+    private AdminMajorService adminMajorService;       // 追加
+
+    @Autowired
+    private AdminCourseService adminCourseService;     // 追加
+
 
     private Integer getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -324,4 +336,109 @@ public class AdminController {
         //リダイレクト先も新しいURLに変更
         return "redirect:/admin/master/SubjectInformation";
     }
+
+    // // --- 14. 所属(クラス)マスタ詳細画面 (GET) ---
+    // @GetMapping("/master/department")
+    // public String showDepartmentMaster(Model model) {
+    //     // 一覧表示用データ
+    //     List<DepartmentEntity> deptList = adminDepartmentService.getAllDepartments();
+    //     model.addAttribute("departmentList", deptList);
+        
+    //     // ドロップダウン用コースリスト
+    //     model.addAttribute("courseList", adminDepartmentService.getAllCourses());
+        
+    //     return "admin/mdDepartment"; // 新規作成するHTML
+    // }
+
+    // // --- 所属(クラス)マスタ保存 (POST) ---
+    // @PostMapping("/master/department/save")
+    // public String saveDepartmentMaster(
+    //         @RequestParam(name = "departmentId", required = false) List<Integer> departmentIds,
+    //         @RequestParam(name = "className", required = false) List<String> classNames,
+    //         @RequestParam(name = "courseId", required = false) List<Integer> courseIds,
+    //         RedirectAttributes redirectAttributes) {
+        
+    //     try {
+    //         adminDepartmentService.saveDepartmentList(departmentIds, classNames, courseIds);
+    //         redirectAttributes.addFlashAttribute("successMessage", "所属情報を保存しました。");
+    //     } catch (Exception e) {
+    //         e.printStackTrace();
+    //         redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+    //     }
+
+    //     return "redirect:/admin/master/department";
+    // }
+
+
+    // ==========================================
+    // 所属マスタ機能 (3タブ構成)
+    // ==========================================
+
+    // --- Tab 1: 学科マスタ ---
+    @GetMapping("/master/major")
+    public String showMajorMaster(Model model) {
+        model.addAttribute("majorList", adminMajorService.getAllMajors());
+        return "admin/mdMajor";
+    }
+
+    @PostMapping("/master/major/save")
+    public String saveMajorMaster(
+            @RequestParam(name = "majorId", required = false) List<Integer> majorIds,
+            @RequestParam(name = "majorName", required = false) List<String> majorNames,
+            RedirectAttributes redirectAttributes) {
+        try {
+            adminMajorService.saveMajorList(majorIds, majorNames);
+            redirectAttributes.addFlashAttribute("successMessage", "学科情報を保存しました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+        }
+        return "redirect:/admin/master/major";
+    }
+
+    // --- Tab 2: コースマスタ ---
+    @GetMapping("/master/course")
+    public String showCourseMaster(Model model) {
+        model.addAttribute("courseList", adminCourseService.getAllCourses());
+        model.addAttribute("majorList", adminCourseService.getAllMajors());
+        return "admin/mdCourse";
+    }
+
+    @PostMapping("/master/course/save")
+    public String saveCourseMaster(
+            @RequestParam(name = "courseId", required = false) List<Integer> courseIds,
+            @RequestParam(name = "courseName", required = false) List<String> courseNames,
+            @RequestParam(name = "majorId", required = false) List<Integer> majorIds,
+            RedirectAttributes redirectAttributes) {
+        try {
+            adminCourseService.saveCourseList(courseIds, courseNames, majorIds);
+            redirectAttributes.addFlashAttribute("successMessage", "コース情報を保存しました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+        }
+        return "redirect:/admin/master/course";
+    }
+
+    // --- Tab 3: 所属(クラス)マスタ ---
+    @GetMapping("/master/department")
+    public String showDepartmentMaster(Model model) {
+        model.addAttribute("departmentList", adminDepartmentService.getAllDepartments());
+        model.addAttribute("courseList", adminDepartmentService.getAllCourses());
+        return "admin/mdDepartment";
+    }
+
+    @PostMapping("/master/department/save")
+    public String saveDepartmentMaster(
+            @RequestParam(name = "departmentId", required = false) List<Integer> departmentIds,
+            @RequestParam(name = "className", required = false) List<String> classNames,
+            @RequestParam(name = "courseId", required = false) List<Integer> courseIds,
+            RedirectAttributes redirectAttributes) {
+        try {
+            adminDepartmentService.saveDepartmentList(departmentIds, classNames, courseIds);
+            redirectAttributes.addFlashAttribute("successMessage", "所属情報を保存しました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+        }
+        return "redirect:/admin/master/department";
+    }
 }
+

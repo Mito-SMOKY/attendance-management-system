@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>所属マスタ</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}" />
+    <link rel="stylesheet" th:href="@{/css/admin/adminMdClassroom.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      .master-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 10px;
+      }
+      .master-tab {
+        padding: 10px 20px;
+        background-color: #f0f0f0;
+        border-radius: 5px 5px 0 0;
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+      }
+      .master-tab.active {
+        background-color: #007bff;
+        color: white;
+      }
+      .master-tab:hover {
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header-container">
+      <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+    <div class="backbutton-container">
+      <div
+        th:replace="~{fragments/_parts :: backButton(url='/admin/master-data')}"
+      ></div>
+    </div>
+
+    <form
+      th:action="@{/admin/master/department/save}"
+      method="post"
+      id="masterForm"
+    >
+      <div class="classroom-container">
+        <div class="master-tabs">
+          <a th:href="@{/admin/master/major}" class="master-tab">① 学科登録</a>
+          <a th:href="@{/admin/master/course}" class="master-tab"
+            >② コース登録</a
+          >
+          <a th:href="@{/admin/master/department}" class="master-tab active"
+            >③ クラス(所属)登録</a
+          >
+        </div>
+
+        <div class="page-header-wrapper">
+          <h1 class="page-title">所属マスタ (クラス登録)</h1>
+        </div>
+        <div
+          th:if="${successMessage}"
+          style="color: green; text-align: center; margin-bottom: 10px"
+        >
+          <span th:text="${successMessage}"></span>
+        </div>
+        <div
+          th:if="${errorMessage}"
+          style="color: red; text-align: center; margin-bottom: 10px"
+        >
+          <span th:text="${errorMessage}"></span>
+        </div>
+
+        <div class="filter-area">
+          <button type="button" class="edit-btn" onclick="toggleEditMode()">
+            編集
+          </button>
+        </div>
+        <div class="error-message-area">
+          <span id="errorMsgRequired" class="error-text" style="display: none"
+            >※クラス名とコースは必須です。</span
+          >
+        </div>
+
+        <div class="table-wrapper">
+          <table class="classroom-table" id="deptTable">
+            <colgroup>
+              <col style="width: 30%" />
+              <col style="width: 30%" />
+              <col style="width: 30%" />
+              <col style="width: 10%" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>学科</th>
+                <th>コース</th>
+                <th>クラス名</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="dept : ${departmentList}">
+                <input
+                  type="hidden"
+                  name="departmentId"
+                  th:value="${dept.departmentId}"
+                />
+                <td>
+                  <span
+                    class="view-mode"
+                    th:text="${dept.course != null && dept.course.major != null ? dept.course.major.majorName : '-'}"
+                  ></span>
+                  <span
+                    class="edit-mode major-display"
+                    style="display: none; color: #666"
+                    th:text="${dept.course != null && dept.course.major != null ? dept.course.major.majorName : '-'}"
+                  ></span>
+                </td>
+                <td>
+                  <span
+                    class="view-mode"
+                    th:text="${dept.course != null ? dept.course.courseName : '-'}"
+                  ></span>
+                  <select
+                    class="form-input edit-mode course-select"
+                    name="courseId"
+                    style="display: none"
+                    onchange="updateMajorDisplay(this)"
+                  >
+                    <option value="" data-major="-">コースを選択</option>
+                    <option
+                      th:each="course : ${courseList}"
+                      th:value="${course.courseId}"
+                      th:text="${course.courseName}"
+                      th:data-major="${course.major != null ? course.major.majorName : '-'}"
+                      th:selected="${dept.course != null && dept.course.courseId == course.courseId}"
+                    ></option>
+                  </select>
+                </td>
+                <td>
+                  <span class="view-mode" th:text="${dept.className}"></span>
+                  <input
+                    type="text"
+                    class="form-input edit-mode"
+                    style="display: none"
+                    name="className"
+                    th:value="${dept.className}"
+                    placeholder="クラス名"
+                  />
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="delete-btn"
+                    onclick="deleteRow(this)"
+                    style="display: none"
+                  >
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="add-btn-wrapper" style="display: none">
+          <button type="button" class="add-row-btn" onclick="addDeptRow()">
+            ＋
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      const deptCourseOptions = /*[[${courseList}]]*/ [];
+      /*]]>*/
+    </script>
+
+    <script>
+      function toggleEditMode() {
+        const body = document.body;
+        const btn = document.querySelector(".edit-btn");
+        const form = document.getElementById("masterForm");
+
+        if (body.classList.contains("editing-mode")) {
+          if (!validateData()) return;
+          if (!confirm("変更を保存しますか？")) return;
+          form.submit();
+        } else {
+          body.classList.add("editing-mode");
+          btn.textContent = "適用";
+          document
+            .querySelectorAll(".view-mode")
+            .forEach((el) => (el.style.display = "none"));
+          document
+            .querySelectorAll(".edit-mode")
+            .forEach(
+              (el) =>
+                (el.style.display =
+                  el.tagName === "SPAN" ? "inline-block" : "block")
+            );
+          document
+            .querySelectorAll(".delete-btn")
+            .forEach((el) => (el.style.display = "inline-block"));
+          document.querySelector(".add-btn-wrapper").style.display = "block";
+        }
+      }
+
+      function addDeptRow() {
+        const tableBody = document.querySelector("#deptTable tbody");
+        const newRow = document.createElement("tr");
+        let optionsHtml =
+          '<option value="" data-major="-">コースを選択</option>';
+        if (deptCourseOptions) {
+          deptCourseOptions.forEach((c) => {
+            const majorName = c.major ? c.major.majorName : "-";
+            optionsHtml += `<option value="${c.courseId}" data-major="${majorName}">${c.courseName}</option>`;
+          });
+        }
+
+        newRow.innerHTML = `
+            <td><span class="edit-mode major-display" style="display: inline-block; color: #666;">-</span></td>
+            <td><select class="form-input edit-mode course-select" name="courseId" style="display: block" onchange="updateMajorDisplay(this)">${optionsHtml}</select></td>
+            <td><input type="text" class="form-input edit-mode" name="className" placeholder="クラス名" style="display: block"></td>
+            <td><button type="button" class="delete-btn" onclick="deleteRow(this)" style="display: inline-block"><i class="fa-solid fa-trash-can"></i></button></td>
+        `;
+        tableBody.appendChild(newRow);
+      }
+
+      function updateMajorDisplay(selectElement) {
+        const selectedOption =
+          selectElement.options[selectElement.selectedIndex];
+        const majorName = selectedOption.getAttribute("data-major");
+        const row = selectElement.closest("tr");
+        const majorDisplay = row.querySelector(".major-display");
+        if (majorDisplay)
+          majorDisplay.textContent = majorName ? majorName : "-";
+      }
+
+      function deleteRow(btn) {
+        if (confirm("この行を削除しますか？")) btn.closest("tr").remove();
+      }
+
+      function validateData() {
+        let hasError = false;
+        document.getElementById("errorMsgRequired").style.display = "none";
+        document.querySelectorAll("#deptTable tbody tr").forEach((row) => {
+          const name = row.querySelector('input[name="className"]');
+          const course = row.querySelector('select[name="courseId"]');
+          if (!name || !course) return;
+
+          if (name.value.trim() === "") {
+            name.classList.add("input-error");
+            hasError = true;
+          } else {
+            name.classList.remove("input-error");
+          }
+          if (course.value === "") {
+            course.classList.add("input-error");
+            hasError = true;
+          } else {
+            course.classList.remove("input-error");
+          }
+        });
+        if (hasError)
+          document.getElementById("errorMsgRequired").style.display =
+            "inline-block";
+        return !hasError;
+      }
+    </script>
+  </body>
+</html>
