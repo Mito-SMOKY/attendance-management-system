@@ -53,7 +53,10 @@
                     <div class="sidebar-title">受講教科一覧</div>
                     <ul class="subject-list" id="subjectListUl">
                         <li th:each="subject : ${student.subjectList}" class="subject-item">
-                            <a href="#" th:text="${subject.subjectName}">教科名</a>
+                            <a th:href="@{/admin/student/{sid}/subject/{subid}(sid=${student.studentId}, subid=${subject.subjectId})}" 
+                                th:text="${subject.subjectName}">
+                                    教科名
+                            </a>
                         </li>
                         <li th:if="${#lists.isEmpty(student.subjectList)}" class="subject-item" style="color: #999; padding: 5px;">
                             該当なし
