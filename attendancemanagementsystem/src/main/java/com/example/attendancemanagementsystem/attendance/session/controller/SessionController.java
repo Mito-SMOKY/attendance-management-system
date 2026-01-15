@@ -112,6 +112,7 @@ public class SessionController {
     public List<Integer> getGradesByDepartment(@PathVariable Integer departmentId) {
         return departmentSubjectRepository.findGradesByDepartmentId(departmentId);
     }
+    
 
     // 科目リストAPI
     @GetMapping("/api/subjects/{departmentId}")

@@ -53,7 +53,7 @@ public class NotificationMessageService {
     @Transactional
     public void createOfficialAbsenceRequestNotification(UsersEntity approver, UsersEntity student, String reason) {
         create(approver, student.getUserId(), NotificationType.OFFICIAL_ABSENCE_REQUEST, null, 
-            student.getName(), reason);
+            approver.getName(),student.getName(), reason);
     }
 
     // 申請許可通知(生徒向け)

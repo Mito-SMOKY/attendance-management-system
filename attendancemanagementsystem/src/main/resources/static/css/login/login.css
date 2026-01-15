@@ -19,7 +19,7 @@ html, body {
     width: 100%;
     height: auto;
     padding: 30px;
-    margin-top: 100px;
+    margin-top: 60px;
 }
 
 .firstLogin-container {
@@ -32,17 +32,16 @@ html, body {
 
 .title {
     text-align: center;
-    margin-bottom: 20px;
-    font-size: 50px;
+    font-size: 1.2em;
     color: #00bdca;
-    padding: 30px;
 }
 
 .form-group {
     display: block;
     align-items: center;
     margin-bottom: 10px;
-    width: 100%;
+    max-width: 350px;
+    text-align: left;
     padding-block-end: 10px;
 }
 
@@ -62,11 +61,9 @@ input::placeholder {
 }
 
 .label {
-    display: block; /* 念のためブロック要素に */
     width: 100%;
     text-align: left;
-    font-size: 20px;
-    margin-bottom: 5px;
+    font-size: 1em;
 }
 
 .form {
@@ -81,37 +78,35 @@ input::placeholder {
 
 /* ▼▼▼ パスワード表示切り替え用のスタイル ▼▼▼ */
 .password-wrapper {
-    position: relative; /* アイコンを絶対配置するための基準 */
+    position: relative;
     width: 100%;
 }
 
 .password-wrapper .form {
-    padding-right: 50px; /* アイコンと被らないように右側に余白を作る */
-    margin: 0; /* ラッパーの中なのでマージン調整 */
+    padding-right: 50px;
+    margin: 0; 
 }
 
 .toggle-password {
     position: absolute;
     right: 15px;
     top: 50%;
-    transform: translateY(-50%); /* 垂直中央揃え */
+    transform: translateY(-50%);
     cursor: pointer;
-    color: #00bdca; /* テーマカラーに合わせる */
+    color: #00bdca; 
     font-size: 1.2rem;
     z-index: 10;
 }
 .toggle-password:hover {
     opacity: 0.7;
 }
-/* ▲▲▲ ここまで追加 ▲▲▲ */
-
 
 .forget-password {
-    display: block; /* ブロック要素にして中央寄せを効かせる */
+    display: block;
     text-align: center;
     font-size: 16px;
     color: #00bdca;
-    text-decoration: underline; /* line-throughs(打ち消し線)ではなくunderline(下線)が一般的ですが、元の通りにするならここを変更 */
+    text-decoration: underline; 
     margin-top: 10px;
 }
 
@@ -148,3 +143,5 @@ input::placeholder {
     text-align: center;
     margin-top: 10px;
 }
+
+

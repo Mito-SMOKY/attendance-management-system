@@ -90,3 +90,61 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+window.addEventListener('load', () => {
+    const body = document.body;
+    const splash = document.getElementById('splash');
+    const splashLogoContainer = document.querySelector('.splash-logo-container');
+    const staticLogo = document.querySelector('.static-logo');
+
+    const hasPlayed = sessionStorage.getItem('animationPlayed');
+
+    if (hasPlayed) {
+        if (splash) splash.style.display = 'none';
+        body.classList.remove('loading');
+        body.classList.add('header-active', 'loaded', 'show-static', 'animation-done');
+        
+    } else {
+        // 1. ヘッダー表示
+        setTimeout(() => body.classList.add('header-active'), 100); 
+
+        // 2. 波紋待機後の移動開始
+        setTimeout(() => {
+            // --- 座標計算ロジック ---
+            if (staticLogo && splashLogoContainer) {
+                //スタティックロゴの現在の位置を取得
+                const rect = staticLogo.getBoundingClientRect();
+                
+                //画面の中心座標
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+
+                //中心から目的地までの正確な距離を計算
+                const moveX = (rect.left + rect.width / 2) - centerX;
+                const moveY = (rect.top + rect.height / 2) - centerY;
+
+                //座標を指定
+                splashLogoContainer.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px)) scale(1)`;
+            }
+
+            body.classList.add('loaded'); 
+
+            // 3. 移動完了後（1.5秒後）にスタティックロゴを裏で表示
+            setTimeout(() => {
+                body.classList.add('show-static');
+
+                setTimeout(() => {
+                    body.classList.add('animation-done'); 
+                    
+                    if(splash) splash.style.opacity = '0';
+
+                    setTimeout(() => {
+                        if(splash) splash.style.display = 'none';
+                        body.classList.remove('loading');
+                        sessionStorage.setItem('animationPlayed', 'true');
+                    }, 500); // 消えるアニメーション時間
+                },); 
+            }, 1500); // 移動にかかる時間（CSSの1.5sと合わせる）
+        }, 2200); // 最初の波紋待機
+    }
+});
