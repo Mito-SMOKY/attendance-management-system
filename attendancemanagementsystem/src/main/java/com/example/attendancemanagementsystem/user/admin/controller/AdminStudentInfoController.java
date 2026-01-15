@@ -3,6 +3,8 @@ package com.example.attendancemanagementsystem.user.admin.controller;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 
 import com.example.attendancemanagementsystem.user.admin.dto.StudentAttendanceUpdateDto;
 import com.example.attendancemanagementsystem.user.admin.dto.StudentInfoDetailDto;
@@ -53,10 +56,13 @@ public class AdminStudentInfoController {
     //  出席情報更新用のエンドポイント
     @PostMapping("/student-info/update")
     @ResponseBody
-    public String updateAttendance(@RequestBody StudentAttendanceUpdateDto form) {
-
-        //更新処理の呼び出し
-        studentInfoService.updateStudentAttendance(form);
-        return "OK";
+    public ResponseEntity<String> updateAttendance(@RequestBody StudentAttendanceUpdateDto form) {
+        try {
+            studentInfoService.updateStudentAttendance(form); 
+            return ResponseEntity.ok("更新成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("更新失敗");
+        }
     }
 }

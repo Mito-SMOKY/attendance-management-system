@@ -132,6 +132,7 @@ public class SubjectAttendanceService {
                         .findFirst().orElse(null);
 
                 if (att != null) {
+                    // ステータス名取得
                     String sName = att.getStatus().getStatusName();
                     // 表示用シンボルと月間カウント
                     // ※ここでカウントするのは「その月」の回数

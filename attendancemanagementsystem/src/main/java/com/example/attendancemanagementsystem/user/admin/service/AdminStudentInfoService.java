@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map; // 追加
 import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -94,7 +95,7 @@ public class AdminStudentInfoService {
         EnrollmentsEntity activeEnrollment = enrollmentsRepository.findByUserAndIsActiveTrue(user)
                 .orElse(null);
 
-        // 選択可能な月リストの生成 (入学年度4月 ～ 現在/指定月)
+        // 選択可能な月リストの生成
         List<String> selectableMonths = new ArrayList<>();
         if (activeEnrollment != null && activeEnrollment.getAcademicYear() != null) {
             int startYear = activeEnrollment.getAcademicYear();
@@ -102,18 +103,14 @@ public class AdminStudentInfoService {
             YearMonth nowYm = YearMonth.now();
             YearMonth targetYm = YearMonth.parse(targetMonthStr.replace("/", "-"));
             
-            // 現在日付または選択中日付の遅い方をエンドにする
             YearMonth endYm = nowYm.isAfter(targetYm) ? nowYm : targetYm;
 
-            // 最新から過去へ降順でリスト作成
             YearMonth current = endYm;
             while (!current.isBefore(startYm)) {
                 selectableMonths.add(current.format(DateTimeFormatter.ofPattern("yyyy-MM")));
                 current = current.minusMonths(1);
             }
         } else {
-
-            // 在籍情報がない場合はとりあえず表示月だけ入れる
             selectableMonths.add(targetMonthStr);
         }
         dto.setSelectableMonths(selectableMonths);
@@ -122,37 +119,46 @@ public class AdminStudentInfoService {
         List<SubjectSimpleDto> displaySubjects = new ArrayList<>();
         Integer targetDeptId = null;
         
-        // 在籍情報がある場合のみ処理
+        Specification<SubjectEntity> keywordSpec = searchService.createKeywordSpec(searchSubject, List.of("subjectName"));
+        boolean filterSuccess = false;
+
+        // 学科・学年による絞り込み
         if (activeEnrollment != null && activeEnrollment.getDepartment() != null) {
             targetDeptId = activeEnrollment.getDepartment().getDepartmentId();
             Integer grade = activeEnrollment.getGrade();
 
-            // 履修可能な全教科を取得する
             List<SubjectEntity> allowedSubjects = departmentSubjectRepository.findSubjectsByDepartmentIdAndGrade(targetDeptId, grade);
             List<Integer> allowedSubjectIds = allowedSubjects.stream()
                     .map(SubjectEntity::getSubjectId)
                     .collect(Collectors.toList());
 
             if (!allowedSubjectIds.isEmpty()) {
-                
-                // キーワード検索条件の作成
-                Specification<SubjectEntity> spec = searchService.createKeywordSpec(searchSubject, List.of("subjectName"));
-
-                // 許可された教科IDの絞り込み条件を追加
                 Specification<SubjectEntity> allowedSpec = (root, query, cb) -> root.get("subjectId").in(allowedSubjectIds);
-                spec = spec.and(allowedSpec);
+                Specification<SubjectEntity> finalSpec = keywordSpec.and(allowedSpec);
 
-                // 絞り込み後の教科リスト取得
-                List<SubjectEntity> filteredSubjects = subjectRepository.findAll(spec);
+                List<SubjectEntity> filteredSubjects = subjectRepository.findAll(finalSpec);
                 
-                // DTOへ変換
-                displaySubjects = filteredSubjects.stream().map(s -> {
-                    SubjectSimpleDto sd = new SubjectSimpleDto();
-                    sd.setSubjectId(s.getSubjectId());
-                    sd.setSubjectName(s.getSubjectName());
-                    return sd;
-                }).collect(Collectors.toList());
+                if (!filteredSubjects.isEmpty()) {
+                    displaySubjects = filteredSubjects.stream().map(s -> {
+                        SubjectSimpleDto sd = new SubjectSimpleDto();
+                        sd.setSubjectId(s.getSubjectId());
+                        sd.setSubjectName(s.getSubjectName());
+                        return sd;
+                    }).collect(Collectors.toList());
+                    filterSuccess = true;
+                }
             }
+        }
+
+        // 救済措置: 絞り込めない場合は全教科検索
+        if (!filterSuccess) {
+            List<SubjectEntity> allSubjects = subjectRepository.findAll(keywordSpec);
+            displaySubjects = allSubjects.stream().map(s -> {
+                SubjectSimpleDto sd = new SubjectSimpleDto();
+                sd.setSubjectId(s.getSubjectId());
+                sd.setSubjectName(s.getSubjectName());
+                return sd;
+            }).collect(Collectors.toList());
         }
         dto.setSubjectList(displaySubjects);
 
@@ -165,13 +171,78 @@ public class AdminStudentInfoService {
         List<SessionEntity> allSessions = sessionRepository.findBySessionDateBetween(startDate, endDate);
         List<AttendanceEntity> attendances = attendanceRepository.findByStudentIdAndDateBetween(studentId, startDate, endDate);
 
-        // 出席サマリー集計
+        // --- ★修正: 出席サマリー集計 (日付単位のロジックへ変更) ---
         AttendanceSummaryDto summary = new AttendanceSummaryDto();
-        for (AttendanceEntity att : attendances) {
-            String statusName = att.getStatus() != null ? att.getStatus().getStatusName() : "";
-            countStatus(summary, statusName);
+
+    // 1. 日付ごとにデータをグループ化
+    Map<LocalDate, List<AttendanceEntity>> groupedByDate = attendances.stream()
+            .filter(a -> a.getSession() != null)
+            .collect(Collectors.groupingBy(a -> a.getSession().getSessionDate()));
+
+    // 2. 日付ごとに「1日の扱い」を判定
+    for (List<AttendanceEntity> dailyAtts : groupedByDate.values()) {
+        
+        // 重要: 時系列順（1限 -> 4限）に並べ替える
+        dailyAtts.sort((a, b) -> {
+            Integer slotA = a.getSession().getTimeSlot().getSlotId();
+            Integer slotB = b.getSession().getTimeSlot().getSlotId();
+            return slotA.compareTo(slotB);
+        });
+
+        // 判定用のステータスリストを作成（文字列リスト化して扱いやすくする）
+        List<String> statusList = dailyAtts.stream()
+                .map(a -> a.getStatus() != null ? a.getStatus().getStatusName() : "")
+                .collect(Collectors.toList());
+
+        // --- A. 「1日まるごと」系の判定 ---
+
+        // (1) 全欠席
+        if (statusList.stream().allMatch(s -> "欠席".equals(s))) {
+            summary.setAbsenceCount(summary.getAbsenceCount() + 1);
+            continue;
         }
-        dto.setSummary(summary);
+
+        // (2) 全公欠 (公欠 または 公欠候補)
+        if (statusList.stream().allMatch(s -> "公欠".equals(s) || "公欠候補".equals(s))) {
+            summary.setPublicAbsenceCount(summary.getPublicAbsenceCount() + 1);
+            continue;
+        }
+
+        // (3) 全出席停止
+        if (statusList.stream().allMatch(s -> "出席停止".equals(s))) {
+            summary.setSuspensionCount(summary.getSuspensionCount() + 1);
+            continue;
+        }
+
+        // --- B. 部分的な出席（遅刻・早退）の判定 ---
+
+        String firstStatus = statusList.get(0); // 1限目の状態
+        String lastStatus = statusList.get(statusList.size() - 1); // 最後の授業の状態
+
+        // (4) 遅刻判定
+        // ルール: 1限目が「欠席」または「遅刻」の場合
+        // 例: [欠席, 欠席, 出席, 出席] -> 朝いないので「遅刻」カウント
+        if ("欠席".equals(firstStatus) || "遅刻".equals(firstStatus)) {
+            summary.setLateCount(summary.getLateCount() + 1);
+            continue;
+        }
+
+        // (5) 早退判定
+        // ルール: 1限目はOKだったが、最後の授業が「欠席」または「早退」の場合
+        // 例: [出席, 出席, 早退, 欠席] -> 最後いないので「早退」カウント
+        if ("欠席".equals(lastStatus) || "早退".equals(lastStatus)) {
+            summary.setEarlyLeaveCount(summary.getEarlyLeaveCount() + 1);
+            continue;
+        }
+
+        // --- C. その他 ---
+
+        // (6) 出席
+        // 上記のいずれにも当てはまらない（朝から最後まで出席している）
+        summary.setAttendanceCount(summary.getAttendanceCount() + 1);
+    }
+    
+    dto.setSummary(summary);
 
         // スケジュール表の作成
         final Integer deptIdFilter = targetDeptId;
@@ -182,11 +253,9 @@ public class AdminStudentInfoService {
             .sorted()
             .collect(Collectors.toList());
 
-        // 日別スケジュールリストの構築
         List<DailyScheduleDto> scheduleList = new ArrayList<>();
         DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("yyyy / MM / dd (E)", Locale.JAPANESE);
 
-        // 日付ごとに処理
         for (LocalDate date : activeDates) {
             DailyScheduleDto dailyDto = new DailyScheduleDto();
             dailyDto.setDateStr(date.format(dateFmt));
@@ -194,7 +263,6 @@ public class AdminStudentInfoService {
             List<PeriodDetailDto> periodList = new ArrayList<>();
             boolean hasAnyClass = false; 
 
-            // 各時間帯ごとに処理
             for (TimeSlotEntity timeSlot : allTimeSlots) {
                 int slotId = timeSlot.getSlotId();
                 PeriodDetailDto pDto = new PeriodDetailDto();
@@ -202,7 +270,6 @@ public class AdminStudentInfoService {
 
                 SessionEntity session = findSession(allSessions, date, slotId, deptIdFilter);
 
-                // 出席情報の検索
                 if (session != null) {
                     hasAnyClass = true;
                     pDto.setHasClass(true);
@@ -215,7 +282,6 @@ public class AdminStudentInfoService {
 
                     AttendanceEntity att = findAttendanceBySessionId(attendances, session.getSessionId());
                     
-                    // 出席ステータスの設定
                     if (att != null) {
                         String statusName = att.getStatus() != null ? att.getStatus().getStatusName() : "-";
                         pDto.setStatusIcon(convertStatusToIcon(statusName));
@@ -228,10 +294,7 @@ public class AdminStudentInfoService {
                 }
                 periodList.add(pDto);
             }
-
             dailyDto.setPeriods(periodList);
-
-            // 欠席日フラグの設定
             boolean isAllAbsent = hasAnyClass && isAllAbsent(periodList);
             dailyDto.setAbsentDay(isAllAbsent);
             scheduleList.add(dailyDto);
@@ -246,45 +309,34 @@ public class AdminStudentInfoService {
     public void updateStudentAttendance(StudentAttendanceUpdateDto form) {
         Integer studentId = form.getStudentId();
         
-        // 生徒の存在確認
         StudentEntity student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found: " + studentId));
 
-        // 各更新データの処理
         for (StudentAttendanceUpdateDto.DailyUpdateDto update : form.getUpdates()) {
             LocalDate date = update.getDate();
             Integer period = update.getPeriod();
             String statusName = update.getStatus();
 
-            // 授業セッションを取得 
             SessionEntity session = sessionRepository.findBySessionDateAndTimeSlotSlotId(date, period);
             
             if (session == null) {
-
-                // 授業がないコマは無視
                 continue; 
             }
 
-            // 出席ステータスの取得
             AttendanceStatusEntity statusEntity = attendanceStatusRepository.findByStatusName(statusName);
             if (statusEntity == null) {
                 continue; 
             }
 
-            // 既存の出席情報を取得または新規作成
             AttendanceEntity attendance = attendanceRepository.findBySessionIdAndStudent_UserId(session.getSessionId(), studentId)
                     .orElse(new AttendanceEntity());
 
-            // 学生とセッションの設定 (新規作成時のみ)
             if (attendance.getAttendanceId() == null) {
                 attendance.setStudent(student);
                 attendance.setSession(session);
             }
 
-            // ステータス更新
             attendance.setStatusId(statusEntity);
-
-            // 保存
             attendanceRepository.save(attendance);
         }
     }
@@ -320,19 +372,6 @@ public class AdminStudentInfoService {
         return true;
     }
 
-    // 出席ステータス集計ヘルパー
-    private void countStatus(AttendanceSummaryDto summary, String status) {
-        if (status == null) return;
-        switch (status) {
-            case "出席" -> summary.setAttendanceCount(summary.getAttendanceCount() + 1);
-            case "欠席" -> summary.setAbsenceCount(summary.getAbsenceCount() + 1);
-            case "遅刻" -> summary.setLateCount(summary.getLateCount() + 1);
-            case "早退" -> summary.setEarlyLeaveCount(summary.getEarlyLeaveCount() + 1);
-            case "公欠" -> summary.setPublicAbsenceCount(summary.getPublicAbsenceCount() + 1);
-            case "出席停止" -> summary.setSuspensionCount(summary.getSuspensionCount() + 1);
-        }
-    }
-
     // ステータスをアイコンに変換
     private String convertStatusToIcon(String status) {
         if (status == null) return "-";
@@ -342,6 +381,7 @@ public class AdminStudentInfoService {
             case "遅刻" -> "△";
             case "早退" -> "早";
             case "公欠" -> "公";
+            case "公欠候補" -> "候";
             case "出席停止" -> "停";
             default -> "-";
         };
@@ -356,6 +396,7 @@ public class AdminStudentInfoService {
             case "遅刻" -> "bg-late";
             case "早退" -> "bg-early";
             case "公欠" -> "bg-public";
+            case "公欠候補" -> "bg-public";
             case "出席停止" -> "bg-suspend";
             default -> "bg-other";
         };

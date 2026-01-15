@@ -147,6 +147,7 @@
                                                 <option value="遅刻" th:selected="${period.statusIcon == '△'}">遅刻</option>
                                                 <option value="早退" th:selected="${period.statusIcon == '早'}">早退</option>
                                                 <option value="公欠" th:selected="${period.statusIcon == '公'}">公欠</option>
+                                                <option value="公欠候補" th:selected="${period.statusIcon == '候'}">公欠候補</option>
                                                 <option value="出席停止" th:selected="${period.statusIcon == '停'}">出停</option>
                                             </select>
                                         </div>
@@ -164,124 +165,6 @@
             </div>
         </div>
     </div>
-
-    <script>
-    // --- 月変更 ---
-    function changeMonth() {
-        const month = document.getElementById('monthPicker').value;
-        const currentUrl = new URL(window.location.href);
-        if (month) {
-            currentUrl.searchParams.set('month', month);
-        } else {
-            currentUrl.searchParams.delete('month');
-        }
-        window.location.href = currentUrl.toString();
-    }
-
-    // --- 教科検索 ---
-    function searchSubject() {
-        const keyword = document.getElementById('subjectSearchInput').value;
-        const currentUrl = new URL(window.location.href);
-        if (keyword) {
-            currentUrl.searchParams.set('searchSubject', keyword);
-        } else {
-            currentUrl.searchParams.delete('searchSubject');
-        }
-        window.location.href = currentUrl.toString();
-    }
-
-    // --- 編集機能 ---
-    let isEditing = false;
-
-    function toggleEditMode() {
-        isEditing = !isEditing;
-        
-        const viewElements = document.querySelectorAll('.view-mode');
-        const editElements = document.querySelectorAll('.edit-mode');
-        const editBtn = document.getElementById('editBtn');
-        const saveBtn = document.getElementById('saveBtn');
-
-        if (isEditing) {
-            // 編集モードON
-            viewElements.forEach(el => el.style.display = 'none');
-            editElements.forEach(el => el.style.display = 'block');
-            
-            editBtn.textContent = 'キャンセル';
-            editBtn.style.backgroundColor = '#6c757d'; // グレー
-            editBtn.style.color = '#fff';
-            saveBtn.style.display = 'block';
-        } else {
-            // 編集モードOFF
-            viewElements.forEach(el => el.style.display = 'block');
-            editElements.forEach(el => el.style.display = 'none');
-            
-            editBtn.textContent = '編集';
-            editBtn.style.backgroundColor = ''; // 元に戻す
-            editBtn.style.color = '';
-            saveBtn.style.display = 'none';
-        }
-    }
-
-    async function saveChanges() {
-        if (!confirm('変更を保存しますか？')) return;
-
-        const studentId = document.getElementById('studentIdHidden').value;
-        const selects = document.querySelectorAll('.status-select');
-        const updates = [];
-
-        selects.forEach(select => {
-            // 日付文字列 "2026 / 01 / 15 (木)" から "2026-01-15" を抽出
-            const rawDate = select.dataset.date;
-            // 正規表現で yyyy / MM / dd を取り出す
-            const match = rawDate.match(/(\d{4})\s*\/\s*(\d{2})\s*\/\s*(\d{2})/);
-            
-            if (match) {
-                const formattedDate = `${match[1]}-${match[2]}-${match[3]}`;
-                
-                updates.push({
-                    date: formattedDate,
-                    period: parseInt(select.dataset.period),
-                    status: select.value
-                });
-            }
-        });
-
-        const payload = {
-            studentId: parseInt(studentId),
-            updates: updates
-        };
-
-        try {
-            // CSRFトークン取得 (Spring Security使用時用)
-            // const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-            // const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
-            
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-            // if (csrfToken && csrfHeader) {
-            //     headers[csrfHeader] = csrfToken;
-            // }
-
-            const response = await fetch('/admin/student/student-info/update', {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(payload)
-            });
-
-            if (response.ok) {
-                alert('保存しました');
-                location.reload();
-            } else {
-                alert('保存に失敗しました');
-                console.error(await response.text());
-            }
-
-        } catch (error) {
-            console.error('Error:', error);
-            alert('通信エラーが発生しました');
-        }
-    }
-    </script>
+    <script th:src="@{/js/admin/studentInfo.js}"></script>
 </body>
 </html>

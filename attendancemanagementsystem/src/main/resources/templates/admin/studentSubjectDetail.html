@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>受講情報詳細</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/studentSubjectDetail.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- <meta name="_csrf" th:content="${_csrf?.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName}"/> -->
+</head>
+<body>
+    <input type="hidden" id="studentIdHidden" th:value="${detail.studentId}">
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url=@{/admin/student/info/{id}(id=${detail.studentId})})}"></div>
+    </div>
+
+    <div class="main-container">
+        <h1 class="page-title">受講情報</h1>
+
+        <div class="student-name-display">
+            <span th:text="${detail.studentName}">学生 太郎</span> さん
+        </div>
+
+        <div class="content-wrapper">
+            <div class="left-panel">
+                <table class="info-table">
+                    <tr>
+                        <th>教科名</th>
+                        <td class="subject-name" th:text="${detail.subjectName}">教科名</td>
+                    </tr>
+                    <tr>
+                        <th>教室</th>
+                        <td th:text="${detail.classroomName}">-</td>
+                    </tr>
+                    <tr>
+                        <th>担当教員</th>
+                        <td th:text="${detail.teacherName}">-</td>
+                    </tr>
+                    <tr>
+                        <th>実施コマ数</th>
+                        <td th:text="${detail.totalClasses} + 'コマ'">0コマ</td>
+                    </tr>
+                    <tr>
+                        <th>履修状況</th>
+                        <td th:text="${detail.completedCount}">0/0</td>
+                    </tr>
+                    <tr>
+                        <th>現在の出席率</th>
+                        <td class="rate-highlight" th:text="${detail.attendanceRate}">0.0%</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="right-panel">
+                
+                <div class="summary-area">
+                    <table class="summary-table">
+                        <thead>
+                            <tr>
+                                <th>出席</th>
+                                <th>欠席</th>
+                                <th>遅刻</th>
+                                <th>早退</th>
+                                <th>出停</th>
+                                <th>公欠</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td th:text="${detail.attendanceCount}">0</td>
+                                <td th:text="${detail.absenceCount}">0</td>
+                                <td th:text="${detail.lateCount}">0</td>
+                                <td th:text="${detail.earlyLeaveCount}">0</td>
+                                <td th:text="${detail.suspensionCount}">0</td>
+                                <td th:text="${detail.publicAbsenceCount}">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="button-group">
+                        <button type="button" class="edit-btn" id="editBtn" onclick="toggleEditMode()">編集</button>
+                        <button type="button" class="save-btn" id="saveBtn" onclick="saveChanges()" style="display:none;">保存</button>
+                        <button type="button" class="cancel-btn" id="cancelBtn" onclick="cancelEdit()" style="display:none;">キャンセル</button>
+                    </div>
+                </div>
+
+                <div class="detail-table-wrapper">
+                    <table class="schedule-table" id="scheduleTable">
+                        <thead>
+                            <tr>
+                                <th>日付</th>
+                                <th>一限目</th>
+                                <th>二限目</th>
+                                <th>三限目</th>
+                                <th>四限目</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(detail.dailyRecords)}">
+                                <td colspan="5">データがありません</td>
+                            </tr>
+                            
+                            <tr th:each="row : ${detail.dailyRecords}">
+                                <td th:text="${row.dateStr}">2024/01/01(月)</td>
+                                
+                                <td class="editable-cell" 
+                                    th:data-date="${row.dateStr}" 
+                                    data-period="1"
+                                    th:data-original-mark="${row.period1}"
+                                    th:text="${row.period1}" 
+                                    th:classappend="${row.period1 == '×' ? 'status-bad' : ''}">-</td>
+                                    
+                                <td class="editable-cell" 
+                                    th:data-date="${row.dateStr}" 
+                                    data-period="2"
+                                    th:data-original-mark="${row.period2}"
+                                    th:text="${row.period2}" 
+                                    th:classappend="${row.period2 == '×' ? 'status-bad' : ''}">-</td>
+                                    
+                                <td class="editable-cell" 
+                                    th:data-date="${row.dateStr}" 
+                                    data-period="3"
+                                    th:data-original-mark="${row.period3}"
+                                    th:text="${row.period3}" 
+                                    th:classappend="${row.period3 == '×' ? 'status-bad' : ''}">-</td>
+                                    
+                                <td class="editable-cell" 
+                                    th:data-date="${row.dateStr}" 
+                                    data-period="4"
+                                    th:data-original-mark="${row.period4}"
+                                    th:text="${row.period4}" 
+                                    th:classappend="${row.period4 == '×' ? 'status-bad' : ''}">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/admin/studentSubjectDetail.js}"></script>
+</body>
+</html>
