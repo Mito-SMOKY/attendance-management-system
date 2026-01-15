@@ -11,8 +11,8 @@ const STATUS_MAP = {
     2: { name: '欠席', cls: 'status-btn-2' },
     3: { name: '遅刻', cls: 'status-btn-3' },
     4: { name: '公欠', cls: 'status-btn-4' },
-    5: { name: '公欠候補', cls: 'status-btn-4' },
-    6: { name: '出席停止', cls: 'status-btn-4' },
+    5: { name: '公欠候補', cls: 'status-btn-5' },
+    6: { name: '出席停止', cls: 'status-btn-6' },
     7: { name: '早退', cls: 'status-btn-7' }
 };
 
@@ -59,6 +59,9 @@ function renderTable(attendees) {
         // 現在のステータスIDを決定（手動変更があればそちらを優先）
         let currentStatusId = localChanges[student.userId] || student.statusId;
 
+        // 公欠候補または出欠停止の場合ステータス編集不可
+        const isLocked = (currentStatusId === 5 || currentStatusId === 6);
+
         // 自動判定: エントリー時間があり、ステータス未設定なら「出席」にする
         if (!localChanges[student.userId] && !student.statusId && student.entryTime && student.entryTime !== '--:--') {
             currentStatusId = 1;
@@ -91,6 +94,13 @@ function renderTable(attendees) {
             btn.type = 'button';
             btn.className = `btn btn-sm ${info.cls}`;
             btn.innerText = info.name;
+
+            // ロック状態はボタンを無効化
+            if(isLocked){
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+            }
             
             // 現在選択中ならアクティブ化
             if (sId === currentStatusId) {
@@ -106,23 +116,35 @@ function renderTable(attendees) {
             };
             btnGroup.appendChild(btn);
         });
-        
-        dFlex.appendChild(btnGroup);
+        actionTd.appendChild(btnGroup);
 
-        // 現在のステータス表示（編集不可の場合のみ）
-        if (!EDITABLE_STATUS_IDS.includes(currentStatusId) && STATUS_MAP[currentStatusId]) {
-            const badge = document.createElement('span');
-            badge.className = 'badge bg-secondary ms-3';
-            badge.innerText = `現在: ${STATUS_MAP[currentStatusId].name}`;
-            dFlex.appendChild(badge);
+        // ステータスを「文字」で表示するロジック
+        const statusTextTd = document.createElement('td');
+
+        if (currentStatusId && STATUS_MAP[currentStatusId]) {
+            const info = STATUS_MAP[currentStatusId];
+            const statusText = document.createElement('span');
+            
+            if (isLocked) {
+                // 公欠候補・出席停止の場合は赤字などで警告色にする
+                statusText.className += ' text-danger'; 
+                statusText.innerText = `[ ${info.name} ]`; // カッコ等で強調
+            } else {
+                // 通常の選択状態
+                statusText.className += ' text-primary';
+                statusText.innerText = `${info.name}`;
+            }
+            statusTextTd.appendChild(statusText);
+            // dFlex.appendChild(btnGroup);
         }
 
-        // アクションカラムに追加
-        actionTd.appendChild(dFlex);
         tr.appendChild(nameTd);
         tr.appendChild(timeTd);
         tr.appendChild(actionTd);
+        tr.appendChild(statusTextTd);
+
         tbody.appendChild(tr);
+
     });
 
     // 自動判定で変更があった場合、ブラウザに保存する
@@ -133,7 +155,7 @@ function renderTable(attendees) {
 
 // 集計ロジック
 function updateStats(attendees) {
-    let present = 0, absent = 0, late = 0, early = 0;
+    let present = 0, absent = 0, late = 0, early = 0, absentCandidate = 0, suspended = 0;
     
     // 出席状況をカウント
     attendees.forEach(s => {
@@ -142,6 +164,8 @@ function updateStats(attendees) {
         else if (sid === 2) absent++;
         else if (sid === 3) late++;
         else if (sid === 7) early++;
+        else if (sid === 5) absentCandidate++;
+        else if (sid === 6) suspended++;
     });
 
     // 結果を表示
@@ -150,6 +174,8 @@ function updateStats(attendees) {
     document.getElementById('countAbsent').innerText = absent;
     document.getElementById('countLate').innerText = late;
     document.getElementById('countEarly').innerText = early;
+    document.getElementById('countAbsentCandidate').innerText = absentCandidate;
+    document.getElementById('countSuspended').innerText = suspended;
 }
 
 // 親ウィンドウ更新＆閉じる

@@ -62,6 +62,19 @@
                 <div class="stat-number text-danger" id="countAbsent">-</div>
             </div>
         </div>
+        <div class="col">
+            <div class="stat-card">
+                <div class="text-muted">公欠</div>
+                <div class="stat-number text-danger" id="countAbsentCandidate">-</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="stat-card">
+                <div class="text-muted">出欠停止</div>
+                <div class="stat-number text-danger" id="countSuspended">-</div>
+            </div>
+        </div>
+
     </div>
 
     <div class="student-table-container">
@@ -75,7 +88,8 @@
                 <tr>
                     <th style="width: 25%">名前</th>
                     <th style="width: 15%">入室時間</th>
-                    <th style="width: 60%">ステータス変更</th>
+                    <th style="width: 30%">ステータス変更</th>
+                    <th style="width: 30%">ステータス</th>
                 </tr>
             </thead>
             <tbody id="attendeesTableBody">
