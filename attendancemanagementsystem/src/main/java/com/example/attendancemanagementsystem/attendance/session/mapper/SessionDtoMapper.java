@@ -93,6 +93,12 @@ public class SessionDtoMapper {
             dto.setGradeClass(session.getTargetGrade() + "年");
         }
 
+        
+        // クラス表示
+        if (session.getDepartment() != null) {
+        dto.setClassName(session.getDepartment().getClassName());
+        }
+
         // 教室情報
         mapClassroomInfo(session, dto);
         

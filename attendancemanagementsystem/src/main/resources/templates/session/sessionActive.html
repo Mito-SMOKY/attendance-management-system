@@ -6,23 +6,26 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     
     <link th:href="@{/css/session/sessionActive.css}" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
 </head>
 <body>
 
 <div class="active-header d-flex justify-content-between align-items-center">
+    
     <div>
         <h2 class="m-0">
-            <span th:text="${sessionDto.gradeClass}"></span>: 
+            <span th:text="${sessionDto.gradeClass}"></span>
+            <span th:text="${sessionDto.className}"></span>: 
             <span th:text="${sessionDto.subjectName}"></span>
         </h2>
         <div class="text-muted mt-1">
-            <span class="me-3">📅 <span th:text="${sessionDto.startTime}"></span> 開始</span>
-            <span>📍 <span th:text="${sessionDto.classroomName}"></span></span>
+            <span class="me-3">開始時間：<span th:text="${sessionDto.startTime}"></span></span>
+            <span>場所：<span th:text="${sessionDto.classroomName}"></span></span>
         </div>
     </div>
     <div class="d-flex gap-2">
         <button id="cancelSessionBtn" class="btn btn-outline-danger">授業キャンセル</button>
-        <button id="endSessionBtn" class="btn btn-primary px-4">授業終了・確定</button>
+        <button id="endSessionBtn" class="btn btn-primary">授業終了・確定</button>
     </div>
 </div>
 
