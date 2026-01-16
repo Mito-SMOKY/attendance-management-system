@@ -6,6 +6,7 @@ public class ClassListDto {
 
     private String searchDate;      // 検索フォーム用 (yyyyMMdd)
     private String headerDate;      // ヘッダー表示用 (2024年 8月 14日 (水))
+    private String searchWord;
     
     // キー: 時限(1,2,3...), 値: その時限の詳細
     private Map<Integer, PeriodDetail> periods;
@@ -25,6 +26,14 @@ public class ClassListDto {
 
     public void setHeaderDate(String headerDate) {
         this.headerDate = headerDate;
+    }
+
+    public String getSearchWord() {
+        return searchWord;
+    }
+
+    public void setSearchWord(String searchWord) {
+        this.searchWord = searchWord;
     }
 
     public Map<Integer, PeriodDetail> getPeriods() {

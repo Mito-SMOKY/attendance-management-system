@@ -22,6 +22,7 @@ public class AdminClassListController {
     public String showList(
             @RequestParam(name = "date", required = false) String date,
             @RequestParam(name = "userId", required = false, defaultValue = "admin001") String userId,
+            @RequestParam(name = "search", required = false) String searchWord,
             Model model) {
 
         // 日付がない場合は今日にする
@@ -29,8 +30,9 @@ public class AdminClassListController {
             date = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
         }
 
-        ClassListDto dto = adminClassListService.getDailyClassInfo(date, userId);
+        ClassListDto dto = adminClassListService.getDailyClassInfo(date, userId, searchWord);
         model.addAttribute("viewData", dto);
+        model.addAttribute("currentUserId", userId);
 
         return "admin/classList";
     }
