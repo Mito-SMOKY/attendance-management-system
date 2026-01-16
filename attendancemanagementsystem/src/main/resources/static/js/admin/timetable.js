@@ -52,15 +52,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return date;
     }
 
-    // ★追加: 週番号をクライアント側で計算する関数
+    // 週番号をクライアント側で計算する関数
     function calculateWeekNumber(date) {
-        // その月の1日を取得
         const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-        const dayOfWeekFirst = firstDayOfMonth.getDay() || 7; // 1日が何曜日か(1=月...7=日)
-        
-        // 日付 + (1日の曜日オフセット) を7で割って切り上げ
-        // ※日本のカレンダー表記(月曜始まりなど)に合わせた簡易計算
-        //  (日付 + 1日の曜日 - 1) / 7
+        const dayOfWeekFirst = firstDayOfMonth.getDay() || 7; 
         const offsetDate = date.getDate() + dayOfWeekFirst - 1;
         return Math.floor((offsetDate - 1) / 7) + 1;
     }
@@ -195,18 +190,30 @@ document.addEventListener('DOMContentLoaded', function() {
         const theadRow = timetable.querySelector('thead tr');
         tbody.innerHTML = ''; 
 
+        // --- ヘッダー生成（日付リンク付き） ---
         if (data.dates) {
             theadRow.innerHTML = '<th class="time-slot-header">時間</th>';
             const weekDays = ['日','月','火','水','木','金','土'];
+            
             data.dates.forEach(dateStr => {
                 const d = parseISODateLocal(dateStr);
                 const label = `${d.getMonth() + 1}/${d.getDate()} (${weekDays[d.getDay()]})`;
-                theadRow.innerHTML += `<th>${label}</th>`;
+                
+                // リンク先URLの作成
+                const targetUrl = `/admin/dailyClassList?date=${dateStr}&userId=${currentUserId}`;
+
+                theadRow.innerHTML += `
+                    <th class="clickable-header">
+                        <a href="${targetUrl}" class="date-link" style="display: block; color: inherit; text-decoration: none; width: 100%; height: 100%;">
+                            ${label} <i class="fa-solid fa-chevron-right" style="font-size: 0.8em; margin-left: 5px;"></i>
+                        </a>
+                    </th>`;
             });
         }
 
         updateWeekDisplay(data);
 
+        // --- ボディ生成（ステータスによる色分け付き） ---
         data.timeSlots.forEach((slotTime, slotIndex) => {
             const row = tbody.insertRow();
             const timeCell = row.insertCell();
@@ -221,6 +228,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (daySchedule && daySchedule[slotIndex]) {
                     const entry = daySchedule[slotIndex];
                     if (entry && entry.subject) {
+                        
+                        // ★修正ポイント: 実績(actual)の場合はクラスを付与
+                        if (entry.status === 'actual') {
+                            cell.classList.add('timetable-cell-actual');
+                        }
+
                         cell.innerHTML = `
                             <div class="subject">${entry.subject}</div>
                             <div class="classroom">${entry.classroom || ''}</div>
@@ -245,8 +258,6 @@ document.addEventListener('DOMContentLoaded', function() {
             displayMonth = middleDay.getMonth() + 1;
         }
 
-        // ★修正: サーバーからの weekNumber が無ければ、JSで計算した値を使う
-        // calculateWeekNumber には週の代表日(水曜日あたり)を渡すと精度が良い
         const middleDay = new Date(currentWeekStart);
         middleDay.setDate(middleDay.getDate() + 3);
         

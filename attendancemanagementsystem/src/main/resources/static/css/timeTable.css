@@ -219,3 +219,33 @@
     clip-path: polygon(50% 0, 0 100%, 100% 100%);
     content: '';
 }
+/* ここから川島が追加したから吟味して */
+.clickable-header {
+    padding: 0 !important;
+    height: 100%; /* 高さの継承 */
+    transition: background-color 0.2s;
+}
+
+.clickable-header:hover {
+    background-color: #e3f2fd; /* ホバー時の色 */
+    cursor: pointer;
+}
+
+/* 2. リンクの中身を上下左右中央揃えにする（Flexbox） */
+/* !important は JSの埋め込みスタイルを強制上書きするために付けています */
+.date-link {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+    box-sizing: border-box; /* 枠線を含めたサイズ計算 */
+}
+
+/* timeTable.css */
+.timetable-cell-actual {
+    background-color: #e0f7fa; /* ←ここを好きな色に変更 */
+    border-left: 4px solid #00acc1;
+}

@@ -44,4 +44,11 @@ public interface SessionRepository extends JpaRepository<SessionEntity, Integer>
 
     // 特定の日付と時間帯に基づくセッションの取得
     SessionEntity findBySessionDateAndTimeSlotSlotId(LocalDate sessionDate, Integer slotId);
+
+    // 指定した教員・日付のセッションをすべて取得 
+    @Query("SELECT s FROM SessionEntity s WHERE s.userId = :userId AND s.sessionDate = :date ORDER BY s.timeSlot.slotId ASC")
+    List<SessionEntity> findByUserIdAndDate(
+        @Param("userId") Integer userId, 
+        @Param("date") LocalDate date
+    );
 }
