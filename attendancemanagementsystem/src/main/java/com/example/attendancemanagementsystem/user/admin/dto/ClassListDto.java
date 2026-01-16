@@ -4,11 +4,9 @@ import java.util.Map;
 
 public class ClassListDto {
 
-    private String searchDate;      // 検索フォーム用 (yyyyMMdd)
-    private String headerDate;      // ヘッダー表示用 (2024年 8月 14日 (水))
+    private String searchDate;      
+    private String headerDate;      
     private String searchWord;
-    
-    // キー: 時限(1,2,3...), 値: その時限の詳細
     private Map<Integer, PeriodDetail> periods;
 
     // --- Getter / Setter ---
@@ -46,11 +44,11 @@ public class ClassListDto {
 
     // 内部クラス: 各時限の詳細
     public static class PeriodDetail {
-        private boolean hasClass;      // 授業があるか
-        private String subjectName;    // 教科名
-        private String classroomName;  // 教室名
-        private Integer subjectId;     // リンク用ID
-
+        private boolean hasClass;      
+        private String subjectName;    
+        private String classroomName;  
+        private Integer subjectId; 
+            
         // --- Getter / Setter ---
         public boolean isHasClass() {
             return hasClass;

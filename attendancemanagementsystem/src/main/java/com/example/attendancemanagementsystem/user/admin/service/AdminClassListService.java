@@ -2,13 +2,11 @@ package com.example.attendancemanagementsystem.user.admin.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +19,7 @@ import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.common.service.SearchService;
 import com.example.attendancemanagementsystem.user.admin.dto.ClassListDto;
 import com.example.attendancemanagementsystem.user.admin.dto.ClassListDto.PeriodDetail;
+
 
 @Service
 public class AdminClassListService {
@@ -40,84 +39,76 @@ public class AdminClassListService {
         this.searchService = searchService;
     }
 
+    // 指定された条件（日付、ID、キーワード）で授業一覧データを取得する
     @Transactional(readOnly = true)
     public ClassListDto getDailyClassInfo(String dateStr, String loginId, String searchWord) {
         ClassListDto dto = new ClassListDto();
 
-        // 1. 日付のパース処理
+        // 文字列の日付を変換する処理
         LocalDate date;
         try {
             if (dateStr != null && dateStr.matches("\\d{8}")) {
+
+                // yyyyMMdd形式の場合
                 date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
             } else if (dateStr != null && dateStr.matches("\\d{4}-\\d{2}-\\d{2}")) {
+
+                // yyyy-MM-dd形式の場合
                 date = LocalDate.parse(dateStr);
             } else {
+
+                // 形式が合わない場合は今日の日付にする
                 date = LocalDate.now();
             }
         } catch (Exception e) {
+
+            // エラーが発生した場合も今日の日付にする
             date = LocalDate.now();
         }
 
-        // 2. DTOへのセット
+        // DTOにセットする
         dto.setSearchDate(date.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
         dto.setHeaderDate(date.format(DateTimeFormatter.ofPattern("yyyy年 M月 d日 (E)", Locale.JAPANESE)));
         dto.setSearchWord(searchWord);
 
-        // 3. ユーザー情報の取得
+        // ログインIDからユーザー情報を取得
         UsersEntity user = usersRepository.findByLoginId(loginId).orElse(null);
 
-        // 4. 全時限枠の準備
+        // 全ての時限の枠を用意する
         List<TimeSlotEntity> allSlots = timeSlotRepository.findAllByOrderBySlotIdAsc();
         Map<Integer, PeriodDetail> periodMap = new LinkedHashMap<>();
         
+        // 全時限分の空データを一旦作成してマップに入れる
         for (TimeSlotEntity slot : allSlots) {
             PeriodDetail detail = new PeriodDetail();
             detail.setHasClass(false);
             periodMap.put(slot.getSlotId(), detail);
         }
 
+        // ユーザーが存在しない場合は、空の表だけ返して終了する
         if (user == null) {
             dto.setPeriods(periodMap);
             return dto;
         }
 
-        // =========================================================
-        // 5. Specificationを使った検索
-        // =========================================================
         
-        // ★修正ポイント: ラムダ式の中で使うために、finalな変数に値をコピーする
-        final LocalDate searchDate = date;
+        //日付検索
+        List<SessionEntity> sessions = sessionRepository.findByUserIdAndDate(user.getUserId(), date);
 
-        // (A) 基本条件: ユーザーID AND 日付
-        Specification<SessionEntity> spec = Specification.where((root, query, cb) -> {
-            return cb.and(
-                cb.equal(root.get("userId"), user.getUserId()),
-                cb.equal(root.get("sessionDate"), searchDate) // ★コピーした変数(searchDate)を使う
-            );
-        });
-
-        // (B) キーワード検索条件 (入力がある場合のみ追加)
-        if (searchWord != null && !searchWord.isEmpty()) {
-            List<String> targetColumns = Arrays.asList("subject.subjectName", "classroom.classroomName");
-            Specification<SessionEntity> wordSpec = searchService.createKeywordSpec(searchWord, targetColumns);
-            spec = spec.and(wordSpec);
-        }
-
-        // (C) 検索実行
-        List<SessionEntity> sessions = sessionRepository.findAll(spec);
-
-        // =========================================================
-
-        // 6. 結果のマッピング
+        // 取得した授業データを、時限ごとのマップに当てはめる
         for (SessionEntity s : sessions) {
+
+            // 時限情報がないデータはスキップする
             if (s.getTimeSlot() == null) continue;
 
             int p = s.getTimeSlot().getSlotId();
 
+            // 用意しておいたマップに該当する時限があればデータをセット
             if (periodMap.containsKey(p)) {
                 PeriodDetail detail = periodMap.get(p);
                 detail.setHasClass(true);
 
+                // 科目名のセット
                 if (s.getSubject() != null) {
                     detail.setSubjectName(s.getSubject().getSubjectName());
                     detail.setSubjectId(s.getSubject().getSubjectId());
@@ -126,6 +117,7 @@ public class AdminClassListService {
                     detail.setSubjectId(null);
                 }
 
+                // 教室名のセット
                 if (s.getClassroom() != null) {
                     detail.setClassroomName(s.getClassroom().getClassroomName());
                 } else {
@@ -134,6 +126,7 @@ public class AdminClassListService {
             }
         }
 
+        // DTOにセット
         dto.setPeriods(periodMap);
         return dto;
     }
