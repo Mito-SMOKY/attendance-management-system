@@ -39,34 +39,33 @@
             
         </div>
         
-        <div class="date-header" th:text="${viewData.headerDate}">
-            2024年 8月 14日 (水)
-        </div>
+        <div class="date-header" th:text="${viewData.headerDate}"></div>
 
         <div class="table-wrapper">
             <table class="class-list-table">
                 <thead>
                     <tr>
-                        <th class="period-header">時限</th>
-                        <th class="subject-header">教科 / 教室</th>
+                        <th class="period-header col-period">時限</th>
+                        <th class="subject-header col-subject">教科</th>
+                        <th class="classroom-header col-classroom">教室</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="entry : ${viewData.periods}">
-                        
+
+                    <tr th:each="entry : ${viewData.periods}" th:with="p=${entry.value}">
                         <td class="period-cell" th:text="${entry.key}">1</td>
                         
-                        <td class="subject-cell" th:with="p=${entry.value}">
-                            
+                        <td class="subject-cell">
                             <th:block th:if="${p != null && p.hasClass}">
                                 <a th:href="@{/admin/subject/detail/{id}(id=${p.subjectId})}" 
                                 class="subject-link"
                                 th:text="${p.subjectName}">教科名</a>
-                                
-                                <br> <span class="room-name" th:text="${p.classroomName}">教室名</span>
                             </th:block>
-                            
-                            <span th:if="${p == null || !p.hasClass}" style="color:#ccc;">-</span>
+                            <span th:if="${p == null || !p.hasClass}" style="color:#ccc;">データがありません</span>
+                        </td>
+
+                        <td class="classroom-cell">
+                            <span th:text="${p != null && p.hasClass ? p.classroomName : '-'}">教室名</span>
                         </td>
                     </tr>
                 </tbody>

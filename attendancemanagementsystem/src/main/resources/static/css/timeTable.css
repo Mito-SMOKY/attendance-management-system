@@ -227,7 +227,7 @@
 }
 
 .clickable-header:hover {
-    background-color: #e3f2fd; /* ホバー時の色 */
+    background-color: #00929c; /* ホバー時の色 */
     cursor: pointer;
 }
 

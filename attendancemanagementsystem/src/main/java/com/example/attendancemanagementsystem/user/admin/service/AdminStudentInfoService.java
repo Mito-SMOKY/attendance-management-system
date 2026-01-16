@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map; // 追加
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.domain.Specification;

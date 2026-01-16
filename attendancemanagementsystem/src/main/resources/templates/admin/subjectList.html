@@ -24,7 +24,6 @@
                 <tr>
                     <th class="col-subject">教科名</th>
                     <th class="col-teacher">担当教師</th>
-                    <th class="col-attendance">出席率</th>
                 </tr>
             </thead>
 
@@ -40,22 +39,6 @@
                     
                     <td th:text="${subject.teacherName}" class="teacher-name-cell"></td>
                     
-                    <td class="attendance-cell">
-                        <span th:if="${subject.isAttendanceRisk()}" class="risk-warning">&#9888;</span>
-
-                        <span th:text="|${subject.attendedClasses}/${subject.totalClasses}コマ|"></span>
-                        
-                        <span th:text="|${#numbers.formatDecimal(subject.attendanceRate * 100, 0, 0)}%履修済|"></span>
-                        
-                        <!-- atenndanceRate=出席率の計算 
-                        現在までの授業数/現在までの受講数で算出-->
-                        <div class="attendance-bar-container">
-                            <div class="attendance-bar" 
-                                th:style="|width: ${#numbers.formatDecimal(subject.attendanceRate * 100, 0, 0)}%;|"
-                                th:classappend="${subject.isAttendanceRisk()} ? 'risk-bar' : ''">
-                            </div>
-                        </div>
-                    </td>
                 </tr>
             </tbody>
         </table>
