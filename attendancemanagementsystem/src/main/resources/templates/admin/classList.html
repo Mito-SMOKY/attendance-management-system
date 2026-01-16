@@ -26,8 +26,18 @@
 
         <div class="controls-area">
 
+           
             <form th:action="@{/admin/dailyClassList}" method="get" class="search-form-3">
-                <input type="text" name="date" th:value="${viewData.searchDate}" placeholder="yyyyMMdd">
+                <input  type="text" 
+                        name="date" 
+                        id="dateInput"
+                        required 
+                        maxlength="8" 
+                        pattern="\d{8}" 
+                        autocomplete="off"
+                        title="数字8桁（YYYYMMDD）で入力してください"
+                        th:value="${viewData.searchDate}" 
+                        placeholder="yyyyMMdd">
                 
                 <input type="hidden" name="userId" th:value="${currentUserId}">
                 
@@ -70,6 +80,8 @@
         </div>
 
     </div>
+
+    <script  th:src="@{/js/admin/classList.js}"></script>
 
 </body>
 </html>
