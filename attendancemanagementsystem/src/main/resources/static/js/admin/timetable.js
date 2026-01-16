@@ -164,6 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         data.weekStart = formatDateYMD(finalMonday);
         data.dates = [];
+        // 月〜金の5日間を表示
         for (let i = 0; i < 5; i++) {
             const d = new Date(finalMonday);
             d.setDate(d.getDate() + i);
@@ -171,7 +172,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (!data.timeSlots || !Array.isArray(data.timeSlots)) {
-            data.timeSlots = ["9:30-11:00", "11:10-12:30", "13:30-14:50", "15:00-16:20"];
+            // デフォルトの時限（サーバーから返ってこない場合のフォールバック）
+            data.timeSlots = ["9:30-11:00", "11:10-12:30", "13:30-14:50", "15:00-16:20", "16:30-17:50", "18:00-19:20"];
         }
         
         data.schedule = data.schedule || {};
@@ -199,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const d = parseISODateLocal(dateStr);
                 const label = `${d.getMonth() + 1}/${d.getDate()} (${weekDays[d.getDay()]})`;
                 
-                // リンク先URLの作成
+                // 日付クリック時のリンク (日別一覧へ)
                 const targetUrl = `/admin/dailyClassList?date=${dateStr}&userId=${currentUserId}`;
 
                 theadRow.innerHTML += `
@@ -213,32 +215,63 @@ document.addEventListener('DOMContentLoaded', function() {
 
         updateWeekDisplay(data);
 
-        // --- ボディ生成（ステータスによる色分け付き） ---
+        // --- ボディ生成（ステータスによる色分け ＆ 教科名リンク） ---
         data.timeSlots.forEach((slotTime, slotIndex) => {
             const row = tbody.insertRow();
+            
+            // 左端：時間セル
             const timeCell = row.insertCell();
             timeCell.textContent = slotTime;
             timeCell.classList.add('time-slot-cell'); 
 
-            for (let i = 0; i < 5; i++) {
+            // 各日付のセル
+            // data.dates (5日分) でループ
+            const daysCount = data.dates ? data.dates.length : 5;
+            for (let i = 0; i < daysCount; i++) {
                 const dateKey = data.dates[i]; 
                 const daySchedule = data.schedule[dateKey];
                 const cell = row.insertCell();
+                cell.className = 'timetable-cell'; // 基本クラス
 
+                // データが存在するかチェック
                 if (daySchedule && daySchedule[slotIndex]) {
                     const entry = daySchedule[slotIndex];
-                    if (entry && entry.subject) {
+                    
+                    // 教科名などが存在する場合
+                    if (entry && (entry.subject || entry.status === 'plan')) {
                         
-                        // ★修正ポイント: 実績(actual)の場合はクラスを付与
+                        // 実績(actual)の場合は背景色変更用のクラス付与
                         if (entry.status === 'actual') {
                             cell.classList.add('timetable-cell-actual');
                         }
 
+                        // --- ★修正ポイント: セッションIDがあればリンクにする ---
+                        let subjectHtml = '';
+                        if (entry.sessionId) {
+                            // 授業詳細画面へのリンク
+                            // ★ここを修正しました (?from=timetable を追加)
+                            subjectHtml = `<a href="/admin/class/detail/${entry.sessionId}?from=timetable" 
+                                              class="subject-link" 
+                                              style="color: #00bdca; font-weight: bold; text-decoration: none; display:block;">
+                                              ${entry.subject || '未設定'}
+                                           </a>`;
+                        } else {
+                            // リンクなし（テキストのみ）
+                            subjectHtml = `<div class="subject">${entry.subject || '未設定'}</div>`;
+                        }
+
+                        // セルの中身を構築
                         cell.innerHTML = `
-                            <div class="subject">${entry.subject}</div>
-                            <div class="classroom">${entry.classroom || ''}</div>
+                            ${subjectHtml}
+                            <div class="classroom" style="font-size:0.85em; color:#666;">${entry.classroom || ''}</div>
                         `;
+                    } else {
+                        // 授業なし
+                        cell.innerHTML = '<span class="no-class">-</span>';
                     }
+                } else {
+                    // データなし
+                    cell.innerHTML = '<span class="no-class">-</span>';
                 }
             }
         });

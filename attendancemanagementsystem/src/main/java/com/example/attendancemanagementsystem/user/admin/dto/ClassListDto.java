@@ -44,12 +44,22 @@ public class ClassListDto {
 
     // 内部クラス: 各時限の詳細
     public static class PeriodDetail {
+        private Integer sessionId;
         private boolean hasClass;      
         private String subjectName;    
         private String classroomName;  
         private Integer subjectId; 
             
         // --- Getter / Setter ---
+
+        public Integer getSessionId() { 
+            return sessionId; 
+        }
+
+        public void setSessionId(Integer sessionId) { 
+            this.sessionId = sessionId; 
+        }
+        
         public boolean isHasClass() {
             return hasClass;
         }

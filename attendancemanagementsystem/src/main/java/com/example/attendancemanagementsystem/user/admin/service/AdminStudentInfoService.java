@@ -150,7 +150,7 @@ public class AdminStudentInfoService {
             }
         }
 
-        // 救済措置: 絞り込めない場合は全教科検索
+        // 絞り込めない場合は全教科検索
         if (!filterSuccess) {
             List<SubjectEntity> allSubjects = subjectRepository.findAll(keywordSpec);
             displaySubjects = allSubjects.stream().map(s -> {
@@ -171,50 +171,47 @@ public class AdminStudentInfoService {
         List<SessionEntity> allSessions = sessionRepository.findBySessionDateBetween(startDate, endDate);
         List<AttendanceEntity> attendances = attendanceRepository.findByStudentIdAndDateBetween(studentId, startDate, endDate);
 
-        // --- ★修正: 出席サマリー集計 (日付単位のロジックへ変更) ---
+        // 出席サマリー集計 
         AttendanceSummaryDto summary = new AttendanceSummaryDto();
 
-    // 1. 日付ごとにデータをグループ化
+    // 日付ごとにデータをグループ化
     Map<LocalDate, List<AttendanceEntity>> groupedByDate = attendances.stream()
             .filter(a -> a.getSession() != null)
             .collect(Collectors.groupingBy(a -> a.getSession().getSessionDate()));
 
-    // 2. 日付ごとに「1日の扱い」を判定
+    // 日付ごとに「1日の扱い」を判定
     for (List<AttendanceEntity> dailyAtts : groupedByDate.values()) {
         
-        // 重要: 時系列順（1限 -> 4限）に並べ替える
+        // 時系列順に並べ替える
         dailyAtts.sort((a, b) -> {
             Integer slotA = a.getSession().getTimeSlot().getSlotId();
             Integer slotB = b.getSession().getTimeSlot().getSlotId();
             return slotA.compareTo(slotB);
         });
 
-        // 判定用のステータスリストを作成（文字列リスト化して扱いやすくする）
+        // 判定用のステータスリストを作成
         List<String> statusList = dailyAtts.stream()
                 .map(a -> a.getStatus() != null ? a.getStatus().getStatusName() : "")
                 .collect(Collectors.toList());
 
-        // --- A. 「1日まるごと」系の判定 ---
 
-        // (1) 全欠席
+        // 全欠席
         if (statusList.stream().allMatch(s -> "欠席".equals(s))) {
             summary.setAbsenceCount(summary.getAbsenceCount() + 1);
             continue;
         }
 
-        // (2) 全公欠 (公欠 または 公欠候補)
+        // 全公欠 (公欠 または 公欠候補)
         if (statusList.stream().allMatch(s -> "公欠".equals(s) || "公欠候補".equals(s))) {
             summary.setPublicAbsenceCount(summary.getPublicAbsenceCount() + 1);
             continue;
         }
 
-        // (3) 全出席停止
+        // 全出席停止
         if (statusList.stream().allMatch(s -> "出席停止".equals(s))) {
             summary.setSuspensionCount(summary.getSuspensionCount() + 1);
             continue;
         }
-
-        // --- B. 部分的な出席（遅刻・早退）の判定 ---
 
         String firstStatus = statusList.get(0); // 1限目の状態
         String lastStatus = statusList.get(statusList.size() - 1); // 最後の授業の状態
@@ -234,8 +231,6 @@ public class AdminStudentInfoService {
             summary.setEarlyLeaveCount(summary.getEarlyLeaveCount() + 1);
             continue;
         }
-
-        // --- C. その他 ---
 
         // (6) 出席
         // 上記のいずれにも当てはまらない（朝から最後まで出席している）

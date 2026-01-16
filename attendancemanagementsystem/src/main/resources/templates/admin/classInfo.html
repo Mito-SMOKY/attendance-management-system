@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf}"/> -->
+    
     <title>授業情報</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/admin/admininfo.css}">
-    
+    <link rel="stylesheet" th:href="@{/css/admin/classInfo.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -15,35 +17,55 @@
     <div class="header-container">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
-
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/classList')}"></div>
+        <div th:replace="~{fragments/_parts :: backButton(url=${backUrl})}"></div>
     </div>
     
     <div class="info-container">
         
         <h1 class="page-title">授業情報</h1>
+        
+        <input type="hidden" id="sessionId" th:value="${classInfo.sessionId}">
 
-        <div class="controls-area">
-            <button class="edit-btn">編集</button>
+        <div class="controls-area" style="justify-content: flex-end; display: flex;">
+            <div class="btn-group">
+                <button id="editSessionBtn" class="btn-edit" type="button"><i class="fas fa-pen"></i> 授業情報の編集</button>
+                <button id="saveSessionBtn" class="btn-save" type="button"><i class="fas fa-save"></i> 保存</button>
+                <button id="cancelSessionBtn" class="btn-cancel" type="button"><i class="fas fa-times"></i> キャンセル</button>
+            </div>
         </div>
 
-        <div class="top-info-section">
-            
+        <div class="top-info-section" id="sessionInfoArea">
             <div class="info-table-wrapper">
                 <table class="detail-table">
                     <tbody>
                         <tr>
                             <th>教科名</th>
-                            <td></td>
+                            <td>
+                                <span class="session-view" th:text="${classInfo.subjectName}"></span>
+                                <select class="session-edit" id="subjectId">
+                                    <option th:each="item : ${classInfo.allSubjects}" 
+                                            th:value="${item.subjectId}" 
+                                            th:text="${item.subjectName}"
+                                            th:selected="${item.subjectId == classInfo.currentSubjectId}"></option>
+                                </select>
+                            </td>
                         </tr>
                         <tr>
                             <th>担当教員</th>
-                            <td>鈴木千太郎</td>
+                            <td>
+                                <span class="session-view" th:text="${classInfo.teacherName}"></span>
+                                <select class="session-edit" id="teacherId">
+                                    <option th:each="item : ${classInfo.allTeachers}" 
+                                            th:value="${item.userId}" 
+                                            th:text="${item.name}"
+                                            th:selected="${item.userId == classInfo.currentTeacherId}"></option>
+                                </select>
+                            </td>
                         </tr>
                         <tr>
                             <th>コース</th>
-                            <td></td>
+                            <td th:text="${classInfo.courseName}"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -54,64 +76,81 @@
                     <tbody>
                         <tr>
                             <th>教室</th>
-                            <td></td>
+                            <td>
+                                <span class="session-view" th:text="${classInfo.classroomName}"></span>
+                                <select class="session-edit" id="classroomId">
+                                    <option th:each="item : ${classInfo.allClassrooms}" 
+                                            th:value="${item.classroomId}" 
+                                            th:text="${item.classroomName}"
+                                            th:selected="${item.classroomId == classInfo.currentClassroomId}"></option>
+                                </select>
+                            </td>
                         </tr>
                         <tr>
                             <th>授業時間</th>
-                            <td></td>
+                            <td>
+                                <span class="session-view" th:text="${classInfo.timeSlotText}"></span>
+                                <select class="session-edit" id="timeSlotId">
+                                    <option th:each="item : ${classInfo.allTimeSlots}" 
+                                            th:value="${item.slotId}" 
+                                            th:text="${item.startTime} + ' ～ ' + ${item.endTime}"
+                                            th:selected="${item.slotId == classInfo.currentTimeSlotId}"></option>
+                                </select>
+                            </td>
                         </tr>
                         <tr>
                             <th>日付</th>
-                            <td></td>
+                            <td>
+                                <span class="session-view" th:text="${classInfo.dateText}"></span>
+                                <input type="date" class="session-edit" id="sessionDate" th:value="${classInfo.currentDateValue}">
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-
         </div>
+
 
         <div class="student-list-section">
-            <div class="section-subtitle">受講生徒一覧</div>
+            <div class="list-header">
+                <div class="section-subtitle">受講生徒一覧</div>
+                <div class="btn-group">
+                    <button id="editStudentBtn" class="btn-edit" type="button"><i class="fas fa-pen"></i> 出欠の編集</button>
+                    <button id="saveStudentBtn" class="btn-save" type="button"><i class="fas fa-save"></i> 保存</button>
+                    <button id="cancelStudentBtn" class="btn-cancel" type="button"><i class="fas fa-times"></i> キャンセル</button>
+                </div>
+            </div>
+            
             <div class="student-table-wrapper">
-                <table class="student-table">
+                <table class="student-table" id="studentTable">
                     <colgroup>
-                        <col style="width: 15%;"> 
-                        <col style="width: 10%;"> 
-                        <col style="width: 15%;"> 
-                        <col style="width: 30%;"> 
-                        <col style="width: 30%;"> 
+                        <col style="width: 15%;"> <col style="width: 10%;"> <col style="width: 15%;"> <col style="width: 30%;"> <col style="width: 30%;"> 
                     </colgroup>
                     <thead>
-                        <tr>
-                            <th>学籍番号</th>
-                            <th>学年</th>
-                            <th>クラス</th>
-                            <th>氏名</th>
-                            <th>出欠状況</th>
-                        </tr>
+                        <tr><th>学籍番号</th><th>学年</th><th>クラス</th><th>氏名</th><th>出欠状況</th></tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td><td></td><td></td><td></td><td class="status-present"></td>
+                        <tr th:each="student : ${classInfo.students}" th:attr="data-user-id=${student.userId}">
+                            <td th:text="${student.studentNumber}"></td>
+                            <td th:text="${student.grade}"></td>
+                            <td th:text="${student.className}"></td>
+                            <td th:text="${student.name}"></td>
+                            <td>
+                                <span class="status-view" th:text="${student.statusLabel}" th:classappend="${student.statusStyle}">-</span>
+                                <select class="status-select">
+                                    <option value="" th:selected="${student.currentStatusId == null}">未登録</option>
+                                    <th:block th:each="st : ${classInfo.allStatuses}">
+                                        <option th:value="${st.statusId}" th:text="${st.statusName}" th:selected="${student.currentStatusId == st.statusId}"></option>
+                                    </th:block>
+                                </select>
+                            </td>
                         </tr>
-                        <tr>
-                            <td></td><td></td><td></td><td></td><td class="status-absent"></td>
-                        </tr>
-                        <tr>
-                            <td></td><td></td><td></td><td></td><td class="status-present"></td>
-                        </tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr th:if="${#lists.isEmpty(classInfo.students)}"><td colspan="5">生徒がいません。</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
-
-        <div class="footer-action">
-            <button class="start-session-btn">セッションを開始</button>
-        </div>
-
     </div>
-
+    <script th:src="@{/js/admin/classInfo.js}"></script>
 </body>
 </html>

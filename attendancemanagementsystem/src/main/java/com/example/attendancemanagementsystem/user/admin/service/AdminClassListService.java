@@ -107,6 +107,7 @@ public class AdminClassListService {
             if (periodMap.containsKey(p)) {
                 PeriodDetail detail = periodMap.get(p);
                 detail.setHasClass(true);
+                detail.setSessionId(s.getSessionId());
 
                 // 科目名のセット
                 if (s.getSubject() != null) {

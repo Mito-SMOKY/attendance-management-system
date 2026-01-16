@@ -249,3 +249,8 @@
     background-color: #e0f7fa; /* ←ここを好きな色に変更 */
     border-left: 4px solid #00acc1;
 }
+
+.subject-link:hover {
+    text-decoration: underline !important;
+    cursor: pointer;
+}

@@ -72,7 +72,7 @@ public class AdminStudentListService {
     public Map<String, Object> searchStudents(int page, int size, String keyword, 
                                             Integer departmentId, Integer grade, Integer courseId) {
 
-        // --- 1. 検索条件 (Specification) の構築 ---
+        // 検索条件の構築 ---
         Specification<StudentEntity> spec = Specification.where(null);
 
         // キーワード検索

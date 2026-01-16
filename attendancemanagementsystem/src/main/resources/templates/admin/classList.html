@@ -25,8 +25,6 @@
         <h1 class="page-title">授業一覧</h1>
 
         <div class="controls-area">
-
-           
             <form th:action="@{/admin/dailyClassList}" method="get" class="search-form-3">
                 <input  type="text" 
                         name="date" 
@@ -64,7 +62,7 @@
                         
                         <td class="subject-cell">
                             <th:block th:if="${p != null && p.hasClass}">
-                                <a th:href="@{/admin/subject/detail/{id}(id=${p.subjectId})}" 
+                                <a th:href="@{/admin/class/detail/{id}(id=${p.sessionId})}" 
                                 class="subject-link"
                                 th:text="${p.subjectName}">教科名</a>
                             </th:block>

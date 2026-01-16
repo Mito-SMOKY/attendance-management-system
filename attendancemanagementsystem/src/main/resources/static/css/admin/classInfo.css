@@ -201,3 +201,39 @@ body {
 .start-session-btn:hover {
     background-color: #f0fcfd;
 }
+
+.list-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 10px; 
+}
+.btn-group button { 
+    margin-left: 5px; 
+    padding: 5px 15px; 
+    border: none; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 0.9rem; 
+}
+.btn-edit { 
+    background-color: #539DA4; 
+    color: white; 
+}
+.btn-save { 
+    background-color: #28a745; 
+    color: white; 
+    display: none; 
+}
+.btn-cancel { 
+    background-color: #dc3545; 
+    color: white; 
+    display: none; 
+}
+        
+/* 編集用フォームのスタイル */
+.session-edit, .status-select { 
+    display: none; 
+    width: 100%; 
+    padding: 4px; 
+}
