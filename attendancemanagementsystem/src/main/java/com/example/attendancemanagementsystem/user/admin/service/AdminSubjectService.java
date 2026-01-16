@@ -21,6 +21,7 @@ import com.example.attendancemanagementsystem.common.repository.DepartmentReposi
 import com.example.attendancemanagementsystem.common.repository.DepartmentSubjectRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectFacultyRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
+import com.example.attendancemanagementsystem.common.repository.TimetableRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.user.admin.dto.SubjectMatrixRowDTO;
 
@@ -32,8 +33,10 @@ public class AdminSubjectService {
     @Autowired private DepartmentSubjectRepository departmentSubjectRepository;
     @Autowired private UsersRepository usersRepository;
     @Autowired private SubjectFacultyRepository subjectFacultyRepository;
-    // @Autowired private MajorRepository majorRepository;
-    @Autowired private CourseRepository courseRepository; // 追加
+    @Autowired private CourseRepository courseRepository;
+    
+    // ★追加: 時間割削除のためにRepositoryを注入
+    @Autowired private TimetableRepository timetableRepository; 
 
     // --- 教科一覧取得（情報マスタ画面用） ---
     public List<SubjectMatrixRowDTO> getSubjectInfoList() {
@@ -189,7 +192,7 @@ public class AdminSubjectService {
             List<String> subjectNames, 
             List<Integer> teacherIds, 
             List<Integer> courseCounts,
-            List<Integer> courseIds,        // ★この行を追加してください
+            List<Integer> courseIds,
             List<Integer> departmentIds,
             List<Integer> grades) {
     
@@ -208,12 +211,21 @@ public class AdminSubjectService {
         for (SubjectEntity sub : allSubjects) {
             if (!keptIds.contains(sub.getSubjectId())) {
                 // 関連テーブルの削除
+                
+                // (1) クラス紐づけ(DepartmentSubject)を削除
                 departmentSubjectRepository.deleteAll(
                     departmentSubjectRepository.findAll().stream()
                         .filter(ds -> ds.getId().getSubjectId().equals(sub.getSubjectId()))
                         .collect(Collectors.toList())
                 );
+                
+                // (2) 担当教師(SubjectFaculty)を削除
                 subjectFacultyRepository.deleteBySubjectId(sub.getSubjectId());
+                
+                // ★追加: (3) 時間割(TimeTable)を削除 (外部キー制約エラー回避のため必須)
+                timetableRepository.deleteBySubjectId(sub.getSubjectId());
+
+                // (4) 最後に教科本体(Subject)を削除
                 subjectRepository.delete(sub); 
             }
         }
@@ -225,14 +237,12 @@ public class AdminSubjectService {
             Integer teacherId = (teacherIds != null && teacherIds.size() > i) ? teacherIds.get(i) : null;
             Integer departmentId = (departmentIds != null && departmentIds.size() > i) ? departmentIds.get(i) : null;
 
-            // ★修正箇所: コマ数と学年の取得ロジックを修正 (null安全にする)
             Integer countVal = (courseCounts != null && courseCounts.size() > i) ? courseCounts.get(i) : null;
-            Integer count = (countVal != null) ? countVal : 1; // nullなら1にする
+            Integer count = (countVal != null) ? countVal : 1; 
 
             Integer gradeVal = (grades != null && grades.size() > i) ? grades.get(i) : null;
-            Integer grade = (gradeVal != null) ? gradeVal : 1; // nullなら1にする
+            Integer grade = (gradeVal != null) ? gradeVal : 1; 
             
-            // --- 以下、元のコードと同じ ---
             // SubjectEntity (教科本体) の保存
             SubjectEntity entity;
             if (currentId != null) {
@@ -255,23 +265,44 @@ public class AdminSubjectService {
             }
 
             // DepartmentSubject (クラス・学年との紐付け) の保存
+            // 1. この教科に関連する既存データを取得
             List<DepartmentSubject> existingLinks = departmentSubjectRepository.findAll().stream()
                 .filter(ds -> ds.getId().getSubjectId().equals(savedSubjectId))
                 .collect(Collectors.toList());
-            departmentSubjectRepository.deleteAll(existingLinks);
 
             if (departmentId != null) {
-                DepartmentSubject newLink = new DepartmentSubject();
-                DepartmentSubjectKey key = new DepartmentSubjectKey(departmentId, savedSubjectId);
+                // 2. 今回登録しようとしているキー（クラスと教科の組み合わせ）を作成
+                DepartmentSubjectKey targetKey = new DepartmentSubjectKey(departmentId, savedSubjectId);
                 
-                newLink.setId(key);
-                newLink.setGrade(grade);
-                
-                departmentRepository.findById(departmentId).ifPresent(newLink::setDepartment);
-                newLink.setSubject(savedEntity);
+                // 3. 既存データの中に、同じキーのものがあるか探す
+                DepartmentSubject targetLink = existingLinks.stream()
+                    .filter(ds -> ds.getId().equals(targetKey))
+                    .findFirst()
+                    .orElse(null);
 
-                departmentSubjectRepository.save(newLink);
+                if (targetLink != null) {
+                    // 【重要】既存データがあるなら「更新」する（削除・再作成はしない！）
+                    targetLink.setGrade(grade);
+                    departmentSubjectRepository.save(targetLink);
+                    
+                    // 更新したので、削除リスト（existingLinks）から外す
+                    existingLinks.remove(targetLink);
+                } else {
+                    // 既存データがないなら「新規作成」する
+                    DepartmentSubject newLink = new DepartmentSubject();
+                    newLink.setId(targetKey);
+                    newLink.setGrade(grade);
+                    
+                    departmentRepository.findById(departmentId).ifPresent(newLink::setDepartment);
+                    newLink.setSubject(savedEntity);
+
+                    departmentSubjectRepository.save(newLink);
+                }
             }
+
+            // 4. 今回の処理で選ばれなかった（＝クラスが変わって不要になった）古いデータだけを削除
+            departmentSubjectRepository.deleteAll(existingLinks);
+
         }
     }
 
@@ -313,7 +344,6 @@ public class AdminSubjectService {
         }
     }
 
-    // ★追加: 循環参照を避けるために、IDと名前だけのMapリストを作る
     public List<Map<String, Object>> getSimpleCourseList() {
         return courseRepository.findAll().stream().map(c -> {
             Map<String, Object> map = new HashMap<>();
@@ -323,18 +353,15 @@ public class AdminSubjectService {
         }).collect(Collectors.toList());
     }
 
-    // ★追加
     public List<Map<String, Object>> getSimpleDepartmentList() {
         return departmentRepository.findAll().stream().map(d -> {
             Map<String, Object> map = new HashMap<>();
             map.put("departmentId", d.getDepartmentId());
             map.put("className", d.getClassName());
-            // 関連するSubjectリストなどは入れない！これでループ回避
             return map;
         }).collect(Collectors.toList());
     }
 
-    // ★追加
     public List<Map<String, Object>> getSimpleTeacherList() {
         return usersRepository.findByUserTypeId(2).stream().map(u -> {
             Map<String, Object> map = new HashMap<>();

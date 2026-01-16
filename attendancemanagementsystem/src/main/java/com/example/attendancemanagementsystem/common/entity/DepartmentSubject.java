@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 
 @Entity
@@ -16,13 +15,14 @@ public class DepartmentSubject {
     private DepartmentSubjectKey id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("departmentId")
-    @JoinColumn(name = "DepartmentID")
+    // @MapsId("departmentId")
+    // @JoinColumn(name = "DepartmentID")
+    @JoinColumn(name = "DepartmentID", insertable = false, updatable = false)
     private DepartmentEntity department; // 既存の DepartmentEntity を使用
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("subjectId")
-    @JoinColumn(name = "SubjectID")
+    // @MapsId("subjectId")
+    @JoinColumn(name = "SubjectID", insertable = false, updatable = false)
     private SubjectEntity    subject;
 
     @Column(name = "Grade")

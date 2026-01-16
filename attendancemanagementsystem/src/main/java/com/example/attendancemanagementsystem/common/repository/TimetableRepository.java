@@ -4,12 +4,15 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.entity.TimetableEntity;
+
+import jakarta.transaction.Transactional;
 
 @Repository
 public interface TimetableRepository extends JpaRepository<TimetableEntity, Integer> {
@@ -46,4 +49,9 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
     
     //指定したユーザIDの時間割エンティティの特定のコマを取得
     List<TimetableEntity> findByUserIdAndDate(Integer userId, LocalDate date);
+
+    // ★追加: 教科IDに基づいて時間割データを削除するメソッド
+    @Modifying
+    @Transactional
+    void deleteBySubjectId(Integer subjectId);
 }

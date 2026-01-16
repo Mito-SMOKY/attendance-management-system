@@ -330,7 +330,7 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("successMessage", "変更を保存しました。");
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", "保存中にエラーが発生しました。");
+            redirectAttributes.addFlashAttribute("errorMessage", "保存中にエラーが発生しました。" + e.getMessage());
         }
 
         //リダイレクト先も新しいURLに変更

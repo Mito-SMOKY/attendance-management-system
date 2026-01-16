@@ -75,13 +75,12 @@
             </thead>
             <tbody>
               <tr th:each="info : ${subjectInfoList}">
-                <input
-                  type="hidden"
-                  name="subjectId"
-                  th:value="${info.subjectId}"
-                />
-
                 <td>
+                  <input
+                    type="hidden"
+                    name="subjectId"
+                    th:value="${info.subjectId}"
+                  />
                   <span class="view-mode" th:text="${info.courseName}"></span>
                   <select class="edit-mode" name="courseId">
                     <option value="">選択</option>
