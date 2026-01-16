@@ -29,7 +29,7 @@
             <div class="search-section">
                 <form th:action="@{/admin/dailyClassList}" method="get" class="search-form-row">
                     <input type="text" name="date" class="search-input" 
-                           th:value="${viewData.searchDate}" placeholder="yyyyMMdd">
+                        th:value="${viewData.searchDate}" placeholder="yyyyMMdd">
                     <input type="hidden" name="userId" value="admin001">
                     <button type="submit" class="search-btn">
                         <i class="fa-solid fa-magnifying-glass"></i> 検索
