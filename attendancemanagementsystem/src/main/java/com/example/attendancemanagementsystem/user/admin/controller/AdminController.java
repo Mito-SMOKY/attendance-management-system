@@ -310,7 +310,7 @@ public class AdminController {
             @RequestParam(name = "subjectName", required = false) List<String> subjectNames,
             @RequestParam(name = "teacherId", required = false) List<Integer> teacherIds,
             @RequestParam(name = "courseCount", required = false) List<Integer> courseCounts,
-            @RequestParam(name = "majorId", required = false) List<Integer> majorIds,
+            @RequestParam(name = "courseId", required = false) List<Integer> courseIds,
             @RequestParam(name = "departmentId", required = false) List<Integer> departmentIds,
             @RequestParam(name = "grade", required = false) List<Integer> grades,
             RedirectAttributes redirectAttributes) {
@@ -322,7 +322,7 @@ public class AdminController {
                 subjectNames,
                 teacherIds,
                 courseCounts,
-                majorIds,
+                courseIds,
                 departmentIds,
                 grades
             );
