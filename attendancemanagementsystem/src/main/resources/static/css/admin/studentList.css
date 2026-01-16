@@ -12,9 +12,7 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
-    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
     font-size: 16px; 
-    background-color: #f4f4f9;
     color: #333;
 }
 
@@ -221,7 +219,7 @@ input[type="radio"]#modal-2__close,
 }
 
 .student-name-link {
-    color: #007bff;
+    color: #00bdca;
     text-decoration: none;
     font-weight: bold;
     cursor: pointer;
@@ -229,7 +227,7 @@ input[type="radio"]#modal-2__close,
     width: 100%;
 }
 .student-name-link:hover {
-    color: #0056b3;
+    color: #00bdca;
     text-decoration: underline;
 }
 

@@ -25,17 +25,22 @@
         <h1 class="page-title">授業一覧</h1>
 
         <div class="controls-area">
+
+            <form th:action="@{/admin/dailyClassList}" method="get" class="search-form-3">
+                <input type="text" name="date"th:value="${viewData.searchDate}" placeholder="yyyyMMdd">
+                <input type="hidden" name="userId" value="admin001">
+                <button type="submit" aria-label="検索"></button>
+            </form>
             
-            <div class="search-section">
-                <form th:action="@{/admin/dailyClassList}" method="get" class="search-form-row">
-                    <input type="text" name="date" class="search-input" 
-                        th:value="${viewData.searchDate}" placeholder="yyyyMMdd">
+            <!-- <div class="search-section"> -->
+                <!-- <form th:action="@{/admin/dailyClassList}" method="get" class="search-form-row">
+                    <input type="text" name="date"th:value="${viewData.searchDate}" placeholder="yyyyMMdd">
                     <input type="hidden" name="userId" value="admin001">
                     <button type="submit" class="search-btn">
                         <i class="fa-solid fa-magnifying-glass"></i> 検索
                     </button>
-                </form>
-            </div>
+                </form> -->
+            <!-- </div> -->
             
         </div>
         
@@ -61,7 +66,7 @@
                                 class="subject-link"
                                 th:text="${p.subjectName}">教科名</a>
                             </th:block>
-                            <span th:if="${p == null || !p.hasClass}" style="color:#ccc;">データがありません</span>
+                            <span th:if="${p == null || !p.hasClass}" style="color:#ccc;">授業データがありません</span>
                         </td>
 
                         <td class="classroom-cell">
