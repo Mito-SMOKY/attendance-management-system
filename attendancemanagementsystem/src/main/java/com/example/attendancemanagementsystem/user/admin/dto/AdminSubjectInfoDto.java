@@ -8,40 +8,42 @@ public class AdminSubjectInfoDto {
     private Integer subjectId;
     private Integer grade;
 
-    // ヘッダー・基本情報
-    private String subjectName;       // 講座名
-    private String fiscalYear;        // 年度
-    private String courseAndGrade;    // コース・学年
-    private String displaySubjectId;  // 教科ID
+    private String subjectName;
+    private String fiscalYear;
+    private String courseAndGrade;
+    private String displaySubjectId;
 
-    // 詳細情報
-    private String teacherName;       // 担当教員
-    private String totalClasses;      // 授業数
-    private String schedule;          // 曜日・コマ
-    private String classroom;         // 教室
+    private String teacherName;
+    private String totalClasses;
+    private String schedule;
+    private String classroom;
 
-    // 学生リスト
     private List<StudentSimpleInfo> students;
-    
-    // ★追加: 検索機能などで使うリスト（今は使わないかもしれませんが念のため）
     private List<SubjectOption> subjectList;
 
     public AdminSubjectInfoDto() {}
 
-    // 学生用インナークラス
+    // ★修正: 生徒ID (id) を追加
     public static class StudentSimpleInfo {
+        private Integer id;   // ★追加
         private String name;
-        public StudentSimpleInfo(String name) { this.name = name; }
+        
+        public StudentSimpleInfo(Integer id, String name) { 
+            this.id = id;
+            this.name = name; 
+        }
+        
+        // ★追加: getterが必須です
+        public Integer getId() { return id; }
         public String getName() { return name; }
     }
 
-    // ★★★ ここが抜けていました！追加してください ★★★
-    // 検索結果（オートコンプリート）を返すためのクラス
+    // 検索用オプション
     public static class SubjectOption {
-        private Integer id;           // subjectId
-        private String name;          // subjectName
-        private Integer departmentId; // 遷移先の学科ID
-        private Integer grade;        // 遷移先の学年
+        private Integer id;
+        private String name;
+        private Integer departmentId;
+        private Integer grade;
 
         public SubjectOption(Integer id, String name, Integer departmentId, Integer grade) {
             this.id = id;
@@ -55,7 +57,6 @@ public class AdminSubjectInfoDto {
         public Integer getDepartmentId() { return departmentId; }
         public Integer getGrade() { return grade; }
     }
-    // ★★★ ここまで ★★★
 
     // --- Getters / Setters ---
     public Integer getDepartmentId() { return departmentId; }
@@ -82,8 +83,6 @@ public class AdminSubjectInfoDto {
     public void setClassroom(String classroom) { this.classroom = classroom; }
     public List<StudentSimpleInfo> getStudents() { return students; }
     public void setStudents(List<StudentSimpleInfo> students) { this.students = students; }
-    
-    // subjectListのGetter/Setterも追加
     public List<SubjectOption> getSubjectList() { return subjectList; }
     public void setSubjectList(List<SubjectOption> subjectList) { this.subjectList = subjectList; }
 }

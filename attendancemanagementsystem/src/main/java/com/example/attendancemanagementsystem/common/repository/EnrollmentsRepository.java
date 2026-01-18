@@ -87,4 +87,16 @@ public interface EnrollmentsRepository extends JpaRepository<EnrollmentsEntity, 
         @Param("departmentId") Integer departmentId, 
         @Param("grade") Integer grade
     );
+
+    //クラスの生徒IDと名前を取得する
+    @Query("SELECT s.userId, u.name " +
+        "FROM EnrollmentsEntity e " +
+        "JOIN e.student s " +
+        "JOIN s.users u " +
+        "WHERE e.department.departmentId = :departmentId " +
+        "AND e.grade = :grade " +
+        "ORDER BY s.userId ASC")
+    List<Object[]> findStudentIdAndNamesByClass(
+            @Param("departmentId") Integer departmentId, 
+            @Param("grade") Integer grade);
 }

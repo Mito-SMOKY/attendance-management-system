@@ -106,11 +106,16 @@ public class AdminSubjectInfoService {
         dto.setClassroom(roomSet.isEmpty() ? "未定" : String.join(", ", roomSet));
 
         // 5. 学生リスト
-        List<String> studentNames = enrollmentsRepository.findStudentNamesByClass(departmentId, grade);
+        List<Object[]> studentData = enrollmentsRepository.findStudentIdAndNamesByClass(departmentId, grade);
         List<AdminSubjectInfoDto.StudentSimpleInfo> studentList = new ArrayList<>();
-        if (studentNames != null) {
-            for (String name : studentNames) {
-                studentList.add(new AdminSubjectInfoDto.StudentSimpleInfo(name));
+        
+        if (studentData != null) {
+            for (Object[] row : studentData) {
+                // row[0]=userId(Integer), row[1]=name(String)
+                Integer sId = (Integer) row[0];
+                String sName = (String) row[1];
+                // DTOのコンストラクタに合わせてIDと名前をセット
+                studentList.add(new AdminSubjectInfoDto.StudentSimpleInfo(sId, sName));
             }
         }
         dto.setStudents(studentList);
