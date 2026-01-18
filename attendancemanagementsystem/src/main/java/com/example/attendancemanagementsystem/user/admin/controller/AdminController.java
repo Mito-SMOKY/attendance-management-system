@@ -53,34 +53,10 @@ public class AdminController {
         return 3;
     }
 
-    @GetMapping("/subjectList")
-    public String showSubjectList() {
-        return "admin/subjectList";
-    }
-
-    @GetMapping("/subjectAttendance")
-    public String showSubjectAttendance() {
-        return "admin/subjectAttendance";
-    }
 
     @GetMapping("/studentList")
     public String showStudentList() {
         return "admin/studentList";
-    }
-
-    @GetMapping("/studentInfo")
-    public String showStudentInfo() {
-        return "admin/studentInfo";
-    }
-
-    @GetMapping("/timeTableList")
-    public String showtimeTableList() {
-        return "admin/timeTableList";
-    }
-
-    @GetMapping("/timeTableEdit")
-    public String showtimeTableEdit() {
-        return "admin/timeTableEdit";
     }
 
     @GetMapping("/tmpAccount")

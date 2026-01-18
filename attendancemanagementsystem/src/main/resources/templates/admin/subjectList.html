@@ -3,46 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>教科一覧</title>
+    <title>担当教科一覧</title>
+    
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/common/subjectList.css}"> 
-
+    <link rel="stylesheet" th:href="@{/css/admin/subjectList.css}"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
     
     <div class="header-container">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
 
-    <!-- 教科一覧のコンテナ -->
-    <div class="main-container">
-        <table class="subject-table">
-            <thead>
-                <tr>
-                    <th class="col-subject">教科名</th>
-                    <th class="col-teacher">担当教師</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr th:each="subject : ${subjectList}">
-                    <td class="subject-info-cell">
-                        <div th:text="${subject.courseName}" class="course-name"></div>
-                        <a th:href="@{/admin/subject_attendance(subjectId=${subject.subjectId})}" 
-                            th:text="${subject.subjectName}" 
-                            class="subject-name">
-                        </a>
-                    </td>
-                    
-                    <td th:text="${subject.teacherName}" class="teacher-name-cell"></td>
-                    
-                </tr>
-            </tbody>
-        </table>
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
     </div>
+
+    <div class="main-container">
+        <h2 class="page-title"><i class="fa-solid fa-book-open"></i> 担当教科一覧</h2>
+
+        <div class="top-controls">
+            <div class="search-form-3">
+                <label>
+                    <input type="text" id="searchInput" placeholder="教科名で検索">
+                </label>
+                <button type="button" id="searchBtn" aria-label="検索"></button>
+            </div>
+
+            <div class="modal-2__wrap">
+                <input type="radio" id="modal-2__open" class="modal-2__open-input" name="modal-2__trigger"/>
+                <label for="modal-2__open" class="modal-2__open-label">
+                    <i class="fa-solid fa-filter" style="color: #00acbd; font-size: 1.2rem;"></i>
+                </label>
+                <input type="radio" id="modal-2__close" name="modal-2__trigger"/>
+
+                <div class="modal-2">
+                    <div class="modal-2__content-wrap">
+                        <label for="modal-2__close" class="modal-2__close-label">×</label>
+                        <div class="modal-2__content">
+                            <div style="color: #00acbd; font-weight: bold; font-size: 1.5rem; margin-top: 10px;">
+                                <i class="fa-solid fa-filter"></i> 絞り込み
+                            </div><br/>
+
+                            <div style="font-weight: bold; margin-bottom: 10px;">学年</div>
+                            <fieldset class="checkbox-1" id="gradeFilterContainer"></fieldset>
+                            <br/>
+
+                            <div style="font-weight: bold; margin-bottom: 10px;">クラス</div>
+                            <fieldset class="checkbox-1" id="classFilterContainer"></fieldset>
+                            <br/>
+                        </div>
+                    </div>
+                    <label for="modal-2__close"><div class="modal-2__background"></div></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-scroll-container">
+            <table class="subject-table">
+                <thead>
+                    <tr><th class="col-subject">教科・クラス情報</th></tr>
+                </thead>
+                <tbody id="subjectTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script th:src="@{/js/admin/subjectList.js}"></script>
 
 </body>
 </html>
