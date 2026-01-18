@@ -95,4 +95,31 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
         ORDER BY c.courseName, ds.grade, d.className
     """)
     List<Object[]> findTeacherSubjectsRaw(@Param("userId") Integer userId);
+
+    //担当教員名を取得
+    @Query(value = """
+        SELECT u.Name 
+        FROM timetable t
+        JOIN users u ON t.UserID = u.UserID
+        WHERE t.SubjectID = :subjectId 
+        AND t.DepartmentID = :departmentId 
+        LIMIT 1
+        """, nativeQuery = true)
+    List<String> findTeacherNameBySubjectAndClass(
+        @Param("subjectId") Integer subjectId, 
+        @Param("departmentId") Integer departmentId
+    );
+
+    //曜日と教室を取得
+    @Query(value = """
+        SELECT t.Date, c.ClassroomName 
+        FROM timetable t 
+        LEFT JOIN classroom c ON t.ClassroomID = c.ClassroomID
+        WHERE t.SubjectID = :subjectId 
+        AND t.DepartmentID = :departmentId
+        """, nativeQuery = true)
+    List<Object[]> findScheduleAndRoom(
+        @Param("subjectId") Integer subjectId, 
+        @Param("departmentId") Integer departmentId
+    );
 }

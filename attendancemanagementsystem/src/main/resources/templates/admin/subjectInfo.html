@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教科情報詳細</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/subjectInfo.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/subjectList')}"></div>
+    </div>
+
+    <div class="main-container">
+        
+        <h2 class="page-title mt-header"><i class="fa-solid fa-file-lines"></i> 教科詳細情報</h2>
+
+        <div class="control-bar">
+            <div class="left-controls">
+                
+                <div class="search-wrapper">
+                    <div class="search-input-container">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="subjectSearchInput" class="search-input" placeholder="教科名で検索 (例: Java)">
+                        <div id="searchLoader" class="loader" style="display: none;"></div>
+                    </div>
+                    
+                    <ul id="suggestionList" class="suggestion-list" style="display: none;"></ul>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="info-grid">
+            
+            <div class="left-panel">
+                <div class="info-card">
+                    <h3 class="card-title">基本情報</h3>
+                    <table class="detail-table">
+                        <tr>
+                            <th>講座名</th>
+                            <td th:text="${info.subjectName}">Python II</td>
+                        </tr>
+                        <tr>
+                            <th>年度</th>
+                            <td th:text="${info.fiscalYear}">2025年度</td>
+                        </tr>
+                        <tr>
+                            <th>コース・学年</th>
+                            <td th:text="${info.courseAndGrade}">SE 2年 A組</td>
+                        </tr>
+                        <tr>
+                            <th>教科ID</th>
+                            <td th:text="${info.displaySubjectId}">XXXX-XX</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="info-card mt-20">
+                    <h3 class="card-title">授業詳細</h3>
+                    <table class="detail-table">
+                        <tr>
+                            <th>担当教員</th>
+                            <td th:text="${info.teacherName}">〇〇 〇〇</td>
+                        </tr>
+                        <tr>
+                            <th>授業数</th>
+                            <td th:text="${info.totalClasses}">15コマ</td>
+                        </tr>
+                        <tr>
+                            <th>曜日・コマ</th>
+                            <td th:text="${info.schedule}">水曜4限</td>
+                        </tr>
+                        <tr>
+                            <th>教室</th>
+                            <td th:text="${info.classroom}">232</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="student-card">
+                    <h3 class="card-title">履修学生一覧 <span class="badge" th:text="${info.students.size()} + '名'"></span></h3>
+                    
+                    <div class="student-scroll-container">
+                        <table class="student-table">
+                            <thead>
+                                <tr>
+                                    <th>氏名</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="student : ${info.students}">
+                                    <td>
+                                        <a href="#" class="student-link">
+                                            <i class="fa-solid fa-user-graduate"></i>
+                                            <span th:text="${student.name}">川島 未裕</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(info.students)}">
+                                    <td class="text-center" style="color: #999; padding: 20px;">登録学生なし</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+<script th:src="@{/js/admin/subjectInfo.js}"></script>
+</body>
+</html>

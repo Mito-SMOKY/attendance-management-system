@@ -30,11 +30,11 @@ async function fetchData() {
         
         // チェックされている学年を取得
         const selectedGrades = Array.from(document.querySelectorAll('input[name="grades"]:checked'))
-                                    .map(cb => cb.value);
+                                      .map(cb => cb.value);
         
         // チェックされているクラスを取得
         const selectedClasses = Array.from(document.querySelectorAll('input[name="classes"]:checked'))
-                                    .map(cb => cb.value);
+                                       .map(cb => cb.value);
 
         // 2. クエリパラメータの作成
         const params = new URLSearchParams();
@@ -73,10 +73,7 @@ function renderTable(subjects) {
 
     subjects.forEach(item => {
         const tr = document.createElement('tr');
-        // リンク先URLの生成（Thymeleafの @{} が使えないのでハードコーディングか、data属性で渡す工夫が必要）
-        // ここではシンプルにコンテキストパスが / である前提で記述します。
-        // もしコンテキストパスがある場合は調整が必要です。
-        const linkUrl = `/admin/subject_attendance?subjectId=${item.subjectId}`;
+        const linkUrl = `/admin/subjectInfo?departmentId=${item.departmentId}&subjectId=${item.subjectId}&grade=${item.grade}`;
         
         tr.innerHTML = `
             <td class="subject-info-cell">

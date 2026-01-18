@@ -21,5 +21,4 @@ public interface UsersRepository extends JpaRepository<UsersEntity, Integer> {
 
     // RoleIDをキーにしてusersテーブルから複数件検索するメソッド
     List<UsersEntity> findByUserTypeId(Integer userTypeId);
-    
 }

@@ -1,6 +1,7 @@
 package com.example.attendancemanagementsystem.user.admin.dto;
 
 public class AdminSubjectListDto {
+    private Integer departmentId;
     private Integer subjectId;
     private String subjectName;
     private String courseName;
@@ -8,7 +9,8 @@ public class AdminSubjectListDto {
     private String className;
 
     // コンストラクタ
-    public AdminSubjectListDto(Integer subjectId, String subjectName, String courseName, Integer grade, String className) {
+    public AdminSubjectListDto(Integer departmentId,Integer subjectId, String subjectName, String courseName, Integer grade, String className) {
+        this.departmentId = departmentId;
         this.subjectId = subjectId;
         this.subjectName = subjectName;
         this.courseName = courseName;
@@ -19,6 +21,10 @@ public class AdminSubjectListDto {
     public AdminSubjectListDto() {}
 
     // --- Getter / Setter ---
+
+    public Integer getDepartmentId() { return departmentId; }
+    public void setDepartmentId(Integer departmentId) { this.departmentId = departmentId; }
+
     public Integer getSubjectId() { return subjectId; }
     public void setSubjectId(Integer subjectId) { this.subjectId = subjectId; }
 
@@ -46,7 +52,7 @@ public class AdminSubjectListDto {
         );
     }
 
-    // ★追加: クラス情報部分だけを返す: {情報システム科 2年A組}
+    // クラス情報部分だけを返す: {情報システム科 2年A組}
     public String getClassInfoStr() {
         return String.format("{%s %d%s}", 
             courseName != null ? courseName : "",

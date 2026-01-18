@@ -2,6 +2,7 @@ package com.example.attendancemanagementsystem.user.admin.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap; 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +25,7 @@ public class AdminSubjectListService {
         this.departmentSubjectRepository = departmentSubjectRepository;
     }
 
-    //教科一覧の取得とフィルタリング
+    // 教科一覧の取得とフィルタリング
     public List<AdminSubjectListDto> getTeacherSubjects(String loginId, String search, List<Integer> grades, List<String> classes) {
 
         // 履修マスタ取得
@@ -32,7 +33,7 @@ public class AdminSubjectListService {
 
         return allSubjects.stream()
 
-            // 指定された学年で絞り込み（未指定時はスキップ）
+            // 指定された学年で絞り込み
             .filter(dto -> {
                 if (grades == null || grades.isEmpty()) return true;
                 return grades.contains(dto.getGrade());
@@ -50,22 +51,17 @@ public class AdminSubjectListService {
                 String keyword = search.toLowerCase();
                 return dto.getSubjectName() != null && dto.getSubjectName().toLowerCase().contains(keyword);
             })
-
-            // フィルタ結果をリストに変換して返却
             .collect(Collectors.toList());
     }
 
-    
-    //フィルタ選択肢の取得
+    // フィルタ選択肢の取得
     public Map<String, Object> getAvailableFilterOptions(String loginId, List<Integer> selectedGrades, List<String> selectedClasses) {
-
-        // カリキュラムを取得）
+        
+        // 重複除去済みのデータを取得
         List<AdminSubjectListDto> allSubjects = getAllSubjectsRaw();
 
         // 学年の選択肢リストを作成
         Set<Integer> availableGrades = new TreeSet<>();
-        
-        // クラスが選択されている場合は、そのクラスが存在する学年のみ抽出、未選択なら全学年
         if (selectedClasses != null && !selectedClasses.isEmpty()) {
             allSubjects.stream()
                 .filter(d -> selectedClasses.contains(d.getClassName()))
@@ -76,8 +72,6 @@ public class AdminSubjectListService {
 
         // クラスの選択肢リストを作成
         Set<String> availableClasses = new TreeSet<>();
-        
-        // 学年が選択されている場合は、その学年に存在するクラスのみ抽出、未選択なら全クラス
         if (selectedGrades != null && !selectedGrades.isEmpty()) {
             allSubjects.stream()
                 .filter(d -> selectedGrades.contains(d.getGrade()))
@@ -86,30 +80,38 @@ public class AdminSubjectListService {
             allSubjects.forEach(d -> availableClasses.add(d.getClassName()));
         }
 
-        // 結果をマップに格納して返却
         Map<String, Object> options = new HashMap<>();
         options.put("grades", new ArrayList<>(availableGrades));
         options.put("classes", new ArrayList<>(availableClasses));
         return options;
     }
 
-    //全データを取得してDTOに変換
+    // 全データを取得してDTOに変換
     private List<AdminSubjectListDto> getAllSubjectsRaw() {
 
         // 全教科・全クラスの組み合わせを取得
         List<Object[]> rawDataList = departmentSubjectRepository.findAllCurriculumRaw();
 
-        // 取得した生データをDTOリストに変換
-        List<AdminSubjectListDto> dtoList = new ArrayList<>();
+        //セット
+        Map<String, AdminSubjectListDto> uniqueMap = new LinkedHashMap<>();
         for (Object[] row : rawDataList) {
-            Integer subjectId   = (Integer) row[0];
-            String subjectName  = (String)  row[1];
-            String courseName   = (String)  row[2];
-            Integer grade       = (Integer) row[3];
-            String className    = (String)  row[4];
-            
-            dtoList.add(new AdminSubjectListDto(subjectId, subjectName, courseName, grade, className));
+            Integer departmentId = (Integer) row[0];
+            Integer subjectId    = (Integer) row[1];
+            String subjectName   = (String)  row[2];
+            String courseName    = (String)  row[3];
+            Integer grade        = (Integer) row[4];
+            String className     = (String)  row[5];
+
+            // 一意にするためのキーを作成（クラスIDと教科IDの組み合わせ）
+            String uniqueKey = courseName + "_" + grade + "_" + className + "_" + subjectName;
+
+            // まだマップに登録されていない場合のみ追加
+            if (!uniqueMap.containsKey(uniqueKey)) {
+                uniqueMap.put(uniqueKey, new AdminSubjectListDto(departmentId, subjectId, subjectName, courseName, grade, className));
+            }
         }
-        return dtoList;
+        
+        // マップの値（DTO）だけをリストにして返す
+        return new ArrayList<>(uniqueMap.values());
     }
 }
