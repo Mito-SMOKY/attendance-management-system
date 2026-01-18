@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
             const input = document.getElementById('subjectSearchInput');
             const list = document.getElementById('suggestionList');
             const loader = document.getElementById('searchLoader');

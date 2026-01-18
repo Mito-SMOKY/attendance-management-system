@@ -16,7 +16,7 @@
     </div>
 
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/admin/subjectList')}"></div>
+        <div th:replace="~{fragments/_parts :: backButton(url=${backUrl})}"></div>
     </div>
 
     <div class="main-container">
@@ -100,7 +100,8 @@
                             <tbody>
                                 <tr th:each="student : ${info.students}">
                                     <td>
-                                        <a th:href="@{/admin/student/{sid}/subject/{subid}(sid=${student.id}, subid=${info.subjectId})}" class="student-link">
+                                        <a th:href="@{/admin/student/{sid}/subject/{subid}(sid=${student.id}, subid=${info.subjectId}, from='subject', fromDeptId=${info.departmentId}, fromGrade=${info.grade})}" 
+                                           class="student-link">
                                             <i class="fa-solid fa-user-graduate"></i>
                                             <span th:text="${student.name}">川島 未裕</span>
                                             <i class="fa-solid fa-chevron-right" style="float: right; font-size: 0.8em; color: #ccc; margin-top: 4px;"></i>

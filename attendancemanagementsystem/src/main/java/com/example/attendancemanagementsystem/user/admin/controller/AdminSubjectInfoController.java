@@ -27,10 +27,20 @@ public class AdminSubjectInfoController {
             @RequestParam("departmentId") Integer departmentId,
             @RequestParam("subjectId") Integer subjectId,
             @RequestParam("grade") Integer grade,
+            @RequestParam(name = "from", required = false) String from,
+            @RequestParam(name = "fromStudentId", required = false) Integer fromStudentId,
             Model model) {
 
         AdminSubjectInfoDto subjectInfo = adminSubjectInfoService.getSubjectInfo(departmentId, subjectId, grade);
         model.addAttribute("info", subjectInfo);
+
+        String backUrl = "/admin/subjectList";
+        
+        // 生徒詳細から来た場合は、その生徒詳細へ戻る
+        if ("student".equals(from) && fromStudentId != null) {
+            backUrl = "/admin/student/info/" + fromStudentId;
+        }
+        model.addAttribute("backUrl", backUrl);
         
         return "admin/subjectInfo"; 
     }

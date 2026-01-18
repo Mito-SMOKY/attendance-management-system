@@ -6,8 +6,7 @@
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/admin/studentSubjectDetail.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    </head>
+</head>
 <body>
     <input type="hidden" id="studentIdHidden" th:value="${detail.studentId}">
 
@@ -16,7 +15,7 @@
     </div>
     
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url=@{/admin/student/info/{id}(id=${detail.studentId})})}"></div>
+        <div th:replace="~{fragments/_parts :: backButton(url=${backUrl})}"></div>
     </div>
 
     <div class="main-container">
@@ -32,14 +31,14 @@
                     <tr>
                         <th>教科名</th>
                         <td class="subject-name">
-                            <a th:href="@{/admin/subjectInfo(departmentId=${detail.departmentId}, subjectId=${detail.subjectId}, grade=${detail.grade})}"
-                               th:text="${detail.subjectName}"
-                               style="text-decoration: none; color: #00acbd; font-weight: bold; border-bottom: 1px solid transparent; transition: border-bottom 0.3s;">
+                            <a th:href="@{/admin/subjectInfo(departmentId=${detail.departmentId}, subjectId=${detail.subjectId}, grade=${detail.grade}, from='student', fromStudentId=${detail.studentId})}"
+                                th:text="${detail.subjectName}"
+                                style="text-decoration: none; color: #00acbd; font-weight: bold; border-bottom: 1px solid transparent; transition: border-bottom 0.3s;">
                                 教科名
                             </a>
-                            <a th:href="@{/admin/subjectInfo(departmentId=${detail.departmentId}, subjectId=${detail.subjectId}, grade=${detail.grade})}"
-                               style="font-size: 0.9em; color: #00acbd; margin-left: 5px;">
-                               <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            <a th:href="@{/admin/subjectInfo(departmentId=${detail.departmentId}, subjectId=${detail.subjectId}, grade=${detail.grade}, from='student', fromStudentId=${detail.studentId})}"
+                                style="font-size: 0.9em; color: #00acbd; margin-left: 5px;">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
                             </a>
                         </td>
                     </tr>
