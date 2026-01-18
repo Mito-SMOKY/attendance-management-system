@@ -32,7 +32,6 @@
                         <input type="text" id="subjectSearchInput" class="search-input" placeholder="教科名で検索 (例: Java)">
                         <div id="searchLoader" class="loader" style="display: none;"></div>
                     </div>
-                    
                     <ul id="suggestionList" class="suggestion-list" style="display: none;"></ul>
                 </div>
 
@@ -101,9 +100,10 @@
                             <tbody>
                                 <tr th:each="student : ${info.students}">
                                     <td>
-                                        <a href="#" class="student-link">
+                                        <a th:href="@{/admin/student/{sid}/subject/{subid}(sid=${student.id}, subid=${info.subjectId})}" class="student-link">
                                             <i class="fa-solid fa-user-graduate"></i>
                                             <span th:text="${student.name}">川島 未裕</span>
+                                            <i class="fa-solid fa-chevron-right" style="float: right; font-size: 0.8em; color: #ccc; margin-top: 4px;"></i>
                                         </a>
                                     </td>
                                 </tr>

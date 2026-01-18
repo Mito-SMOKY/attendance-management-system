@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
+import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity; 
 import com.example.attendancemanagementsystem.common.repository.AttendanceRepository;
+import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository;
 import com.example.attendancemanagementsystem.common.repository.StudentRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository; 
 import com.example.attendancemanagementsystem.user.admin.dto.StudentSubjectDetailDto;
@@ -32,6 +34,9 @@ public class AdminStudentSubjectService {
     @Autowired
     private UsersRepository usersRepository;
 
+    @Autowired
+    private EnrollmentsRepository enrollmentsRepository;
+
     // 生徒の科目詳細情報を取得
     @Transactional(readOnly = true)
     public StudentSubjectDetailDto getSubjectDetail(Integer studentId, Integer subjectId) {
@@ -43,6 +48,16 @@ public class AdminStudentSubjectService {
             dto.setStudentId(studentId);
             if (student.getUsers() != null) {
                 dto.setStudentName(student.getUsers().getName());
+
+                //在籍情報から学年を取得してセット
+                EnrollmentsEntity enrollment = enrollmentsRepository.findByUserAndIsActiveTrue(student.getUsers()).orElse(null);
+                if (enrollment != null) {
+                    dto.setGrade(enrollment.getGrade());
+                    // 万が一セッションから取れない場合に備えてここでもDepartmentIdを取れるが、基本はSession優先
+                    if (dto.getDepartmentId() == null && enrollment.getDepartment() != null) {
+                        dto.setDepartmentId(enrollment.getDepartment().getDepartmentId());
+                    }
+                }
             }
         }
         dto.setSubjectId(subjectId);
@@ -58,6 +73,11 @@ public class AdminStudentSubjectService {
         AttendanceEntity first = list.get(0);
         if (first.getSession() != null && first.getSession().getSubject() != null) {
             dto.setSubjectName(first.getSession().getSubject().getSubjectName());
+
+            // セッションから学科IDを取得してセット
+            if (first.getSession().getDepartment() != null) {
+                dto.setDepartmentId(first.getSession().getDepartment().getDepartmentId());
+            }
             
             // 教室名
             if (first.getSession().getClassroom() != null) {
