@@ -31,4 +31,14 @@ public interface DepartmentSubjectRepository extends JpaRepository<DepartmentSub
             @Param("departmentId") Integer departmentId, 
             @Param("grade") Integer grade);
     
+    //全教科・全クラスの組み合わせを取得
+    @Query("SELECT DISTINCT " + 
+        "  ds.subject.subjectId, " +
+        "  ds.subject.subjectName, " +
+        "  ds.department.major.course.courseName, " +
+        "  ds.grade, " +
+        "  ds.department.className " +
+        "FROM DepartmentSubject ds " +
+        "ORDER BY ds.grade ASC, ds.department.className ASC, ds.subject.subjectName ASC")
+    List<Object[]> findAllCurriculumRaw();
 }
