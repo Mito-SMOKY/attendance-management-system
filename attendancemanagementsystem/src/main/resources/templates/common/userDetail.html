@@ -24,7 +24,6 @@
     <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
         <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
     </div>
-
 </div>
 
     <div class="profile-container">
@@ -34,14 +33,15 @@
                 <div class="user-icon"></div>
             
                 <div class="form-item-group" id="name-group">
-                    <p class="user-role" th:text="${userData.Role}"></p>
+                    <p class="user-role" th:text="${userData.role}"></p>
                     <div class="label-and-button">
                         <span class="label">氏名</span>
                         <button class="edit-button" id="edit-button" data-target="name">編集</button>
-                        <button class="save-button hidden" id="save-button" data-target="name">確定</button> <button class="cancel-button hidden" id="cancel-button" data-target="name">キャンセル</button>
+                        <button class="save-button hidden" id="save-button" data-target="name">確定</button> 
+                        <button class="cancel-button hidden" id="cancel-button" data-target="name">キャンセル</button>
                     </div>
-                    <p class="display-name-value" id="display-value" th:text="${userData.Name}"></p> 
-                    <input class="edit-field hidden" type="text" id="username-input" name="username" required th:value="${userData.Name}">
+                    <p class="display-name-value" id="display-value" th:text="${userData.name}"></p> 
+                    <input class="edit-field hidden" type="text" id="username-input" name="username" required th:value="${userData.name}">
                 </div>
             </div>
         </div>
@@ -71,23 +71,34 @@
 
             <div class="card subject-details-card">
                 <h2 class="card-title">
-                <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
-                    <span class="card-title-big">受講教科詳細</span>
+                    <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
+                        <span class="card-title-big">受講教科詳細</span>
                     </div>
-                <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
-                    <span>担当教科詳細</span>
-                </div>
+                    <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+                        <span>担当教科詳細</span>
+                    </div>
                 </h2>
 
                 <div class="read-more-4">
                     <p>
                         <ul class="subject-list" id="subjectList">
-                            <li th:each="subject , iterStat: ${subjectData}" >
-                                <a th:href="@{/student/subject_attendance(subjectId=${subject.SubjectID})}" class="detail-link">
-                                    <span class="display-value" th:text=" ${subject.SubjectName}"></span>
+                            <li th:each="subject : ${subjectData}">
+                                
+                                <a th:if="${#authorization.expr('hasRole(''STUDENT'')')}"
+                                    th:href="@{/student/subject_attendance(subjectId=${subject.subjectId})}" 
+                                    class="detail-link">
+                                    <span class="display-value" th:text="${subject.subjectName}"></span>
                                 </a>
+
+                                <a th:if="${#authorization.expr('hasRole(''ADMIN'')') or #authorization.expr('hasRole(''SUPER_ADMIN'')')}"
+                                    th:href="@{/admin/subjectInfo(departmentId=${subject.departmentId}, subjectId=${subject.subjectId}, grade=${subject.grade}, from='profile')}"
+                                    class="detail-link">
+                                    
+                                        <span class="display-value" th:text="${subject.subjectName}"></span>
+                                </a>
+
                             </li>
-                            <div th:unless="${!#lists.isEmpty(subjectData)}">
+                            <div th:if="${#lists.isEmpty(subjectData)}">
                                 <p>登録されている教科はありません。</p>
                             </div>
                         </ul>
