@@ -2,7 +2,7 @@
 let currentViewMode = 'schedule'; 
 let currentWeekStart;
 
-// === 2. モーダル制御関数 (定義を先に行う) ===
+// === 2. モーダル制御関数 ===
 function openModal(dateStr) {
     const modal = document.getElementById('scheduleModal');
     const modalDateEl = document.getElementById('modalDate');
@@ -10,11 +10,10 @@ function openModal(dateStr) {
 
     if (!modal || !modalDateEl) return;
 
-    // 日付の表示
     modalDateEl.textContent = dateStr.replace(/-/g, '/') + ' の予定';
-    modalDateEl.dataset.rawDate = dateStr; // 保存用に生の日付を持っておく
+    modalDateEl.dataset.rawDate = dateStr; 
     
-    // 既存予定の表示
+    // 既存予定リストの表示更新
     if (listContainer) {
         const dailyEvents = (typeof calendarEventsData !== 'undefined' ? calendarEventsData : [])
                             .filter(e => e.date === dateStr);
@@ -37,23 +36,19 @@ function closeModal() {
     if (modal) modal.style.display = 'none';
 }
 
-/**
- * 3. 削除処理
- */
+// === 3. 予定削除処理関数 ===
 function handleDeleteSchedule(button) {
     const scheduleId = button.dataset.id;
     if (!confirm('この予定を削除してもよろしいですか？')) return;
 
-    // 【修正】現在のURLパスからロール名(admin/student)を取得
     const pathSegments = window.location.pathname.split('/');
-    const rolePath = pathSegments[1]; // 例: "admin" または "student"
+    const rolePath = pathSegments[1];
 
-    // 【修正】動的なURLに対してリクエストを送信
     fetch(`/${rolePath}/calendar/delete/${scheduleId}`, { method: 'DELETE' })
     .then(response => {
         if (response.ok) {
             alert('予定を削除しました。');
-            window.location.reload(); // カレンダー再描画のためリロード
+            window.location.reload(); 
         } else {
             alert('削除に失敗しました。');
         }
@@ -99,16 +94,37 @@ function createCalendar(month, year) {
                             '</div>';
                     }
                 } else {
+                    // 出席管理モード
                     const dailyRecords = (typeof attendanceRecordsData !== 'undefined' ? attendanceRecordsData : []).filter(r => r.date === dataDate);
+                    
                     if (dailyRecords.length > 0) {
-                        const isAllPresent = dailyRecords.every(r => r.status === '出席');
-                        const isAllAbsent = dailyRecords.every(r => r.status === '欠席');
-                        let mark = isAllPresent ? '〇' : isAllAbsent ? '✕' : '△';
-                        let cls = isAllPresent ? 'attendance-present' : isAllAbsent ? 'attendance-absent' : 'attendance-late';
+                        const status = dailyRecords[0].status; // "◎", "〇", "△", "欠席" など
+                        
+                        let mark = status;
+                        let cls = '';
+
+                        if (status === '◎') {
+                            mark = '◎';
+                            cls = 'attendance-present'; 
+                        } else if (status === '〇') {
+                            mark = '〇';
+                            cls = 'attendance-present';
+                        } else if (status === '△') {
+                            mark = '△';
+                            cls = 'attendance-late';    
+                        } else if (status === '欠席') {
+                            mark = '✕';
+                            cls = 'attendance-absent';  
+                        } else {
+                            mark = status;
+                            cls = 'attendance-late';
+                        }
+                        
                         eventsHtml = `<div class="attendance-list"><span class="${cls}">${mark}</span></div>`;
                     }
                 }
 
+                // 今日の日付強調表示
                 const isToday = (dayCount === today.getDate() && month === today.getMonth() && year === today.getFullYear());
                 tableHTML += `<td class="${isToday ? 'today' : ''} ${j === 0 ? 'sun' : j === 6 ? 'sat' : ''}" data-date="${dataDate}">
                                 <div class="day-number">${dayCount}</div>${eventsHtml}</td>`;
@@ -130,23 +146,20 @@ function renderCalendar(month, year) {
     calendarTableContainerEl.innerHTML = createCalendar(month, year);
 }
 
-/**
- * 5. 初期化
- */
+// === 5. 初期化 ===
 function initializeCalendar() {
     const viewToggleCheckbox = document.getElementById('viewToggleCheckbox');
     const yearSelector = document.getElementById('yearSelector');
     const monthSelector = document.getElementById('monthSelector');
 
-    // --- A. 「現在の年」を取得 (プルダウンの選択肢の基準) ---
-    const todayObj = new Date();
-    const currentActualYear = todayObj.getFullYear();
-
-    // --- B. URLやサーバーからの情報を取得 (表示中のカレンダーの基準) ---
+    // URLパラメータから表示モードを取得
     const urlParams = new URLSearchParams(window.location.search);
     currentViewMode = urlParams.get('mode') === 'attendance' ? 'attendance' : 'schedule';
     if (viewToggleCheckbox) viewToggleCheckbox.checked = (currentViewMode === 'attendance');
 
+    // サーバーから渡されたターゲット年月を解析
+    // PCの現在時刻ではなく、表示しようとしている年月を基準にする
+    const todayObj = new Date();
     let serverMonth, serverYear;
     if (typeof serverTargetMonthString === 'undefined' || !serverTargetMonthString) {
         serverMonth = todayObj.getMonth();
@@ -157,14 +170,29 @@ function initializeCalendar() {
         serverYear = d.getFullYear();
     }
 
-    // --- C. 年プルダウン生成 (常に「現在の年」から±2年) ---
+    // --- C. 年プルダウン生成 ---
     if (yearSelector) {
         yearSelector.innerHTML = '';
-        // 現在の年から-2年 〜 +2年 の固定範囲をループ
-        for (let y = currentActualYear - 2; y <= currentActualYear + 2; y++) {
-            yearSelector.add(new Option(y + '年', y));
+
+        // 1. 入学年度(studentAcademicYear)が定義されている場合はそれを使用
+        if (typeof studentAcademicYear !== 'undefined' && studentAcademicYear) {
+            // 入学年度から3年間を表示 (例: 2026, 2027, 2028)
+            const startYear = parseInt(studentAcademicYear, 10);
+            for (let i = 0; i < 3; i++) {
+                let y = startYear + i;
+                yearSelector.add(new Option(y + '年', y));
+            }
+        } else {
+            // 2. 安全策(フォールバック): 
+            // 「PCの現在年」ではなく「今表示しているカレンダーの年(serverYear)」を基準にする
+            // これにより、2026年を表示中なら確実に2026年が選択肢に出る
+            const baseYear = serverYear; 
+            for (let y = baseYear - 2; y <= baseYear + 2; y++) {
+                yearSelector.add(new Option(y + '年', y));
+            }
         }
-        // プルダウンの選択状態は「表示中の年」に合わせる
+
+        // プルダウンの選択状態を表示中の年に合わせる
         yearSelector.value = serverYear;
     }
 
@@ -177,10 +205,11 @@ function initializeCalendar() {
         monthSelector.value = serverMonth;
     }
 
+    // カレンダー描画
     renderCalendar(serverMonth, serverYear);
 }
 
-// === 6. イベントリスナー登録 (DOMContentLoaded) ===
+// === 6. イベントリスナー登録 ===
 document.addEventListener('DOMContentLoaded', () => {
     initializeCalendar();
 
@@ -189,14 +218,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewToggleCheckbox = document.getElementById('viewToggleCheckbox');
     const calendarTableContainerEl = document.getElementById('calendar-table-container');
 
-    // 更新ハンドラ（URL遷移）
     const handleUpdate = () => {
         const y = yearSelector.value;
         const m = String(parseInt(monthSelector.value) + 1).padStart(2, '0');
         const mode = viewToggleCheckbox && viewToggleCheckbox.checked ? 'attendance' : 'schedule';
-        // 現在のパス（例: /superadmin/main_calendar）を「/」で分割
         const pathSegments = window.location.pathname.split('/'); 
-            // pathSegments[0]は空文字、pathSegments[1]にロール名（superadmin 等）が入る
         const rolePath = pathSegments[1];
         location.href =  `/${rolePath}/main_calendar?month=${y}-${m}&mode=${mode}`;
     };
@@ -205,18 +231,13 @@ document.addEventListener('DOMContentLoaded', () => {
     monthSelector?.addEventListener('change', handleUpdate);
     viewToggleCheckbox?.addEventListener('change', handleUpdate);
 
-    // カレンダークリック
     calendarTableContainerEl?.addEventListener('click', (event) => {
         const targetCell = event.target.closest('td[data-date]');
         if (targetCell) {
             const dateStr = targetCell.dataset.date;
             if (viewToggleCheckbox && viewToggleCheckbox.checked) {
-                // 現在のパス（例: /superadmin/main_calendar）を「/」で分割
                 const pathSegments = window.location.pathname.split('/'); 
-                // pathSegments[0]は空文字、pathSegments[1]にロール名（superadmin 等）が入る
                 const rolePath = pathSegments[1]; 
-                
-                // 動的なパスを使ってURLを組み立てる
                 window.location.href = `/${rolePath}/attendance/date?date=${dateStr}`;
             } else {
                 openModal(dateStr);
@@ -224,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // モーダル内クリック（削除ボタンなど）
     document.getElementById('scheduleModal')?.addEventListener('click', (event) => {
         const deleteBtn = event.target.closest('.delete-schedule-btn');
         if (deleteBtn) {
@@ -236,19 +256,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('closeButton')?.addEventListener('click', closeModal);
 
-    // 予定追加フォーム
     document.getElementById('scheduleForm')?.addEventListener('submit', (event) => {
         event.preventDefault();
         const title = document.getElementById('scheduleTitle').value;
         const date = document.getElementById('modalDate').dataset.rawDate;
 
-        // 【修正】現在のURLパスからロール名(admin/student)を取得
         const pathSegments = window.location.pathname.split('/');
-        const rolePath = pathSegments[1]; // 例: "admin" または "student"
+        const rolePath = pathSegments[1]; 
 
         const formData = new URLSearchParams({ title, date });
         
-        // 【修正】動的なURLに対してリクエストを送信
         fetch(`/${rolePath}/calendar/add`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -264,7 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// BFcache対策
 window.addEventListener('pageshow', (event) => {
     if (event.persisted) initializeCalendar();
 });

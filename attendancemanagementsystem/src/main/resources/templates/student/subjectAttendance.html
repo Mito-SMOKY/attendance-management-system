@@ -4,15 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>教科出席情報</title>
-    
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/student/subjectAttendance.css}">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
- <div class="header-container">
+    <div class="header-container">
         <div th:replace="~{fragments/_parts :: student-header}"></div>
     </div>
 
@@ -23,13 +21,7 @@
     <input type="hidden" id="currentSubjectId" th:value="${attendanceData.subjectId}">
 
     <div class="month-select-form">
-        <select id="year-dropdown" class="month-dropdown">
-            <option th:each="year : ${yearList}" 
-                    th:value="${year}" 
-                    th:text="${year}" 
-                    th:selected="${year == selectedYear}"></option>
-        </select>
-        /
+        <select id="year-dropdown" class="month-dropdown"></select> /
         <select id="month-dropdown" class="month-dropdown">
             <option th:each="month : ${monthList}" 
                     th:value="${month}" 
@@ -45,10 +37,6 @@
             <tr>
                 <td class="info-label">教科名</td>
                 <td class="info-value subject-name" th:text="${attendanceData.subjectName}"></td>
-            </tr>
-            <tr>
-                <td class="info-label">教室</td>
-                <td class="info-value" id="classroom-value" th:text="${attendanceData.classroom}"></td>
             </tr>
             <tr>
                 <td class="info-label">担当教師</td>
@@ -82,12 +70,16 @@
                 <div class="summary-box label">出席 <span class="present">〇</span></div>
                 <div class="summary-box label">欠席 <span class="absent">✕</span></div>
                 <div class="summary-box label">遅刻 <span class="late">△</span></div>
+                <div class="summary-box label">早退 <span class="late">△</span></div>
                 <div class="summary-box label">公欠 <span class="attendance-public">〇</span></div>
                 <div class="summary-box label">公欠候補</div>
+            </div>
 
+            <div class="summary-grid">
                 <div class="summary-box days" id="present-classes-value" th:text="${attendanceData.presentClasses} + 'コマ'"></div>
                 <div class="summary-box days" id="absent-classes-value" th:text="${attendanceData.absentClasses} + 'コマ'"></div>
                 <div class="summary-box days" id="late-classes-value" th:text="${attendanceData.lateClasses} + 'コマ'"></div>
+                <div class="summary-box days" id="early-leave-classes-value" th:text="${attendanceData.earlyLeaveClasses} + 'コマ'"></div>
                 <div class="summary-box days" id="official-absent-value" th:text="${attendanceData.officialAbsentClasses} + 'コマ'"></div>
                 <div class="summary-box days" id="official-pending-value" th:text="${attendanceData.officialPendingClasses} + 'コマ'"></div>
             </div>
@@ -130,6 +122,11 @@
         
     </div>
 </div>
+
+<script th:inline="javascript">
+    const studentAcademicYear = /*[[${attendanceData.academicYear}]]*/ 2026;
+    const currentSelectedYear = /*[[${selectedYear}]]*/ 2026;
+</script>
 
 <script th:src="@{/js/subjectAttendance.js}"></script>
 
