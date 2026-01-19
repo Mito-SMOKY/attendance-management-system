@@ -54,7 +54,7 @@
                                 li.innerHTML = `
                                     <a href="${url}" class="suggestion-link">
                                         <div class="suggest-name">${item.name}</div>
-                                        <div class="suggest-meta">ID: ${item.id}</div>
+                                        <div class="suggest-meta">${item.classDetail}</div>
                                     </a>
                                 `;
                                 list.appendChild(li);
