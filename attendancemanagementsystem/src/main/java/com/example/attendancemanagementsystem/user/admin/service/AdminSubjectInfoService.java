@@ -3,6 +3,7 @@ package com.example.attendancemanagementsystem.user.admin.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -15,8 +16,10 @@ import com.example.attendancemanagementsystem.common.entity.DepartmentSubject;
 import com.example.attendancemanagementsystem.common.entity.SubjectEntity;
 import com.example.attendancemanagementsystem.common.repository.DepartmentSubjectRepository;
 import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository;
+import com.example.attendancemanagementsystem.common.repository.SubjectFacultyRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
 import com.example.attendancemanagementsystem.common.repository.TimetableRepository;
+import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.common.service.SearchService; 
 import com.example.attendancemanagementsystem.user.admin.dto.AdminSubjectInfoDto;
 
@@ -28,6 +31,8 @@ public class AdminSubjectInfoService {
     private final TimetableRepository timetableRepository;
     private final SubjectRepository subjectRepository;
     private final EnrollmentsRepository enrollmentsRepository;
+    private final SubjectFacultyRepository subjectFacultyRepository; // ★追加
+    private final UsersRepository usersRepository; // ★追加
     private final SearchService searchService; 
 
     // コンストラクタインジェクション
@@ -36,11 +41,15 @@ public class AdminSubjectInfoService {
             TimetableRepository timetableRepository,
             SubjectRepository subjectRepository,
             EnrollmentsRepository enrollmentsRepository,
+            SubjectFacultyRepository subjectFacultyRepository, // ★追加
+            UsersRepository usersRepository, // ★追加
             SearchService searchService) {
         this.departmentSubjectRepository = departmentSubjectRepository;
         this.timetableRepository = timetableRepository;
         this.subjectRepository = subjectRepository;
         this.enrollmentsRepository = enrollmentsRepository;
+        this.subjectFacultyRepository = subjectFacultyRepository; // ★追加
+        this.usersRepository = usersRepository; // ★追加
         this.searchService = searchService;
     }
 
@@ -58,8 +67,6 @@ public class AdminSubjectInfoService {
         // 1学科・クラス情報の取得
         List<Object[]> deptInfoList = departmentSubjectRepository.findCourseAndClass(departmentId);
         if (deptInfoList != null && !deptInfoList.isEmpty()) {
-
-            // データが存在する場合、表示用文字列を作成
             Object[] row = deptInfoList.get(0);
             String courseName = (String) row[0];
             String className = (String) row[1];
@@ -77,9 +84,17 @@ public class AdminSubjectInfoService {
             dto.setCredits(0);
         }
         
-        // 担当教員の取得
-        List<String> teacherNames = timetableRepository.findTeacherNameBySubjectAndClass(subjectId, departmentId);
-        dto.setTeacherName(teacherNames != null && !teacherNames.isEmpty() ? teacherNames.get(0) : "未定");
+        // ★変更: 担当教員の取得 (SubjectFacultyテーブルから取得)
+        Integer teacherId = subjectFacultyRepository.findTeacherIdBySubjectId(subjectId);
+        String teacherName = "未定";
+        if (teacherId != null) {
+            // IDから名前を取得
+            String name = usersRepository.findNameByUserId(teacherId);
+            if (name != null) {
+                teacherName = name;
+            }
+        }
+        dto.setTeacherName(teacherName);
 
         // スケジュール（曜日）の取得
         List<Object[]> scheduleData = timetableRepository.findScheduleAndRoom(subjectId, departmentId);
@@ -127,7 +142,6 @@ public class AdminSubjectInfoService {
     //検索機能
     public List<AdminSubjectInfoDto.SubjectOption> searchSubjects(String query) {
 
-        // キーワード検索条件を作成
         Specification<SubjectEntity> spec = searchService.createKeywordSpec(query, Arrays.asList("subjectName"));
         List<SubjectEntity> subjects = subjectRepository.findAll(spec);
         
@@ -139,7 +153,6 @@ public class AdminSubjectInfoService {
                 .filter(r -> r.getId().getSubjectId().equals(s.getSubjectId()))
                 .forEach(match -> {
                     
-                    // ★追加: 5つ目の引数(classDetail)を作成するロジック
                     String deptName = "";
                     String className = "";
                     if (match.getDepartment() != null) {
@@ -150,7 +163,6 @@ public class AdminSubjectInfoService {
                     }
                     String detailText = String.format("%s %d年 %s", deptName, match.getGrade(), className);
 
-                    // ★修正: 引数を5つ渡す (detailTextを追加)
                     results.add(new AdminSubjectInfoDto.SubjectOption(
                         s.getSubjectId(),
                         s.getSubjectName(),
