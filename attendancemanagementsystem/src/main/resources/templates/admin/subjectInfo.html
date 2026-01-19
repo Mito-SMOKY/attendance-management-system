@@ -71,18 +71,14 @@
                             <td th:text="${info.teacherName}">〇〇 〇〇</td>
                         </tr>
                         <tr>
-                            <th>授業数</th>
-                            <td th:text="${info.totalClasses}">15コマ</td>
+                            <th>コマ数</th>
+                            <td th:text="${info.credits} + 'コマ'">2コマ</td>
                         </tr>
                         <tr>
                             <th>曜日・コマ</th>
                             <td th:text="${info.schedule}">水曜4限</td>
                         </tr>
-                        <tr>
-                            <th>教室</th>
-                            <td th:text="${info.classroom}">232</td>
-                        </tr>
-                    </table>
+                        </table>
                 </div>
             </div>
 
@@ -116,7 +112,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 <script th:src="@{/js/admin/subjectInfo.js}"></script>

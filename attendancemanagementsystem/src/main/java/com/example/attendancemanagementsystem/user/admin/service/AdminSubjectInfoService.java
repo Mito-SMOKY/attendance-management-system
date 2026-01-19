@@ -3,7 +3,6 @@ package com.example.attendancemanagementsystem.user.admin.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -66,42 +65,30 @@ public class AdminSubjectInfoService {
             String className = (String) row[1];
             dto.setCourseAndGrade(String.format("%s %d年 %s", courseName, grade, className));
         } else {
-
-            // データがない場合はハイフンを表示
             dto.setCourseAndGrade("-");
         }
 
-        // 教科名の取得
+        // 教科名の取得 & コマ数(RequiredCredits)の取得
         SubjectEntity subject = subjectRepository.findById(subjectId).orElse(null);
         if (subject != null) {
             dto.setSubjectName(subject.getSubjectName());
+            dto.setCredits(subject.getRequiredCredits());
+        } else {
+            dto.setCredits(0);
         }
         
         // 担当教員の取得
         List<String> teacherNames = timetableRepository.findTeacherNameBySubjectAndClass(subjectId, departmentId);
-
-        // リストが空でなければ最初の名前を表示、なければ"未定"とする
         dto.setTeacherName(teacherNames != null && !teacherNames.isEmpty() ? teacherNames.get(0) : "未定");
 
-        // スケジュール（曜日・教室）の取得
+        // スケジュール（曜日）の取得
         List<Object[]> scheduleData = timetableRepository.findScheduleAndRoom(subjectId, departmentId);
         
-        // 重複を排除し、曜日順に並べるためにTreeSetを使用
         Set<Integer> dayNumSet = new TreeSet<>();
-
-        // 教室名の重複を排除するためにHashSetを使用
-        Set<String> roomSet = new HashSet<>();
         
         if (scheduleData != null) {
-
-            // 合計コマ数を設定
-            dto.setTotalClasses(scheduleData.size() + "コマ");
-            
             for (Object[] row : scheduleData) {
                 Object dateObj = row[0];
-                String room = (String) row[1];
-                
-                // 日付オブジェクトから曜日数値を取得
                 if (dateObj != null) {
                     LocalDate date = null;
                     if (dateObj instanceof java.sql.Date) {
@@ -109,24 +96,17 @@ public class AdminSubjectInfoService {
                     } else if (dateObj instanceof java.time.LocalDate) {
                         date = (java.time.LocalDate) dateObj;
                     }
-                    // 日付が取得できたら曜日をセット
                     if (date != null) dayNumSet.add(date.getDayOfWeek().getValue());
                 }
-
-                // 教室名があればセットに追加
-                if (room != null && !room.isEmpty()) roomSet.add(room);
             }
         }
         
-        // 曜日数値を日本語文字列に変換
         List<String> dayStrings = new ArrayList<>();
         for (Integer dayNum : dayNumSet) {
             dayStrings.add(convertDayToKanji(dayNum));
         }
         
-        // リストを結合して表示用文字列を作成
         dto.setSchedule(dayStrings.isEmpty() ? "未定" : String.join("、", dayStrings));
-        dto.setClassroom(roomSet.isEmpty() ? "未定" : String.join(", ", roomSet));
 
         // 履修学生リストの取得
         List<Object[]> studentData = enrollmentsRepository.findStudentIdAndNamesByClass(departmentId, grade);
@@ -149,38 +129,40 @@ public class AdminSubjectInfoService {
 
         // キーワード検索条件を作成
         Specification<SubjectEntity> spec = searchService.createKeywordSpec(query, Arrays.asList("subjectName"));
-        
-        // 条件に合致する教科をDBから全件取得
         List<SubjectEntity> subjects = subjectRepository.findAll(spec);
         
-        // 結果格納用リスト
         List<AdminSubjectInfoDto.SubjectOption> results = new ArrayList<>();
-        
-        // 遷移先URLを作るために、教科と学科の紐付けテーブルを全件取得
         List<DepartmentSubject> allRelations = departmentSubjectRepository.findAll(); 
 
-        // 検索された各教科について、紐付いている学科・学年を探す
         for (SubjectEntity s : subjects) {
-
-            // 教科IDに一致する紐付けデータを最初の一つだけ取得
-            DepartmentSubject match = allRelations.stream()
+            allRelations.stream()
                 .filter(r -> r.getId().getSubjectId().equals(s.getSubjectId()))
-                .findFirst().orElse(null);
+                .forEach(match -> {
+                    
+                    // ★追加: 5つ目の引数(classDetail)を作成するロジック
+                    String deptName = "";
+                    String className = "";
+                    if (match.getDepartment() != null) {
+                        if (match.getDepartment().getMajor() != null) {
+                            deptName = match.getDepartment().getMajor().getMajorName();
+                        }
+                        className = match.getDepartment().getClassName();
+                    }
+                    String detailText = String.format("%s %d年 %s", deptName, match.getGrade(), className);
 
-            // 紐付けが見つかった場合のみ、検索結果として追加
-            if (match != null) {
-                results.add(new AdminSubjectInfoDto.SubjectOption(
-                    s.getSubjectId(),
-                    s.getSubjectName(),
-                    match.getId().getDepartmentId(), 
-                    match.getGrade()               
-                ));
-            }
+                    // ★修正: 引数を5つ渡す (detailTextを追加)
+                    results.add(new AdminSubjectInfoDto.SubjectOption(
+                        s.getSubjectId(),
+                        s.getSubjectName(),
+                        match.getId().getDepartmentId(),
+                        match.getGrade(),
+                        detailText 
+                    ));
+                });
         }
         return results;
     }
 
-    // 曜日の数値を漢字に変換するヘルパーメソッド
     private String convertDayToKanji(Integer dayNum) {
         switch (dayNum) {
             case 1: return "月曜";
@@ -194,12 +176,9 @@ public class AdminSubjectInfoService {
         }
     }
 
-    // 現在日付から年度（4月始まり）を計算するヘルパーメソッド
     private String calculateFiscalYear() {
         LocalDate now = LocalDate.now();
         int year = now.getYear();
-        
-        // 1月〜3月の場合は前年度として扱う
         if (now.getMonthValue() < 4) year -= 1;
         return year + "年度";
     }
