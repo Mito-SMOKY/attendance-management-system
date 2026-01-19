@@ -10,6 +10,9 @@ public class SubjectAttendanceDto {
     private String subjectName;
     private String teacherName;
     private String classroom;
+    
+    // ★入学年度 (プルダウン生成用)
+    private Integer academicYear;
 
     // --- 基準値・計算用 ---
     private int requiredClasses;          // 必要コマ数
@@ -20,6 +23,10 @@ public class SubjectAttendanceDto {
     private int presentClasses;         // 出席
     private int absentClasses;          // 欠席
     private int lateClasses;            // 遅刻
+    
+    // ★早退 (追加)
+    private int earlyLeaveClasses;      
+    
     private int officialAbsentClasses;  // 公欠
     private int officialPendingClasses; // 公欠申請中
 
@@ -52,31 +59,50 @@ public class SubjectAttendanceDto {
     public SubjectAttendanceDto() {
     }
 
-    // Getter / Setter
+    // --- Getter / Setter ---
+
     public Integer getSubjectId() { return subjectId; }
     public void setSubjectId(Integer subjectId) { this.subjectId = subjectId; }
+    
     public String getSubjectName() { return subjectName; }
     public void setSubjectName(String subjectName) { this.subjectName = subjectName; }
+    
     public String getTeacherName() { return teacherName; }
     public void setTeacherName(String teacherName) { this.teacherName = teacherName; }
+    
     public String getClassroom() { return classroom; }
     public void setClassroom(String classroom) { this.classroom = classroom; }
+    
+    public Integer getAcademicYear() { return academicYear; }
+    public void setAcademicYear(Integer academicYear) { this.academicYear = academicYear; }
+
     public int getRequiredClasses() { return requiredClasses; }
     public void setRequiredClasses(int requiredClasses) { this.requiredClasses = requiredClasses; }
+    
     public int getMaxAbsenceClasses() { return maxAbsenceClasses; }
     public void setMaxAbsenceClasses(int maxAbsenceClasses) { this.maxAbsenceClasses = maxAbsenceClasses; }
+    
     public double getCurrentAttendanceRate() { return currentAttendanceRate; }
     public void setCurrentAttendanceRate(double currentAttendanceRate) { this.currentAttendanceRate = currentAttendanceRate; }
+    
     public int getPresentClasses() { return presentClasses; }
     public void setPresentClasses(int presentClasses) { this.presentClasses = presentClasses; }
+    
     public int getAbsentClasses() { return absentClasses; }
     public void setAbsentClasses(int absentClasses) { this.absentClasses = absentClasses; }
+    
     public int getLateClasses() { return lateClasses; }
     public void setLateClasses(int lateClasses) { this.lateClasses = lateClasses; }
+
+    public int getEarlyLeaveClasses() { return earlyLeaveClasses; }
+    public void setEarlyLeaveClasses(int earlyLeaveClasses) { this.earlyLeaveClasses = earlyLeaveClasses; }
+
     public int getOfficialAbsentClasses() { return officialAbsentClasses; }
     public void setOfficialAbsentClasses(int officialAbsentClasses) { this.officialAbsentClasses = officialAbsentClasses; }
+
     public int getOfficialPendingClasses() { return officialPendingClasses; }
     public void setOfficialPendingClasses(int officialPendingClasses) { this.officialPendingClasses = officialPendingClasses; }
+
     public List<DailyDetail> getDailyAttendanceList() { return dailyAttendanceList; }
     public void setDailyAttendanceList(List<DailyDetail> dailyAttendanceList) { this.dailyAttendanceList = dailyAttendanceList; }
 }

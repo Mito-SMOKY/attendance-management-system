@@ -37,4 +37,14 @@ public interface SessionRepository extends JpaRepository<SessionEntity, Integer>
         SubjectEntity subject, 
         LocalDate sessionDate
     );
+
+    // 指定された学科と日付範囲に一致するセッションの取得（週単位）
+    List<SessionEntity> findByDepartment_DepartmentIdAndSessionDateBetween(Integer departmentId, LocalDate startDate, LocalDate endDate);
+
+    // 指定された学科と日付に一致するセッションの取得（日単位）
+    List<SessionEntity> findByDepartment_DepartmentIdAndSessionDate(Integer departmentId, LocalDate sessionDate);
+
+    // 指定された学科と科目に対する実施済みセッションのカウント
+    @Query("SELECT COUNT(s) FROM SessionEntity s WHERE s.department.departmentId = :departmentId AND s.subject.subjectId = :subjectId AND s.sessionFlag = true")
+    int countImplementedSessions(@Param("departmentId") Integer departmentId, @Param("subjectId") Integer subjectId);
 }
