@@ -14,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // ★追加
+import org.springframework.transaction.annotation.Transactional; 
 
 import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
@@ -43,7 +43,7 @@ public class AdminStudentListService {
     @Autowired
     private CourseRepository courseRepository;
 
-    // フィルター選択肢(学科・コース一覧)取得
+    // フィルター選択肢取得
     public Map<String, Object> getFilterOptions() {
         Map<String, Object> options = new HashMap<>();
         

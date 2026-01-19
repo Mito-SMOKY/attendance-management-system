@@ -31,32 +31,31 @@ public class AdminSubjectInfoService {
     private final TimetableRepository timetableRepository;
     private final SubjectRepository subjectRepository;
     private final EnrollmentsRepository enrollmentsRepository;
-    private final SubjectFacultyRepository subjectFacultyRepository; // ★追加
-    private final UsersRepository usersRepository; // ★追加
+    private final SubjectFacultyRepository subjectFacultyRepository; 
+    private final UsersRepository usersRepository; 
     private final SearchService searchService; 
 
-    // コンストラクタインジェクション
     public AdminSubjectInfoService(
             DepartmentSubjectRepository departmentSubjectRepository,
             TimetableRepository timetableRepository,
             SubjectRepository subjectRepository,
             EnrollmentsRepository enrollmentsRepository,
-            SubjectFacultyRepository subjectFacultyRepository, // ★追加
-            UsersRepository usersRepository, // ★追加
+            SubjectFacultyRepository subjectFacultyRepository, 
+            UsersRepository usersRepository, 
             SearchService searchService) {
         this.departmentSubjectRepository = departmentSubjectRepository;
         this.timetableRepository = timetableRepository;
         this.subjectRepository = subjectRepository;
         this.enrollmentsRepository = enrollmentsRepository;
-        this.subjectFacultyRepository = subjectFacultyRepository; // ★追加
-        this.usersRepository = usersRepository; // ★追加
+        this.subjectFacultyRepository = subjectFacultyRepository; 
+        this.usersRepository = usersRepository; 
         this.searchService = searchService;
     }
 
-    //教科詳細画面に必要な情報をまとめて取得するメソッド
+    // 教科詳細画面を表示
     public AdminSubjectInfoDto getSubjectInfo(Integer departmentId, Integer subjectId, Integer grade) {
 
-        // 基本情報をセット
+        // IDや年度情報をセット
         AdminSubjectInfoDto dto = new AdminSubjectInfoDto();
         dto.setDepartmentId(departmentId);
         dto.setSubjectId(subjectId);
@@ -64,8 +63,10 @@ public class AdminSubjectInfoService {
         dto.setFiscalYear(calculateFiscalYear());
         dto.setDisplaySubjectId(String.format("%04d-%02d", subjectId, departmentId));
 
-        // 1学科・クラス情報の取得
+        // コース名とクラス名を取得
         List<Object[]> deptInfoList = departmentSubjectRepository.findCourseAndClass(departmentId);
+        
+        // 学科情報がある場合は整形してDTOにセット、なければハイフンを設定
         if (deptInfoList != null && !deptInfoList.isEmpty()) {
             Object[] row = deptInfoList.get(0);
             String courseName = (String) row[0];
@@ -75,7 +76,7 @@ public class AdminSubjectInfoService {
             dto.setCourseAndGrade("-");
         }
 
-        // 教科名の取得 & コマ数(RequiredCredits)の取得
+        // 教科情報を取得し存在すれば名前と単位数をセット
         SubjectEntity subject = subjectRepository.findById(subjectId).orElse(null);
         if (subject != null) {
             dto.setSubjectName(subject.getSubjectName());
@@ -84,11 +85,12 @@ public class AdminSubjectInfoService {
             dto.setCredits(0);
         }
         
-        // ★変更: 担当教員の取得 (SubjectFacultyテーブルから取得)
+        // 担当教員の取得
         Integer teacherId = subjectFacultyRepository.findTeacherIdBySubjectId(subjectId);
         String teacherName = "未定";
+        
+        // 氏名を取得
         if (teacherId != null) {
-            // IDから名前を取得
             String name = usersRepository.findNameByUserId(teacherId);
             if (name != null) {
                 teacherName = name;
@@ -96,11 +98,13 @@ public class AdminSubjectInfoService {
         }
         dto.setTeacherName(teacherName);
 
-        // スケジュール（曜日）の取得
+        // 対象教科の日付・教室情報を取得
         List<Object[]> scheduleData = timetableRepository.findScheduleAndRoom(subjectId, departmentId);
         
+        // 曜日の数値を格納
         Set<Integer> dayNumSet = new TreeSet<>();
         
+        // 曜日をセット
         if (scheduleData != null) {
             for (Object[] row : scheduleData) {
                 Object dateObj = row[0];
@@ -116,17 +120,20 @@ public class AdminSubjectInfoService {
             }
         }
         
+        // 日本語表記リストに変換
         List<String> dayStrings = new ArrayList<>();
         for (Integer dayNum : dayNumSet) {
             dayStrings.add(convertDayToKanji(dayNum));
         }
         
+        // 曜日リストをカンマ区切りで結合し、空の場合は「未定」とする
         dto.setSchedule(dayStrings.isEmpty() ? "未定" : String.join("、", dayStrings));
 
-        // 履修学生リストの取得
+        // 学科・学年の履修学生リストを取得
         List<Object[]> studentData = enrollmentsRepository.findStudentIdAndNamesByClass(departmentId, grade);
         List<AdminSubjectInfoDto.StudentSimpleInfo> studentList = new ArrayList<>();
         
+        // 学生データをDtoに追加
         if (studentData != null) {
             for (Object[] row : studentData) {
                 Integer sId = (Integer) row[0];
@@ -139,20 +146,24 @@ public class AdminSubjectInfoService {
         return dto;
     }
 
-    //検索機能
+    // キーワード検索
     public List<AdminSubjectInfoDto.SubjectOption> searchSubjects(String query) {
 
+        // 教科名を対象とした部分一致検索の条件を作成
         Specification<SubjectEntity> spec = searchService.createKeywordSpec(query, Arrays.asList("subjectName"));
         List<SubjectEntity> subjects = subjectRepository.findAll(spec);
         
+        // 全データを取得
         List<AdminSubjectInfoDto.SubjectOption> results = new ArrayList<>();
         List<DepartmentSubject> allRelations = departmentSubjectRepository.findAll(); 
 
+        // 紐づく学科や学年情報をストリーム処理で検索
         for (SubjectEntity s : subjects) {
             allRelations.stream()
                 .filter(r -> r.getId().getSubjectId().equals(s.getSubjectId()))
                 .forEach(match -> {
                     
+                    // 学科名とクラス名を抽出して表示用文字列を作成
                     String deptName = "";
                     String className = "";
                     if (match.getDepartment() != null) {
@@ -163,6 +174,7 @@ public class AdminSubjectInfoService {
                     }
                     String detailText = String.format("%s %d年 %s", deptName, match.getGrade(), className);
 
+                    // 検索結果用DTOを作成しリストに追加
                     results.add(new AdminSubjectInfoDto.SubjectOption(
                         s.getSubjectId(),
                         s.getSubjectName(),
@@ -175,6 +187,7 @@ public class AdminSubjectInfoService {
         return results;
     }
 
+    // 日本語の曜日文字列に変換
     private String convertDayToKanji(Integer dayNum) {
         switch (dayNum) {
             case 1: return "月曜";
@@ -188,9 +201,11 @@ public class AdminSubjectInfoService {
         }
     }
 
+    // 現在日付から年度（4月始まり）を計算して文字列で返す
     private String calculateFiscalYear() {
         LocalDate now = LocalDate.now();
         int year = now.getYear();
+        // 1月～3月の場合は前年度として扱う
         if (now.getMonthValue() < 4) year -= 1;
         return year + "年度";
     }

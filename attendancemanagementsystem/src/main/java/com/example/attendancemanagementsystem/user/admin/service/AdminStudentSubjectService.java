@@ -53,7 +53,6 @@ public class AdminStudentSubjectService {
                 EnrollmentsEntity enrollment = enrollmentsRepository.findByUserAndIsActiveTrue(student.getUsers()).orElse(null);
                 if (enrollment != null) {
                     dto.setGrade(enrollment.getGrade());
-                    // 万が一セッションから取れない場合に備えてここでもDepartmentIdを取れるが、基本はSession優先
                     if (dto.getDepartmentId() == null && enrollment.getDepartment() != null) {
                         dto.setDepartmentId(enrollment.getDepartment().getDepartmentId());
                     }

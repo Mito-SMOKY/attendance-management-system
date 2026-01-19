@@ -39,7 +39,7 @@ public class AdminClassListService {
         this.searchService = searchService;
     }
 
-    // 指定された条件（日付、ID、キーワード）で授業一覧データを取得する
+    // 授業一覧データを取得する
     @Transactional(readOnly = true)
     public ClassListDto getDailyClassInfo(String dateStr, String loginId, String searchWord) {
         ClassListDto dto = new ClassListDto();

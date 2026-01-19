@@ -23,7 +23,6 @@ public class AdminClassInfoService {
     private final ClassroomRepository classroomRepository;
     private final TimeSlotRepository timeSlotRepository;
 
-    // 依存するリポジトリの注入
     public AdminClassInfoService(
             SessionRepository sessionRepository,
             StudentRepository studentRepository,
