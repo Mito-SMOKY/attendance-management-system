@@ -174,8 +174,8 @@ public class AdminStudentInfoService {
         // 出席サマリー集計 
         AttendanceSummaryDto summary = new AttendanceSummaryDto();
 
-    // 日付ごとにデータをグループ化
-    Map<LocalDate, List<AttendanceEntity>> groupedByDate = attendances.stream()
+        // 日付ごとにデータをグループ化
+        Map<LocalDate, List<AttendanceEntity>> groupedByDate = attendances.stream()
             .filter(a -> a.getSession() != null)
             .collect(Collectors.groupingBy(a -> a.getSession().getSessionDate()));
 
@@ -216,23 +216,21 @@ public class AdminStudentInfoService {
         String firstStatus = statusList.get(0); // 1限目の状態
         String lastStatus = statusList.get(statusList.size() - 1); // 最後の授業の状態
 
-        // (4) 遅刻判定
+        // 遅刻判定
         // ルール: 1限目が「欠席」または「遅刻」の場合
-        // 例: [欠席, 欠席, 出席, 出席] -> 朝いないので「遅刻」カウント
         if ("欠席".equals(firstStatus) || "遅刻".equals(firstStatus)) {
             summary.setLateCount(summary.getLateCount() + 1);
             continue;
         }
 
-        // (5) 早退判定
+        // 早退判定
         // ルール: 1限目はOKだったが、最後の授業が「欠席」または「早退」の場合
-        // 例: [出席, 出席, 早退, 欠席] -> 最後いないので「早退」カウント
         if ("欠席".equals(lastStatus) || "早退".equals(lastStatus)) {
             summary.setEarlyLeaveCount(summary.getEarlyLeaveCount() + 1);
             continue;
         }
 
-        // (6) 出席
+        // 出席
         // 上記のいずれにも当てはまらない（朝から最後まで出席している）
         summary.setAttendanceCount(summary.getAttendanceCount() + 1);
     }

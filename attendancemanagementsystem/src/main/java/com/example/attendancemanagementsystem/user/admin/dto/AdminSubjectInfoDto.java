@@ -23,9 +23,8 @@ public class AdminSubjectInfoDto {
 
     public AdminSubjectInfoDto() {}
 
-    // ★修正: 生徒ID (id) を追加
     public static class StudentSimpleInfo {
-        private Integer id;   // ★追加
+        private Integer id;
         private String name;
         
         public StudentSimpleInfo(Integer id, String name) { 
@@ -33,7 +32,7 @@ public class AdminSubjectInfoDto {
             this.name = name; 
         }
         
-        // ★追加: getterが必須です
+        //getter setter
         public Integer getId() { return id; }
         public String getName() { return name; }
     }

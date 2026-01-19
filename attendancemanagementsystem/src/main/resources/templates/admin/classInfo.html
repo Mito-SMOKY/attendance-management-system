@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf}"/> -->
-    
     <title>授業情報</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
@@ -27,107 +24,115 @@
         
         <input type="hidden" id="sessionId" th:value="${classInfo.sessionId}">
 
-        <div class="controls-area" style="justify-content: flex-end; display: flex;">
-            <div class="btn-group">
-                <button id="editSessionBtn" class="btn-edit" type="button"><i class="fas fa-pen"></i> 授業情報の編集</button>
-                <button id="saveSessionBtn" class="btn-save" type="button"><i class="fas fa-save"></i> 保存</button>
-                <button id="cancelSessionBtn" class="btn-cancel" type="button"><i class="fas fa-times"></i> キャンセル</button>
-            </div>
+        <div class="controls-area" style="justify-content: flex-end; display: flex; margin-bottom: 10px;">
+            <button id="editSessionBtn" class="edit-btn">授業情報の編集</button>
+            <button id="saveSessionBtn" class="save-btn" style="display:none;">保存</button>
+            <button id="cancelSessionBtn" class="cancel-btn" style="display:none;">キャンセル</button>
         </div>
 
-        <div class="top-info-section" id="sessionInfoArea">
-            <div class="info-table-wrapper">
-                <table class="detail-table">
-                    <tbody>
-                        <tr>
-                            <th>教科名</th>
-                            <td>
-                                <span class="session-view" th:text="${classInfo.subjectName}"></span>
-                                <select class="session-edit" id="subjectId">
-                                    <option th:each="item : ${classInfo.allSubjects}" 
-                                            th:value="${item.subjectId}" 
-                                            th:text="${item.subjectName}"
-                                            th:selected="${item.subjectId == classInfo.currentSubjectId}"></option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>担当教員</th>
-                            <td>
-                                <span class="session-view" th:text="${classInfo.teacherName}"></span>
-                                <select class="session-edit" id="teacherId">
-                                    <option th:each="item : ${classInfo.allTeachers}" 
-                                            th:value="${item.userId}" 
-                                            th:text="${item.name}"
-                                            th:selected="${item.userId == classInfo.currentTeacherId}"></option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>コース</th>
-                            <td th:text="${classInfo.courseName}"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="info-table-wrapper">
-                <table class="detail-table">
-                    <tbody>
-                        <tr>
-                            <th>教室</th>
-                            <td>
-                                <span class="session-view" th:text="${classInfo.classroomName}"></span>
-                                <select class="session-edit" id="classroomId">
-                                    <option th:each="item : ${classInfo.allClassrooms}" 
-                                            th:value="${item.classroomId}" 
-                                            th:text="${item.classroomName}"
-                                            th:selected="${item.classroomId == classInfo.currentClassroomId}"></option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>授業時間</th>
-                            <td>
-                                <span class="session-view" th:text="${classInfo.timeSlotText}"></span>
-                                <select class="session-edit" id="timeSlotId">
-                                    <option th:each="item : ${classInfo.allTimeSlots}" 
-                                            th:value="${item.slotId}" 
-                                            th:text="${item.startTime} + ' ～ ' + ${item.endTime}"
-                                            th:selected="${item.slotId == classInfo.currentTimeSlotId}"></option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>日付</th>
-                            <td>
-                                <span class="session-view" th:text="${classInfo.dateText}"></span>
-                                <input type="date" class="session-edit" id="sessionDate" th:value="${classInfo.currentDateValue}">
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="session-info-card" id="sessionInfoArea">
+            <table class="session-table">
+                <tr>
+                    <th>教科名</th>
+                    <td>
+                        <div class="session-view" id="viewSubject">
+                            <a th:href="@{/admin/subjectInfo(departmentId=${classInfo.departmentId}, subjectId=${classInfo.currentSubjectId}, grade=${classInfo.grade}, from='classInfo', fromSessionId=${classInfo.sessionId})}"
+                                th:text="${classInfo.subjectName}"
+                                style="text-decoration: none; color: #00acbd; font-weight: bold; border-bottom: 1px dashed #00acbd; transition: all 0.3s;">
+                                数学I
+                            </a>
+                            <a th:href="@{/admin/subjectInfo(departmentId=${classInfo.departmentId}, subjectId=${classInfo.currentSubjectId}, grade=${classInfo.grade}, from='classInfo', fromSessionId=${classInfo.sessionId})}"
+                                style="font-size: 0.8em; color: #00acbd; margin-left: 5px;">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                        </div>
+                        
+                        <div class="session-edit" style="display:none;">
+                            <select id="editSubject" class="form-select">
+                                <option th:each="subj : ${classInfo.allSubjects}"
+                                        th:value="${subj.subjectId}"
+                                        th:text="${subj.subjectName}"
+                                        th:selected="${subj.subjectId == classInfo.currentSubjectId}">
+                                </option>
+                            </select>
+                        </div>
+                    </td>
+                    <th>担当教員</th>
+                    <td>
+                        <span class="session-view" th:text="${classInfo.teacherName}">山田 太郎</span>
+                        <div class="session-edit" style="display:none;">
+                            <select id="editTeacher" class="form-select">
+                                <option th:each="t : ${classInfo.allTeachers}"
+                                        th:value="${t.userId}"
+                                        th:text="${t.name}"
+                                        th:selected="${t.userId == classInfo.currentTeacherId}">
+                                </option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>実施日</th>
+                    <td>
+                        <span class="session-view" th:text="${classInfo.dateText}">2026/01/19(月)</span>
+                        <div class="session-edit" style="display:none;">
+                            <input type="date" id="editDate" class="form-input" th:value="${classInfo.currentDateValue}">
+                        </div>
+                    </td>
+                    <th>時限</th>
+                    <td>
+                        <span class="session-view" th:text="${classInfo.timeSlotText}">9:00 ~</span>
+                        <div class="session-edit" style="display:none;">
+                            <select id="editTimeSlot" class="form-select">
+                                <option th:each="slot : ${classInfo.allTimeSlots}"
+                                        th:value="${slot.slotId}"
+                                        th:text="${slot.startTime + ' ~'}"
+                                        th:selected="${slot.slotId == classInfo.currentTimeSlotId}">
+                                </option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>教室</th>
+                    <td>
+                        <span class="session-view" th:text="${classInfo.classroomName}">101教室</span>
+                        <div class="session-edit" style="display:none;">
+                            <select id="editClassroom" class="form-select">
+                                <option th:each="room : ${classInfo.allClassrooms}"
+                                        th:value="${room.classroomId}"
+                                        th:text="${room.classroomName}"
+                                        th:selected="${room.classroomId == classInfo.currentClassroomId}">
+                                </option>
+                            </select>
+                        </div>
+                    </td>
+                    <th>クラス</th>
+                    <td th:text="${classInfo.courseName}">情報工学科 1年</td>
+                </tr>
+            </table>
         </div>
-
 
         <div class="student-list-section">
-            <div class="list-header">
-                <div class="section-subtitle">受講生徒一覧</div>
-                <div class="btn-group">
-                    <button id="editStudentBtn" class="btn-edit" type="button"><i class="fas fa-pen"></i> 出欠の編集</button>
-                    <button id="saveStudentBtn" class="btn-save" type="button"><i class="fas fa-save"></i> 保存</button>
-                    <button id="cancelStudentBtn" class="btn-cancel" type="button"><i class="fas fa-times"></i> キャンセル</button>
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; margin-bottom: 10px;">
+                <h2 style="font-size: 1.2rem; border-left: 5px solid #007bff; padding-left: 10px;">出席簿</h2>
+                <div>
+                    <button id="editStudentBtn" class="edit-btn">出欠の編集</button>
+                    <button id="saveStudentBtn" class="save-btn" style="display:none;">保存</button>
+                    <button id="cancelStudentBtn" class="cancel-btn" style="display:none;">キャンセル</button>
                 </div>
             </div>
             
-            <div class="student-table-wrapper">
+            <div class="table-wrapper">
                 <table class="student-table" id="studentTable">
-                    <colgroup>
-                        <col style="width: 15%;"> <col style="width: 10%;"> <col style="width: 15%;"> <col style="width: 30%;"> <col style="width: 30%;"> 
-                    </colgroup>
                     <thead>
-                        <tr><th>学籍番号</th><th>学年</th><th>クラス</th><th>氏名</th><th>出欠状況</th></tr>
+                        <tr>
+                            <th>番号</th>
+                            <th>学年</th>
+                            <th>クラス</th>
+                            <th>氏名</th>
+                            <th>出欠</th>
+                        </tr>
                     </thead>
                     <tbody>
                         <tr th:each="student : ${classInfo.students}" th:attr="data-user-id=${student.userId}">

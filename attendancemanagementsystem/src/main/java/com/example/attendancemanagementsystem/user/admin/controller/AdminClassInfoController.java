@@ -19,11 +19,14 @@ public class AdminClassInfoController {
         this.adminClassInfoService = adminClassInfoService;
     }
 
-    // 授業詳細画面を表示
+// 授業詳細画面を表示
     @GetMapping("/detail/{sessionId}")
     public String showClassDetail(
             @PathVariable("sessionId") Integer sessionId,
             @RequestParam(name = "from", required = false) String from,
+            @RequestParam(name = "fromDeptId", required = false) Integer fromDeptId,
+            @RequestParam(name = "fromSubjectId", required = false) Integer fromSubjectId,
+            @RequestParam(name = "fromGrade", required = false) Integer fromGrade,
             Model model) {
         
         // 詳細データを取得してModelに格納
@@ -37,6 +40,13 @@ public class AdminClassInfoController {
 
             // 時間割画面から来た場合は時間割へ戻る
             backUrl = "/admin/timetable";
+
+        } else if ("subject".equals(from) && fromDeptId != null && fromSubjectId != null && fromGrade != null) {
+            
+            // 教科詳細画面から来た場合は、その教科詳細へ戻る
+            backUrl = String.format("/admin/subjectInfo?departmentId=%d&subjectId=%d&grade=%d", 
+                    fromDeptId, fromSubjectId, fromGrade);
+
         } else {
 
             // それ以外は授業一覧画面へ戻る

@@ -76,6 +76,12 @@ public class AdminClassInfoService {
             dto.setClassroomName(session.getClassroom().getClassroomName());
             dto.setCurrentClassroomId(session.getClassroom().getClassroomId());
         }
+
+        //学科IDと学年をセット
+        if (session.getDepartment() != null) {
+            dto.setDepartmentId(session.getDepartment().getDepartmentId());
+        }
+        dto.setGrade(session.getTargetGrade());
         
         // 学科・コース情報をセット
         if (session.getDepartment() != null && session.getDepartment().getMajor() != null && session.getDepartment().getMajor().getCourse() != null) {

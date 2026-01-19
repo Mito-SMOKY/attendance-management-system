@@ -49,7 +49,6 @@ public class AdminSubjectListController {
 
         // フィルタ連動用の選択肢を取得
         Map<String, Object> filterOptions = adminSubjectListService.getAvailableFilterOptions(loginId, grades, classes);
-
         Map<String, Object> response = new HashMap<>();
         response.put("subjects", subjectList);
         response.put("filterOptions", filterOptions);

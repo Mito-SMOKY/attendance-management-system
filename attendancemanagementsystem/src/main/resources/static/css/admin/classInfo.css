@@ -28,14 +28,12 @@ body {
     /* ヘッダー(約80px) + 余白 */
     padding-top: 120px; 
     padding-bottom: 50px;
-    position: relative; /* 戻るボタンなどの基準点 */
+    position: relative;
 }
 
 /* =========================================
-   ページヘッダー (戻るボタン・タイトル)
+   ページヘッダー
    ========================================= */
-
-/* タイトル */
 .page-title {
     text-align: center;
     font-size: 2rem;
@@ -43,103 +41,129 @@ body {
     margin-bottom: 30px;
     color: #333;
     letter-spacing: 2px;
-    margin-top: 20px; /* 戻るボタンと被らないように調整 */
 }
 
 /* =========================================
-   コントロールエリア (編集ボタン)
+   コントロールエリア (ボタン群)
    ========================================= */
 .controls-area {
     display: flex;
     justify-content: flex-end; /* 右寄せ */
+    align-items: center;
+    gap: 10px;
     margin-bottom: 10px;
-    padding-right: 5px;
 }
 
-.edit-btn {
-    height: 40px;
-    padding: 0 25px;
-    border: 1px solid #333;
-    border-radius: 4px;
-    background-color: #fff;
-    color: #333;
-    font-size: 1rem;
+/* 共通ボタンスタイル */
+button {
+    font-family: inherit;
     cursor: pointer;
+    border-radius: 4px;
+    border: none;
+    padding: 8px 16px;
     font-weight: bold;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+/* 編集ボタン */
+.edit-btn {
+    background-color: #fff;
+    border: 1px solid #333;
+    color: #333;
 }
 .edit-btn:hover {
     background-color: #f0f0f0;
 }
 
+/* 保存ボタン */
+.save-btn {
+    background-color: #28a745; /* 緑 */
+    color: white;
+    border: 1px solid #28a745;
+}
+.save-btn:hover {
+    background-color: #218838;
+}
+
+/* キャンセルボタン */
+.cancel-btn {
+    background-color: #dc3545; /* 赤 */
+    color: white;
+    border: 1px solid #dc3545;
+}
+.cancel-btn:hover {
+    background-color: #c82333;
+}
+
 /* =========================================
-   上部情報エリア (2つのテーブル)
+   上部情報エリア (授業情報テーブル)
    ========================================= */
-.top-info-section {
-    display: flex;
-    justify-content: space-between;
-    gap: 30px;
-    margin-bottom: 40px;
-    flex-wrap: wrap;
-}
-
-.info-table-wrapper {
-    flex: 1;
-    min-width: 350px;
-    border: 1px solid #999;
+.session-info-card {
     background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 40px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.detail-table {
+.session-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.detail-table th,
-.detail-table td {
-    border: 1px solid #999;
+.session-table th,
+.session-table td {
     padding: 12px 15px;
     vertical-align: middle;
+    border-bottom: 1px solid #eee;
 }
 
-/* ヘッダー列 (青緑) */
-.detail-table th {
-    background-color: #539DA4;
+/* ヘッダー列 */
+.session-table th {
+    background-color: #539DA4; /* テーマカラー */
     color: white;
-    width: 35%;
+    width: 15%; /* ラベル幅 */
     font-weight: normal;
     text-align: left;
     white-space: nowrap;
 }
 
 /* データ列 */
-.detail-table td {
-    background-color: #fff;
+.session-table td {
+    width: 35%; /* データ幅 */
     color: #333;
     font-weight: bold;
 }
 
+/* 編集モード時の入力フォーム */
+.form-select, .form-input {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
 /* =========================================
-   下部エリア：生徒リスト
+   下部エリア：生徒リスト (出席簿)
    ========================================= */
 .student-list-section {
     margin-bottom: 40px;
 }
 
-.section-subtitle {
-    font-size: 1.3rem;
-    margin-bottom: 15px;
-    border-left: 6px solid #539DA4;
-    padding-left: 10px;
+.section-header h2 {
     color: #333;
-    font-weight: bold;
+    margin: 0;
 }
 
-.student-table-wrapper {
+.table-wrapper {
     width: 100%;
-    border: 1px solid #999;
+    border: 1px solid #ccc;
     background-color: white;
     /* スクロール設定 */
-    max-height: 400px;
+    max-height: 500px;
     overflow-y: auto;
 }
 
@@ -147,93 +171,67 @@ body {
     width: 100%;
     border-collapse: separate; /* stickyヘッダー用 */
     border-spacing: 0;
-    text-align: center;
-    min-width: 700px;
+    text-align: left;
 }
 
 .student-table th,
 .student-table td {
-    border-bottom: 1px solid #999;
-    border-right: 1px solid #999;
-    padding: 10px;
-    vertical-align: middle;
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
 }
-/* 枠線調整 */
-.student-table th { border-top: 1px solid #999; }
-.student-table th:last-child, .student-table td:last-child { border-right: none; }
 
 /* リストヘッダー (固定) */
 .student-table th {
     background-color: #539DA4;
     color: white;
     font-weight: normal;
-    padding: 12px 0;
     position: sticky;
     top: 0;
     z-index: 1;
 }
 
-.student-table td {
-    background-color: #fff;
-    color: #333;
+.student-table tr:hover td {
+    background-color: #f9f9f9;
 }
 
 /* =========================================
-   フッターアクション (セッション開始ボタン)
+   出欠ステータスの表示スタイル
    ========================================= */
-.footer-action {
-    text-align: center;
-    margin-top: 40px;
-    margin-bottom: 30px;
-}
-
-.start-session-btn {
-    background-color: white;
-    color: #539DA4;
-    border: 2px solid #539DA4;
-    padding: 15px 60px;
-    font-size: 1.2rem;
+.status-view {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
     font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-.start-session-btn:hover {
-    background-color: #f0fcfd;
+    min-width: 40px;
+    text-align: center;
 }
 
-.list-header {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 10px; 
+/* 出席・公欠 */
+.status-present {
+    color: #28a745;
+    background-color: #e6f9ec;
+    border: 1px solid #c3e6cb;
 }
-.btn-group button { 
-    margin-left: 5px; 
-    padding: 5px 15px; 
-    border: none; 
-    border-radius: 4px; 
-    cursor: pointer; 
-    font-size: 0.9rem; 
+
+/* 欠席 */
+.status-absent {
+    color: #dc3545;
+    background-color: #fce8e8;
+    border: 1px solid #f5c6cb;
 }
-.btn-edit { 
-    background-color: #539DA4; 
-    color: white; 
+
+/* 遅刻 */
+.status-late {
+    color: #e0a800; /* 黄色/オレンジ */
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
 }
-.btn-save { 
-    background-color: #28a745; 
-    color: white; 
-    display: none; 
-}
-.btn-cancel { 
-    background-color: #dc3545; 
-    color: white; 
-    display: none; 
-}
-        
-/* 編集用フォームのスタイル */
-.session-edit, .status-select { 
-    display: none; 
-    width: 100%; 
-    padding: 4px; 
+
+/* 編集用プルダウン（テーブル内） */
+.status-select {
+    display: none;
+    width: 100%;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
 }

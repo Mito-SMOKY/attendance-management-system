@@ -67,7 +67,7 @@ function renderTable(subjects) {
     tbody.innerHTML = ''; // クリア
 
     if (!subjects || subjects.length === 0) {
-        tbody.innerHTML = '<tr><td class="no-data">担当している教科はありません。</td></tr>';
+        tbody.innerHTML = '<tr><td class="no-data">教科がありません。</td></tr>';
         return;
     }
 

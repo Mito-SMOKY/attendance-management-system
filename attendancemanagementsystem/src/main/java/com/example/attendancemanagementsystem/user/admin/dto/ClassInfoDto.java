@@ -14,6 +14,8 @@ public class ClassInfoDto {
     private String classroomName;
     private String timeSlotText;
     private String dateText;
+    private Integer departmentId;
+    private Integer grade;
     
     // --- 編集用: 現在の設定値 (ID) ---
     private Integer currentSubjectId;
@@ -49,7 +51,10 @@ public class ClassInfoDto {
     public void setTimeSlotText(String timeSlotText) { this.timeSlotText = timeSlotText; }
     public String getDateText() { return dateText; }
     public void setDateText(String dateText) { this.dateText = dateText; }
-
+    public Integer getDepartmentId() { return departmentId; }
+    public void setDepartmentId(Integer departmentId) { this.departmentId = departmentId; }
+    public Integer getGrade() { return grade; }
+    public void setGrade(Integer grade) { this.grade = grade; }
     public Integer getCurrentSubjectId() { return currentSubjectId; }
     public void setCurrentSubjectId(Integer currentSubjectId) { this.currentSubjectId = currentSubjectId; }
     public Integer getCurrentTeacherId() { return currentTeacherId; }
