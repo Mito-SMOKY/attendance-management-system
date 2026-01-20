@@ -57,7 +57,7 @@ public class SessionAttendanceService {
             // 新規作成の場合の初期設定
             if (attendance.getAttendanceId() == null) {
                 attendance.setSessionId(session.getSessionId());
-                attendance.setTimetable(session.getTimeTable());
+                attendance.setTimeTable(session.getTimeTable());
                 attendance.setStudent(enrollment.getStudent());
                 attendance.setCreatedAt(now);
             }
