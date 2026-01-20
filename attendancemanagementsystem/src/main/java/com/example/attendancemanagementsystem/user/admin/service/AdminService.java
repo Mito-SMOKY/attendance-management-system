@@ -208,7 +208,7 @@ public class AdminService {
                 enroll.setDepartment(department);
                 enroll.setGrade(grade);
                 enroll.setAcademicYear(year);
-                enroll.setActive(true);
+                enroll.setIsActive(true);
                 
                 enrollmentsList.add(enroll);
             }
