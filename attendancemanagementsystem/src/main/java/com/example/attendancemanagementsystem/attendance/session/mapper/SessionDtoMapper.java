@@ -20,9 +20,9 @@ public class SessionDtoMapper {
         SessionDto dto = new SessionDto();
         
         // 生徒情報のセット
-        if (enrollment.getStudent() != null && enrollment.getStudent().getUsers() != null) {
+        if (enrollment.getStudent() != null && enrollment.getStudent().getUser() != null) {
             dto.setUserId(enrollment.getStudent().getUserId());
-            dto.setStudentName(enrollment.getStudent().getUsers().getName());
+            dto.setStudentName(enrollment.getStudent().getUser().getName());
         } else {
             dto.setUserId(null);
             dto.setStudentName("Unknown");

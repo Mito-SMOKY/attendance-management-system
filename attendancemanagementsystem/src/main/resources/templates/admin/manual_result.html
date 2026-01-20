@@ -59,7 +59,7 @@
         th:object="${manualForm}"
         method="post"
       >
-        <input type="hidden" th:field="*{datalistName}" />
+        <input type="hidden" th:field="*{dataListName}" />
 
         <th:block th:each="acc, stat : *{accounts}">
           <input

@@ -54,7 +54,7 @@ public class AttendanceDisplayService {
 
         // 1. ユーザー・生徒情報取得
         UsersEntity user = usersRepository.findByLoginId(loginId).orElseThrow();
-        StudentEntity student = studentRepository.findByUsers(user).orElseThrow();
+        StudentEntity student = studentRepository.findByUser(user).orElseThrow();
 
         // 2. 所属学科IDを特定 (今回は仮で1固定)
         Integer deptId = 1; 

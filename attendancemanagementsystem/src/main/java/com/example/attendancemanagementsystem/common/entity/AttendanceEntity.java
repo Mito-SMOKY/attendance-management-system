@@ -39,10 +39,14 @@ public class AttendanceEntity {
     @JoinColumn(name = "TimeTableID", nullable = true) 
     private TimetableEntity timeTable;
 
-    // UserID (Student) との紐づけ
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserID", nullable = false) 
-    private StudentEntity student;
+    // // UserID (Student) との紐づけ
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "UserID", nullable = false) 
+    // private StudentEntity student;
+
+    @ManyToOne
+    @JoinColumn(name = "UserID")
+    private StudentEntity student; // ★StudentEntity に戻す
 
     // --- constructor ---
     public AttendanceEntity() {
@@ -102,4 +106,6 @@ public class AttendanceEntity {
     public void setStudent(StudentEntity student) {
         this.student = student;
     }
+
+    
 }

@@ -80,7 +80,7 @@ public class StudentService {
         data.put("calendarEvents", calendarDtos);
 
         // 4. 出席(Attendance)取得
-        Optional<StudentEntity> studentOpt = studentRepository.findByUsers(currentUser);
+        Optional<StudentEntity> studentOpt = studentRepository.findByUser(currentUser);
             
         if (studentOpt.isPresent()) {
             StudentEntity currentStudent = studentOpt.get();
