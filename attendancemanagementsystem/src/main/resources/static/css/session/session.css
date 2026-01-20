@@ -1,0 +1,42 @@
+@charset "UTF-8";
+
+.setting-container { 
+    /* display: flex; */
+    max-width: 1000px; 
+    margin: 120px auto 0 ; 
+    align-self: center;
+}
+
+.card-header { 
+    background-color: #00bdca; 
+    font-size: 1.5em;
+    font-weight: bold; 
+    color: #ffffff;
+}
+
+.card-body{
+    font-size: 1.2em;
+}
+
+.form-label { 
+    font-weight: bold; 
+}
+
+.btn-secondary,
+.btn-primary{
+    color: #ffffff;
+    padding: 10px 20px;
+    border: 1px solid ;
+    border-color: #00bdca;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.btn-secondary{
+    background-color: rgb(173, 173, 173);
+}
+
+.btn-primary{
+    background-color: #00bdca;
+}

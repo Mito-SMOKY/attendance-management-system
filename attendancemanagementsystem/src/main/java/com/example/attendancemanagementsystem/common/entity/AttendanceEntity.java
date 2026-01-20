@@ -25,7 +25,10 @@ public class AttendanceEntity {
     @Column(name = "SessionID")
     private Integer sessionId;
 
-    // AttendanceStatus との紐づけ
+    @ManyToOne
+    @JoinColumn(name = "SessionID", insertable = false, updatable = false)
+    private SessionEntity session;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "StatusID", nullable = false)
     private AttendanceStatusEntity status;
@@ -33,20 +36,9 @@ public class AttendanceEntity {
     @Column(name = "CreatedAt", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // 変数名を 'timeTable' にすることで getTimeTable() が生成されます
     @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "TimeTableID", nullable = false) 
-    @JoinColumn(name = "TimeTableID", nullable = true) 
-    private TimetableEntity timeTable;
-
-    // // UserID (Student) との紐づけ
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "UserID", nullable = false) 
-    // private StudentEntity student;
-
-    @ManyToOne
-    @JoinColumn(name = "UserID")
-    private StudentEntity student; // ★StudentEntity に戻す
+    @JoinColumn(name = "UserID", nullable = false) 
+    private StudentEntity student;
 
     // --- constructor ---
     public AttendanceEntity() {
@@ -75,6 +67,14 @@ public class AttendanceEntity {
         this.sessionId = sessionId; 
     }
 
+    public SessionEntity getSession() { 
+        return session; 
+    }
+
+    public void setSession(SessionEntity session) { 
+        this.session = session; 
+    }
+
     public AttendanceStatusEntity getStatus() {
         return status;
     }
@@ -89,14 +89,6 @@ public class AttendanceEntity {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public TimetableEntity getTimeTable() {
-        return timeTable;
-    }
-
-    public void setTimeTable(TimetableEntity timeTable) {
-        this.timeTable = timeTable;
     }
 
     public StudentEntity getStudent() {

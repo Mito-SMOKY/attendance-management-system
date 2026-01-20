@@ -12,9 +12,18 @@ import com.example.attendancemanagementsystem.common.entity.SubjectEntity;
 @Repository
 public interface SubjectRepository extends JpaRepository<SubjectEntity, Integer> {
 
-    // subjectfaculty テーブルを結合して検索します
+    // 教員のユーザIDにもとづく科目の取得
     @Query(value = "SELECT s.* FROM subject s " +
                 "JOIN subjectfaculty sf ON s.SubjectID = sf.SubjectID " +
                 "WHERE sf.UserID = :userId", nativeQuery = true)
     List<SubjectEntity> findSubjectsByTeacherId(@Param("userId") Integer userId);
+
+    // コースIDにもとづく科目の取得
+    @Query(value = "SELECT DISTINCT s.* FROM subject s " +
+        "INNER JOIN departmentsubject ds ON s.SubjectID = ds.SubjectID " +
+        "INNER JOIN department d ON ds.DepartmentID = d.DepartmentID " +
+        "INNER JOIN major m ON d.MajorID = m.MajorID " +
+        "WHERE m.CourseID = :courseId", nativeQuery = true)
+    List<SubjectEntity> findByCourseId(@Param("courseId") Integer courseId);
+
 }

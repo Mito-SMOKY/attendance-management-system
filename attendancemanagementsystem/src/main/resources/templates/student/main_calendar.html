@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -18,8 +17,6 @@
     </div>
 
     <div id="calendar" class="calendar">
-
-        
         
         <div class="student-calendar-header">
 
@@ -30,15 +27,12 @@
 
             <div id="calendar-ym" class="calendar-ym"></div> 
             
-            <!-- 出欠切り替えトグル -->
             <div class="calendar-toggle" style="display: flex; justify-content: center; align-items: center; gap: 8px;">
                 予定表
                 <label class="toggle-button">
                     <input type="checkbox" id="viewToggleCheckbox"/>
                 </label>
                 出欠
-
-                <!-- 時間割ボタン -->
 
                 <div class="tooltip-005">
                     <a href="/student/timetable">
@@ -81,6 +75,8 @@
         const calendarEventsData = /*[[${calendarEvents}]]*/ [];
         const attendanceRecordsData = /*[[${attendanceRecords}]]*/ [];
         const serverTargetMonthString = /*[[${targetMonthDate}]]*/ "2025-11-01";
+        
+        const studentAcademicYear = /*[[${academicYear}]]*/ null;
     </script>
 
     <script th:src="@{/js/calendar.js}"></script>

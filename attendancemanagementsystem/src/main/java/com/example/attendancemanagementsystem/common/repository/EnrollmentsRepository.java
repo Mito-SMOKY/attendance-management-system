@@ -18,10 +18,58 @@ public interface EnrollmentsRepository extends JpaRepository<EnrollmentsEntity, 
     // 生徒に紐づく在籍情報（複数）を検索
     List<EnrollmentsEntity> findByStudent(StudentEntity student);
 
-    @Query("SELECT e FROM EnrollmentsEntity e WHERE e.student.user = :user AND e.isActive = true")
+    // ユーザーとアクティブ状態で検索
+    @Query("SELECT e FROM EnrollmentsEntity e WHERE e.student.users = :user AND e.isActive = true")
     Optional<EnrollmentsEntity> findByUserAndIsActiveTrue(@Param("user") UsersEntity user);
 
-    //学科IDと学年で在籍情報を検索するメソッド
+    // 学科IDで検索
+    List<EnrollmentsEntity> findByDepartment_DepartmentId(Integer departmentId);
+
+    // 学科IDと学年で検索 
     @Query("SELECT e FROM EnrollmentsEntity e WHERE e.department.departmentId = :deptId AND e.grade = :grade")
     List<EnrollmentsEntity> findByDepartmentIdAndGrade(@Param("deptId") Integer deptId, @Param("grade") Integer grade);
+
+    // コースIDと学年で検索 
+    @Query(value = "SELECT e.* FROM enrollments e " +
+        "INNER JOIN department d ON e.DepartmentID = d.DepartmentID " +
+        "INNER JOIN major m ON d.MajorID = m.MajorID " +
+        "WHERE m.CourseID = :courseId " +
+        "AND e.Grade = :grade " +
+        "AND e.IsActive = 1", nativeQuery = true)
+    List<EnrollmentsEntity> findByCourseIdAndGrade(@Param("courseId") Integer courseId, @Param("grade") Integer grade);
+
+    // コースIDから学年リスト (★追加: これがないと学年プルダウンが出ません)
+    @Query(value = "SELECT DISTINCT e.Grade FROM enrollments e " +
+        "INNER JOIN department d ON e.DepartmentID = d.DepartmentID " +
+        "INNER JOIN major m ON d.MajorID = m.MajorID " +
+        "WHERE m.CourseID = :courseId " +
+        "AND e.IsActive = 1 " + 
+        "ORDER BY e.Grade", nativeQuery = true)
+    List<Integer> findDistinctGradesByCourseId(@Param("courseId") Integer courseId);
+
+    // コースIDに基づく在籍学年・クラスID・クラス名の取得 
+    @Query(value = "SELECT DISTINCT d.DepartmentID, d.Class FROM enrollments e " +
+        "INNER JOIN department d ON e.DepartmentID = d.DepartmentID " +
+        "INNER JOIN major m ON d.MajorID = m.MajorID " +
+        "WHERE m.CourseID = :courseId " +
+        "AND e.Grade = :grade " +
+        "AND e.IsActive = 1 " +
+        "ORDER BY d.Class", nativeQuery = true)
+    List<Object[]> findDistinctDepartmentIdAndClass(
+        @Param("courseId") Integer courseId, 
+        @Param("grade") Integer grade
+    );
+
+    // コースIDと学年に基づく在籍クラス名の取得 (一応残しておきます)
+    @Query(value = "SELECT DISTINCT d.Class FROM enrollments e " +
+        "INNER JOIN department d ON e.DepartmentID = d.DepartmentID " +
+        "INNER JOIN major m ON d.MajorID = m.MajorID " +
+        "WHERE m.CourseID = :courseId " +
+        "AND e.Grade = :grade " +
+        "AND e.IsActive = 1 " +
+        "ORDER BY d.Class", nativeQuery = true)
+    List<String> findDistinctClassesByCourseIdAndGrade(
+        @Param("courseId") Integer courseId, 
+        @Param("grade") Integer grade
+    );
 }

@@ -20,6 +20,14 @@ public class EnrollmentsEntity {
     @Column(name = "EnrollmentsID")
     private Integer enrollmentsId;
 
+    @ManyToOne
+    @JoinColumn(name = "UserID")
+    private StudentEntity student;
+
+    @ManyToOne
+    @JoinColumn(name = "DepartmentID")
+    private DepartmentEntity department;
+
     @Column(name = "AcademicYear")
     private Integer academicYear;
 
@@ -27,19 +35,8 @@ public class EnrollmentsEntity {
     private Integer grade;
 
     @Column(name = "IsActive")
-    private boolean isActive;
+    private Boolean isActive;
 
-    // --- 関連定義 ---
-
-    // Enrollments(多) 対 Student(1)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserID") // DBのFKカラム名
-    private StudentEntity student;
-
-    // Enrollments(多) 対 Department(1)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "DepartmentID") // DBのFKカラム名
-    private DepartmentEntity department;
 
     // --- constructor ---
     public EnrollmentsEntity() {
@@ -52,6 +49,22 @@ public class EnrollmentsEntity {
 
     public void setEnrollmentsId(Integer enrollmentsId) {
         this.enrollmentsId = enrollmentsId;
+    }
+
+        public StudentEntity getStudent() {
+            return student;
+        }
+
+        public void setStudent(StudentEntity student) {
+            this.student = student;
+        }
+
+    public DepartmentEntity getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(DepartmentEntity department) {
+        this.department = department;
     }
 
     public Integer getAcademicYear() {
@@ -70,28 +83,11 @@ public class EnrollmentsEntity {
         this.grade = grade;
     }
 
-    public boolean isActive() {
+    public Boolean getIsActive() {
         return isActive;
     }
 
-    public void setActive(boolean isActive) {
+    public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
-    }
-
-    // 関連のゲッター・セッター
-    public StudentEntity getStudent() {
-        return student;
-    }
-
-    public void setStudent(StudentEntity student) {
-        this.student = student;
-    }
-
-    public DepartmentEntity getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(DepartmentEntity department) {
-        this.department = department;
     }
 }

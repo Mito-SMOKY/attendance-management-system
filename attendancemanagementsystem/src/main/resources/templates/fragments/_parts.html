@@ -70,7 +70,7 @@
 <div th:fragment="student-header">
   <header class="main-header-student">
     <div class="header-left">
-      <span sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
+      <span id="header-user-name" sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
     </div>
     <nav class="header-nav">
       <ul>
@@ -95,7 +95,7 @@
 <div th:fragment="admin-header">
   <header class="main-header-admin">
     <div class="header-left">
-      <span sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
+      <span id="header-user-name" sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
     </div>
     <nav class="header-nav">
       <ul>
@@ -103,7 +103,7 @@
         <li><a th:href="@{/admin/subjectList}">教科</a></li>
         <li><a th:href="@{/admin/studentList}">生徒</a></li>
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle">その他 ▼</a>
+          <a href="#" class="dropdown-toggle">その他</a>
           <div class="dropdown-menu">
             <a th:href="@{/admin/tmpAccount}">仮アカウント管理</a>
             <a th:href="@{/admin/master-data}">マスタデータ管理</a>
@@ -126,12 +126,11 @@
   </header>
 </div>
 
-
 <!-- 上位管理者用ヘッダー -->
 <div th:fragment="superadmin-header">
   <header class="main-header-admin">
     <div class="header-left">
-      <span sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
+      <span id="header-user-name" sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
     </div>
     <nav class="header-nav">
       <ul>

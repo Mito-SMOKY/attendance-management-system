@@ -13,6 +13,7 @@ import com.example.attendancemanagementsystem.common.entity.TimetableEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.AttendanceRepository;
 import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository;
+import com.example.attendancemanagementsystem.common.repository.SessionRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
 import com.example.attendancemanagementsystem.common.repository.TimetableRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
@@ -27,18 +28,21 @@ public class SubjectListService {
     private final TimetableRepository timetableRepository;
     private final AttendanceRepository attendanceRepository;
     private final SubjectRepository subjectRepository;
+    private final SessionRepository sessionRepository; 
 
     public SubjectListService(
             UsersRepository usersRepository,
             EnrollmentsRepository enrollmentsRepository,
             TimetableRepository timetableRepository,
             AttendanceRepository attendanceRepository,
-            SubjectRepository subjectRepository) {
+            SubjectRepository subjectRepository,
+            SessionRepository sessionRepository) {
         this.usersRepository = usersRepository;
         this.enrollmentsRepository = enrollmentsRepository;
         this.timetableRepository = timetableRepository;
         this.attendanceRepository = attendanceRepository;
         this.subjectRepository = subjectRepository;
+        this.sessionRepository = sessionRepository;
     }
 
     // 科目別出席情報一覧を取得
@@ -59,7 +63,7 @@ public class SubjectListService {
         // 当該学科の時間割から科目リストを取得（重複排除）
         List<TimetableEntity> allTimetables = timetableRepository.findDistinctSubjectsByDepartment(deptId);
         
-        // 科目ごとに出席情報を集計
+        // 科目ID重複排除
         Map<Integer, TimetableEntity> uniqueSubjectsMap = allTimetables.stream()
                 .collect(Collectors.toMap(
                         TimetableEntity::getSubjectId, 
@@ -81,19 +85,30 @@ public class SubjectListService {
 
             SubjectListDto dto = new SubjectListDto(subjectId, courseName, subjectName, teacherName);
             
-            // 1. 全授業数
-            int rawTotal = timetableRepository.countTotalClassesBySubject(deptId, subjectId);
+            // -------------------------------------------------
+            // ★計算ロジック修正 (公欠を出席扱いに変更)
+            // -------------------------------------------------
+
+            // 1. 全授業数 (Sessionから取得: 実施済みのみ)
+            int rawTotal = sessionRepository.countImplementedSessions(deptId, subjectId);
 
             // 2. 出席停止の数 (分母から引く)
-            int suspensions = attendanceRepository.countSuspensions(user.getUserId(), subjectId);
+            // StatusID 6: 出席停止
+            int suspensions = attendanceRepository.countByStatusTotal(user.getUserId(), subjectId, 6);
 
-            // 3. 有効な授業数 = 全授業数 - 出席停止数
+            // ※公欠(StatusID: 4) は分母から引かない
+            
+            // 3. 有効な授業数(分母) = 全実施授業数 - 出席停止
             int effectiveTotal = Math.max(0, rawTotal - suspensions);
             dto.setTotalClasses(effectiveTotal);
 
-            // 4. 出席数 = 出席 + 公欠
-            int attended = attendanceRepository.countEffectiveAttendance(user.getUserId(), subjectId);
-            dto.setAttendedClasses(attended);
+            // 4. 出席数(分子) = 出席(StatusID: 1) + 公欠(StatusID: 4)
+            int attendedCount = attendanceRepository.countByStatusTotal(user.getUserId(), subjectId, 1);
+            int publicAbsenceCount = attendanceRepository.countByStatusTotal(user.getUserId(), subjectId, 4);
+            
+            dto.setAttendedClasses(attendedCount + publicAbsenceCount);
+
+            // -------------------------------------------------
 
             dto.calculateRate();
             dtoList.add(dto);

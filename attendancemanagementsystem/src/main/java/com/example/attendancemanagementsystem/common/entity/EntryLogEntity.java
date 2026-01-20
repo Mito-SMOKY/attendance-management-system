@@ -8,10 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Data;
 
 @Entity
-@Data
 @Table(name = "entrylog")
 public class EntryLogEntity {
     @Id
@@ -33,6 +31,9 @@ public class EntryLogEntity {
 
     @Column(name = "ProcessedAt")
     private LocalDateTime processedAt;
+
+    @Column(name = "StatusID") 
+    private Integer statusId;
 
     public EntryLogEntity() {}
 
@@ -84,5 +85,13 @@ public class EntryLogEntity {
 
     public void setProcessedAt(LocalDateTime processedAt) {
         this.processedAt = processedAt;
+    }
+
+    public Integer getStatusId(){
+        return statusId;
+    }
+
+    public void setStatusId(Integer statusId){
+        this.statusId = statusId;
     }
 }
