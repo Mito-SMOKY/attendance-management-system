@@ -9,7 +9,11 @@
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
 </head>
+
 <body>
+<div class="header-container">
+    <div th:replace="~{fragments/_parts :: admin-header}"></div>
+</div>
 
     <div class="header-container">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>

@@ -70,7 +70,7 @@
 <div th:fragment="student-header">
   <header class="main-header-student">
     <div class="header-left">
-      <span sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
+      <span id="header-user-name" sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
     </div>
     <nav class="header-nav">
       <ul>
@@ -95,7 +95,7 @@
 <div th:fragment="admin-header">
   <header class="main-header-admin">
     <div class="header-left">
-      <span sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
+      <span id="header-user-name" sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
     </div>
     <nav class="header-nav">
       <ul>
@@ -126,12 +126,11 @@
   </header>
 </div>
 
-
 <!-- 上位管理者用ヘッダー -->
 <div th:fragment="superadmin-header">
   <header class="main-header-admin">
     <div class="header-left">
-      <span sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
+      <span id="header-user-name" sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
     </div>
     <nav class="header-nav">
       <ul>

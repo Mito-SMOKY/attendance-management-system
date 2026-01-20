@@ -291,7 +291,7 @@ public class AdminController {
     }
 
     // --- 保存処理 (POST) ---
-    // ★修正: こちらも合わせてURLを変更 (/mdSubjectInformation/save → /master/SubjectInformation/save)
+    // こちらも合わせてURLを変更 (/mdSubjectInformation/save → /master/SubjectInformation/save)
     @PostMapping("/master/SubjectInformation/save")
     public String saveSubjectInformation(
             @RequestParam(name = "subjectId", required = false) List<Integer> subjectIds,
