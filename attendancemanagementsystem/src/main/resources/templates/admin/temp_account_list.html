@@ -43,12 +43,6 @@
       .btn:hover {
         background-color: #5a6268;
       }
-      /* パスワード列が長くなるので折り返し設定 */
-      .password-col {
-        word-break: break-all;
-        font-size: 0.9em;
-        color: #666;
-      }
     </style>
   </head>
   <body>
@@ -66,8 +60,13 @@
 
       <p>
         <strong>作成者:</strong>
-        <span th:text="${datalist.creatorUser.name}"></span>
-        (<span th:text="${datalist.creatorUser.loginId}"></span>)
+        <span
+          th:text="${datalist.creatorUser != null ? datalist.creatorUser.name : '不明'}"
+        ></span>
+        (<span
+          th:text="${datalist.creatorUser != null ? datalist.creatorUser.loginId : '-'}"
+        ></span
+        >)
       </p>
 
       <p>
@@ -75,26 +74,30 @@
       </p>
     </div>
 
-    <h3>登録メンバー一覧</h3>
+    <h3>登録メンバー一覧（保存履歴）</h3>
     <table>
       <thead>
         <tr>
           <th style="width: 50px">No.</th>
           <th>ログインID</th>
           <th>氏名</th>
-          <th>パスワード (ハッシュ値)</th>
-          <th>ステータスID</th>
+
+          <th>年度</th>
+          <th>学年</th>
+          <th>学科</th>
+          <th>クラス</th>
         </tr>
       </thead>
       <tbody>
-        <tr th:each="student, stat : ${datalist.students}">
+        <tr th:each="detail, stat : ${details}">
           <td th:text="${stat.count}">1</td>
-          <td th:text="${student.user.loginId}">ST001</td>
-          <td th:text="${student.user.name}">山田 太郎</td>
+          <td th:text="${detail.loginId}">ST001</td>
+          <td th:text="${detail.name}">山田 太郎</td>
 
-          <td class="password-col" th:text="${student.user.password}"></td>
-
-          <td th:text="${student.studentStatusId}">1</td>
+          <td th:text="${detail.academicYear}">2025</td>
+          <td th:text="${detail.grade} + '年'">1年</td>
+          <td th:text="${detail.majorName}">情報システム学科</td>
+          <td th:text="${detail.className}">Aクラス</td>
         </tr>
       </tbody>
     </table>

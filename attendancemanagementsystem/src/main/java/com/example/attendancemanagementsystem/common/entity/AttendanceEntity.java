@@ -98,4 +98,6 @@ public class AttendanceEntity {
     public void setStudent(StudentEntity student) {
         this.student = student;
     }
+
+    
 }
