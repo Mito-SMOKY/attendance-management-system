@@ -2,9 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>セッション設定画面</title>
-    <link rel="stylesheet" th:href="@{/css/admin/session.css}">
+    <title>授業開始設定</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link th:href="@{/css/session/session.css}" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
 </head>
@@ -14,112 +15,123 @@
     <div th:replace="~{fragments/_parts :: admin-header}"></div>
 </div>
 
-<div th:if="${activeSession != null}" id="activeSessionOverlay" 
-        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; justify-content: center; align-items: center;">
-    
-    <div style="background: white; padding: 40px; border-radius: 10px; width: 550px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-        <h2 style="color: #dc3545; margin-bottom: 20px; font-weight: bold;">⚠️ 前回の授業が終了していません</h2>
-        <p style="margin-bottom: 20px; font-size: 1.1em; color: #555;">
-            以下の授業が「実施中」のまま残っています。<br>新しい授業を始める前に処理してください。
-        </p>
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 30px; text-align: left; border-left: 5px solid #dc3545;">
-            <p style="margin: 0 0 10px 0;"><strong>授業内容:</strong> <span th:text="${activeSession.note}">情報</span></p>
-            <p style="margin: 0;"><strong>開始日時:</strong> <span th:text="${#temporals.format(activeSession.startTime, 'yyyy/MM/dd HH:mm')}">日時</span></p>
-        </div>
-        <div style="display: flex; gap: 15px; justify-content: center;">
-            <button onclick="forceEndSession()" class="btn btn-secondary btn-lg" style="width: 200px;">
-                強制終了して次へ
-            </button>
-            
-            <button th:onclick="|const win = window.open('@{/session/active/__${activeSession.sessionId}__}', 'SessionWindow_${activeSession.sessionId}'); if(win) win.focus();|" 
-                    class="btn btn-success btn-lg" style="width: 200px;">
-                画面に戻って確認
-            </button>
-        </div>
-        <p style="margin-top: 15px; font-size: 0.9em; color: #888;">※「強制終了」はステータス9（異常終了）として記録されます。</p>
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
-</div>
 
-<div class="container">
-    <div class="setting-table">
-        <h2 class="table-label">授業を開始する</h2>
-        <form id="startSessionForm">
-            <input type="hidden" id="targetDepartment" name="targetDepartmentId">
-
-            <div class="select-box">
-                <div class="col-md-6">
-                    <label for="date" class="form-label">日付</label>
-                    <input type="date" id="date" class="form-control" th:value="${defaultDate}" required>
-                </div>
-
-                <div class="col-md-6">
-                    <label for="time">開始時間</label>
-                    <input type="time" id="time" class="form-control" th:value="${defaultTime}" required>
-                </div>
+    <div class="setting-container">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                授業設定
             </div>
+            <div class="card-body">
+                <form id="startSessionForm">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="date" class="form-label">日付</label>
+                            <input type="date" id="date" class="form-control" th:value="${defaultDate}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="slotId" class="form-label">時限</label>
+                            <select id="slotId" class="form-select" required>
+                                <option value="" disabled selected>選択してください</option>
+                                <option th:each="slot : ${timeSlotList}" 
+                                        th:value="${slot.slotId}" 
+                                        th:text="${slot.slotId} + '限 (' + ${slot.startTime} + '-' + ${slot.endTime} + ')'"></option>
+                            </select>
+                        </div>
+                    </div>
 
-            <div class="select-box">
-                <div class="col-md-12">
-                    <label for="majorSelect">コース</label>
-                    <select class="form-select" id="majorSelect" onchange="onMajorChange()" required>
-                        <option value="">選択してください</option>
-                    </select>
-                </div>
-            </div>
+                    <hr style="color: #00bdca;">
 
-            <div class="select-box">
-                <div class="col-md-6">
-                    <label for="targetGrade">学年</label>
-                    <select class="form-select" id="targetGrade" onchange="onGradeChange()" required disabled>
-                        <option value="">学科を選択してください</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label for="classSelect">クラス</label>
-                    <select class="form-select" id="classSelect" onchange="onClassChange()" required disabled>
-                        <option value="">学年を選択してください</option>
-                    </select>
-                </div>
-            </div>
+                    <h5 class="mb-3">対象クラス選択</h5>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="majorId" class="form-label">学科</label>
+                            <select id="majorId" class="form-select">
+                                <option value="" selected>選択してください</option>
+                                <option th:each="m : ${majorList}" th:value="${m.majorId}" th:text="${m.majorName}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="courseId" class="form-label">コース</label>
+                            <select id="courseId" class="form-select" disabled>
+                                <option value="" selected>学科を選択してください</option>
+                            </select>
+                        </div>
+                    </div>
 
-            <div class="select-box">
-                <div class="col-md-6">
-                    <label for="subjectId">科目</label>
-                    <select class="form-select" id="subjectId" required>
-                        <option value="">クラスを選択してください</option>
-                    </select>
-                </div>
-                
-                <div class="col-md-6">
-                    <label for="classroomId">使用教室</label>
-                    <select class="form-select" id="classroomId" required>
-                        <option th:each="room : ${classroomList}" 
-                                th:value="${room.classroomId}" 
-                                th:text="${room.classroomName}"></option>
-                    </select>
-                </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="grade" class="form-label">学年</label>
+                            <select id="grade" class="form-select" disabled>
+                                <option value="" selected>コースを選択してください</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="departmentId" class="form-label">クラス</label>
+                            <select id="departmentId" class="form-select" disabled>
+                                <option value="" selected>学年を選択してください</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr style="color: #00bdca;">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="subjectId" class="form-label">科目</label>
+                            <select id="subjectId" class="form-select" required>
+                                <option value="" disabled selected>選択してください</option>
+                                <option th:each="sub : ${subjectList}" th:value="${sub.subjectId}" th:text="${sub.subjectName}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="classroomId" class="form-label">教室</label>
+                            <select id="classroomId" class="form-select" required>
+                                <option value="" disabled selected>選択してください</option>
+                                <option th:each="room : ${classroomList}" th:value="${room.classroomId}" th:text="${room.classroomName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="button" class="btn-secondary" onclick="fillTimetable()">時間割から反映 (任意)</button>
+                        <button type="button" class="btn-primary" onclick="startSession()">授業開始</button>
+                    </div>
+                </form>
             </div>
-            <div class="btn-container">
-                <button type="submit" class="session-start-btn">セッションを開始</button>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
 
-<script th:inline="javascript">
-    window.APP_CONFIG = {
-        apiBase: /*[[@{/session/api}]]*/ '/session/api',
-        startUrl: /*[[@{/session/start}]]*/ '/session/start',
-        activeUrlBase: /*[[@{/session/active/}]]*/ '/session/active/',
-        departmentList: /*[[${departmentList}]]*/ [],
-        activeSessionId: /*[[${activeSession != null ? activeSession.sessionId : null}]]*/ null,
-        suggested: {
-            deptId: /*[[${suggestedDeptId}]]*/ null,
-            subjectId: /*[[${suggestedSubjectId}]]*/ null,
-            grade: /*[[${suggestedGrade}]]*/ null
-        }
-    };
-</script>
-<script th:src="@{/js/session_menu.js}"></script>
+    <div class="modal fade" id="conflictModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">未終了の授業があります</h5>
+                </div>
+                <div class="modal-body">
+                    <p id="conflictMessage">他の授業が終了していません。</p>
+                    <p>どちらの操作を行いますか？</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" onclick="openConflictSession()">
+                        未終了の画面を開く
+                    </button>
+                    
+                    <button type="button" class="btn btn-danger" onclick="forceEndSession()">
+                        強制終了して新規作成
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<input type="hidden" id="conflictSessionId">
+<input type="hidden" id="activeSessionId" th:value="${activeSession != null ? activeSession.sessionId : ''}">
+<input type="hidden" id="userId" th:value="${userId}">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/session/session.js}"></script>
 </body>
 </html>

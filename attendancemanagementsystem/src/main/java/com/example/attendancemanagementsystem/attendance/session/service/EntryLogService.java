@@ -10,42 +10,50 @@ import com.example.attendancemanagementsystem.common.entity.EntryLogEntity;
 import com.example.attendancemanagementsystem.common.entity.SessionEntity;
 import com.example.attendancemanagementsystem.common.repository.EntryLogRepository;
 
-import lombok.RequiredArgsConstructor;
-
 
 @Service
-@RequiredArgsConstructor
-
-// カードリーダーのログ操作
 public class EntryLogService {
 
     private final EntryLogRepository entryLogRepository;
 
-    // 画面表示用にログを検索する
-    public List<EntryLogEntity> findLogsForSession(Integer classroomId, LocalDateTime startTime, LocalDateTime endTime) {
-        return entryLogRepository.findByClassroomIdAndEntryTimeBetween(classroomId, startTime, endTime);
+    public EntryLogService(EntryLogRepository entryLogRepository) {
+        this.entryLogRepository = entryLogRepository;
     }
 
-    // 授業終了後にログを処理済みに更新する
-    @Transactional
-    public void processRemainingLogs(SessionEntity session, LocalDateTime now) {
-        LocalDateTime searchLimit = session.getStartTime().plusMinutes(85);
-        LocalDateTime searchEnd = now.isBefore(searchLimit) ? now : searchLimit;
+    // セッション終了時に関連する入室ログを取得するメソッド
+    public List<EntryLogEntity> getLogsForEndSession(SessionEntity session, LocalDateTime now) {
         
-        //授業開始15分前から終了までのログを取得
-        List<EntryLogEntity> logs = entryLogRepository.findByClassroomIdAndEntryTimeBetween(
-            session.getActualClassroomId(), 
-            session.getStartTime().minusMinutes(15), 
+        // セッションの開始時刻を取得
+        LocalDateTime actualStartTime = session.getStartTime(); 
+
+        // 検索開始は「セッション開始時刻の1時間前」
+        LocalDateTime searchStart = actualStartTime.minusMinutes(60);
+        
+        // 検索終了は「現在時刻」
+        LocalDateTime searchEnd = now;
+
+        // 指定した教室IDと時間範囲で、未処理のログを取得
+        return entryLogRepository.findByClassroomIdAndEntryTimeBetween(
+            session.getClassroom().getClassroomId(), 
+            searchStart, 
             searchEnd
         );
-        
-        //ログの更新
+    }
+
+    // 取得した入室ログを処理済みに更新するメソッド
+    @Transactional
+    public void markLogsAsProcessed(List<EntryLogEntity> logs, LocalDateTime processedAt) {
+
+        // ログが空でない場合にのみ処理
+        if (logs.isEmpty()) return;
+
+        // 各ログの処理済みフラグと処理日時を更新
         for (EntryLogEntity log : logs) {
             if (log.getIsProcessed() == null || log.getIsProcessed() == 0) {
                 log.setIsProcessed(1);
-                log.setProcessedAt(now);
-                entryLogRepository.save(log);
+                log.setProcessedAt(processedAt);
             }
         }
+        entryLogRepository.saveAll(logs);
     }
 }

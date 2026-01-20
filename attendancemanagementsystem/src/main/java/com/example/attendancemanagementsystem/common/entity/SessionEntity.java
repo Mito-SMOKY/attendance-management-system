@@ -15,23 +15,37 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "classsession")
 public class SessionEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SessionID")
     private Integer sessionId;
 
+    @Column(name = "UserId")
+    private Integer userId;
+
     @ManyToOne
-    @JoinColumn(name = "TimeTableID") 
+    @JoinColumn(name = "TimeTableID")
     private TimetableEntity timeTable;
 
-    @Column(name = "ActualClassroomID")
-    private Integer actualClassroomId;
+    @ManyToOne
+    @JoinColumn(name = "SlotID")
+    private TimeSlotEntity timeSlot;
 
-    @Column(name = "TargetDepartmentID")
-    private Integer targetDepartmentId;
+    @ManyToOne
+    @JoinColumn(name = "ClassroomID")
+    private ClassroomEntity classroom;
 
-    @Column(name = "TargetGrade")
+    @ManyToOne
+    @JoinColumn(name = " DepartmentID")
+    private DepartmentEntity department;
+
+    @Column(name = "Grade")
     private Integer targetGrade;
+
+    @ManyToOne
+    @JoinColumn(name = "SubjectID")
+    private SubjectEntity subject;
 
     @Column(name = "SessionDate")
     private LocalDate sessionDate;
@@ -42,13 +56,10 @@ public class SessionEntity {
     @Column(name = "EndTime")
     private LocalDateTime endTime;
 
-    @Column(name = "SessionStatus", columnDefinition = "TINYINT")
-    private Integer sessionStatus;
+    @Column(name = "SessionFlag", nullable = false)
+    private boolean sessionFlag = false;    
 
-    @Column(name = "Note")
-    private String note;
-
-    // --- Getters and Setters ---
+    // Getter / Setter
 
     public Integer getSessionId() {
         return sessionId;
@@ -56,6 +67,14 @@ public class SessionEntity {
 
     public void setSessionId(Integer sessionId) {
         this.sessionId = sessionId;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public TimetableEntity getTimeTable() {
@@ -66,28 +85,43 @@ public class SessionEntity {
         this.timeTable = timeTable;
     }
 
-    public Integer getActualClassroomId() {
-        return actualClassroomId;
+    public TimeSlotEntity getTimeSlot() {
+        return timeSlot;
     }
 
-    public void setActualClassroomId(Integer actualClassroomId) {
-        this.actualClassroomId = actualClassroomId;
+    public void setTimeSlot(TimeSlotEntity timeSlot) {
+        this.timeSlot = timeSlot;
     }
 
-    public Integer getTargetDepartmentId() {
-        return targetDepartmentId;
+    public ClassroomEntity getClassroom() {
+        return classroom;
     }
 
-    public void setTargetDepartmentId(Integer targetDepartmentId) {
-        this.targetDepartmentId = targetDepartmentId;
+    public void setClassroom(ClassroomEntity classroom) {
+        this.classroom = classroom;
     }
 
+    public DepartmentEntity getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(DepartmentEntity department) {
+        this.department = department;
+    }
     public Integer getTargetGrade() {
         return targetGrade;
     }
 
     public void setTargetGrade(Integer targetGrade) {
         this.targetGrade = targetGrade;
+    }
+
+    public SubjectEntity getSubject() {
+        return subject;
+    }
+
+    public void setSubject(SubjectEntity subject) {
+        this.subject = subject;
     }
 
     public LocalDate getSessionDate() {
@@ -114,19 +148,11 @@ public class SessionEntity {
         this.endTime = endTime;
     }
 
-    public Integer getSessionStatus() {
-        return sessionStatus;
+    public boolean getSessionFlag() {
+        return sessionFlag;
     }
 
-    public void setSessionStatus(Integer sessionStatus) {
-        this.sessionStatus = sessionStatus;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
+    public void setSessionFlag(boolean sessionFlag) {
+        this.sessionFlag = sessionFlag;
     }
 }

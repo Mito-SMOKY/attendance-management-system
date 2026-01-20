@@ -14,8 +14,9 @@ public class MajorEntity {
     @Column(name = "MajorName")
     private String majorName;
 
-    @Column(name = "CourseID")
-    private Integer courseId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CourseID") 
+    private CourseEntity course;
 
     // --- constructor ---
     public MajorEntity() {}
@@ -27,6 +28,6 @@ public class MajorEntity {
     public String getMajorName() { return majorName; }
     public void setMajorName(String majorName) { this.majorName = majorName; }
 
-    public Integer getCourseId() { return courseId; }
-    public void setCourseId(Integer courseId) { this.courseId = courseId; }
+    public CourseEntity getCourse() { return course; }
+    public void setCourse(CourseEntity course) { this.course = course; }
 }
