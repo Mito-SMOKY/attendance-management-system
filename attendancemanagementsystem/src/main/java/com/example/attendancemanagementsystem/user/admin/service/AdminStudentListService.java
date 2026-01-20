@@ -74,7 +74,7 @@ public class AdminStudentListService {
             if (enrollList != null && !enrollList.isEmpty()) {
                 // 有効(IsActive=true)かつ最新のデータを取得
                 EnrollmentsEntity activeEnrollment = enrollList.stream()
-                    .filter(EnrollmentsEntity::getIsActive)
+                    .filter(EnrollmentsEntity::getActive)
                     .max(Comparator.comparing(EnrollmentsEntity::getEnrollmentsId))
                     .orElse(null);
 
