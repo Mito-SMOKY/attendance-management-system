@@ -31,6 +31,7 @@ public class AdminSubjectInfoController {
             @RequestParam(name = "from", required = false) String from,
             @RequestParam(name = "fromStudentId", required = false) Integer fromStudentId,
             @RequestParam(name = "fromSessionId", required = false) Integer fromSessionId,
+            @RequestParam(name = "fromUserId", required = false) Integer fromUserId,
             Model model) {
 
         AdminSubjectInfoDto subjectInfo = adminSubjectInfoService.getSubjectInfo(departmentId, subjectId, grade);
@@ -46,6 +47,11 @@ public class AdminSubjectInfoController {
         //授業詳細から来た場合は、そこへ戻る
         else if ("classInfo".equals(from) && fromSessionId != null) {
             backUrl = "/admin/class/detail/" + fromSessionId;
+        }
+
+        //プロフィールから来た場合は、そこへ戻る
+        else if ("profile".equals(from)) {
+            backUrl = "/profile"; 
         }
         model.addAttribute("backUrl", backUrl);
         

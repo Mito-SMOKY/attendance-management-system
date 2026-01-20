@@ -91,12 +91,11 @@
                                 </a>
 
                                 <a th:if="${#authorization.expr('hasRole(''ADMIN'')') or #authorization.expr('hasRole(''SUPER_ADMIN'')')}"
-                                    th:href="@{/admin/subjectInfo(departmentId=${subject.departmentId}, subjectId=${subject.subjectId}, grade=${subject.grade}, from='profile')}"
+                                    th:href="@{/admin/subjectInfo(departmentId=${subject.departmentId}, subjectId=${subject.subjectId}, grade=${subject.grade}, from='profile', fromUserId=${userData.userId})}"
                                     class="detail-link">
                                     
-                                        <span class="display-value" th:text="${subject.subjectName}"></span>
+                                    <span class="display-value" th:text="${subject.subjectName}"></span>
                                 </a>
-
                             </li>
                             <div th:if="${#lists.isEmpty(subjectData)}">
                                 <p>登録されている教科はありません。</p>

@@ -53,7 +53,7 @@ public class ProfileService {
         String displayRole = (user.getUserTypeId() == 1) ? "学生" : "管理者";
         
         // プロフィール情報DTOを生成して返却
-        return new UserProfileDto(user.getName(), displayRole, "Asia/Tokyo", user.getEmail());
+        return new UserProfileDto(user.getUserId(), user.getName(), displayRole, user.getEmail());        
     }
 
     @Transactional
