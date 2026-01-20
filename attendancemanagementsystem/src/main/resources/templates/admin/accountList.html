@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>仮アカウント一覧</title>
     
-    <link rel="stylesheet" th:href="@{/css/common/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/account/accountList.css}">
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminAccountList.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -71,7 +71,13 @@
 
     </div>
 
-    <script th:src="@{/js/accountList.js}"></script>
+    <script>
+        function exportCsv() {
+            // ファイル出力処理
+            alert("ファイル出力処理を実行します");
+            // location.href = '/admin/export-accounts';
+        }
+    </script>
 
 </body>
 </html>

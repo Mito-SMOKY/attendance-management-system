@@ -21,8 +21,8 @@ public class TimetableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "TimetableID")
-    private Integer timetableId;
+    @Column(name = "TimeTableID")
+    private Integer timeTableId;
 
     @Column(name = "Date")
     private LocalDate date;
@@ -64,7 +64,7 @@ public class TimetableEntity {
     private TimeSlotEntity timeSlot;
 
     // Timetable(1) 対 Attendance(多)
-    @OneToMany(mappedBy = "timetable", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "timeTable", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AttendanceEntity> attendances;
 
     // --- constructor ---
@@ -72,12 +72,12 @@ public class TimetableEntity {
     }
 
     // --- Getter/Setter ---
-    public Integer getTimetableId() {
-        return timetableId;
+    public Integer getTimeTableId() {
+        return timeTableId;
     }
 
-    public void setTimetableId(Integer timetableId) {
-        this.timetableId = timetableId;
+    public void setTimeTableId(Integer timeTableId) {
+        this.timeTableId = timeTableId;
     }
 
     public LocalDate getDate() {
