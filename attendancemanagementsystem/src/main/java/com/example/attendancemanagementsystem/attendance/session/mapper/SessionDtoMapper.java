@@ -36,7 +36,7 @@ public class SessionDtoMapper {
         // 生徒情報
         if (enrollment != null && enrollment.getStudent() != null && enrollment.getStudent().getUsers() != null) {
             dto.setUserId(enrollment.getStudent().getUserId());
-            dto.setStudentName(enrollment.getStudent().getUsers().getName());
+            dto.setStudentName(enrollment.getStudent().getUser().getName());
         } else {
             dto.setUserId(null);
             dto.setStudentName("Unknown");

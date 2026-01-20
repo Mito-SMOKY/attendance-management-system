@@ -56,9 +56,9 @@ public class AdminStudentListService {
             Map<String, Object> map = new HashMap<>();
             
             // --- 基本情報 (UsersEntity) ---
-            if (s.getUsers() != null) {
-                map.put("loginId", s.getUsers().getLoginId());
-                map.put("name", s.getUsers().getName());
+            if (s.getUser() != null) {
+                map.put("loginId", s.getUser().getLoginId());
+                map.put("name", s.getUser().getName());
             } else {
                 map.put("loginId", "-");
                 map.put("name", "不明");

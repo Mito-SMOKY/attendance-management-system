@@ -24,6 +24,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.attendancemanagementsystem.common.entity.ClassroomEntity;
 import com.example.attendancemanagementsystem.common.entity.Datalist; // ★追加
+import com.example.attendancemanagementsystem.common.entity.DatalistDetailEntity;
+import com.example.attendancemanagementsystem.common.repository.DatalistDetailRepository;
+import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
 import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
 import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm;
 import com.example.attendancemanagementsystem.user.admin.service.AdminClassroomService;
@@ -43,6 +46,12 @@ public class AdminController {
 
     @Autowired
     private AdminClassroomService adminClassroomService; // ★追加
+
+    @Autowired
+    private DepartmentRepository departmentRepository; // ★追加
+
+    @Autowired
+    private DatalistDetailRepository datalistDetailRepository;
 
     private Integer getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -95,30 +104,41 @@ public class AdminController {
 
     @GetMapping("/upload")
     public String showFileUploadPage() {
-        return "admin/upload";
+        return "admin/csvUpload";
     }
 
     // ★修正箇所: アップロード後に csvName へ遷移
+    // ★修正: handleFileUpload メソッド
     @PostMapping("/upload-file")
     public String handleFileUpload(@RequestParam("file") MultipartFile file, Model model) {
         try {
             DatalistForm form = adminService.parseAccountFile(file);
             model.addAttribute("datalistForm", form);
+            
+            // ★追加: csvName画面のプルダウン用に学科リストを渡す
+            model.addAttribute("departmentList", departmentRepository.findAll());
+
             return "admin/csvName"; 
         } catch (Exception e) {
             model.addAttribute("errorMessage", "ファイルの読み込みに失敗しました: " + e.getMessage());
-            return "admin/upload";
+            return "admin/csvUpload";
         }
     }
 
     @PostMapping("/save-temp-accounts")
     public String saveTempAccounts(@ModelAttribute DatalistForm form, RedirectAttributes redirectAttributes) {
         
-        List<String> skippedIds = adminService.saveDatalist(form, getCurrentUserId());
+        // 重複があった場合は、そのIDリストが返ってくる（保存はされていない）
+        List<String> duplicateIds = adminService.saveDatalist(form, getCurrentUserId());
         
-        if (!skippedIds.isEmpty()) {
-            String message = "以下のIDは重複しているため登録されませんでした: " + String.join(", ", skippedIds);
+        if (!duplicateIds.isEmpty()) {
+            // ★メッセージ変更: 全件キャンセルされたことを伝える
+            String message = "以下のIDで重複が検出されたため、登録処理を中止しました（データは保存されていません）: " 
+                           + String.join(", ", duplicateIds);
             redirectAttributes.addFlashAttribute("warningMessage", message);
+            
+            // エラー時は登録確認画面に戻るなどの配慮も可能ですが、
+            // 今回は仕様通り履歴画面(または一覧)へ戻します
         } else {
             redirectAttributes.addFlashAttribute("successMessage", "すべてのデータが正常に登録されました。");
         }
@@ -132,8 +152,19 @@ public class AdminController {
         return "admin/creation_history";
     }
 
+    // @GetMapping("/manual-input")
+    // public String showManualAccountPage() {
+    //     return "admin/manual_input";
+    // }
+
     @GetMapping("/manual-input")
-    public String showManualAccountPage() {
+    public String showManualAccountPage(Model model) {
+        // ★追加: プルダウン用に全学科・クラスを取得して画面に渡す
+        model.addAttribute("departmentList", departmentRepository.findAll());
+        
+        // フォームの初期化（空のリストを入れておくなど）
+        model.addAttribute("manualAccountForm", new ManualAccountForm());
+        
         return "admin/manual_input";
     }
 
@@ -141,6 +172,11 @@ public class AdminController {
     public String showTempAccountList(@PathVariable("id") Integer id, Model model) {
         Datalist datalist = adminService.getDatalistById(id);
         model.addAttribute("datalist", datalist);
+        
+        // ★変更: メソッド名修正 (OrderByLoginIdAsc)
+        List<DatalistDetailEntity> details = datalistDetailRepository.findByDatalistIdOrderByLoginIdAsc(id);
+        model.addAttribute("details", details);
+        
         return "admin/temp_account_list";
     }
 
@@ -202,9 +238,11 @@ public class AdminController {
     } 
 
     // --- csvName.htmlからの遷移用 ---
+    // ★修正: 引数を @ModelAttribute DatalistForm に変更
     @PostMapping("/account-list")
-    public String postAccountList(@RequestParam("dataListName") String dataListName, Model model) {
-        model.addAttribute("listName", dataListName);
+    public String postAccountList(@ModelAttribute DatalistForm form, Model model) {
+        // これで名前だけでなく、生徒リスト(tempAccounts)や学科情報もすべて受け取れます
+        model.addAttribute("datalistForm", form);
         return "admin/accountList"; 
     }
     
