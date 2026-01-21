@@ -15,7 +15,7 @@ public interface DatalistRepository extends JpaRepository<Datalist, Integer> {
     
     List<Datalist> findByCreatorId(Integer creatorId);
     
-    // ★修正: enrollments などの FETCH を削除して、MultipleBagFetchException を回避
+    // enrollments などの FETCH を削除して、MultipleBagFetchException を回避
     @Query("SELECT d FROM Datalist d " +
            "LEFT JOIN FETCH d.creatorUser " +
            "LEFT JOIN FETCH d.students s " +
@@ -23,7 +23,11 @@ public interface DatalistRepository extends JpaRepository<Datalist, Integer> {
            "WHERE d.dataListId = :id")
     Optional<Datalist> findByIdWithDetails(@Param("id") Integer id);
 
-    // 全件取得（作成者情報付き）
+    // 全件取得（作成者情報付き）下記メソッド使用より不使用
     @Query("SELECT d FROM Datalist d LEFT JOIN FETCH d.creatorUser ORDER BY d.createdAt DESC")
     List<Datalist> findAllWithCreator();
+
+    // Roleを指定して取得するメソッド（作成者情報付き）
+    @Query("SELECT d FROM Datalist d LEFT JOIN FETCH d.creatorUser WHERE d.role = :role ORDER BY d.createdAt DESC")
+    List<Datalist> findByRoleWithCreator(@Param("role") Integer role);
 }

@@ -52,9 +52,9 @@ public class AdminService {
     @Autowired
     private DatalistDetailRepository datalistDetailRepository;
 
-    // 1. 全履歴取得
+    // 1. 履歴取得
     public List<Datalist> getAllDatalists() {
-        return datalistRepository.findAllWithCreator();
+        return datalistRepository.findByRoleWithCreator(1);
     }
     
     // 2. 自分の履歴のみ取得
@@ -98,6 +98,7 @@ public class AdminService {
         Datalist datalist = new Datalist();
         datalist.setDataListName(form.getDatalistName());
         datalist.setCreatorId(creatorId);
+        datalist.setRole(1);
 
         List<Student> students = new ArrayList<>();
 
@@ -142,6 +143,7 @@ public class AdminService {
         Datalist datalist = new Datalist();
         datalist.setDataListName(form.getDataListName());
         datalist.setCreatorId(creatorId);
+        datalist.setRole(1);
 
         DepartmentEntity department = null;
         if (form.getDepartmentId() != null) {
