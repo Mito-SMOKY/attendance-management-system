@@ -221,34 +221,60 @@
         }
 
         // ★追加: AIデータを画面に反映する関数
-        function applyTimetableData(data) {
-            let count = 0;
-            data.forEach(item => {
-                // item = {day: "MONDAY", slot: 1, subjectId: 10, userId: 5, classroomId: 3}
-                
-                // Thymeleafが出力するname属性: scheduleMap[1]['MONDAY'].subjectId など
-                const baseSelector = `select[name="scheduleMap[${item.slot}]['${item.day}']`;
+        // ★修正版: AIデータを画面に反映する関数（デバッグ機能付き）
+    function applyTimetableData(data) {
+        let count = 0;
+        
+        console.log("▼ データ反映開始: 全" + data.length + "件");
 
-                // 1. 科目をセット
-                if (item.subjectId) {
-                    const el = document.querySelector(`${baseSelector}.subjectId"]`);
-                    if (el) { el.value = item.subjectId; count++; }
-                }
-                // 2. 教室をセット
-                if (item.classroomId) {
-                    const el = document.querySelector(`${baseSelector}.classroomId"]`);
-                    if (el) { el.value = item.classroomId; }
-                }
-                // 3. 先生をセット
-                if (item.userId) {
-                    const el = document.querySelector(`${baseSelector}.userId"]`);
-                    if (el) { el.value = item.userId; }
-                }
-            });
-            return count; // 入力できた件数を返す
-        }
+        data.forEach(item => {
+            // item = {day: "MONDAY", slot: 1, subjectId: 10, userId: 5, classroomId: 3}
+            
+            // 【重要】Thymeleafの出力に合わせて name属性を構成
+            // HTML側が scheduleMap[1]['MONDAY'] となっているので、ここもシングルクォートで囲む
+            const nameBase = `scheduleMap[${item.slot}]['${item.day}']`;
 
-        // 重複チェック処理
+            // 1. 科目セレクトボックスを探す
+            // CSSセレクタで属性を指定する場合、値全体をダブルクォートで囲めば中のシングルクォートはそのままでOK
+            const subjectEl = document.querySelector(`select[name="${nameBase}.subjectId"]`);
+            const roomEl    = document.querySelector(`select[name="${nameBase}.classroomId"]`);
+            const teacherEl = document.querySelector(`select[name="${nameBase}.userId"]`);
+
+            // 要素が見つかったかチェック（見つからない場合はコンソールに警告を出す）
+            if (!subjectEl) {
+                console.warn(`[Skip] HTML要素が見つかりません。selector: [name="${nameBase}.subjectId"]`);
+                return; // このコマはスキップ
+            }
+
+            // 2. 値をセット (値が存在する場合のみ)
+            if (item.subjectId) {
+                subjectEl.value = item.subjectId;
+                // ちゃんと値が入ったか確認（プルダウンにないIDだと空になるため）
+                if (subjectEl.value == item.subjectId) {
+                    count++;
+                    // 変更されたことがわかるように背景色を一瞬変える演出（任意）
+                    subjectEl.style.backgroundColor = "#e8f0fe"; 
+                } else {
+                    console.warn(`[Match Error] 科目ID(${item.subjectId})はプルダウンの選択肢にありません。`);
+                }
+            }
+
+            if (item.classroomId && roomEl) {
+                roomEl.value = item.classroomId;
+                roomEl.style.backgroundColor = "#e8f0fe";
+            }
+
+            if (item.userId && teacherEl) {
+                teacherEl.value = item.userId;
+                teacherEl.style.backgroundColor = "#e8f0fe";
+            }
+        });
+
+        console.log(`▲ 反映完了: ${count}件成功`);
+        return count;
+    }
+
+    // 重複チェック処理
         async function checkAndSubmit() {
             const deptId = document.getElementById('departmentId').value;
             const startDate = document.getElementById('startDate').value;

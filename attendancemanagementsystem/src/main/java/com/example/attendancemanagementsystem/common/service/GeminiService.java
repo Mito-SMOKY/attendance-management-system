@@ -1,9 +1,5 @@
 package com.example.attendancemanagementsystem.common.service;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -12,10 +8,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.imageio.ImageIO;
-
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,45 +25,34 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 @Service
 public class GeminiService {
 
+    // 必要なリポジトリの注入
     @Autowired private SubjectRepository subjectRepository;
     @Autowired private UsersRepository usersRepository;
     @Autowired private ClassroomRepository classroomRepository;
 
-    private static final String API_KEY = "AIzaSyDUimnO51j5V5Jfk_CuvVNBEjA48HZKgxk"; 
-    private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
-
+    // Gemini APIの設定
+    private static final String API_KEY = "AIzaSyCKkxKdeRluozRWNp4lWQzwngETYsLYiLY";
+    private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;  
+    
+    // 画像から時間割情報を解析する
     public String analyzeTimetableImage(MultipartFile file) {
-        System.out.println("【Debug】現在のAPIキー確認: " + API_KEY);
-        System.out.println("【Debug】処理開始: ファイル名=" + file.getOriginalFilename());
+        
         try {
-            // 1. マスタデータ取得
+            // DBからマスタデータを全件取得
             List<SubjectEntity> subjects = subjectRepository.findAll();
             List<UsersEntity> teachers = usersRepository.findByUserTypeId(2);
             List<ClassroomEntity> classrooms = classroomRepository.findAll();
-            
-            System.out.println("【Debug】マスタデータ取得: 科目=" + subjects.size() + "件, 教員=" + teachers.size() + "件, 教室=" + classrooms.size() + "件");
 
+            // プロンプトに含めるためのマスタデータリストを作成
             String subjectListStr = subjects.stream().map(SubjectEntity::getSubjectName).collect(Collectors.joining(", "));
             String teacherListStr = teachers.stream().map(UsersEntity::getName).collect(Collectors.joining(", "));
 
-            // 2. 画像変換
-            byte[] imageBytes;
-            String mimeType = "image/jpeg";
-            String contentType = file.getContentType();
-
-            if ((contentType != null && contentType.equalsIgnoreCase("application/pdf")) 
-                || file.getOriginalFilename().toLowerCase().endsWith(".pdf")) {
-                System.out.println("【Debug】PDFを検知。画像変換を開始します...");
-                imageBytes = convertPdfToJpg(file.getInputStream());
-                System.out.println("【Debug】PDF変換完了。サイズ=" + imageBytes.length + "bytes");
-            } else {
-                imageBytes = file.getBytes();
-                if (contentType != null) mimeType = contentType;
-            }
-            
+            // 画像データを取得してBase64形式にエンコード
+            byte[] imageBytes = file.getBytes();
+            String mimeType = file.getContentType() != null ? file.getContentType() : "image/jpeg";
             String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
-            // 3. プロンプト作成
+            // プロンプト構築
             String promptText = 
                 "この画像は学校の時間割です。各コマには「科目名」「教室名」「教員名」が記載されています。\n" +
                 "（例: 223 上野 → 教室:223, 教員:上野）\n\n" +
@@ -83,8 +64,7 @@ public class GeminiService {
                 "2. 教員名は、リスト: [" + teacherListStr + "] にある名前を含んでいれば、そのフルネームを優先してください（例: '上野' -> '上野 太郎'）。\n" +
                 "3. Markdown記法は不要です。生データのJSONのみを返してください。";
 
-            // 4. API送信
-            System.out.println("【Debug】Gemini APIへリクエスト送信中...");
+            // APIリクエストボディのJSONを作成
             ObjectMapper mapper = new ObjectMapper();
             String jsonBody = "{"
                     + "\"contents\": [{"
@@ -98,6 +78,8 @@ public class GeminiService {
                     + "}]"
                     + "}";
 
+            // HTTPクライアントでAPIへPOST送信
+            System.out.println("【Debug】Gemini APIへリクエスト送信中...");
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(API_URL))
@@ -106,14 +88,9 @@ public class GeminiService {
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            
             String responseBody = response.body();
-            // ★超重要：APIからのナマの返事をログに出す
-            System.out.println("================ AI RAW RESPONSE ================");
-            System.out.println(responseBody);
-            System.out.println("=================================================");
 
-            // 5. 結果抽出
+            // レスポンスからJSONを抽出しDB照合を実施して結果を返す
             return extractJsonFromResponse(responseBody, subjects, teachers, classrooms);
 
         } catch (Throwable e) {
@@ -123,101 +100,111 @@ public class GeminiService {
         }
     }
 
-    private byte[] convertPdfToJpg(InputStream pdfStream) throws IOException {
-        try (PDDocument document = PDDocument.load(pdfStream)) {
-            PDFRenderer renderer = new PDFRenderer(document);
-            BufferedImage image = renderer.renderImage(0, 2.0f); 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, "jpg", baos);
-            return baos.toByteArray();
-        }
-    }
-
+    // APIレスポンスからJSONを抽出・整形しDBと照合する処理
     private String extractJsonFromResponse(String responseBody, 
-                                           List<SubjectEntity> subjects,
-                                           List<UsersEntity> teachers,
-                                           List<ClassroomEntity> classrooms) {
+                                        List<SubjectEntity> subjects,
+                                        List<UsersEntity> teachers,
+                                        List<ClassroomEntity> classrooms) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(responseBody);
             
-            // エラーチェック
+            // エラーレスポンスのチェック
             if (root.has("error")) {
-                System.err.println("【API Error】Geminiからエラーが返ってきました: " + root.path("error").toString());
+                System.err.println("【API Error】" + root.path("error").toString());
                 return "[]";
             }
 
+            // AIの回答テキストを取得
             JsonNode candidates = root.path("candidates");
             if (candidates.isArray() && candidates.size() > 0) {
                 String text = candidates.get(0).path("content").path("parts").get(0).path("text").asText();
-                System.out.println("【Debug】AI抽出テキスト(整形前): " + text);
 
+                // 純粋なJSON文字列へ
                 text = text.replaceAll("```json", "").replaceAll("```", "").trim();
                 
+                // 文字列をJSON配列としてパース
                 JsonNode timetableArray = mapper.readTree(text);
                 if (timetableArray.isArray()) {
                     ArrayNode processedArray = mapper.createArrayNode();
-                    System.out.println("【Debug】AIは " + timetableArray.size() + " 件のコマを認識しました。DB照合を開始します...");
                     
+                    // 各コマデータの照合処理
                     for (JsonNode node : timetableArray) {
                         var newNode = mapper.createObjectNode();
                         newNode.put("day", node.path("day").asText().toUpperCase());
                         newNode.put("slot", node.path("slot").asInt());
 
-                        // マッピング詳細ログ
-                        String subjectName = node.path("subject").asText();
-                        String teacherName = node.path("teacher").asText();
-                        String roomName = node.path("room").asText();
+                        String aiSub = node.path("subject").asText();
+                        String aiTea = node.path("teacher").asText();
+                        String aiRoom = node.path("room").asText();
 
-                        System.out.print("  - [解析] 科目:" + subjectName + ", 教員:" + teacherName + ", 教室:" + roomName);
+                        // 科目名を正規化してDBマスタとあいまい照合
+                        String normAiSub = normalize(aiSub);
+                        var subOpt = subjects.stream().filter(s -> {
+                            String dbName = normalize(s.getSubjectName());
+                            return dbName.equals(normAiSub) || dbName.contains(normAiSub) || normAiSub.contains(dbName);
+                        }).findFirst();
 
-                        // 科目
-                        var subOpt = subjects.stream().filter(s -> s.getSubjectName().equals(subjectName)).findFirst();
                         if (subOpt.isPresent()) {
                             newNode.put("subjectId", subOpt.get().getSubjectId());
-                            System.out.print(" -> 科目OK(ID:" + subOpt.get().getSubjectId() + ")");
+                            System.out.print(" -> 科目OK");
                         } else {
-                            System.out.print(" -> 科目NG(一致なし)");
+                            System.out.print(" -> 科目NG");
                         }
 
-                        // 教員
-                        if (!teacherName.isEmpty()) {
-                            var tOpt = teachers.stream().filter(u -> u.getName().contains(teacherName)).findFirst();
+                        // 教員名を正規化してDBマスタとあいまい照合
+                        if (!aiTea.isEmpty()) {
+                            String normAiTea = normalize(aiTea);
+                            var tOpt = teachers.stream().filter(u -> {
+                                String dbName = normalize(u.getName());
+                                return dbName.equals(normAiTea) || dbName.contains(normAiTea);
+                            }).findFirst();
+
                             if (tOpt.isPresent()) {
                                 newNode.put("userId", tOpt.get().getUserId());
-                                System.out.print(", 教員OK(ID:" + tOpt.get().getUserId() + ")");
+                                System.out.print(", 教員OK");
                             } else {
                                 System.out.print(", 教員NG");
                             }
                         }
 
-                        // 教室
-                        if (!roomName.isEmpty()) {
-                            var rOpt = classrooms.stream().filter(r -> r.getClassroomName().equals(roomName)).findFirst();
+                        // 教室名を正規化してDBマスタとあいまい照合
+                        if (!aiRoom.isEmpty()) {
+                            String normAiRoom = normalize(aiRoom);
+                            var rOpt = classrooms.stream().filter(r -> {
+                                String dbName = normalize(r.getClassroomName());
+                                return dbName.equals(normAiRoom) || dbName.contains(normAiRoom) || normAiRoom.contains(dbName);
+                            }).findFirst();
+
                             if (rOpt.isPresent()) {
                                 newNode.put("classroomId", rOpt.get().getClassroomId());
-                                System.out.print(", 教室OK(ID:" + rOpt.get().getClassroomId() + ")");
+                                System.out.print(", 教室OK");
                             } else {
                                 System.out.print(", 教室NG");
                             }
                         }
                         System.out.println(""); // 改行
 
-                        // 一つでもマッチすれば採用
+                        // いずれかのIDが特定できた場合のみ結果に追加
                         if (newNode.has("subjectId") || newNode.has("userId") || newNode.has("classroomId")) {
                             processedArray.add(newNode);
                         }
                     }
-                    System.out.println("【Debug】最終結果: " + processedArray.size() + " 件のデータを返します。");
                     return processedArray.toString();
                 }
-            } else {
-                System.err.println("【Debug】APIレスポンスに candidates が含まれていません。");
             }
         } catch (Exception e) {
-            System.err.println("【Debug】JSONパースまたはマッピング中にエラー発生");
+            System.err.println("【Debug】エラー: " + e.getMessage());
             e.printStackTrace();
         }
         return "[]";
+    }
+
+    // 文字列の正規化
+    private String normalize(String input) {
+        if (input == null) return "";
+        return input.replace(" ", "")
+                    .replace("　", "")
+                    .trim();
     }
 }

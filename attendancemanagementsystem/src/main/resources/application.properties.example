@@ -86,3 +86,6 @@ spring.devtools.livereload.enabled=true
 # ファイルアップロード制限の緩和 (デフォルトは1MB)
 spring.servlet.multipart.max-file-size=10MB
 spring.servlet.multipart.max-request-size=10MB
+
+# キーの部分は隠しておく
+gemini.api.key=ここにAPIキーを入れてください
