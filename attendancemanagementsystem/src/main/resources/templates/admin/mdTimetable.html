@@ -12,28 +12,79 @@
     </div>
 
     <div class="timetable-container">
+        
+        <div th:if="${successMessage}" 
+             style="background-color: #d4edda; color: #155724; padding: 15px; margin-bottom: 20px; border: 1px solid #c3e6cb; border-radius: 4px; text-align: center; font-weight: bold;">
+            <span th:text="${successMessage}"></span>
+        </div>
+
         <h1 class="page-title">時間割登録 (週間テンプレート)</h1>
+
+        <div class="mode-tabs" style="margin-bottom: 20px; border-bottom: 2px solid #ddd; display: flex; gap: 10px;">
+            <a th:href="@{/admin/mdTimetable}" class="active-tab" 
+               style="padding: 10px 20px; text-decoration: none; border-radius: 5px 5px 0 0; background: #007bff; color: white;">
+               半期一括登録
+            </a>
+            <a th:href="@{/admin/mdTimetable/daily}" 
+               style="padding: 10px 20px; text-decoration: none; border-radius: 5px 5px 0 0; background: #f8f9fa; color: #333;">
+               日別編集
+            </a>
+            <a th:href="@{/admin/mdTimetable/view}" 
+               style="padding: 10px 20px; text-decoration: none; border-radius: 5px 5px 0 0; background: #f8f9fa; color: #333;">
+               時間割参照
+            </a>
+        </div>
 
         <form th:action="@{/admin/mdTimetable/register}" th:object="${mdTimetableDto}" method="post">
             
             <div class="setting-area" style="background: #fff; padding: 20px; margin-bottom: 20px; border: 1px solid #ccc;">
-                <div class="form-group">
-                    <label>対象クラス(学科):</label>
-                    <select th:field="*{departmentId}" class="filter-select" required>
-                        <option value="">選択してください</option>
-                        <option th:each="entry : ${departmentOptions}" 
-                                th:value="${entry.key}" 
-                                th:text="${entry.value}">
-                            表示例: 【ITコース】情報科 / 2年 / A組
-                        </option>
-                    </select>
+                <div style="display:flex; gap:20px; margin-bottom:15px; align-items:flex-end;">
+                    <div class="form-group">
+                        <label>対象クラス(学科):</label>
+                        <select th:field="*{departmentId}" class="filter-select" required style="width: 300px;">
+                            <option value="">選択してください</option>
+                            <option th:each="entry : ${departmentOptions}" 
+                                    th:value="${entry.key}" 
+                                    th:text="${entry.value}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>年度:</label>
+                        <select th:field="*{year}" id="yearSelect" class="filter-select" style="width:100px;">
+                            <option th:each="y : ${#numbers.sequence(mdTimetableDto.year - 1, mdTimetableDto.year + 1)}"
+                                    th:value="${y}" 
+                                    th:text="${y} + '年度'">
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>学期:</label>
+                        <select th:field="*{term}" id="termSelect" class="filter-select" style="width:100px;">
+                            <option value="1">前期</option>
+                            <option value="2">後期</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                         <button type="button" onclick="setAutoDates()" class="btn-secondary" style="padding: 5px 10px; font-size:0.8rem;">
+                            日付目安を入力
+                         </button>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label>適用期間:</label>
-                    <input type="date" th:field="*{startDate}" required> ～ 
-                    <input type="date" th:field="*{endDate}" required>
-                    <p style="font-size:0.8rem; color:#666;">※指定した期間のすべての曜日に、以下の時間割が反映されます。</p>
+                <div class="form-group" style="border-top:1px dashed #ccc; padding-top:15px;">
+                    <label style="font-weight:bold;">適用期間 (手入力で調整してください):</label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="date" th:field="*{startDate}" id="startDate" required>
+                        <span>～</span>
+                        <input type="date" th:field="*{endDate}" id="endDate" required>
+                    </div>
+                    <p style="font-size:0.8rem; color:#d9534f; margin-top:5px;">
+                        ※「日付目安を入力」を押すと仮の日付が入りますが、必ず学校のスケジュールに合わせて開始日・終了日を修正してください。
+                    </p>
                 </div>
             </div>
 
@@ -51,21 +102,20 @@
                     </thead>
                     <tbody>
                         <tr th:each="ts : ${timeSlots}">
-                            
-                            <td th:text="${ts.slotId} + '限'" style="font-weight:bold; background:#eee;"></td>
-                            
+                            <td style="font-weight:bold; background:#eee; text-align:center;">
+                                <span th:text="${ts.slotId} + '限'"></span><br>
+                                <span style="font-size:0.8em; font-weight:normal;" th:text="${ts.startTime} + '～' + ${ts.endTime}"></span>
+                            </td>
                             <td th:each="day : ${ {'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'} }">
                                 <div class="cell-input">
                                     <select th:field="*{scheduleMap[__${ts.slotId}__]['__${day}__'].subjectId}">
                                         <option value="">(教科なし)</option>
                                         <option th:each="sub : ${subjectList}" th:value="${sub.subjectId}" th:text="${sub.subjectName}"></option>
                                     </select>
-                                    
                                     <select th:field="*{scheduleMap[__${ts.slotId}__]['__${day}__'].classroomId}">
                                         <option value="">(教室未定)</option>
                                         <option th:each="room : ${classroomList}" th:value="${room.classroomId}" th:text="${room.classroomName}"></option>
                                     </select>
-                                    
                                     <select th:field="*{scheduleMap[__${ts.slotId}__]['__${day}__'].userId}">
                                         <option value="">(教員未定)</option>
                                         <option th:each="teacher : ${teacherList}" th:value="${teacher.userId}" th:text="${teacher.name}"></option>
@@ -73,7 +123,7 @@
                                 </div>
                             </td>
                         </tr>
-                    </tbody>                
+                    </tbody>
                 </table>
             </div>
 
@@ -82,5 +132,23 @@
             </div>
         </form>
     </div>
+
+    <script>
+        function setAutoDates() {
+            const year = document.getElementById('yearSelect').value;
+            const term = document.getElementById('termSelect').value;
+            const startInput = document.getElementById('startDate');
+            const endInput = document.getElementById('endDate');
+
+            if (term == '1') {
+                startInput.value = year + '-04-01';
+                endInput.value = year + '-09-30';
+            } else {
+                const nextYear = parseInt(year) + 1;
+                startInput.value = year + '-10-01';
+                endInput.value = nextYear + '-03-31';
+            }
+        }
+    </script>
 </body>
 </html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>時間割参照</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/mdTimetable.css}">
+</head>
+<body>
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+
+    <div class="timetable-container">
+        <h1 class="page-title">時間割参照</h1>
+
+        <div class="mode-tabs" style="margin-bottom: 20px; border-bottom: 2px solid #ddd; display: flex; gap: 10px;">
+            <a th:href="@{/admin/mdTimetable}" 
+               style="padding: 10px 20px; text-decoration: none; border-radius: 5px 5px 0 0; background: #f8f9fa; color: #333;">
+               半期一括登録
+            </a>
+            <a th:href="@{/admin/mdTimetable/daily}" 
+               style="padding: 10px 20px; text-decoration: none; border-radius: 5px 5px 0 0; background: #f8f9fa; color: #333;">
+               日別編集
+            </a>
+            <a th:href="@{/admin/mdTimetable/view}" class="active-tab" 
+               style="padding: 10px 20px; text-decoration: none; border-radius: 5px 5px 0 0; background: #007bff; color: white;">
+               時間割参照
+            </a>
+        </div>
+
+        <form th:action="@{/admin/mdTimetable/view}" method="get" class="setting-area" style="background:#fff; padding:20px; border:1px solid #ccc; margin-bottom:20px;">
+            <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center; border-bottom:1px dashed #ddd; padding-bottom:10px;">
+                <label>年度:</label>
+                <select name="year" id="yearSelect" class="filter-select" style="width:100px;">
+                    <option th:each="y : ${#numbers.sequence(mdTimetableDto.year - 1, mdTimetableDto.year + 1)}"
+                            th:value="${y}" 
+                            th:text="${y} + '年度'"
+                            th:selected="${y == mdTimetableDto.year}">
+                    </option>
+                </select>
+                <label>学期:</label>
+                <select name="term" id="termSelect" class="filter-select" style="width:100px;">
+                    <option value="1" th:selected="${mdTimetableDto.term == 1}">前期</option>
+                    <option value="2" th:selected="${mdTimetableDto.term == 2}">後期</option>
+                </select>
+                <button type="button" onclick="setReferenceDate()" class="btn-secondary" style="font-size:0.8rem; padding:3px 8px;">
+                   ← この学期の基準日をセット
+                </button>
+            </div>
+
+            <div style="display:flex; gap:20px; align-items:flex-end;">
+                <div class="form-group">
+                    <label>表示基準日 (この日を含む週を表示):</label>
+                    <input type="date" name="date" id="dateInput" th:value="${mdTimetableDto.startDate}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>クラス:</label>
+                    <select name="departmentId" class="filter-select" required style="min-width: 300px;">
+                        <option value="">選択してください</option>
+                        <option th:each="entry : ${departmentOptions}" 
+                                th:value="${entry.key}" 
+                                th:text="${entry.value}"
+                                th:selected="${entry.key == mdTimetableDto.departmentId}">
+                        </option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-primary">表示</button>
+            </div>
+        </form>
+
+        <div class="table-wrapper" th:if="${mdTimetableDto.departmentId != null}">
+            <div style="margin-bottom:10px; font-weight:bold; color:#333;">
+                表示中の週: <span th:text="${mdTimetableDto.startDate}"></span> ～ <span th:text="${mdTimetableDto.endDate}"></span>
+            </div>
+
+            <table class="timetable-table">
+                <thead>
+                    <tr>
+                        <th style="width:10%;">時限</th>
+                        <th>月</th><th>火</th><th>水</th><th>木</th><th>金</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ts : ${timeSlots}">
+                        <td style="font-weight:bold; background:#eee; text-align:center;">
+                            <span th:text="${ts.slotId} + '限'"></span><br>
+                            <span style="font-size:0.8em; font-weight:normal;" th:text="${ts.startTime} + '～' + ${ts.endTime}"></span>
+                        </td>
+                        
+                        <td th:each="day : ${ {'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'} }">
+                            <div th:with="slotMap=${mdTimetableDto.scheduleMap.get(ts.slotId)}" 
+                                 style="min-height: 80px; padding: 5px; font-size: 0.9em; vertical-align:top;">
+                                
+                                <th:block th:if="${slotMap != null}">
+                                    <div th:with="cell=${slotMap.get(day)}">
+                                        
+                                        <div th:if="${cell != null && cell.subjectId != null}">
+                                            <div style="font-weight:bold; color:#0056b3; margin-bottom:4px;" 
+                                                 th:text="${cell.subjectName != null ? cell.subjectName : '(科目ID:' + cell.subjectId + ')'}">
+                                            </div>
+                                            <div style="font-size:0.85em; color:#555;">
+                                                <span th:if="${cell.classroomName != null}">
+                                                    <i class="fas fa-door-open"></i> <span th:text="${cell.classroomName}"></span>
+                                                </span>
+                                                <br th:if="${cell.classroomName != null}">
+                                                <span th:if="${cell.teacherName != null}">
+                                                    <i class="fas fa-user"></i> <span th:text="${cell.teacherName}"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div th:if="${cell == null || cell.subjectId == null}" style="color:#ddd; text-align:center; padding-top:20px;">
+                                            -
+                                        </div>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div th:if="${mdTimetableDto.departmentId == null}" style="text-align:center; margin-top:50px; color:#666;">
+            <p>条件を指定して「表示」ボタンを押してください。</p>
+        </div>
+    </div>
+
+    <script>
+        function setReferenceDate() {
+            const year = document.getElementById('yearSelect').value;
+            const term = document.getElementById('termSelect').value;
+            const dateInput = document.getElementById('dateInput');
+
+            if (term == '1') {
+                dateInput.value = year + '-04-01';
+            } else {
+                dateInput.value = year + '-10-01';
+            }
+        }
+    </script>
+</body>
+</html>
