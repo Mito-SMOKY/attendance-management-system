@@ -4,47 +4,53 @@
     <meta charset="UTF-8">
     <title>日別時間割編集</title>
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/admin/mdTimetable.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/mdTimetableDaily.css}">
+    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+
+    <script th:src="@{/js/admin/mdTimetable.js}"></script>
 </head>
 <body>
     <div class="header-container">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
 
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
+    </div>
+
     <div class="timetable-container">
         
-        <div th:if="${successMessage}" 
-             style="background-color: #d4edda; color: #155724; padding: 15px; margin-bottom: 20px; border: 1px solid #c3e6cb; border-radius: 4px; text-align: center; font-weight: bold;">
+        <div th:if="${successMessage}" class="success-message">
             <span th:text="${successMessage}"></span>
         </div>
 
         <h1 class="page-title">日別時間割編集</h1>
             
-        <div class="mode-tabs" style="margin-bottom: 20px; border-bottom: 2px solid #ddd; display: flex; gap: 10px;">
-            <a th:href="@{/admin/mdTimetable}" 
-               style="padding: 10px 20px; text-decoration: none; border-radius: 5px 5px 0 0; background: #f8f9fa; color: #333;">
-               半期一括登録
-            </a>
-            <a th:href="@{/admin/mdTimetable/daily}" class="active-tab" 
-               style="padding: 10px 20px; text-decoration: none; border-radius: 5px 5px 0 0; background: #007bff; color: white;">
-               日別編集
-            </a>
-            <a th:href="@{/admin/mdTimetable/view}" 
-               style="padding: 10px 20px; text-decoration: none; border-radius: 5px 5px 0 0; background: #f8f9fa; color: #333;">
-               時間割参照
-            </a>
+        <div class="mode-tabs">
+            <a th:href="@{/admin/mdTimetable}" class="tab-link">半期一括登録</a>
+            <a th:href="@{/admin/mdTimetable/daily}" class="tab-link active-tab">日別編集</a>
+            <a th:href="@{/admin/mdTimetable/view}" class="tab-link">時間割参照</a>
         </div>
 
-        <form th:action="@{/admin/mdTimetable/daily}" method="get" class="setting-area" style="background:#fff; padding:20px; border:1px solid #ccc; margin-bottom:20px;">
-            <div style="display:flex; gap:20px; align-items:flex-end;">
+        <form th:action="@{/admin/mdTimetable/daily}" method="get" class="setting-area">
+            <div class="setting-row">
                 <div class="form-group">
                     <label>対象日:</label>
-                    <input type="date" name="date" th:value="${mdTimetableDto.startDate}" required>
+                    <input type="text" id="dateInput" name="date" th:value="${mdTimetableDto.startDate}" class="form-control" required style="width: 150px; background-color: white;">
                 </div>
                 
                 <div class="form-group">
                     <label>クラス:</label>
-                    <select name="departmentId" class="filter-select" required style="min-width: 300px;">
+                    <select name="departmentId" class="searchable-select" required style="min-width: 300px;">
                         <option value="">選択してください</option>
                         <option th:each="entry : ${departmentOptions}" 
                                 th:value="${entry.key}" 
@@ -81,16 +87,16 @@
                                     <span style="font-size:0.8em; font-weight:normal;" th:text="${ts.startTime} + '～' + ${ts.endTime}"></span>
                                 </td>
                                 <td th:with="dayKey=${mdTimetableDto.startDate.dayOfWeek.name()}">
-                                    <div style="display:flex; gap:10px;">
-                                        <select th:field="*{scheduleMap[__${ts.slotId}__]['__${dayKey}__'].subjectId}" style="flex:1;">
+                                    <div class="daily-cell">
+                                        <select th:field="*{scheduleMap[__${ts.slotId}__]['__${dayKey}__'].subjectId}" class="searchable-select" style="flex:1;">
                                             <option value="">(教科なし)</option>
                                             <option th:each="sub : ${subjectList}" th:value="${sub.subjectId}" th:text="${sub.subjectName}"></option>
                                         </select>
-                                        <select th:field="*{scheduleMap[__${ts.slotId}__]['__${dayKey}__'].classroomId}">
+                                        <select th:field="*{scheduleMap[__${ts.slotId}__]['__${dayKey}__'].classroomId}" class="searchable-select">
                                             <option value="">(教室未定)</option>
                                             <option th:each="room : ${classroomList}" th:value="${room.classroomId}" th:text="${room.classroomName}"></option>
                                         </select>
-                                        <select th:field="*{scheduleMap[__${ts.slotId}__]['__${dayKey}__'].userId}">
+                                        <select th:field="*{scheduleMap[__${ts.slotId}__]['__${dayKey}__'].userId}" class="searchable-select">
                                             <option value="">(教員未定)</option>
                                             <option th:each="teacher : ${teacherList}" th:value="${teacher.userId}" th:text="${teacher.name}"></option>
                                         </select>
@@ -101,7 +107,7 @@
                     </table>
                 </div>
 
-                <div class="button-area" style="text-align: center; margin-top: 20px;">
+                <div class="button-area">
                     <button type="submit" class="btn-primary" onclick="return confirm('この内容で更新しますか？元のデータは上書きされます。');">
                         保存する
                     </button>

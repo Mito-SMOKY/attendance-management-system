@@ -4,60 +4,69 @@
     <meta charset="UTF-8">
     <title>時間割参照</title>
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/admin/mdTimetable.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/mdTimetableView.css}">
+    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+
+    <script th:src="@{/js/admin/mdTimetable.js}"></script>
 </head>
 <body>
     <div class="header-container">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
 
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
+    </div>
+
     <div class="timetable-container">
         <h1 class="page-title">時間割参照</h1>
 
-        <div class="mode-tabs" style="margin-bottom: 20px; border-bottom: 2px solid #ddd; display: flex; gap: 10px;">
-            <a th:href="@{/admin/mdTimetable}" 
-               style="padding: 10px 20px; text-decoration: none; border-radius: 5px 5px 0 0; background: #f8f9fa; color: #333;">
-               半期一括登録
-            </a>
-            <a th:href="@{/admin/mdTimetable/daily}" 
-               style="padding: 10px 20px; text-decoration: none; border-radius: 5px 5px 0 0; background: #f8f9fa; color: #333;">
-               日別編集
-            </a>
-            <a th:href="@{/admin/mdTimetable/view}" class="active-tab" 
-               style="padding: 10px 20px; text-decoration: none; border-radius: 5px 5px 0 0; background: #007bff; color: white;">
-               時間割参照
-            </a>
+        <div class="mode-tabs">
+            <a th:href="@{/admin/mdTimetable}" class="tab-link">半期一括登録</a>
+            <a th:href="@{/admin/mdTimetable/daily}" class="tab-link">日別編集</a>
+            <a th:href="@{/admin/mdTimetable/view}" class="tab-link active-tab">時間割参照</a>
         </div>
 
-        <form th:action="@{/admin/mdTimetable/view}" method="get" class="setting-area" style="background:#fff; padding:20px; border:1px solid #ccc; margin-bottom:20px;">
-            <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center; border-bottom:1px dashed #ddd; padding-bottom:10px;">
+        <form th:action="@{/admin/mdTimetable/view}" method="get" class="setting-area">
+            <div class="setting-row center-align" style="border-bottom:1px dashed #ddd; padding-bottom:10px; margin-bottom:15px;">
                 <label>年度:</label>
-                <select name="year" id="yearSelect" class="filter-select" style="width:100px;">
+                <select name="year" id="yearSelect" class="searchable-select" style="width:100px;" onchange="setReferenceDate()">
                     <option th:each="y : ${#numbers.sequence(mdTimetableDto.year - 1, mdTimetableDto.year + 1)}"
                             th:value="${y}" 
                             th:text="${y} + '年度'"
                             th:selected="${y == mdTimetableDto.year}">
                     </option>
                 </select>
+
                 <label>学期:</label>
-                <select name="term" id="termSelect" class="filter-select" style="width:100px;">
+                <select name="term" id="termSelect" class="searchable-select" style="width:100px;" onchange="setReferenceDate()">
                     <option value="1" th:selected="${mdTimetableDto.term == 1}">前期</option>
                     <option value="2" th:selected="${mdTimetableDto.term == 2}">後期</option>
                 </select>
-                <button type="button" onclick="setReferenceDate()" class="btn-secondary" style="font-size:0.8rem; padding:3px 8px;">
-                   ← この学期の基準日をセット
+                
+                <button type="button" onclick="setReferenceDate()" class="btn-secondary">
+                    ← この学期の基準日にリセット
                 </button>
             </div>
 
-            <div style="display:flex; gap:20px; align-items:flex-end;">
+            <div class="setting-row">
                 <div class="form-group">
                     <label>表示基準日 (この日を含む週を表示):</label>
-                    <input type="date" name="date" id="dateInput" th:value="${mdTimetableDto.startDate}" required>
+                    <input type="text" name="date" id="dateInput" th:value="${mdTimetableDto.startDate}" class="form-control" required style="width: 150px; background-color: white;">
                 </div>
                 
                 <div class="form-group">
                     <label>クラス:</label>
-                    <select name="departmentId" class="filter-select" required style="min-width: 300px;">
+                    <select name="departmentId" class="searchable-select" required style="min-width: 300px;">
                         <option value="">選択してください</option>
                         <option th:each="entry : ${departmentOptions}" 
                                 th:value="${entry.key}" 
@@ -91,17 +100,14 @@
                         </td>
                         
                         <td th:each="day : ${ {'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'} }">
-                            <div th:with="slotMap=${mdTimetableDto.scheduleMap.get(ts.slotId)}" 
-                                 style="min-height: 80px; padding: 5px; font-size: 0.9em; vertical-align:top;">
-                                
+                            <div th:with="slotMap=${mdTimetableDto.scheduleMap.get(ts.slotId)}" class="view-cell">
                                 <th:block th:if="${slotMap != null}">
                                     <div th:with="cell=${slotMap.get(day)}">
-                                        
                                         <div th:if="${cell != null && cell.subjectId != null}">
-                                            <div style="font-weight:bold; color:#0056b3; margin-bottom:4px;" 
-                                                 th:text="${cell.subjectName != null ? cell.subjectName : '(科目ID:' + cell.subjectId + ')'}">
+                                            <div class="view-subject" 
+                                                th:text="${cell.subjectName != null ? cell.subjectName : '(科目ID:' + cell.subjectId + ')'}">
                                             </div>
-                                            <div style="font-size:0.85em; color:#555;">
+                                            <div class="view-details">
                                                 <span th:if="${cell.classroomName != null}">
                                                     <i class="fas fa-door-open"></i> <span th:text="${cell.classroomName}"></span>
                                                 </span>
@@ -111,10 +117,7 @@
                                                 </span>
                                             </div>
                                         </div>
-                                        
-                                        <div th:if="${cell == null || cell.subjectId == null}" style="color:#ddd; text-align:center; padding-top:20px;">
-                                            -
-                                        </div>
+                                        <div th:if="${cell == null || cell.subjectId == null}" class="view-empty">-</div>
                                     </div>
                                 </th:block>
                             </div>
@@ -128,19 +131,5 @@
             <p>条件を指定して「表示」ボタンを押してください。</p>
         </div>
     </div>
-
-    <script>
-        function setReferenceDate() {
-            const year = document.getElementById('yearSelect').value;
-            const term = document.getElementById('termSelect').value;
-            const dateInput = document.getElementById('dateInput');
-
-            if (term == '1') {
-                dateInput.value = year + '-04-01';
-            } else {
-                dateInput.value = year + '-10-01';
-            }
-        }
-    </script>
 </body>
 </html>

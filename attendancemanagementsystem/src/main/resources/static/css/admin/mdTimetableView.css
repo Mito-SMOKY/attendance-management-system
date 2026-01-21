@@ -1,10 +1,9 @@
 @charset "UTF-8";
 
 /* =========================================
- * mdTimetable.html (一括登録) 専用スタイル
+ * mdTimetableView.html (参照) 専用スタイル
  * ========================================= */
 
-/* --- コンテナ・基本レイアウト --- */
 .timetable-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -18,17 +17,6 @@
     margin-bottom: 20px;
     border-left: 5px solid #007bff;
     padding-left: 10px;
-}
-
-.success-message {
-    background-color: #d4edda;
-    color: #155724;
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid #c3e6cb;
-    border-radius: 4px;
-    text-align: center;
-    font-weight: bold;
 }
 
 /* --- タブ切り替え --- */
@@ -57,72 +45,7 @@
     background: #e2e6ea;
 }
 
-/* --- AI解析エリア (この画面専用) --- */
-.ai-section {
-    background: #f0f8ff;
-    padding: 15px;
-    border: 1px solid #b0c4de;
-    margin-bottom: 20px;
-    border-radius: 5px;
-}
-
-.ai-title {
-    margin-top: 0;
-    color: #0056b3;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.beta-badge {
-    font-size: 0.8rem;
-    background: #ffc107;
-    color: #333;
-    padding: 2px 6px;
-    border-radius: 4px;
-}
-
-.ai-controls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.file-input {
-    padding: 5px;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.ai-description {
-    font-size: 0.85rem;
-    margin: 10px 0 0;
-    color: #666;
-}
-
-.loading-msg {
-    display: none;
-    color: #d9534f;
-    font-weight: bold;
-    margin-top: 10px;
-}
-
-.btn-analyze {
-    background: #17a2b8;
-    color: white;
-    border: 1px solid #17a2b8;
-    padding: 5px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.btn-analyze:hover {
-    background: #138496;
-}
-
-/* --- 設定フォームエリア --- */
+/* --- 検索エリア --- */
 .setting-area {
     background: #fff;
     padding: 20px;
@@ -138,6 +61,10 @@
     margin-bottom: 15px;
 }
 
+.setting-row.center-align {
+    align-items: center;
+}
+
 .form-group {
     display: flex;
     flex-direction: column;
@@ -147,25 +74,6 @@
 .form-group label {
     font-weight: bold;
     font-size: 0.9rem;
-}
-
-/* 期間設定 (この画面専用) */
-.period-setting {
-    border-top: 1px dashed #ccc;
-    padding-top: 15px;
-    margin-top: 15px;
-}
-
-.date-inputs {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.warning-text {
-    font-size: 0.8rem;
-    color: #d9534f;
-    margin-top: 5px;
 }
 
 /* --- テーブルスタイル --- */
@@ -193,19 +101,39 @@
     padding: 10px;
 }
 
-/* セル内の入力レイアウト */
-.cell-input {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+/* --- 参照モード専用スタイル --- */
+.view-cell {
+    min-height: 80px;
+    padding: 5px;
+    font-size: 0.9em;
+}
+
+.view-subject {
+    font-weight: bold;
+    color: #0056b3;
+    margin-bottom: 4px;
+    font-size: 1.05em;
+}
+
+.view-details {
+    font-size: 0.85em;
+    color: #555;
+    line-height: 1.4;
+}
+
+.view-empty {
+    color: #ddd;
+    text-align: center;
+    padding-top: 20px;
+}
+
+/* アイコン用のマージンなど */
+.view-details i {
+    margin-right: 3px;
+    color: #777;
 }
 
 /* --- ボタン類 --- */
-.button-area {
-    text-align: center;
-    margin-top: 20px;
-}
-
 .btn-primary {
     background-color: #007bff;
     color: white;

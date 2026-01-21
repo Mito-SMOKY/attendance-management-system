@@ -165,24 +165,36 @@ public class MdTimetableController {
                         
         MdTimetableDto dto = new MdTimetableDto();
         
-        // パラメータ設定と初期値補完
+        // 年度と学期を確定
         dto.setYear(year);
         dto.setTerm(term);
         setInitialYearAndTerm(dto);
 
         // 表示基準日の設定
-        if (date == null) date = LocalDate.now();
+        if (date == null) {
+            if (dto.getTerm() == 1) {
+
+                // 前期なら 4月1日
+                date = LocalDate.of(dto.getYear(), 4, 1);
+            } else {
+
+                // 後期なら 10月1日
+                date = LocalDate.of(dto.getYear(), 10, 1);
+            }
+        }
         dto.setStartDate(date);
 
-        // 学科指定がある場合、該当週のデータを取得して表示
+        // 学科指定がある場合、該当週のデータを取得
         if (departmentId != null) {
             dto.setDepartmentId(departmentId);
+
+            // 指定された日付（学期初め）を含む週のデータを取得
             dto = mdTimetableService.getWeeklyScheduleView(departmentId, date);
             
-            // サービス実行後に検索条件を再設定
+            // 検索条件を再設定
             if (dto.getYear() == null) dto.setYear(year);
             if (dto.getTerm() == null) dto.setTerm(term);
-            if (dto.getYear() == null) setInitialYearAndTerm(dto);
+            setInitialYearAndTerm(dto);
         }
 
         model.addAttribute("mdTimetableDto", dto);
