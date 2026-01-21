@@ -29,12 +29,14 @@ import com.example.attendancemanagementsystem.user.admin.dto.MdTimetableDto.Cell
 @Service
 public class MdTimetableService {
 
+    // 必要なリポジトリの注入
     @Autowired private TimetableRepository timetableRepository;
     @Autowired private DepartmentRepository departmentRepository;
     @Autowired private EnrollmentsRepository enrollmentsRepository;
     @Autowired private UsersRepository usersRepository;
     @Autowired private TimeSlotRepository timeSlotRepository;
 
+    // 学科の選択肢リスト作成
     public Map<Integer, String> getDepartmentOptions() {
         List<DepartmentEntity> allDepts = departmentRepository.findAll();
         Map<Integer, String> options = new LinkedHashMap<>();
@@ -56,13 +58,12 @@ public class MdTimetableService {
         return options;
     }
 
+    // 教員のリストを取得
     public List<UsersEntity> getTeacherList() {
         return usersRepository.findByUserTypeId(2);
     }
 
-    /**
-     * 週間スケジュール一括登録（修正版：上書き対応）
-     */
+    // 週間スケジュールを一括で登録・更新する
     @Transactional
     public void registerWeeklySchedule(MdTimetableDto dto) {
         Integer deptId = dto.getDepartmentId();
@@ -75,19 +76,18 @@ public class MdTimetableService {
         LocalDate current = dto.getStartDate();
         LocalDate end = dto.getEndDate();
         
-        // DTOの構造はそのまま使用
-        // Map<SlotID, Map<DayOfWeek, Cell>>
+        // 入力データのマップを取得
         Map<Integer, Map<String, Cell>> scheduleMap = dto.getScheduleMap();
 
         if (scheduleMap == null || scheduleMap.isEmpty()) return;
 
         List<TimeSlotEntity> allSlots = timeSlotRepository.findAllByOrderBySlotIdAsc();
 
-        // 日付ループ
+        // 指定期間の日付ループ
         while (!current.isAfter(end)) {
             String dayOfWeekKey = current.getDayOfWeek().name();
             
-            // 時限ループ
+            // 全時限ループ
             for (TimeSlotEntity ts : allSlots) {
                 Integer slot = ts.getSlotId();
 
@@ -97,38 +97,38 @@ public class MdTimetableService {
                     if (dayMap != null && dayMap.containsKey(dayOfWeekKey)) {
                         Cell cell = dayMap.get(dayOfWeekKey);
                         
-                        // 入力がある場合のみ処理
+                        // 入力があるコマのみ処理
                         if (cell != null && cell.getSubjectId() != null) {
                             
-                            // ★修正ポイント: いきなり new せず、まずは既存データを探す！
+                            // 既存データの検索
                             Optional<TimetableEntity> existingOpt = timetableRepository
                                 .findByDepartment_DepartmentIdAndDateAndSlotId(deptId, current, slot);
 
                             TimetableEntity entity;
 
                             if (existingOpt.isPresent()) {
-                                // --- パターンA: 既にあるなら、それを使う (UPDATEになる) ---
+
+                                // 既存データがあれば更新モード
                                 entity = existingOpt.get();
                             } else {
-                                // --- パターンB: ないなら、新しく作る (INSERTになる) ---
+
+                                // なければ新規作成モード
                                 entity = new TimetableEntity();
-                                // キーとなる情報は新規のときだけセットすればOK（既存データは既に持ってるから）
+
+                                // 新規作成時のみキー情報をセット
                                 entity.setDate(current);
                                 entity.setSlotId(slot);
                                 entity.setDepartment(department);
                             }
 
-                            // --- 共通: 値のセット（上書き） ---
-                            // ここは新規でも更新でも毎回セットする
-                            
+                            // 共通項目のセット
                             if (dto.getYear() != null) {
                                 entity.setAcademicYear(dto.getYear());
                             } else {
-                                // 指定がなければ日付から判定、あるいは既存の値を維持するなら if(entity.getAcademicYear() == null) 等の工夫も可
                                 entity.setAcademicYear(current.getYear());
                             }
                             
-                            // Cellから値を取り出してセット
+                            // 画面からの入力値をエンティティに反映
                             entity.setSubjectId(cell.getSubjectId());
                             entity.setClassroomId(cell.getClassroomId());
                             entity.setUserId(cell.getUserId());
@@ -139,18 +139,18 @@ public class MdTimetableService {
                     }
                 }
             }
+
+            // 次の日付へ
             current = current.plusDays(1);
         }
 
-        // まとめて保存 (新規はINSERT, 既存はUPDATEが自動で発行されます)
+        // 変更があったデータを一括保存
         if (!entitiesToSave.isEmpty()) {
             timetableRepository.saveAll(entitiesToSave);
         }
     }
 
-    /**
-     * 1日分のデータを取得（日別編集用）
-     */
+    // 指定した日付のスケジュールを取得し、整形
     public MdTimetableDto getDailySchedule(Integer deptId, LocalDate date) {
         MdTimetableDto dto = new MdTimetableDto();
         dto.setDepartmentId(deptId);
@@ -176,23 +176,20 @@ public class MdTimetableService {
         return dto;
     }
 
-    /**
-     * 1日分のデータを更新
-     * ★修正ポイント: delete後に flush() を実行
-     */
+    // 1日分のスケジュールを更新
     @Transactional
     public void updateDailySchedule(MdTimetableDto dto) {
         Integer deptId = dto.getDepartmentId();
         LocalDate date = dto.getStartDate();
         DepartmentEntity department = departmentRepository.findById(deptId).orElseThrow();
 
-        // 1. 既存データを削除
+        // 既存データを削除
         timetableRepository.deleteByDepartment_DepartmentIdAndDate(deptId, date);
         
-        // ★ここが重要！削除をDBに即時反映させる
+        // 削除を即時反映
         timetableRepository.flush();
         
-        // 2. 新しいデータを登録
+        // 新しいデータを登録リストに追加
         List<TimetableEntity> entitiesToSave = new ArrayList<>();
         String dayOfWeekKey = date.getDayOfWeek().name();
         Map<Integer, Map<String, Cell>> scheduleMap = dto.getScheduleMap();
@@ -214,27 +211,28 @@ public class MdTimetableService {
                 }
             }
         }
+        // 一括保存
         if (!entitiesToSave.isEmpty()) {
             timetableRepository.saveAll(entitiesToSave);
         }
     }
 
-    /**
-     * 参照モード用
-     */
+    // 週間スケジュールを参照用に取得
     public MdTimetableDto getWeeklyScheduleView(Integer deptId, LocalDate date) {
         MdTimetableDto dto = new MdTimetableDto();
         dto.setDepartmentId(deptId);
 
+        // 週の開始日と終了日を計算
         LocalDate monday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate friday = monday.plusDays(4);
 
         dto.setStartDate(monday);
         dto.setEndDate(friday);
 
+        // データ取得
         List<TimetableEntity> entities = timetableRepository.findForWeeklyView(deptId, monday, friday);
-        System.out.println("★Service: 検索結果 " + entities.size() + "件 (" + monday + " ～ " + friday + ")");
 
+        // 取得データを画面表示用DTOにマッピング
         for (TimetableEntity entity : entities) {
             String dayOfWeek = entity.getDate().getDayOfWeek().name();
             Integer slot = entity.getSlotId();
