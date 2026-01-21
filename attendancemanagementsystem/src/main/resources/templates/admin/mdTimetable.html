@@ -35,13 +35,31 @@
             </a>
         </div>
 
-        <form th:action="@{/admin/mdTimetable/register}" th:object="${mdTimetableDto}" method="post">
+        <div style="background:#f0f8ff; padding:15px; border:1px solid #b0c4de; margin-bottom:20px; border-radius:5px;">
+            <h3 style="margin-top:0; color:#0056b3; display:flex; align-items:center; gap:10px;">
+                📷 AI自動入力 <span style="font-size:0.8rem; background:#ffc107; color:#333; padding:2px 6px; border-radius:4px;">Beta</span>
+            </h3>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <input type="file" id="timetableImage" accept="image/*, application/pdf" style="padding:5px; background:#fff; border:1px solid #ccc; border-radius:4px;">
+                <button type="button" onclick="uploadImage()" class="btn-primary" id="analyzeBtn" style="background:#17a2b8; border-color:#17a2b8;">
+                    画像を読み込んで反映
+                </button>
+            </div>
+            <p style="font-size:0.85rem; margin:10px 0 0; color:#666;">
+                ※時間割の画像(写真・スクショ)、またはPDFファイルを選択してください。<br>
+                ※AIが「科目・教室・教員」を読み取り、自動で選択肢をセットします。
+            </p>
+            <div id="loadingMsg" style="display:none; color:#d9534f; font-weight:bold; margin-top:10px;">
+                ⏳ AIが解析中です... そのままお待ちください (5～10秒程度)
+            </div>
+        </div>
+        <form id="registerForm" th:action="@{/admin/mdTimetable/register}" th:object="${mdTimetableDto}" method="post">
             
             <div class="setting-area" style="background: #fff; padding: 20px; margin-bottom: 20px; border: 1px solid #ccc;">
                 <div style="display:flex; gap:20px; margin-bottom:15px; align-items:flex-end;">
                     <div class="form-group">
                         <label>対象クラス(学科):</label>
-                        <select th:field="*{departmentId}" class="filter-select" required style="width: 300px;">
+                        <select th:field="*{departmentId}" id="departmentId" class="filter-select" required style="width: 300px;">
                             <option value="">選択してください</option>
                             <option th:each="entry : ${departmentOptions}" 
                                     th:value="${entry.key}" 
@@ -128,7 +146,9 @@
             </div>
 
             <div class="button-area" style="text-align: center; margin-top: 20px;">
-                <button type="submit" class="btn-primary">この内容で一括登録する</button>
+                <button type="button" class="btn-primary" onclick="checkAndSubmit()">
+                    この内容で一括登録する
+                </button>
             </div>
         </form>
     </div>
@@ -147,6 +167,139 @@
                 const nextYear = parseInt(year) + 1;
                 startInput.value = year + '-10-01';
                 endInput.value = nextYear + '-03-31';
+            }
+        }
+
+        // ★追加: AI画像読み込み処理
+        async function uploadImage() {
+            const fileInput = document.getElementById('timetableImage');
+            const loadingMsg = document.getElementById('loadingMsg');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+
+            if (fileInput.files.length === 0) {
+                alert("ファイルを選択してください");
+                return;
+            }
+
+            // UI制御（ボタン無効化・ローディング表示）
+            loadingMsg.style.display = 'block';
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = "解析中...";
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            try {
+                // コントローラーへ送信
+                const response = await fetch('/admin/mdTimetable/analyze-image', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error("Server Error");
+
+                const data = await response.json(); // 解析結果(JSON)を取得
+                console.log("AI解析結果:", data);
+
+                if (data.length === 0) {
+                    alert("データを読み取れませんでした。\n画像が不鮮明か、登録済みのマスタデータと一致しませんでした。");
+                } else {
+                    // 画面へ反映
+                    const count = applyTimetableData(data);
+                    alert(count + "件のデータを自動入力しました！\n内容に間違いがないか確認してください。");
+                }
+                
+            } catch (e) {
+                console.error(e);
+                alert("解析中にエラーが発生しました。");
+            } finally {
+                // UIを元に戻す
+                loadingMsg.style.display = 'none';
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = "画像を読み込んで反映";
+            }
+        }
+
+        // ★追加: AIデータを画面に反映する関数
+        function applyTimetableData(data) {
+            let count = 0;
+            data.forEach(item => {
+                // item = {day: "MONDAY", slot: 1, subjectId: 10, userId: 5, classroomId: 3}
+                
+                // Thymeleafが出力するname属性: scheduleMap[1]['MONDAY'].subjectId など
+                const baseSelector = `select[name="scheduleMap[${item.slot}]['${item.day}']`;
+
+                // 1. 科目をセット
+                if (item.subjectId) {
+                    const el = document.querySelector(`${baseSelector}.subjectId"]`);
+                    if (el) { el.value = item.subjectId; count++; }
+                }
+                // 2. 教室をセット
+                if (item.classroomId) {
+                    const el = document.querySelector(`${baseSelector}.classroomId"]`);
+                    if (el) { el.value = item.classroomId; }
+                }
+                // 3. 先生をセット
+                if (item.userId) {
+                    const el = document.querySelector(`${baseSelector}.userId"]`);
+                    if (el) { el.value = item.userId; }
+                }
+            });
+            return count; // 入力できた件数を返す
+        }
+
+        // 重複チェック処理
+        async function checkAndSubmit() {
+            const deptId = document.getElementById('departmentId').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const form = document.getElementById('registerForm');
+
+            // 入力チェック
+            if (!deptId || !startDate || !endDate) {
+                alert("クラスと期間を正しく入力してください。");
+                return;
+            }
+
+            try {
+                // 非同期でAPI呼び出し
+                const response = await fetch(`/admin/mdTimetable/check-overlap?departmentId=${deptId}&startDate=${startDate}&endDate=${endDate}`);
+                
+                // レスポンスが正常か確認
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+
+                const data = await response.json();
+
+                if (data.exists) {
+                    // データがある場合の警告メッセージ作成
+                    const msg = "【⚠️ データ重複警告】\n\n" + 
+                                "指定された期間内に、既に以下のデータが見つかりました。\n" +
+                                "--------------------------------------------------\n" +
+                                "■ 重複期間: " + data.minDate + " ～ " + data.maxDate + "\n" +
+                                "■ データ数: " + data.count + " コマ\n" +
+                                "--------------------------------------------------\n\n" +
+                                "登録を実行すると、これらのデータは今回の内容で\n" +
+                                "上書き（更新）されます。\n\n" +
+                                "本当によろしいですか？";
+                    
+                    if (confirm(msg)) {
+                        form.submit(); // OKなら送信
+                    }
+                } else {
+                    // データがない場合の確認
+                    if (confirm("時間割を一括登録します。よろしいですか？")) {
+                        form.submit(); // OKなら送信
+                    }
+                }
+
+            } catch (error) {
+                console.error("Check Error:", error);
+                // エラー時は安全策として普通の確認を出して進める
+                if (confirm("通信エラーが発生しましたが、登録を続行しますか？")) {
+                    form.submit();
+                }
             }
         }
     </script>
