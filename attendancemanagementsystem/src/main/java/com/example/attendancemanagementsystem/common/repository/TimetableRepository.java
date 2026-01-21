@@ -19,6 +19,10 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
     // 学科と日付範囲で時間割を取得
     List<TimetableEntity> findByDepartmentAndDateBetween(DepartmentEntity department, LocalDate startDate, LocalDate endDate);
 
+    //指定された期間内に、授業が1コマでも登録されている学科を、重複なくリストアップする
+    @Query("SELECT DISTINCT t.department FROM TimetableEntity t WHERE t.date BETWEEN :startDate AND :endDate")
+    List<DepartmentEntity> findDistinctDepartmentByDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
     // メソッド名の "_DepartmentID" は、TimetableEntity内の departmentフィールドの中にある DepartmentID を指します
     List<TimetableEntity> findByDateAndDepartment_DepartmentIdOrderBySlotId(LocalDate date, Integer departmentId);
 
