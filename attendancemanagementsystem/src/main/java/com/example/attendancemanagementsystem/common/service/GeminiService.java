@@ -40,7 +40,7 @@ public class GeminiService {
         
         try {
             // APIのURLを構築 (キーを動的に埋め込む)
-            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiKey;
 
             // DBからマスタデータを全件取得
             List<SubjectEntity> subjects = subjectRepository.findAll();
