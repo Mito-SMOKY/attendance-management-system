@@ -41,6 +41,9 @@ public class Datalist {
     @JoinColumn(name = "Creator", insertable = false, updatable = false)
     private UsersEntity creatorUser;
 
+    @Column(name = "Role")
+    private Integer role;
+
     // --- Getter / Setter ---
     public Integer getDataListId() {
         return dataListId;
@@ -88,6 +91,14 @@ public class Datalist {
 
     public void setCreatorUser(UsersEntity creatorUser) {
         this.creatorUser = creatorUser;
+    }
+
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
     }
 
     // 必要に応じて toString() なども追加
