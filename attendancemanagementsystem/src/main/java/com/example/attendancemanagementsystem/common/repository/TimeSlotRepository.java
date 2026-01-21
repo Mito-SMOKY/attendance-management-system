@@ -8,7 +8,5 @@ import com.example.attendancemanagementsystem.common.entity.TimeSlotEntity;
 
 @Repository
 public interface TimeSlotRepository extends JpaRepository<TimeSlotEntity, Integer> {
-
-    // 全時限を時限ID順で取得
     List<TimeSlotEntity> findAllByOrderBySlotIdAsc();
 }
