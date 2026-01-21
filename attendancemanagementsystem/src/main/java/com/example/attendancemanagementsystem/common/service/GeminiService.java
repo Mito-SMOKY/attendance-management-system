@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value; 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,14 +31,17 @@ public class GeminiService {
     @Autowired private UsersRepository usersRepository;
     @Autowired private ClassroomRepository classroomRepository;
 
-    // Gemini APIの設定
-    private static final String API_KEY = "AIzaSyCKkxKdeRluozRWNp4lWQzwngETYsLYiLY";
-    private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;  
+    // Gemini APIの設定 
+    @Value("${gemini.api.key}")
+    private String apiKey;
     
     // 画像から時間割情報を解析する
     public String analyzeTimetableImage(MultipartFile file) {
         
         try {
+            // APIのURLを構築 (キーを動的に埋め込む)
+            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+
             // DBからマスタデータを全件取得
             List<SubjectEntity> subjects = subjectRepository.findAll();
             List<UsersEntity> teachers = usersRepository.findByUserTypeId(2);
@@ -82,7 +86,7 @@ public class GeminiService {
             System.out.println("【Debug】Gemini APIへリクエスト送信中...");
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(API_URL))
+                    .uri(URI.create(apiUrl)) // 構築したURLを使用
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
@@ -102,9 +106,9 @@ public class GeminiService {
 
     // APIレスポンスからJSONを抽出・整形しDBと照合する処理
     private String extractJsonFromResponse(String responseBody, 
-                                        List<SubjectEntity> subjects,
-                                        List<UsersEntity> teachers,
-                                        List<ClassroomEntity> classrooms) {
+                                            List<SubjectEntity> subjects,
+                                            List<UsersEntity> teachers,
+                                            List<ClassroomEntity> classrooms) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(responseBody);
@@ -183,7 +187,7 @@ public class GeminiService {
                                 System.out.print(", 教室NG");
                             }
                         }
-                        System.out.println(""); // 改行
+                        System.out.println(""); 
 
                         // いずれかのIDが特定できた場合のみ結果に追加
                         if (newNode.has("subjectId") || newNode.has("userId") || newNode.has("classroomId")) {
