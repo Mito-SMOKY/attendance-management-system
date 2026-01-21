@@ -41,8 +41,8 @@ public class AdminStudentListService {
         Specification<StudentEntity> spec = null;
         if (keyword != null && !keyword.trim().isEmpty()) {
             List<String> targetColumns = Arrays.asList(
-                "users.loginId", // 学籍番号
-                "users.name"     // 氏名
+                "user.loginId", // 学籍番号
+                "user.name"     // 氏名
             );
             // 共通検索スペック作成サービスを利用
             spec = searchService.createKeywordSpec(keyword, targetColumns);
