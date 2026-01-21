@@ -87,9 +87,10 @@
                     
                     <!-- 編集保存ボタン -->
                      <div>
-                        <button id="editBtn" class="edit-btn" type="button" onclick="toggleEditMode()">編集</button>
                         <button id="saveBtn" class="edit-btn" type="button" onclick="saveChanges()" 
                                 style="display:none; background-color: #00bdca; color: white; border: none;">保存</button>
+                        <button id="editBtn" class="edit-btn" type="button" onclick="toggleEditMode()">編集</button>
+                        
                     </div>
 
                 </div>
@@ -142,7 +143,7 @@
                                         th:classappend="${period.statusClass}">
                                         <div class="view-mode">
                                             <p class="subject-name" th:text="${period.subjectName}">教科名</p>
-                                            <p class="status-tag" th:text="${period.statusIcon}"></p>
+                                            <p class="status-tag status-icon" th:text="${period.statusIcon}"></p>
                                         </div>
                                         <div class="edit-mode" style="display: none;">
                                             <div class="subject-name" th:text="${period.subjectName}">教科名</div>
@@ -150,8 +151,8 @@
                                                     th:data-date="${day.dateStr}" 
                                                     th:data-period="${period.period}"
                                                     style="width: 100%; font-size: 0.9rem; padding: 2px;">
-                                                <option value="出席" th:selected="${period.statusIcon == '○'}">出席</option>
-                                                <option value="欠席" th:selected="${period.statusIcon == '×'}">欠席</option>
+                                                <option value="出席" th:selected="${period.statusIcon == '〇'}">出席</option>
+                                                <option value="欠席" th:selected="${period.statusIcon == '✕'}">欠席</option>
                                                 <option value="遅刻" th:selected="${period.statusIcon == '△'}">遅刻</option>
                                                 <option value="早退" th:selected="${period.statusIcon == '早'}">早退</option>
                                                 <option value="公欠" th:selected="${period.statusIcon == '公'}">公欠</option>

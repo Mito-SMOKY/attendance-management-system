@@ -10,10 +10,12 @@
 <body>
     <input type="hidden" id="studentIdHidden" th:value="${detail.studentId}">
 
+    <!-- ヘッダー -->
     <div class="header-container">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
     
+    <!-- 戻るボタン -->
     <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url=${backUrl})}"></div>
     </div>
@@ -22,7 +24,7 @@
         <h1 class="page-title">受講情報</h1>
 
         <div class="student-name-display">
-            <span th:text="${detail.studentName}">学生 太郎</span> さん
+            <span th:text="${detail.studentName} + さん" ></span>
         </div>
 
         <div class="content-wrapper">
@@ -52,21 +54,27 @@
                     </tr>
                     <tr>
                         <th>実施コマ数</th>
-                        <td th:text="${detail.totalClasses} + 'コマ'">0コマ</td>
+                        <td th:text="${detail.totalClasses} + 'コマ'"></td>
                     </tr>
                     <tr>
                         <th>履修状況</th>
-                        <td th:text="${detail.completedCount}">0/0</td>
+                        <td th:text="${detail.completedCount}"></td>
                     </tr>
                     <tr>
                         <th>現在の出席率</th>
-                        <td class="rate-highlight" th:text="${detail.attendanceRate}">0.0%</td>
+                        <td class="rate-highlight" th:text="${detail.attendanceRate}"></td>
                     </tr>
                 </table>
             </div>
 
             <div class="right-panel">
                 
+                <div class="button-group">
+                        <button type="button" class="edit-btn" id="editBtn" onclick="toggleEditMode()">編集</button>
+                        <button type="button" class="save-btn" id="saveBtn" onclick="saveChanges()" style="display:none;">保存</button>
+                        <button type="button" class="cancel-btn" id="cancelBtn" onclick="cancelEdit()" style="display:none;">キャンセル</button>
+                </div>
+
                 <div class="summary-area">
                     <table class="summary-table">
                         <thead>
@@ -81,21 +89,15 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td th:text="${detail.attendanceCount}">0</td>
-                                <td th:text="${detail.absenceCount}">0</td>
-                                <td th:text="${detail.lateCount}">0</td>
-                                <td th:text="${detail.earlyLeaveCount}">0</td>
-                                <td th:text="${detail.suspensionCount}">0</td>
-                                <td th:text="${detail.publicAbsenceCount}">0</td>
+                                <td th:text="${detail.attendanceCount}"></td>
+                                <td th:text="${detail.absenceCount}"></td>
+                                <td th:text="${detail.lateCount}"></td>
+                                <td th:text="${detail.earlyLeaveCount}"></td>
+                                <td th:text="${detail.suspensionCount}"></td>
+                                <td th:text="${detail.publicAbsenceCount}"></td>
                             </tr>
                         </tbody>
                     </table>
-                    
-                    <div class="button-group">
-                        <button type="button" class="edit-btn" id="editBtn" onclick="toggleEditMode()">編集</button>
-                        <button type="button" class="save-btn" id="saveBtn" onclick="saveChanges()" style="display:none;">保存</button>
-                        <button type="button" class="cancel-btn" id="cancelBtn" onclick="cancelEdit()" style="display:none;">キャンセル</button>
-                    </div>
                 </div>
 
                 <div class="detail-table-wrapper">
@@ -115,35 +117,24 @@
                             </tr>
                             
                             <tr th:each="row : ${detail.dailyRecords}">
-                                <td th:text="${row.dateStr}">2024/01/01(月)</td>
+                                <td th:text="${row.dateStr}"></td>
                                 
-                                <td class="editable-cell" 
-                                    th:data-date="${row.dateStr}" 
-                                    data-period="1"
-                                    th:data-original-mark="${row.period1}"
-                                    th:text="${row.period1}" 
-                                    th:classappend="${row.period1 == '×' ? 'status-bad' : ''}">-</td>
-                                    
-                                <td class="editable-cell" 
-                                    th:data-date="${row.dateStr}" 
-                                    data-period="2"
-                                    th:data-original-mark="${row.period2}"
-                                    th:text="${row.period2}" 
-                                    th:classappend="${row.period2 == '×' ? 'status-bad' : ''}">-</td>
-                                    
-                                <td class="editable-cell" 
-                                    th:data-date="${row.dateStr}" 
-                                    data-period="3"
-                                    th:data-original-mark="${row.period3}"
-                                    th:text="${row.period3}" 
-                                    th:classappend="${row.period3 == '×' ? 'status-bad' : ''}">-</td>
-                                    
-                                <td class="editable-cell" 
-                                    th:data-date="${row.dateStr}" 
-                                    data-period="4"
-                                    th:data-original-mark="${row.period4}"
-                                    th:text="${row.period4}" 
-                                    th:classappend="${row.period4 == '×' ? 'status-bad' : ''}">-</td>
+                                <td th:each="periodIdx : ${#numbers.sequence(1, 4)}"
+                                    class="editable-cell"
+                                    th:with="statusMark=${periodIdx == 1 ? row.period1 : (periodIdx == 2 ? row.period2 : (periodIdx == 3 ? row.period3 : row.period4))}"
+                                    th:data-date="${row.dateStr}"
+                                    th:data-period="${periodIdx}"
+                                    th:data-original-mark="${statusMark}"
+                                    th:text="${statusMark}"
+                                    th:classappend="${
+                                        statusMark == null ? '' :
+                                        (statusMark == '〇' || statusMark == '○' ? 'status-present' : 
+                                        (statusMark == '✕' || statusMark == '×' || statusMark == 'x' ? 'status-absence' : 
+                                        (statusMark == '△' ? 'status-late' : 
+                                        (statusMark == '早' ? 'status-early' : 
+                                        (statusMark == '停' ? 'status-suspend' : 
+                                        (statusMark == '公' ? 'status-public' : ''))))))
+                                    }">-</td>
                             </tr>
                         </tbody>
                     </table>

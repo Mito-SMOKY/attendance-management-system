@@ -53,7 +53,7 @@ function toggleEditMode() {
         editElements.forEach(el => el.style.display = 'flex');
         
         editBtn.textContent = 'キャンセル';
-        editBtn.style.backgroundColor = '#8d8d8d'; 
+        editBtn.style.backgroundColor = '#e15966'; 
         editBtn.style.color = '#fff';
         saveBtn.style.display = 'inline-block';
     } else {

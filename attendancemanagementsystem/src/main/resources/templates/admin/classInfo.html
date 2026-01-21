@@ -42,7 +42,7 @@
                 <div class="info-card">
                     <div class="info-label">教科名</div>
                     <div class="info-value">
-                        <div class="session-view" id="viewSubject">
+                        <div id="viewSubject">
                             <a class="subject-link" th:href="@{/admin/subjectInfo(departmentId=${classInfo.departmentId}, subjectId=${classInfo.currentSubjectId}, grade=${classInfo.grade}, from='classInfo', fromSessionId=${classInfo.sessionId})}"
                             th:text="${classInfo.subjectName}">
                             </a>
@@ -72,7 +72,7 @@
                 <div class="info-card">
                     <div class="info-label">実施日</div>
                     <div class="info-value">
-                        <span class="session-view" th:text="${classInfo.dateText}">2026/01/19(月)</span>
+                        <span class="session-view" th:text="${classInfo.dateText}"></span>
                         <div class="session-edit" style="display:none;">
                             <input type="date" id="editDate" class="form-input" th:value="${classInfo.currentDateValue}">
                         </div>
@@ -82,7 +82,7 @@
                 <div class="info-card">
                     <div class="info-label">時限</div>
                     <div class="info-value">
-                        <span class="session-view" th:text="${classInfo.timeSlotText}">9:00 ~</span>
+                        <span class="session-view" th:text="${classInfo.timeSlotText}"></span>
                         <div class="session-edit" style="display:none;">
                             <select id="editTimeSlot" class="form-select">
                                 <option th:each="slot : ${classInfo.allTimeSlots}"

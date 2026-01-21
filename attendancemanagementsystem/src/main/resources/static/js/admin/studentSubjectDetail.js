@@ -4,8 +4,8 @@
 
 // ステータスとマークの変換マップ
 const STATUS_MAP = {
-    '出席': '○',
-    '欠席': '×',
+    '出席': '〇',
+    '欠席': '✕',
     '遅刻': '△',
     '早退': '早',
     '公欠': '公',
@@ -15,6 +15,10 @@ const STATUS_MAP = {
 
 // マークからステータス名を取得
 function getStatusNameByMark(mark) {
+    if (!mark) return '出席';
+    if (['✕', '×', 'x', 'X'].includes(mark)) return '欠席';
+    if (['〇', '○'].includes(mark)) return '出席';
+    
     return Object.keys(STATUS_MAP).find(key => STATUS_MAP[key] === mark) || '出席';
 }
 
@@ -28,14 +32,15 @@ function toggleEditMode() {
     const cells = document.querySelectorAll('.editable-cell');
     
     cells.forEach(cell => {
-        const currentMark = cell.textContent.trim();
         
-        // データがないセル（"-"）は編集不可
-        if (currentMark === '-') return; 
+        const currentMark = (cell.dataset.originalMark || cell.textContent).trim();
+        
+        // データがない、または教科名のみで記号がない場合はスキップ
+        if (currentMark === '-' || currentMark === '') return; 
 
+        // 記号からステータス名を特定
         const currentStatus = getStatusNameByMark(currentMark);
 
-        // 安全な要素作成 (DOM操作)
         const select = document.createElement('select');
         select.className = 'status-select';
         select.style.width = '100%';
@@ -51,7 +56,7 @@ function toggleEditMode() {
             select.appendChild(option);
         });
 
-        cell.textContent = ''; 
+        cell.innerHTML = ''; 
         cell.appendChild(select);
     });
 }

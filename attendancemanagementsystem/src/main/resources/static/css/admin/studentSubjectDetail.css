@@ -5,7 +5,6 @@
     max-width: 1100px;
     margin: 0 auto;
     padding: 20px;
-    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
 }
 
 /* 戻るボタン */
@@ -26,16 +25,20 @@
 
 /* タイトルエリア */
 .page-title {
-    text-align: center;
-    font-size: 1.6rem;
     color: #333;
-    margin-bottom: 10px;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #00bdca;
+    padding-bottom: 20px;
+    margin-top: 100px;
+    margin-bottom: 30px;
+    padding-left: 20px;
+    text-align: center;
 }
 
 .student-name-display {
     text-align: left;
     font-size: 1.2rem;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     border-bottom: 2px solid #eee;
     padding-bottom: 10px;
 }
@@ -64,10 +67,10 @@
 }
 
 .info-table th {
-    background-color: #3e9cb1; /* テーマカラー */
+    background-color: #00bdca; /* テーマカラー */
     color: white;
     padding: 15px 10px;
-    text-align: center;
+    text-align: left;
     width: 40%;
     border-bottom: 1px solid #fff;
     font-weight: normal;
@@ -76,7 +79,7 @@
 .info-table td {
     background-color: #fff;
     padding: 15px 10px;
-    text-align: center;
+    text-align: left;
     border-bottom: 1px solid #eee;
     font-weight: bold;
     color: #444;
@@ -87,7 +90,7 @@
 }
 
 .info-table .subject-name {
-    color: #3e9cb1;
+    color: #00bdca;
     font-weight: 900;
 }
 
@@ -98,7 +101,7 @@
 
 /* --- 右パネル（集計・明細） --- */
 .right-panel {
-    flex: 1; /* 残りの幅を使う */
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -107,25 +110,22 @@
 /* 集計テーブルエリア */
 .summary-area {
     display: flex;
-    justify-content: space-between;
+    width: 100%;
+    /* justify-content: space-between; */
     align-items: center;
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
 }
 
 .summary-table {
-    width: 85%;
+    width: 100%;
     border-collapse: collapse;
 }
 
 .summary-table th {
-    background-color: #3e9cb1;
+    background-color: #00bdca;
     color: white;
     padding: 8px;
     font-size: 0.9rem;
-    border: 1px solid #3e9cb1;
+    border: 1px solid #00bdca;
     text-align: center;
 }
 
@@ -150,7 +150,7 @@
 }
 
 .edit-btn:hover {
-    background-color: #3e9cb1;
+    background-color: #00bdca;
     color: #fff;
 }
 
@@ -159,6 +159,9 @@
     background-color: #fff;
     border: 1px solid #ccc;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    max-height: 500px;  
+    overflow-y: auto;  
+    position: relative; 
 }
 
 .schedule-table {
@@ -166,8 +169,16 @@
     border-collapse: collapse;
 }
 
+.schedule-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;  
+    background-color: #00bdca;
+}
+
+
 .schedule-table th {
-    background-color: #3e9cb1;
+    background-color: #00bdca;
     color: white;
     padding: 12px;
     border-right: 1px solid #fff;
@@ -197,30 +208,46 @@
 }
 
 .button-group {
-            margin-top: 10px;
-            text-align: right;
-        }
-        .edit-btn, .save-btn, .cancel-btn {
-            padding: 5px 15px;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-            color: white;
-            font-size: 0.9rem;
-        }
-        .edit-btn { background-color: #007bff; }
-        .edit-btn:hover { background-color: #0056b3; }
-        
-        .save-btn { background-color: #28a745; margin-right: 5px; }
-        .save-btn:hover { background-color: #218838; }
-        
-        .cancel-btn { background-color: #6c757d; }
-        .cancel-btn:hover { background-color: #5a6268; }
+    text-align: right;
+}
 
-        /* プルダウンのスタイル */
-        .status-select {
-            padding: 2px;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-        }
+.edit-btn,.save-btn, .cancel-btn{
+    height: 40px;
+    padding: 0 30px;
+    border: none;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.edit-btn{ border:1px solid #00bdca; color: #00bdca;}
+.edit-btn:hover { background-color: #cccccc; color: #009aa4;}
+
+.save-btn { background-color: #00bdca; margin-right: 5px;  color: #fff;}
+.save-btn:hover { background-color: #009aa4;  color: #fff;}
+
+.cancel-btn { background-color: rgb(225, 89, 102); color: #fff;}
+.cancel-btn:hover { background-color: rgb(225, 89, 102); color: #fff;}
+
+/* プルダウンのスタイル */
+.status-select {
+    padding: 2px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+/* ステータス別の文字色 */
+.status-present { color: #28a745 !important; font-weight: bold; font-size: 1.2em; } /* 〇 出席：緑 */
+.status-absence { color: #dc3545 !important; font-weight: bold; font-size: 1.2em;} /* ✕ 欠席：赤 */
+.status-late    { color: #ffc107 !important; font-weight: bold; font-size: 1.2em;} /* △ 遅刻：黄 */
+
+.status-select {
+    padding: 2px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}

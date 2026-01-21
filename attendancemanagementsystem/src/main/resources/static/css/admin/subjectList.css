@@ -10,7 +10,7 @@
 .page-title {
     color: #333;
     font-size: 1.8rem;
-    border-bottom: 2px solid #00acbd;
+    border-bottom: 2px solid #00bdca;
     padding-bottom: 10px;
     
     /* ヘッダー被り防止と位置調整 */
@@ -254,7 +254,7 @@
     position: sticky;
     top: 0;
     z-index: 10;
-    background-color: #00acbd;
+    background-color: #00bdca;
     color: #fff;
     padding: 15px;
     text-align: left;
@@ -288,7 +288,7 @@
 
 .subject-icon {
     font-size: 1.5rem;
-    color: #00acbd;
+    color: #00bdca;
     min-width: 30px;
     text-align: center;
 }
