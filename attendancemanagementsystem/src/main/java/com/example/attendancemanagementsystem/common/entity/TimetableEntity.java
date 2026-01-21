@@ -59,6 +59,11 @@ public class TimetableEntity {
     @JoinColumn(name = "ClassroomID", insertable = false, updatable = false)
     private ClassroomEntity classroom;
 
+    //教員情報の取得用（読み取り専用）
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UserID", insertable = false, updatable = false)
+    private UsersEntity user;
+
     @ManyToOne
     @JoinColumn(name = "SlotID", insertable = false, updatable = false)
     private TimeSlotEntity timeSlot;
@@ -156,5 +161,13 @@ public class TimetableEntity {
 
     public void setClassroom(ClassroomEntity classroom) {
         this.classroom = classroom;
+    }
+
+    public UsersEntity getUser() { 
+        return user; 
+    }
+
+    public void setUser(UsersEntity user) { 
+        this.user = user; 
     }
 }

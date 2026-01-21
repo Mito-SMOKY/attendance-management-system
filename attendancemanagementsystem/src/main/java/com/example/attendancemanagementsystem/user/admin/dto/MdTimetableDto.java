@@ -8,6 +8,10 @@ import com.example.attendancemanagementsystem.user.admin.dto.MdTimetableDto.Cell
 
 public class MdTimetableDto {
 
+    // 年度・学期選択用
+    private Integer year; 
+    private Integer term; 
+
     //指定期間フィールド
     private LocalDate startDate;
     private LocalDate endDate;
@@ -38,6 +42,9 @@ public class MdTimetableDto {
         private Integer subjectId;
         private Integer classroomId;
         private Integer userId; 
+        private String subjectName;
+        private String classroomName;
+        private String teacherName;
         
         // Getter/Setter
         public Integer getSubjectId() { 
@@ -63,9 +70,49 @@ public class MdTimetableDto {
         public void setUserId(Integer u) { 
             this.userId = u; 
         }
+
+        public String getSubjectName() { 
+            return subjectName; 
+        }
+
+        public void setSubjectName(String s) { 
+            this.subjectName = s; 
+        }
+
+        public String getClassroomName() { 
+            return classroomName; 
+        }
+
+        public void setClassroomName(String c) { 
+            this.classroomName = c; 
+        }
+
+        public String getTeacherName() { 
+            return teacherName; 
+        }
+
+        public void setTeacherName(String t) { 
+            this.teacherName = t; 
+        }
     }
 
     // --- Getter/Setter ---
+    public Integer getYear() { 
+        return year; 
+    }
+
+    public void setYear(Integer year) { 
+        this.year = year; 
+    }
+
+    public Integer getTerm() { 
+        return term; 
+    }
+
+    public void setTerm(Integer term) { 
+        this.term = term; 
+    }
+
     public LocalDate getStartDate() { 
         return startDate; 
     }

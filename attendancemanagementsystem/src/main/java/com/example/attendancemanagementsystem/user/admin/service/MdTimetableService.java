@@ -1,6 +1,8 @@
 package com.example.attendancemanagementsystem.user.admin.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,10 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
+import com.example.attendancemanagementsystem.common.entity.TimeSlotEntity;
 import com.example.attendancemanagementsystem.common.entity.TimetableEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
 import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository;
+import com.example.attendancemanagementsystem.common.repository.TimeSlotRepository;
 import com.example.attendancemanagementsystem.common.repository.TimetableRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.user.admin.dto.MdTimetableDto;
@@ -28,21 +32,15 @@ public class MdTimetableService {
     @Autowired private DepartmentRepository departmentRepository;
     @Autowired private EnrollmentsRepository enrollmentsRepository;
     @Autowired private UsersRepository usersRepository;
+    @Autowired private TimeSlotRepository timeSlotRepository;
 
-    /**
-     * 学科(クラス)選択用のドロップダウンリストを生成
-     * Map<DepartmentID, 表示用ラベル>
-     */
     public Map<Integer, String> getDepartmentOptions() {
         List<DepartmentEntity> allDepts = departmentRepository.findAll();
         Map<Integer, String> options = new LinkedHashMap<>();
-
         for (DepartmentEntity dept : allDepts) {
-            // 学年の特定
-            EnrollmentsEntity enrollment = enrollmentsRepository.findFirstByDepartmentAndIsActiveTrue(dept);
-            String gradeStr = (enrollment != null) ? enrollment.getGrade() + "年" : "(学年不明)";
+            List<EnrollmentsEntity> enList = enrollmentsRepository.findByDepartment_DepartmentId(dept.getDepartmentId());
+            String gradeStr = (!enList.isEmpty()) ? enList.get(0).getGrade() + "年" : "(学年不明)";
             
-            // コース名・学科名の取得
             String courseName = "コース不明";
             String majorName = "学科不明";
             if (dept.getMajor() != null) {
@@ -51,27 +49,18 @@ public class MdTimetableService {
                     courseName = dept.getMajor().getCourse().getCourseName();
                 }
             }
-
-            // 表示ラベル: 【コース名】 学科 / 学年 / クラス
-            String label = String.format("【%s】%s / %s / %s", 
-                courseName, majorName, gradeStr, dept.getClassName());
-
+            String label = String.format("【%s】%s / %s / %s", courseName, majorName, gradeStr, dept.getClassName());
             options.put(dept.getDepartmentId(), label);
         }
         return options;
     }
 
-    /**
-     * 教員（管理者）のみのリストを取得する
-     */
     public List<UsersEntity> getTeacherList() {
-        // DBに合わせて UserTypeID = 2 (administrator) を取得
-        // これで生徒(ID=1)が表示されなくなります
         return usersRepository.findByUserTypeId(2);
     }
 
     /**
-     * 週間スケジュールの一括登録
+     * 週間スケジュール一括登録
      */
     @Transactional
     public void registerWeeklySchedule(MdTimetableDto dto) {
@@ -86,20 +75,30 @@ public class MdTimetableService {
 
         if (scheduleMap == null || scheduleMap.isEmpty()) return;
 
+        List<TimeSlotEntity> allSlots = timeSlotRepository.findAllByOrderBySlotIdAsc();
+
         while (!current.isAfter(end)) {
             String dayOfWeekKey = current.getDayOfWeek().name();
-            // 1限～4限
-            for (Integer slot = 1; slot <= 4; slot++) {
+            
+            for (TimeSlotEntity ts : allSlots) {
+                Integer slot = ts.getSlotId();
+
                 if (scheduleMap.containsKey(slot)) {
                     Map<String, Cell> dayMap = scheduleMap.get(slot);
                     if (dayMap != null && dayMap.containsKey(dayOfWeekKey)) {
                         Cell cell = dayMap.get(dayOfWeekKey);
-                        if (cell.getSubjectId() != null) {
+                        if (cell != null && cell.getSubjectId() != null) {
                             TimetableEntity entity = new TimetableEntity();
                             entity.setDate(current);
                             entity.setSlotId(slot);
                             entity.setDepartment(department);
-                            entity.setAcademicYear(current.getYear());
+                            
+                            if (dto.getYear() != null) {
+                                entity.setAcademicYear(dto.getYear());
+                            } else {
+                                entity.setAcademicYear(current.getYear());
+                            }
+                            
                             entity.setSubjectId(cell.getSubjectId());
                             entity.setClassroomId(cell.getClassroomId());
                             entity.setUserId(cell.getUserId());
@@ -110,9 +109,119 @@ public class MdTimetableService {
             }
             current = current.plusDays(1);
         }
-
         if (!entitiesToSave.isEmpty()) {
             timetableRepository.saveAll(entitiesToSave);
         }
+    }
+
+    /**
+     * 1日分のデータを取得（日別編集用）
+     */
+    public MdTimetableDto getDailySchedule(Integer deptId, LocalDate date) {
+        MdTimetableDto dto = new MdTimetableDto();
+        dto.setDepartmentId(deptId);
+        dto.setStartDate(date);
+        
+        List<TimetableEntity> entities = timetableRepository.findByDepartment_DepartmentIdAndDateOrderBySlotIdAsc(deptId, date);
+        String dayOfWeek = date.getDayOfWeek().name();
+        
+        for (TimetableEntity entity : entities) {
+            Integer slot = entity.getSlotId();
+            Map<String, Cell> dayMap = dto.getScheduleMap().get(slot);
+            Cell cell = dayMap.get(dayOfWeek);
+            
+            if (cell == null) {
+                cell = new Cell();
+                dayMap.put(dayOfWeek, cell);
+            }
+            
+            cell.setSubjectId(entity.getSubjectId());
+            cell.setClassroomId(entity.getClassroomId());
+            cell.setUserId(entity.getUserId());
+        }
+        return dto;
+    }
+
+    /**
+     * 1日分のデータを更新
+     * ★修正ポイント: delete後に flush() を実行
+     */
+    @Transactional
+    public void updateDailySchedule(MdTimetableDto dto) {
+        Integer deptId = dto.getDepartmentId();
+        LocalDate date = dto.getStartDate();
+        DepartmentEntity department = departmentRepository.findById(deptId).orElseThrow();
+
+        // 1. 既存データを削除
+        timetableRepository.deleteByDepartment_DepartmentIdAndDate(deptId, date);
+        
+        // ★ここが重要！削除をDBに即時反映させる
+        timetableRepository.flush();
+        
+        // 2. 新しいデータを登録
+        List<TimetableEntity> entitiesToSave = new ArrayList<>();
+        String dayOfWeekKey = date.getDayOfWeek().name();
+        Map<Integer, Map<String, Cell>> scheduleMap = dto.getScheduleMap();
+        
+        for (Integer slot : scheduleMap.keySet()) {
+            Map<String, Cell> dayMap = scheduleMap.get(slot);
+            if (dayMap != null && dayMap.containsKey(dayOfWeekKey)) {
+                Cell cell = dayMap.get(dayOfWeekKey);
+                if (cell != null && cell.getSubjectId() != null) {
+                    TimetableEntity entity = new TimetableEntity();
+                    entity.setDate(date);
+                    entity.setSlotId(slot);
+                    entity.setDepartment(department);
+                    entity.setAcademicYear(date.getYear());
+                    entity.setSubjectId(cell.getSubjectId());
+                    entity.setClassroomId(cell.getClassroomId());
+                    entity.setUserId(cell.getUserId());
+                    entitiesToSave.add(entity);
+                }
+            }
+        }
+        if (!entitiesToSave.isEmpty()) {
+            timetableRepository.saveAll(entitiesToSave);
+        }
+    }
+
+    /**
+     * 参照モード用
+     */
+    public MdTimetableDto getWeeklyScheduleView(Integer deptId, LocalDate date) {
+        MdTimetableDto dto = new MdTimetableDto();
+        dto.setDepartmentId(deptId);
+
+        LocalDate monday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate friday = monday.plusDays(4);
+
+        dto.setStartDate(monday);
+        dto.setEndDate(friday);
+
+        List<TimetableEntity> entities = timetableRepository.findForWeeklyView(deptId, monday, friday);
+        System.out.println("★Service: 検索結果 " + entities.size() + "件 (" + monday + " ～ " + friday + ")");
+
+        for (TimetableEntity entity : entities) {
+            String dayOfWeek = entity.getDate().getDayOfWeek().name();
+            Integer slot = entity.getSlotId();
+            
+            Map<String, Cell> dayMap = dto.getScheduleMap().get(slot);
+            Cell cell = dayMap.get(dayOfWeek);
+            
+            if (cell == null) {
+                cell = new Cell();
+                dayMap.put(dayOfWeek, cell);
+            }
+            
+            cell.setSubjectId(entity.getSubjectId());
+            if (entity.getSubject() != null) cell.setSubjectName(entity.getSubject().getSubjectName()); else cell.setSubjectName("不明(ID:" + entity.getSubjectId() + ")");
+            
+            cell.setClassroomId(entity.getClassroomId());
+            if (entity.getClassroom() != null) cell.setClassroomName(entity.getClassroom().getClassroomName());
+            
+            cell.setUserId(entity.getUserId());
+            if (entity.getUser() != null) cell.setTeacherName(entity.getUser().getName());
+        }
+        return dto;
     }
 }
