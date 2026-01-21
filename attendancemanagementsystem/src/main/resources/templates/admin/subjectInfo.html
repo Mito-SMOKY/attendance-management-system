@@ -21,7 +21,7 @@
 
     <div class="main-container">
         
-        <h2 class="page-title mt-header"> 教科詳細情報</h2>
+        <h2 class="page-title"> 教科情報</h2>
 
         <div class="control-bar">
             <div class="left-controls">
@@ -46,19 +46,19 @@
                     <table class="detail-table">
                         <tr>
                             <th>講座名</th>
-                            <td th:text="${info.subjectName}">Python II</td>
+                            <td th:text="${info.subjectName}"></td>
                         </tr>
                         <tr>
                             <th>年度</th>
-                            <td th:text="${info.fiscalYear}">2025年度</td>
+                            <td th:text="${info.fiscalYear}"></td>
                         </tr>
                         <tr>
                             <th>コース・学年</th>
-                            <td th:text="${info.courseAndGrade}">SE 2年 A組</td>
+                            <td th:text="${info.courseAndGrade}"></td>
                         </tr>
                         <tr>
                             <th>教科ID</th>
-                            <td th:text="${info.displaySubjectId}">XXXX-XX</td>
+                            <td th:text="${info.displaySubjectId}"></td>
                         </tr>
                     </table>
                 </div>
@@ -68,15 +68,15 @@
                     <table class="detail-table">
                         <tr>
                             <th>担当教員</th>
-                            <td th:text="${info.teacherName}">〇〇 〇〇</td>
+                            <td th:text="${info.teacherName}"></td>
                         </tr>
                         <tr>
                             <th>コマ数</th>
-                            <td th:text="${info.credits} + 'コマ'">2コマ</td>
+                            <td th:text="${info.credits} + 'コマ'"></td>
                         </tr>
                         <tr>
                             <th>曜日・コマ</th>
-                            <td th:text="${info.schedule}">水曜4限</td>
+                            <td th:text="${info.schedule}"></td>
                         </tr>
                         </table>
                 </div>

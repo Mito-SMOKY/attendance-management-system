@@ -2,12 +2,31 @@ package com.example.attendancemanagementsystem.user.admin.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.attendancemanagementsystem.common.entity.*;
-import com.example.attendancemanagementsystem.common.repository.*;
+import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
+import com.example.attendancemanagementsystem.common.entity.AttendanceStatusEntity;
+import com.example.attendancemanagementsystem.common.entity.ClassroomEntity;
+import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
+import com.example.attendancemanagementsystem.common.entity.SessionEntity;
+import com.example.attendancemanagementsystem.common.entity.StudentEntity;
+import com.example.attendancemanagementsystem.common.entity.SubjectEntity;
+import com.example.attendancemanagementsystem.common.entity.TimeSlotEntity;
+import com.example.attendancemanagementsystem.common.repository.AttendanceRepository;
+import com.example.attendancemanagementsystem.common.repository.AttendanceStatusRepository;
+import com.example.attendancemanagementsystem.common.repository.ClassroomRepository;
+import com.example.attendancemanagementsystem.common.repository.SessionRepository;
+import com.example.attendancemanagementsystem.common.repository.StudentRepository;
+import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
+import com.example.attendancemanagementsystem.common.repository.TimeSlotRepository;
+import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.user.admin.dto.ClassInfoDto;
 import com.example.attendancemanagementsystem.user.admin.dto.ClassInfoDto.StudentDetail;
 
@@ -243,8 +262,8 @@ public class AdminClassInfoService {
     private String mapStatusToLabel(String dbStatusName) {
         if (dbStatusName == null) return "-";
         switch (dbStatusName) {
-            case "出席": return "○";
-            case "欠席": return "×";
+            case "出席": return "〇";
+            case "欠席": return "✕";
             case "遅刻": return "△";
             case "公欠": return "公";
             default: return dbStatusName;

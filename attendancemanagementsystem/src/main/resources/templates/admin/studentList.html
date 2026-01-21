@@ -10,20 +10,25 @@
     <link rel="stylesheet" th:href="@{/css/admin/studentList.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
 
+    <!-- ヘッダー -->
     <div class="header-container">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
     
+    <!-- 戻るボタン -->
     <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
     </div>
 
+    <!-- 生徒一覧リスト -->
     <div class="student-list-container">
         
         <h1 class="page-title">生徒一覧</h1>
 
+        <!-- 検索絞り込み -->
         <div class="top-controls">
 
             <form class="search-form-3" onsubmit="return false;">
@@ -33,6 +38,7 @@
                 <button type="button" id="searchBtn" aria-label="検索"></button>
             </form>
 
+            <!-- 絞り込みモーダル -->
             <div class="modal-2__wrap">
                 <input type="radio" id="modal-2__open" class="modal-2__open-input" name="modal-2__trigger"/>
 
@@ -50,17 +56,17 @@
                             <div style="color: #00acbd; font-weight: bold; font-size: 1.5rem; margin-top: 10px;">絞り込み</div><br/>
 
                             <div style="font-weight: bold; margin-bottom: 5px;">学年</div>
-                            <fieldset class="checkbox-1">
+                            <div class="checkbox-1">
                                 <label><input type="radio" name="gradeFilter" value="" checked onchange="executeSearch()"/> 全て</label>
                                 <label><input type="radio" name="gradeFilter" value="1" onchange="executeSearch()"/> 1年</label>
                                 <label><input type="radio" name="gradeFilter" value="2" onchange="executeSearch()"/> 2年</label>
                                 <label><input type="radio" name="gradeFilter" value="3" onchange="executeSearch()"/> 3年</label>
-                            </fieldset>
+                            </div>
                             <br/>
 
                             <div style="font-weight: bold; margin-bottom: 5px;">学科</div>
                             <div class="select-wrapper">
-                                <select id="departmentFilter" onchange="executeSearch()" style="width: 100%; padding: 5px;">
+                                <select class="form-select" id="departmentFilter" onchange="executeSearch()">
                                     <option value="">全ての学科</option>
                                 </select>
                             </div>
@@ -68,7 +74,7 @@
 
                             <div style="font-weight: bold; margin-bottom: 5px;">コース</div>
                             <div class="select-wrapper">
-                                <select id="courseFilter" onchange="executeSearch()" style="width: 100%; padding: 5px;">
+                                <select class="form-select" id="courseFilter" onchange="executeSearch()">
                                     <option value="">全てのコース</option>
                                 </select>
                             </div>
@@ -82,6 +88,7 @@
                 </div>
             </div>
         </div>
+        <!-- ------------------------------------------ -->
 
         <div class="table-wrapper">
             <table class="student-table">

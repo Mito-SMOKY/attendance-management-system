@@ -3,27 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf?.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
+    
     <title>生徒情報</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/admin/studentInfo.css}">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <meta name="_csrf" th:content="${_csrf?.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
 </head>
-<body>
-    <input type="hidden" id="studentIdHidden" th:value="${student.studentId}">
 
+<body>
+
+    <!-- ヘッダー -->
     <div class="header-container">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
-    
+    <!-- 戻るボタン -->
     <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url='/admin/studentList')}"></div>
     </div> 
 
+    <input type="hidden" id="studentIdHidden" th:value="${student.studentId}">
+    
     <div class="info-container">
         
         <div class="page-header-wrapper">
@@ -32,10 +34,11 @@
 
         <div class="main-content-area">
             
+            <!-- 詳細コンテナ -->
             <div class="left-sidebar-area">
                 
                 <div class="student-name-display">
-                    <span th:text="${student.name}">○○ ××</span> さん
+                    <span th:text="${student.name}"></span>
                 </div>
 
                 <div class="sidebar-search-form">
@@ -67,23 +70,28 @@
 
             <div class="attendance-detail-main">
                 
+                <!-- コントロール -->
                 <div class="attendance-controls" style="display: flex; align-items: center; gap: 10px;">
-                    <form id="monthForm">
-                        <select id="monthPicker" name="month" class="month-select" onchange="changeMonth()">
-                            <option th:each="m : ${student.selectableMonths}"
-                                    th:value="${m}"
-                                    th:text="${m}"
-                                    th:selected="${m == currentYearMonth}">
-                                2026-01
-                            </option>
-                        </select>
-                    </form>
+                    <!-- 年月変更 -->
+                     <div>
+                        <form id="monthForm">
+                            <select id="monthPicker" name="month" class="month-select" onchange="changeMonth()">
+                                <option th:each="m : ${student.selectableMonths}"
+                                        th:value="${m}"
+                                        th:text="${m}"
+                                        th:selected="${m == currentYearMonth}">
+                                </option>
+                            </select>
+                        </form>
+                    </div>
                     
-                    <button id="editBtn" class="edit-btn" type="button" onclick="toggleEditMode()">編集</button>
-                    <button id="saveBtn" class="edit-btn" type="button" onclick="saveChanges()" 
-                            style="display:none; background-color: #28a745; color: white; border: none;">
-                        保存
-                    </button>
+                    <!-- 編集保存ボタン -->
+                     <div>
+                        <button id="editBtn" class="edit-btn" type="button" onclick="toggleEditMode()">編集</button>
+                        <button id="saveBtn" class="edit-btn" type="button" onclick="saveChanges()" 
+                                style="display:none; background-color: #00bdca; color: white; border: none;">保存</button>
+                    </div>
+
                 </div>
 
                 <table class="status-summary-table">
@@ -101,12 +109,12 @@
                     <tbody>
                         <tr>
                             <td>日数</td>
-                            <td th:text="${student.summary.attendanceCount} + '日'">0日</td>
-                            <td th:text="${student.summary.absenceCount} + '日'" style="color: #EF5350;">0日</td>
-                            <td th:text="${student.summary.lateCount} + '日'">0日</td>
-                            <td th:text="${student.summary.earlyLeaveCount} + '日'">0日</td>
-                            <td th:text="${student.summary.suspensionCount} + '日'">0日</td>
-                            <td th:text="${student.summary.publicAbsenceCount} + '日'">0日</td>
+                            <td th:text="${student.summary.attendanceCount} + '日'"></td>
+                            <td th:text="${student.summary.absenceCount} + '日'" style="color: #EF5350;"></td>
+                            <td th:text="${student.summary.lateCount} + '日'"></td>
+                            <td th:text="${student.summary.earlyLeaveCount} + '日'"></td>
+                            <td th:text="${student.summary.suspensionCount} + '日'"></td>
+                            <td th:text="${student.summary.publicAbsenceCount} + '日'"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -126,18 +134,18 @@
                             <tr th:each="day : ${student.scheduleList}"
                                 th:classappend="${day.absentDay} ? 'absent-row' : ''"> 
                                 
-                                <td th:text="${day.dateStr}">1/1(月)</td>
+                                <td th:text="${day.dateStr}"></td>
                                 
                                 <td th:each="period : ${day.periods}">
                                     <div th:if="${period.hasClass}" 
                                         class="cell-content"
                                         th:classappend="${period.statusClass}">
                                         <div class="view-mode">
-                                            <span class="subject-name" th:text="${period.subjectName}">教科名</span>
-                                            <span class="status-tag" th:text="${period.statusIcon}">〇</span>
+                                            <p class="subject-name" th:text="${period.subjectName}">教科名</p>
+                                            <p class="status-tag" th:text="${period.statusIcon}"></p>
                                         </div>
                                         <div class="edit-mode" style="display: none;">
-                                            <div style="font-size: 0.75rem; margin-bottom: 2px;" th:text="${period.subjectName}">教科</div>
+                                            <div class="subject-name" th:text="${period.subjectName}">教科名</div>
                                             <select class="status-select" 
                                                     th:data-date="${day.dateStr}" 
                                                     th:data-period="${period.period}"

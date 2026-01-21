@@ -9,12 +9,16 @@
 .backbutton-container {
     max-width: 1000px; margin: 0 auto; padding: 20px 20px 0;
 }
-.mt-header { margin-top: 50px; }
 
 .page-title {
-    color: #333; font-size: 1.8rem;
+    color: #333; 
+    font-size: 1.8rem;
     border-bottom: 2px solid #00acbd;
-    padding-bottom: 10px; margin-bottom: 20px; padding-left: 10px;
+    padding-bottom: 10px; 
+    margin-bottom: 20px; 
+    padding-left: 10px;
+    margin-top: 100px;
+    text-align: center;
 }
 
 /* --- コントロールバー --- */
@@ -39,7 +43,7 @@
     padding: 10px 10px 10px 35px; /* アイコン分の左余白 */
     font-size: 1rem;
     border: 1px solid #ccc;
-    border-radius: 20px; /* 角丸に */
+    border-radius: 5px; /* 角丸に */
     outline: none;
     transition: border-color 0.3s;
 }
@@ -118,61 +122,115 @@
     font-size: 0.9rem;
 }
 
-/* --- グリッドレイアウト等は以前のまま --- */
 .info-grid {
-    display: grid; grid-template-columns: 1.5fr 1fr;
-    gap: 20px; align-items: start;
+    display: grid; 
+    grid-template-columns: 1.5fr 1fr;
+    gap: 20px; 
+    align-items: start;
 }
-.info-card, .student-card {
-    background: #fff; border-radius: 8px;
+.info-card, 
+.student-card {
+    background: #fff; 
+    border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    border: 1px solid #eee; padding: 20px;
+    border: 1px solid #eee; 
+    padding: 20px;
 }
 .card-title {
-    margin: 0 0 15px 0; font-size: 1.1rem; color: #00acbd;
-    border-left: 5px solid #00acbd; padding-left: 10px;
+    margin: 0 0 15px 0; 
+    font-size: 1.1rem; 
+    color: #333; 
+    border-left: 5px solid #00acbd; 
+    padding-left: 10px;
 }
-.mt-20 { margin-top: 20px; }
+.mt-20 { 
+    margin-top: 20px; 
+}
 
 /* テーブル共通 */
-.detail-table, .student-table { width: 100%; border-collapse: collapse; }
-.detail-table th, .student-table thead th {
-    text-align: left; padding: 12px;
+.detail-table, 
+.student-table { 
+    width: 100%; 
+    border-collapse: collapse; 
 }
-.detail-table th { background-color: #f9fbfd; color: #555; border-bottom: 1px solid #eee; font-weight: normal; }
-.detail-table td { padding: 12px; color: #333; border-bottom: 1px solid #eee; font-weight: bold; }
+
+.detail-table th, 
+.student-table thead th {
+    text-align: left; 
+    padding: 12px;
+}
+
+.detail-table th { 
+    background-color: #f9fbfd; 
+    color: #555; 
+    border-bottom: 1px solid #eee; 
+    font-weight: normal; 
+}
+
+.detail-table td { 
+    padding: 12px; 
+    color: #333; 
+    border-bottom: 1px solid #eee; 
+    font-weight: bold; 
+}
 
 /* 学生リスト */
 .badge {
-    font-size: 0.8rem; background-color: #eee; color: #666;
-    padding: 2px 8px; border-radius: 10px;
+    font-size: 0.8rem; 
+    background-color: #eee; 
+    color: #666;
+    padding: 2px 8px; 
+    border-radius: 10px;
 }
+
 .student-scroll-container {
-    max-height: 400px; overflow-y: auto;
-    border: 1px solid #eee; border-radius: 4px;
+    max-height: 400px; 
+    overflow-y: auto;
+    border: 1px solid #eee; 
+    border-radius: 4px;
 }
+
 .student-table thead th {
-    position: sticky; top: 0; z-index: 1;
-    background-color: #00acbd; color: #fff; font-weight: normal;
+    position: sticky; 
+    top: 0; 
+    z-index: 1;
+    background-color: #00acbd; 
+    color: #fff; 
+    font-weight: normal;
 }
-.student-table td { border-bottom: 1px solid #eee; padding: 0; }
+
+.student-table td { 
+    border-bottom: 1px solid #eee; 
+    padding: 0; 
+}
+
 .student-link {
-    display: block; padding: 12px 15px; text-decoration: none; color: #333;
+    display: block; 
+    padding: 12px 15px; 
+    text-decoration: none; 
+    color: #333;
 }
-.student-link:hover { color: #00acbd; background-color: #f0fbfc; }
-.student-link i { color: #ccc; margin-right: 8px; }
+
+.student-link:hover { 
+    color: #00acbd; 
+    background-color: #f0fbfc; 
+}
+
+.student-link i { 
+    color: #ccc; 
+    margin-right: 8px; 
+}
 
 .suggestion-link {
     display: block;
     width: 100%;
     height: 100%;
-    padding: 10px 15px; /* ここで余白をつける */
-    text-decoration: none; /* 下線を消す */
-    color: inherit; /* 文字色は親に合わせる */
+    padding: 10px 15px; 
+    text-decoration: none; 
+    color: inherit; 
     cursor: pointer;
 }
 
-/* 文字色は個別に指定 */
 .suggest-name {
     font-weight: bold;
     color: #333;

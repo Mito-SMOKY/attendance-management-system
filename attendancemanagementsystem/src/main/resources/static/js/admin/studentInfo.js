@@ -50,15 +50,15 @@ function toggleEditMode() {
     if (isEditing) {
         // 編集モードON: 表示用を隠し、編集用を表示
         viewElements.forEach(el => el.style.display = 'none');
-        editElements.forEach(el => el.style.display = 'block');
+        editElements.forEach(el => el.style.display = 'flex');
         
         editBtn.textContent = 'キャンセル';
-        editBtn.style.backgroundColor = '#6c757d'; // bootstrap secondary color
+        editBtn.style.backgroundColor = '#8d8d8d'; 
         editBtn.style.color = '#fff';
-        saveBtn.style.display = 'inline-block'; // blockだとレイアウトが崩れる可能性があるため
+        saveBtn.style.display = 'inline-block';
     } else {
         // 編集モードOFF
-        viewElements.forEach(el => el.style.display = 'block');
+        viewElements.forEach(el => el.style.display = 'flex');
         editElements.forEach(el => el.style.display = 'none');
         
         editBtn.textContent = '編集';

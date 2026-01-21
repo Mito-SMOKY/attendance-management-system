@@ -2,7 +2,7 @@
 
 /* --- 全体のレイアウト調整 --- */
 .main-container {
-    max-width: 1000px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 20px;
 }
@@ -17,6 +17,7 @@
     margin-top: 100px; 
     margin-bottom: 20px;
     padding-left: 20px;
+    text-align: center;
 }
 
 /* --- 検索・コントロールエリア --- */
@@ -167,7 +168,7 @@
 /* チェックボックスデザイン */
 .checkbox-1 {
     display: flex;
-    flex-direction: column; /* 縦並びが見やすいので変更、横並びが良い場合は row wrap へ */
+    flex-direction: row; /* 縦並びが見やすいので変更、横並びが良い場合は row wrap へ */
     gap: 10px;
     border: none;
     padding: 0;
@@ -207,8 +208,11 @@
 }
 
 .checkbox-1 input {
+    display: flex;
     display: none;
+
 }
+
 
 /* --- テーブルスクロール用コンテナ（新規追加） --- */
 .table-scroll-container {
@@ -324,4 +328,16 @@
     padding: 20px;
     text-align: center;
     color: #777;
+}
+
+.col-subject{
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.filter-box{
+    font-weight: bold; 
+    margin-bottom: 10px;
+    font-size: 1.5em;
+    color: #00acbd;
 }

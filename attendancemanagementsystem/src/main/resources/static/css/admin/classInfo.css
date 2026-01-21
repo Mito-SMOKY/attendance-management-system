@@ -12,10 +12,15 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
-    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
     font-size: 16px; 
-    background-color: #f4f4f9;
     color: #333;
+}
+
+.main-container{
+    display: flex;
+    justify-content:space-between;
+    gap: 20px;
+    
 }
 
 /* =========================================
@@ -23,9 +28,8 @@ body {
    ========================================= */
 .info-container {
     width: 95%;
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
-    /* ヘッダー(約80px) + 余白 */
     padding-top: 120px; 
     padding-bottom: 50px;
     position: relative;
@@ -36,6 +40,8 @@ body {
    ========================================= */
 .page-title {
     text-align: center;
+    border-bottom:2px solid #00bdca;
+    padding-bottom: 10px;
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 30px;
@@ -46,7 +52,7 @@ body {
 /* =========================================
    コントロールエリア (ボタン群)
    ========================================= */
-.controls-area {
+.controls-card {
     display: flex;
     justify-content: flex-end; /* 右寄せ */
     align-items: center;
@@ -78,93 +84,137 @@ button {
 
 /* 保存ボタン */
 .save-btn {
-    background-color: #28a745; /* 緑 */
+    background-color: #00bdca; /* 緑 */
     color: white;
-    border: 1px solid #28a745;
+    border: 1px solid #00bdca;
 }
 .save-btn:hover {
-    background-color: #218838;
+    background-color: #0297a2;
 }
 
 /* キャンセルボタン */
 .cancel-btn {
-    background-color: #dc3545; /* 赤 */
+    background-color: #e15966; /* 赤 */
     color: white;
-    border: 1px solid #dc3545;
+    border: 1px solid #e15966;
 }
 .cancel-btn:hover {
-    background-color: #c82333;
+    background-color: #b0444f;
 }
 
 /* =========================================
-   上部情報エリア (授業情報テーブル)
+   上部情報エリア (カード型レイアウト)
    ========================================= */
-.session-info-card {
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 20px;
-    margin-bottom: 40px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
 
-.session-table {
+.session-info-flex {
+    flex-wrap: nowrap;
+    gap: 15px; 
     width: 100%;
-    border-collapse: collapse;
 }
 
-.session-table th,
-.session-table td {
-    padding: 12px 15px;
-    vertical-align: middle;
-    border-bottom: 1px solid #eee;
+/* 各項目のカード（縦長の長方形） */
+.info-card {
+    display: flex;
+    flex-direction: row;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px; /* 角丸 */
+    overflow: hidden;
+    min-width: 150px; 
+    box-shadow: none;
 }
 
-/* ヘッダー列 */
-.session-table th {
-    background-color: #539DA4; /* テーマカラー */
+/* 左側の青いラベル部分（縦書き） */
+.info-label {
+    background-color: #00bdca; 
     color: white;
-    width: 15%; /* ラベル幅 */
-    font-weight: normal;
-    text-align: left;
-    white-space: nowrap;
+    padding: 15px 10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 3px;   
+    width: 120px; 
+    flex-shrink: 0;
 }
 
-/* データ列 */
-.session-table td {
-    width: 35%; /* データ幅 */
+.info-value {
+    background-color: #fff;
+    padding: 10px 15px;
     color: #333;
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    text-align: center;
+    max-height: 100px;
 }
 
-/* 編集モード時の入力フォーム */
-.form-select, .form-input {
+/* リンクがある場合のスタイル調整 */
+.info-value .session-view {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
     width: 100%;
-    padding: 6px;
+}
+
+/* 編集フォーム（input/select）がはみ出さないように */
+.info-value .form-select, 
+.info-value .form-input {
+    width: 100%;
+    max-width: 200px;
+    box-sizing: border-box; 
+    padding: 8px 4px;
+    font-size: 1rem;
+    text-align: center;
+    
     border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 1rem;
+    background-color: #fff;
+}
+
+.info-value .session-edit {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* =========================================
    下部エリア：生徒リスト (出席簿)
    ========================================= */
+
 .student-list-section {
     margin-bottom: 40px;
+    
 }
 
-.section-header h2 {
+.section-header{
     color: #333;
     margin: 0;
+    display: flex; 
+    justify-content:space-between;
+    align-items: center; 
+    margin-bottom: 10px;
+}
+
+.atten-header{
+    font-size: 1.2rem; 
+    border-left: 5px solid #00bdca; 
+    padding-left: 10px;
 }
 
 .table-wrapper {
+    max-width: 1200px;
     width: 100%;
     border: 1px solid #ccc;
     background-color: white;
     /* スクロール設定 */
     max-height: 500px;
     overflow-y: auto;
+    font-size: 1.2em;
 }
 
 .student-table {
@@ -182,7 +232,7 @@ button {
 
 /* リストヘッダー (固定) */
 .student-table th {
-    background-color: #539DA4;
+    background-color: #00bdca;
     color: white;
     font-weight: normal;
     position: sticky;
@@ -208,30 +258,48 @@ button {
 
 /* 出席・公欠 */
 .status-present {
+    font-size: 1.2em;
     color: #28a745;
-    background-color: #e6f9ec;
-    border: 1px solid #c3e6cb;
+    font-weight: bold;
 }
 
 /* 欠席 */
 .status-absent {
-    color: #dc3545;
-    background-color: #fce8e8;
-    border: 1px solid #f5c6cb;
+    font-size: 1.2em;
+    color: #db383d;
+    font-weight: bold;
 }
 
 /* 遅刻 */
 .status-late {
-    color: #e0a800; /* 黄色/オレンジ */
-    background-color: #fff3cd;
-    border: 1px solid #ffeeba;
+    font-size: 1.2em;
+    color: #ddbd3c;
+    font-weight: bold;
 }
 
 /* 編集用プルダウン（テーブル内） */
 .status-select {
+    font-size: 1rem;
     display: none;
     width: 100%;
-    padding: 4px;
+    max-width: 200px;
+    text-align: center;
+    box-sizing: border-box;
+    padding:8px 4px;
     border: 1px solid #ccc;
-    border-radius: 3px;
+    border-radius: 4px;
+}
+
+.subject-link{
+    text-decoration: none; 
+    color: #00acbd; 
+    font-weight: bold; 
+    border-bottom: 1px dashed #00acbd; 
+    transition: all 0.3s;
+}
+
+.subject-link-icon{
+    font-size: 0.8em; 
+    color: #00acbd; 
+    margin-left: 5px;
 }
