@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,48 +61,79 @@ public class MdTimetableService {
     }
 
     /**
-     * 週間スケジュール一括登録
+     * 週間スケジュール一括登録（修正版：上書き対応）
      */
     @Transactional
     public void registerWeeklySchedule(MdTimetableDto dto) {
         Integer deptId = dto.getDepartmentId();
+        
+        // 学科エンティティの取得
         DepartmentEntity department = departmentRepository.findById(deptId)
                 .orElseThrow(() -> new RuntimeException("Department not found ID:" + deptId));
 
         List<TimetableEntity> entitiesToSave = new ArrayList<>();
         LocalDate current = dto.getStartDate();
         LocalDate end = dto.getEndDate();
+        
+        // DTOの構造はそのまま使用
+        // Map<SlotID, Map<DayOfWeek, Cell>>
         Map<Integer, Map<String, Cell>> scheduleMap = dto.getScheduleMap();
 
         if (scheduleMap == null || scheduleMap.isEmpty()) return;
 
         List<TimeSlotEntity> allSlots = timeSlotRepository.findAllByOrderBySlotIdAsc();
 
+        // 日付ループ
         while (!current.isAfter(end)) {
             String dayOfWeekKey = current.getDayOfWeek().name();
             
+            // 時限ループ
             for (TimeSlotEntity ts : allSlots) {
                 Integer slot = ts.getSlotId();
 
                 if (scheduleMap.containsKey(slot)) {
                     Map<String, Cell> dayMap = scheduleMap.get(slot);
+                    
                     if (dayMap != null && dayMap.containsKey(dayOfWeekKey)) {
                         Cell cell = dayMap.get(dayOfWeekKey);
+                        
+                        // 入力がある場合のみ処理
                         if (cell != null && cell.getSubjectId() != null) {
-                            TimetableEntity entity = new TimetableEntity();
-                            entity.setDate(current);
-                            entity.setSlotId(slot);
-                            entity.setDepartment(department);
+                            
+                            // ★修正ポイント: いきなり new せず、まずは既存データを探す！
+                            Optional<TimetableEntity> existingOpt = timetableRepository
+                                .findByDepartment_DepartmentIdAndDateAndSlotId(deptId, current, slot);
+
+                            TimetableEntity entity;
+
+                            if (existingOpt.isPresent()) {
+                                // --- パターンA: 既にあるなら、それを使う (UPDATEになる) ---
+                                entity = existingOpt.get();
+                            } else {
+                                // --- パターンB: ないなら、新しく作る (INSERTになる) ---
+                                entity = new TimetableEntity();
+                                // キーとなる情報は新規のときだけセットすればOK（既存データは既に持ってるから）
+                                entity.setDate(current);
+                                entity.setSlotId(slot);
+                                entity.setDepartment(department);
+                            }
+
+                            // --- 共通: 値のセット（上書き） ---
+                            // ここは新規でも更新でも毎回セットする
                             
                             if (dto.getYear() != null) {
                                 entity.setAcademicYear(dto.getYear());
                             } else {
+                                // 指定がなければ日付から判定、あるいは既存の値を維持するなら if(entity.getAcademicYear() == null) 等の工夫も可
                                 entity.setAcademicYear(current.getYear());
                             }
                             
+                            // Cellから値を取り出してセット
                             entity.setSubjectId(cell.getSubjectId());
                             entity.setClassroomId(cell.getClassroomId());
                             entity.setUserId(cell.getUserId());
+
+                            // 保存リストに追加
                             entitiesToSave.add(entity);
                         }
                     }
@@ -109,6 +141,8 @@ public class MdTimetableService {
             }
             current = current.plusDays(1);
         }
+
+        // まとめて保存 (新規はINSERT, 既存はUPDATEが自動で発行されます)
         if (!entitiesToSave.isEmpty()) {
             timetableRepository.saveAll(entitiesToSave);
         }

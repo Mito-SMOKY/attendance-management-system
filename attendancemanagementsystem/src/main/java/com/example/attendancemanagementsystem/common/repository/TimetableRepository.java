@@ -29,6 +29,9 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
     // 指定した学科・日付のデータを取得する（読み込み用）
     List<TimetableEntity> findByDepartment_DepartmentIdAndDateOrderBySlotIdAsc(Integer departmentId, LocalDate date);
 
+    //1件ピンポイントで探すメソッド
+    Optional<TimetableEntity> findByDepartment_DepartmentIdAndDateAndSlotId(Integer departmentId, LocalDate date, Integer slotId);
+
     // メソッド名の "_DepartmentID" は、TimetableEntity内の departmentフィールドの中にある DepartmentID を指します
     List<TimetableEntity> findByDateAndDepartment_DepartmentIdOrderBySlotId(LocalDate date, Integer departmentId);
 
@@ -99,4 +102,12 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
             @Param("date") LocalDate date, 
             @Param("slotId") Integer slotId
     );
+
+    //重複の要約情報を取得（最小日付、最大日付、件数）
+    @Query("SELECT MIN(t.date), MAX(t.date), COUNT(t) FROM TimetableEntity t " +
+        "WHERE t.department.departmentId = :deptId " +
+        "AND t.date BETWEEN :startDate AND :endDate")
+    List<Object[]> findOverlapSummary(@Param("deptId") Integer deptId, 
+                                    @Param("startDate") LocalDate startDate, 
+                                    @Param("endDate") LocalDate endDate);
 }

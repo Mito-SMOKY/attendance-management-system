@@ -1,7 +1,9 @@
 package com.example.attendancemanagementsystem.user.admin.controller;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,10 +13,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+import com.example.attendancemanagementsystem.common.service.GeminiService;
 
 import com.example.attendancemanagementsystem.common.repository.ClassroomRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
+import com.example.attendancemanagementsystem.common.repository.TimetableRepository;
 import com.example.attendancemanagementsystem.common.repository.TimeSlotRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.user.admin.dto.MdTimetableDto;
@@ -33,7 +40,28 @@ public class MdTimetableController {
     @Autowired
     private ClassroomRepository classroomRepository;
     @Autowired
+    private TimetableRepository timetableRepository;
+    @Autowired
     private TimeSlotRepository timeSlotRepository;
+    @Autowired
+    private GeminiService geminiService;
+
+
+    /**
+     * ★追加: 画像/PDFを受け取ってAIに解析させるAPI
+     */
+    @PostMapping("/analyze-image")
+    @ResponseBody
+    public ResponseEntity<String> analyzeImage(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("[]");
+        }
+        
+        // GeminiServiceを使って解析し、JSON文字列をそのまま返す
+        String jsonResult = geminiService.analyzeTimetableImage(file);
+        
+        return ResponseEntity.ok(jsonResult);
+    }
 
     /**
      * 現在の日付から年度と学期の初期値を設定するヘルパーメソッド
@@ -111,6 +139,39 @@ public class MdTimetableController {
         return "redirect:/admin/mdTimetable/daily?date=" + mdTimetableDto.getStartDate() + "&departmentId=" + mdTimetableDto.getDepartmentId();
     }
     
+    /**
+     * 重複データチェック用API (詳細版)
+     */
+    @GetMapping("/check-overlap")
+    @ResponseBody
+    public Map<String, Object> checkOverlap(@RequestParam("departmentId") Integer departmentId,
+                                            @RequestParam("startDate") LocalDate startDate,
+                                            @RequestParam("endDate") LocalDate endDate) {
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        // Repositoryから要約情報を取得
+        // 戻り値は Object配列のリスト: [0]=MIN(date), [1]=MAX(date), [2]=COUNT
+        List<Object[]> summaryList = timetableRepository.findOverlapSummary(departmentId, startDate, endDate);
+        
+        if (summaryList != null && !summaryList.isEmpty()) {
+            Object[] summary = summaryList.get(0);
+            Long count = (Long) summary[2]; // COUNTの結果
+
+            if (count != null && count > 0) {
+                result.put("exists", true);
+                result.put("minDate", summary[0].toString()); // 最小日付 (例: 2024-04-01)
+                result.put("maxDate", summary[1].toString()); // 最大日付
+                result.put("count", count);
+                return result;
+            }
+        }
+
+        // データがない場合
+        result.put("exists", false);
+        return result;
+    }
+
     /**
      * 参照専用画面
      */
