@@ -46,11 +46,11 @@ public class AdminStudentSubjectService {
         StudentEntity student = studentRepository.findById(studentId).orElse(null);
         if (student != null) {
             dto.setStudentId(studentId);
-            if (student.getUsers() != null) {
-                dto.setStudentName(student.getUsers().getName());
+            if (student.getUser() != null) {
+                dto.setStudentName(student.getUser().getName());
 
                 //在籍情報から学年を取得してセット
-                EnrollmentsEntity enrollment = enrollmentsRepository.findByUserAndIsActiveTrue(student.getUsers()).orElse(null);
+                EnrollmentsEntity enrollment = enrollmentsRepository.findByUserAndIsActiveTrue(student.getUser()).orElse(null);
                 if (enrollment != null) {
                     dto.setGrade(enrollment.getGrade());
                     if (dto.getDepartmentId() == null && enrollment.getDepartment() != null) {

@@ -77,7 +77,7 @@ public class AdminStudentListService {
 
         // キーワード検索
         if (keyword != null && !keyword.isEmpty()) {
-            List<String> targetColumns = Arrays.asList("users.name", "users.loginId");
+            List<String> targetColumns = Arrays.asList("user.name", "user.loginId");
             
             // キーワード検索スペックの作成
             Specification<StudentEntity> searchSpec = searchService.createKeywordSpec(keyword, targetColumns);
@@ -128,8 +128,8 @@ public class AdminStudentListService {
             Map<String, Object> map = new HashMap<>();
             
             map.put("userId", student.getUserId());
-            map.put("name", (student.getUsers() != null) ? student.getUsers().getName() : "");
-            map.put("loginId", (student.getUsers() != null) ? student.getUsers().getLoginId() : "");
+            map.put("name", (student.getUser() != null) ? student.getUser().getName() : "");
+            map.put("loginId", (student.getUser() != null) ? student.getUser().getLoginId() : "");
 
             // 学科・コース・学年・クラス情報の取得
             String gradeStr = "-";

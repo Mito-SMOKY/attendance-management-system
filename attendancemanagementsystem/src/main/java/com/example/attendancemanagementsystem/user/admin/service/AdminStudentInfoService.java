@@ -80,7 +80,7 @@ public class AdminStudentInfoService {
         StudentEntity student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found id: " + studentId));
         dto.setStudentId(student.getUserId());
-        UsersEntity user = student.getUsers();
+        UsersEntity user = student.getUser();
         dto.setName(user != null ? user.getName() : "Unknown");
         dto.setCurrentMonth(targetMonthStr);
 

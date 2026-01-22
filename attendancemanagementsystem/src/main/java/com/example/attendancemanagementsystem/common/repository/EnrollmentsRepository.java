@@ -92,7 +92,7 @@ public interface EnrollmentsRepository extends JpaRepository<EnrollmentsEntity, 
     @Query("SELECT s.userId, u.name " +
         "FROM EnrollmentsEntity e " +
         "JOIN e.student s " +
-        "JOIN s.users u " +
+        "JOIN s.user u " +
         "WHERE e.department.departmentId = :departmentId " +
         "AND e.grade = :grade " +
         "ORDER BY s.userId ASC")

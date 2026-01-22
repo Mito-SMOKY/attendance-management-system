@@ -122,7 +122,7 @@ public class AdminClassInfoService {
         dto.setAllSubjects(subjectRepository.findAll());
         dto.setAllClassrooms(classroomRepository.findAll());
         dto.setAllTimeSlots(timeSlotRepository.findAllByOrderBySlotIdAsc());
-        dto.setAllTeachers(usersRepository.findAll());
+        dto.setAllTeachers(usersRepository.findByUserTypeId(2));
         dto.setAllStatuses(attendanceStatusRepository.findAll());
 
         // 受講生徒リストの生成処理を開始
@@ -148,9 +148,9 @@ public class AdminClassInfoService {
                 detail.setUserId(s.getUserId());
                 
                 // 生徒の基本情報をセット
-                if (s.getUsers() != null) {
-                    detail.setName(s.getUsers().getName());
-                    detail.setStudentNumber(s.getUsers().getLoginId());
+                if (s.getUser() != null) {
+                    detail.setName(s.getUser().getName());
+                    detail.setStudentNumber(s.getUser().getLoginId());
                 } else {
                     detail.setName("不明");
                     detail.setStudentNumber("-");

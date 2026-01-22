@@ -128,7 +128,7 @@ public class ProfileService {
                 String className = (row[4] != null) ? (String) row[4] : "-"; 
                 
                 // データ整形
-                String displayName = String.format("%s (%d年 %s)", sName, grade, className);
+                String displayName = String.format("%s (%d-%s)", sName, grade, className);
 
                 // 重複排除
                 if (processedNames.contains(displayName)) {
