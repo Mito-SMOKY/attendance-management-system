@@ -5,18 +5,20 @@
  * ========================================= */
 
 .timetable-container {
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 1000px;
+    margin: 60px auto 0;
     padding: 20px;
-    background-color: #f9f9f9;
 }
 
 .page-title {
-    font-size: 24px;
+    text-align: center;
+    border-bottom:2px solid #00bdca;
+    padding-bottom: 10px;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 30px;
     color: #333;
-    margin-bottom: 20px;
-    border-left: 5px solid #007bff;
-    padding-left: 10px;
+    letter-spacing: 2px;
 }
 
 .success-message {
@@ -33,27 +35,35 @@
 /* --- タブ切り替え --- */
 .mode-tabs {
     margin-bottom: 20px;
-    border-bottom: 2px solid #ddd;
+    border-bottom: 2px solid #ddd; 
     display: flex;
     gap: 10px;
+    align-items: flex-end;
 }
 
 .tab-link {
+    display: block;
     padding: 10px 20px;
     text-decoration: none;
+    color: #666;
+    font-weight: bold;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px; 
     border-radius: 5px 5px 0 0;
-    color: #333;
-    background: #f8f9fa;
-    transition: background 0.3s;
 }
 
 .tab-link.active-tab {
-    background: #007bff;
+    background: #00bdca;
     color: white;
 }
 
 .tab-link:hover:not(.active-tab) {
     background: #e2e6ea;
+}
+
+.active-tab {
+    color: #00bdca;
+    border-bottom: 2px solid #00bdca;
 }
 
 /* --- 検索・設定エリア --- */
@@ -101,7 +111,7 @@
 }
 
 .timetable-table th {
-    background-color: #007bff;
+    background-color: #00bdca;
     color: #fff;
     text-align: center;
     padding: 10px;
@@ -120,7 +130,7 @@
 }
 
 .btn-primary {
-    background-color: #007bff;
+    background-color: #00bdca;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -130,11 +140,69 @@
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
+    background-color: #009ba7;
 }
 
 /* Select2の高さ調整 */
 .select2-container .select2-selection--single {
     height: 38px !important;
     padding: 5px;
+}
+
+.date-form,
+.searchable-select{
+    width: 150px;
+    height: 45px;
+    padding: 5px 10px;
+    border: 1px solid ;
+    border-color: #00bdca;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
+    outline: none;
+}
+
+.searchable-select{ width: 350px !important;}
+
+/* ツールチップ */
+.tooltip-001 {
+    display: inline-block;
+    position: relative;
+}
+
+.tooltip-001 > div {
+    cursor: pointer;
+}
+
+.tooltip-001 > span {
+    display: flex;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: .5em 1em;
+    border-radius: 3px;
+    background-color: #00bdca;
+    color: #ffffff;
+    font-size: .7em;
+    white-space: nowrap;
+    transition: opacity .3s;
+}
+
+.tooltip-001 > span::before {
+    position: absolute;
+    top: -6px;
+    width: 9px;
+    height: 6px;
+    background-color: inherit;
+    clip-path: polygon(50% 0, 0 100%, 100% 100%);
+    content: '';
+}
+
+.tooltip-001:hover > span {
+    visibility: visible;
+    opacity: 1;
 }
