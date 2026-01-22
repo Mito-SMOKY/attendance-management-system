@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -65,7 +66,7 @@ public class SearchService {
                     
                     // 指定された全カラムに対してLIKE検索
                     for (String column : targetColumns) {
-                        wordMatch = cb.or(wordMatch, cb.like(root.get(column), likePattern));
+                        wordMatch = cb.or(wordMatch, cb.like(getPath(root, column), likePattern));
                     }
                 }
                 
@@ -76,7 +77,7 @@ public class SearchService {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
-    // 補助メソッド: RootからPathを取得（ネスト対応）
+    // ヘルパーメソッド: RootからPathを取得（ドット表記対応）
     private <T> Path<String> getPath(Root<T> root, String attributeName) {
         Path<?> path = root;
         if (attributeName.contains(".")) {
