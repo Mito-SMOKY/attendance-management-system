@@ -5,12 +5,12 @@
 
 $(document).ready(function() {
     // --- 1. Select2の初期化 ---
-    $('.searchable-select').select2({
-        language: "ja",
-        width: '100%',
-        placeholder: "選択してください",
-        allowClear: true
-    });
+    // $('.searchable-select').select2({
+    //     language: "ja",
+    //     width: '100%',
+    //     placeholder: "選択してください",
+    //     allowClear: true
+    // });
 
     // --- 2. Flatpickr (一括登録用・期間選択) ---
     // startとendを別々に初期化して連動させる方式
