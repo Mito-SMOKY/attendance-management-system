@@ -75,26 +75,26 @@ public class MdTimetableService {
         DepartmentEntity department = departmentRepository.findById(deptId)
                 .orElseThrow(() -> new RuntimeException("Department not found ID:" + deptId));
 
-        // 除外日リストの作成 (★強化版)
+        // 除外日リストの作成 
         Set<LocalDate> skipDates = new HashSet<>();
         String excludedStr = dto.getExcludedDates();
 
-        // ログ: 受け取った文字列を確認
+        // 受け取った文字列を確認
         System.out.println("【Debug】除外日文字列(Raw): " + excludedStr);
 
         if (excludedStr != null && !excludedStr.trim().isEmpty()) {
             
-            // JSON形式の記号（ブラケットやクォート）を除去して綺麗にする
+            // JSON形式の記号を除去して綺麗にする
             String cleanStr = excludedStr.replaceAll("[\\[\\]\"']", "");
 
             // カンマ(半角・全角)、読点、改行、スペースなどで分割
             String[] dates = cleanStr.split("[,、\n\r\\s]+");
             
-            // 対応するフォーマット定義 (ハイフン、スラッシュ、ゼロ埋め有無に対応)
+            // 対応するフォーマット定義 
             DateTimeFormatter[] formatters = {
-                DateTimeFormatter.ISO_LOCAL_DATE,       // 2025-04-29
-                DateTimeFormatter.ofPattern("yyyy/MM/dd"), // 2025/04/29
-                DateTimeFormatter.ofPattern("yyyy/M/d")    // 2025/4/29
+                DateTimeFormatter.ISO_LOCAL_DATE,       
+                DateTimeFormatter.ofPattern("yyyy/MM/dd"), 
+                DateTimeFormatter.ofPattern("yyyy/M/d")    
             };
 
             for (String d : dates) {
@@ -106,9 +106,8 @@ public class MdTimetableService {
                     try {
                         skipDates.add(LocalDate.parse(cleanDate, fmt));
                         parsed = true;
-                        break; // 成功したらループを抜ける
+                        break; 
                     } catch (Exception e) {
-                        // 次のフォーマットを試行
                     }
                 }
                 
@@ -118,7 +117,7 @@ public class MdTimetableService {
             }
         }
         
-        // ログ: 実際に除外される日付リスト
+        // 実際に除外される日付リスト
         System.out.println("【Debug】登録スキップ対象の日付: " + skipDates);
 
         List<TimetableEntity> entitiesToSave = new ArrayList<>();
