@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
+import com.example.attendancemanagementsystem.common.entity.SessionEntity;
+import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<AttendanceEntity, Integer> {
@@ -27,6 +29,9 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
 
        // 出席情報の存在確認
        boolean existsBySessionIdAndStudent_UserId(Integer sessionId, Integer userId);
+
+       // ★追加: StudentEntity と SessionEntity オブジェクトによる検索
+       Optional<AttendanceEntity> findByStudentAndSession(StudentEntity student, SessionEntity session);
 
        @Transactional 
        void deleteBySessionId(Integer sessionId);

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>手動登録</title>
     <style>
+      /* 既存のスタイル */
       body {
         padding: 20px;
         font-family: sans-serif;
@@ -25,14 +26,13 @@
       }
       label {
         font-weight: bold;
-        width: 100px;
-      }
-      input {
+        width: 120px;
+      } /* 少し幅を広げました */
+      input,
+      select {
         padding: 5px;
         width: 200px;
       }
-
-      /* ボタンのスタイル */
       .btn {
         padding: 10px 20px;
         color: white;
@@ -43,19 +43,22 @@
       }
       .btn-add {
         background-color: #17a2b8;
-      } /* 青緑 */
+      }
       .btn-remove {
         background-color: #dc3545;
-      } /* 赤 */
+      }
       .btn-save {
         background-color: #28a745;
         font-size: 16px;
         margin-top: 20px;
-      } /* 緑 */
+      }
 
-      h3 {
-        border-bottom: 2px solid #ddd;
-        padding-bottom: 5px;
+      .batch-setting {
+        background-color: #e9ecef;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border-left: 5px solid #007bff;
       }
     </style>
   </head>
@@ -64,15 +67,50 @@
     <p>登録したい学生の情報を入力してください。</p>
 
     <form th:action="@{/admin/save-manual-accounts}" method="post">
-      <div style="margin-bottom: 20px">
-        <label style="width: auto">リスト名:</label>
-        <input
-          type="text"
-          name="datalistName"
-          placeholder="例: 2025年度新入生"
-          required
-          style="width: 300px"
-        />
+      <div class="batch-setting">
+        <h3>基本設定（全員に適用）</h3>
+        <div class="input-row">
+          <label>リスト名:</label>
+          <input
+            type="text"
+            name="dataListName"
+            placeholder="例: 2025年度新入生"
+            required
+          />
+        </div>
+
+        <div class="input-row">
+          <label>年度:</label>
+          <input
+            type="number"
+            name="academicYear"
+            placeholder="2025"
+            value="2025"
+            required
+          />
+        </div>
+
+        <div class="input-row">
+          <label>学年:</label>
+          <select name="grade">
+            <option value="1">1年</option>
+            <option value="2">2年</option>
+            <option value="3">3年</option>
+          </select>
+        </div>
+
+        <div class="input-row">
+          <label>学科・クラス:</label>
+          <select name="departmentId">
+            <option
+              th:each="dept : ${departmentList}"
+              th:value="${dept.departmentId}"
+              th:text="${(dept.major != null ? dept.major.majorName : '(学科不明)') + ' : ' + dept.className}"
+            >
+              情報システム学科 : Aクラス
+            </option>
+          </select>
+        </div>
       </div>
 
       <div id="account-container">
@@ -125,7 +163,7 @@
     <script>
       function addAccount() {
         const container = document.getElementById("account-container");
-        const count = container.children.length; // 現在の件数 (インデックス用)
+        const count = container.children.length; // 現在の要素数
 
         // 新しい入力グループを作成
         const newGroup = document.createElement("div");
@@ -151,7 +189,6 @@
 
       function removeAccount() {
         const container = document.getElementById("account-container");
-        // 1件目は消さないようにする
         if (container.children.length > 1) {
           container.removeChild(container.lastElementChild);
         } else {

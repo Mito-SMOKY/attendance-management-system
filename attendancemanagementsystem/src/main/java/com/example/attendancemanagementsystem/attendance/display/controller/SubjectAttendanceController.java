@@ -32,27 +32,39 @@ public class SubjectAttendanceController {
     public String showPage(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("subjectId") Integer subjectId,
+            @RequestParam(name = "year", required = false) Integer year,   // パラメータを受け取れるよう追加
+            @RequestParam(name = "month", required = false) Integer month, // パラメータを受け取れるよう追加
             Model model) {
         
         LocalDate now = LocalDate.now();
-        int year = now.getYear();
-        int month = now.getMonthValue();
+        
+        // パラメータが空（初回アクセス）なら現在の年月、あればその値を使用
+        int selectedYear = (year != null) ? year : now.getYear();
+        int selectedMonth = (month != null) ? month : now.getMonthValue();
 
+        // サービス呼び出しも選択された年月を使用
         SubjectAttendanceDto data = attendanceService.getAttendanceDetails(
-                userDetails.getUsername(), subjectId, year, month);
+                userDetails.getUsername(), subjectId, selectedYear, selectedMonth);
 
         model.addAttribute("attendanceData", data);
-        model.addAttribute("selectedYear", year);
-        model.addAttribute("selectedMonth", month);
+        model.addAttribute("selectedYear", selectedYear);
+        model.addAttribute("selectedMonth", selectedMonth);
         
-        model.addAttribute("yearList", List.of(2024, 2025)); 
+        // 年のリスト生成（現在を基準に前後1年）
+        List<Integer> yearList = new ArrayList<>();
+        for (int i = now.getYear() - 1; i <= now.getYear() + 1; i++) {
+            yearList.add(i); 
+        }
+        model.addAttribute("yearList", yearList);
+
+        // 月のリスト生成（1〜12）
         List<Integer> monthList = new ArrayList<>();
         for(int i=1; i<=12; i++) monthList.add(i);
         model.addAttribute("monthList", monthList);
 
         return "student/subjectAttendance"; 
     }
-
+    
     //2. JSからの非同期通信用API
     //URL: /student/api/data?year=2025&month=11&subjectId=1
     @GetMapping("/api/data")
@@ -69,4 +81,6 @@ public class SubjectAttendanceController {
 
         return attendanceService.getAttendanceDetails(userDetails.getUsername(), subjectId, year, month);
     }
+
+    
 }

@@ -19,7 +19,7 @@ public interface EnrollmentsRepository extends JpaRepository<EnrollmentsEntity, 
     List<EnrollmentsEntity> findByStudent(StudentEntity student);
 
     // ユーザーとアクティブ状態で検索
-    @Query("SELECT e FROM EnrollmentsEntity e WHERE e.student.users = :user AND e.isActive = true")
+    @Query("SELECT e FROM EnrollmentsEntity e WHERE e.student.user = :user AND e.isActive = true")
     Optional<EnrollmentsEntity> findByUserAndIsActiveTrue(@Param("user") UsersEntity user);
 
     // 学科IDで検索

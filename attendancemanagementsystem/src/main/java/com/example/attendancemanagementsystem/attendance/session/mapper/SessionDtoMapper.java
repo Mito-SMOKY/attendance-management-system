@@ -34,9 +34,9 @@ public class SessionDtoMapper {
         }
 
         // 生徒情報
-        if (enrollment != null && enrollment.getStudent() != null && enrollment.getStudent().getUsers() != null) {
+        if (enrollment != null && enrollment.getStudent() != null && enrollment.getStudent().getUser() != null) {
             dto.setUserId(enrollment.getStudent().getUserId());
-            dto.setStudentName(enrollment.getStudent().getUsers().getName());
+            dto.setStudentName(enrollment.getStudent().getUser().getName());
         } else {
             dto.setUserId(null);
             dto.setStudentName("Unknown");
@@ -91,6 +91,12 @@ public class SessionDtoMapper {
         // 学年表示
         if (session.getTargetGrade() != null) {
             dto.setGradeClass(session.getTargetGrade() + "年");
+        }
+
+        
+        // クラス表示
+        if (session.getDepartment() != null) {
+        dto.setClassName(session.getDepartment().getClassName());
         }
 
         // 教室情報

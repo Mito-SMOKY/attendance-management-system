@@ -75,23 +75,37 @@ public class SessionAttendanceService {
 
             Integer statusId;
 
-            // 出席ステータス判定ロジック
+            // 手動変更があれば最優先
             if (manualChanges != null && manualChanges.containsKey(studentId)) {
                 statusId = manualChanges.get(studentId);
             } 
             else {
-
                 // 入室ログ確認
                 EntryLogEntity myLog = logs.stream()
                     .filter(l -> l.getUserId().equals(studentId))
                     .findFirst().orElse(null);
+
                 if (myLog != null) {
-                    if (myLog.getEntryTime().isAfter(absentBoundary)) {
-                        statusId = 2; // 欠席
-                    } else if (myLog.getEntryTime().isAfter(lateBoundary)) {
-                        statusId = 3; // 遅刻
+
+                    // (カードリーダー等の判定結果や、後から紐づいたステータスを使う)
+                    if (myLog.getStatusId() != null) {
+                        statusId = myLog.getStatusId();
                     } else {
-                        statusId = 1; // 出席
+
+                        // StatusIDがない場合
+                        if (myLog.getEntryTime() != null) {
+                            if (myLog.getEntryTime().isAfter(absentBoundary)) {
+                                statusId = 2;
+                            } else if (myLog.getEntryTime().isAfter(lateBoundary)) {
+                                statusId = 3;
+                            } else {
+                                statusId = 1;
+                            }
+                        } else {
+
+                            // 入室時間もない場合は欠席扱い
+                            statusId = 2;
+                        }
                     }
                 } else {
                     
@@ -113,7 +127,7 @@ public class SessionAttendanceService {
 
             // ステータスエンティティを設定
             AttendanceStatusEntity statusEntity = statusMap.get(statusId);
-            if (statusEntity == null) statusEntity = statusMap.get(2); // デフォルト欠席
+            if (statusEntity == null) statusEntity = statusMap.get(2); 
             
             attendance.setStatusId(statusEntity);
             attendancesToSave.add(attendance);

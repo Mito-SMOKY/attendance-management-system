@@ -6,16 +6,20 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <link th:href="@{/css/session/session.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
 </head>
+
 <body>
+<div class="header-container">
+    <div th:replace="~{fragments/_parts :: admin-header}"></div>
+</div>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">出席管理システム</a>
-        </div>
-    </nav>
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
 
-    <div class="container pb-5 mb-5">
+    <div class="setting-container">
         <div class="card shadow-sm">
             <div class="card-header">
                 授業設定
@@ -39,20 +43,20 @@
                         </div>
                     </div>
 
-                    <hr>
+                    <hr style="color: #00bdca;">
 
                     <h5 class="mb-3">対象クラス選択</h5>
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="majorId" class="form-label">学科 (Major)</label>
+                            <label for="majorId" class="form-label">学科</label>
                             <select id="majorId" class="form-select">
                                 <option value="" selected>選択してください</option>
                                 <option th:each="m : ${majorList}" th:value="${m.majorId}" th:text="${m.majorName}"></option>
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label for="courseId" class="form-label">コース (Course)</label>
+                            <label for="courseId" class="form-label">コース</label>
                             <select id="courseId" class="form-select" disabled>
                                 <option value="" selected>学科を選択してください</option>
                             </select>
@@ -67,14 +71,14 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label for="departmentId" class="form-label">クラス (Class)</label>
+                            <label for="departmentId" class="form-label">クラス</label>
                             <select id="departmentId" class="form-select" disabled>
                                 <option value="" selected>学年を選択してください</option>
                             </select>
                         </div>
                     </div>
 
-                    <hr>
+                    <hr style="color: #00bdca;">
 
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -93,8 +97,8 @@
                         </div>
                     </div>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="button" class="btn btn-secondary me-md-2" onclick="fillTimetable()">時間割から反映 (任意)</button>
-                        <button type="button" class="btn btn-primary" onclick="startSession()">授業開始</button>
+                        <button type="button" class="btn-secondary" onclick="fillTimetable()">時間割から反映 (任意)</button>
+                        <button type="button" class="btn-primary" onclick="startSession()">授業開始</button>
                     </div>
                 </form>
             </div>

@@ -1,10 +1,8 @@
-
 // 定数定義
 const API_BASE = '/session';
 
 // 共通関数
 function resetSelect(el, defaultText) {
-
     // プルダウンを初期化
     el.innerHTML = '';
     const def = document.createElement('option');
@@ -18,7 +16,6 @@ function resetSelect(el, defaultText) {
 
 // アクティブセッションIDを取得
 async function fetchActiveSessionId(userId) {
-
     // API呼び出し
     try {
         const res = await fetch(`${API_BASE}/api/active/check?userId=${userId}`);
@@ -183,11 +180,26 @@ window.startSession = async function() {
             return;
         }
 
-        // エラー時: 未終了授業の存在を確認
-        const errorText = await response.text();
-        if (response.status === 409 || errorText.includes("終了していない")) {
+        // --- エラーハンドリングの変更部分 ---
+        
+        // 1. エラーメッセージをJSONからきれいに取り出す
+        let errorMsg = "エラーが発生しました";
+        try {
+            // クローンして読み取らないと、後で再読み込みできない場合があるが、ここでは1回きりでOK
+            const errData = await response.json();
+            if (errData.message) {
+                errorMsg = errData.message; // メッセージ本文のみ抽出
+            }
+        } catch (e) {
+            // JSONパース失敗時はテキストとして取得
+            errorMsg = await response.text(); 
+        }
+
+        // 2. ステータスコードによる分岐
+        if (response.status === 409) {
+            // 409 Conflict: 実施中の授業がある場合のみモーダルを表示
             const msgEl = document.getElementById('conflictMessage');
-            if(msgEl) msgEl.innerText = "終了していない授業があります。\n(" + errorText + ")";
+            if(msgEl) msgEl.innerText = errorMsg; // きれいなメッセージを表示
 
             const userId = document.getElementById('userId').value;
             let conflictId = await fetchActiveSessionId(userId);
@@ -206,12 +218,16 @@ window.startSession = async function() {
             const modalEl = document.getElementById('conflictModal');
             const modal = new bootstrap.Modal(modalEl);
             modal.show();
+            
         } else {
-            throw new Error(errorText);
+            // 400 Bad Request (重複) や 500 Error の場合はアラートのみ
+            // モーダルは表示しない
+            alert(errorMsg);
         }
 
     } catch (err) {
-        alert("開始できませんでした: " + err.message);
+        // fetch自体の失敗など
+        alert("通信エラーが発生しました: " + err.message);
     }
 };
 

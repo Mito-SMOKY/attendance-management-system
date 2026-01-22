@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -122,11 +123,17 @@ public class SessionController {
     @ResponseBody
     public ResponseEntity<?> startSession(@RequestBody StartSessionDto request, Principal principal) {
         try {
+            // ログイン情報チェック
+            if (principal == null) {
+                System.out.println("Warning: Principal is null");
+            }
+            String loginId = (principal != null) ? principal.getName() : "student";
 
-            // ログイン中のユーザ情報を取得
-            UsersEntity user = usersRepository.findByLoginId(principal.getName())
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            // ユーザ情報取得
+            UsersEntity user = usersRepository.findByLoginId(loginId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found: " + loginId));
             
+            // サービス実行
             SessionEntity session = sessionService.startSession(
                 user.getUserId(), 
                 request.getSubjectId(), 
@@ -137,22 +144,27 @@ public class SessionController {
                 request.getTargetGrade()
             );
 
-            // 成功したらセッションIDを返す
             Map<String, Object> response = new HashMap<>();
             response.put("sessionId", session.getSessionId());
             return ResponseEntity.ok(response);
 
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "指定された日付・時限には、既にこの教員の授業データが存在します。"));
+
         } catch (IllegalStateException e) {
             
-            // 既に実施中のセッションがある場合
+            // モーダルを表示
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
-                    .body(e.getMessage());
+                    .body(Map.of("message", e.getMessage()));
+            
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("システムエラーが発生しました: " + e.getMessage());
+                    .body(Map.of("message", "システムエラー: " + e.getMessage()));
         }
     }
 

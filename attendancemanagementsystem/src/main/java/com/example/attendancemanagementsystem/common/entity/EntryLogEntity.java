@@ -32,6 +32,9 @@ public class EntryLogEntity {
     @Column(name = "ProcessedAt")
     private LocalDateTime processedAt;
 
+    @Column(name = "StatusID") 
+    private Integer statusId;
+
     public EntryLogEntity() {}
 
     // --- Getter / Setter ---
@@ -82,5 +85,13 @@ public class EntryLogEntity {
 
     public void setProcessedAt(LocalDateTime processedAt) {
         this.processedAt = processedAt;
+    }
+
+    public Integer getStatusId(){
+        return statusId;
+    }
+
+    public void setStatusId(Integer statusId){
+        this.statusId = statusId;
     }
 }
