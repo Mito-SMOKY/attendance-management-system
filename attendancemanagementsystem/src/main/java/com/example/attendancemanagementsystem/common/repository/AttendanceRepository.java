@@ -106,4 +106,15 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
        List<AttendanceEntity> findByStudentAndSubject(
               @Param("userId") Integer userId,
               @Param("subjectId") Integer subjectId);
+       
+       // 学生IDと日付範囲にもとづく出席情報取得
+       @Query("SELECT a FROM AttendanceEntity a " +
+              "JOIN FETCH a.session s " +
+              "JOIN FETCH a.status st " +
+              "WHERE a.student.userId = :studentId " +
+              "AND s.sessionDate BETWEEN :startDate AND :endDate")
+       List<AttendanceEntity> findByStudentIdAndDateBetween(
+              @Param("studentId") Integer studentId, 
+              @Param("startDate") LocalDate startDate, 
+              @Param("endDate") LocalDate endDate);
 }
