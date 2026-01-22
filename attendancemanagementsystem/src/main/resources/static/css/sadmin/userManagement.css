@@ -1,0 +1,474 @@
+/* @charset "UTF-8";
+
+body {
+    margin: 0;
+    padding-top: 80px; 
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    background-color: #f9f9f9; 
+}
+
+.page-header-area {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto 40px auto; 
+    position: relative;
+    min-height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; 
+    min-height: calc(100vh - 250px); 
+    padding-bottom: 50px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 40px;
+    padding: 0 20px;
+    justify-content: center;
+    flex-wrap: wrap; 
+    max-width: 1000px;
+}
+
+.ghost-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    width: 250px;
+    height: 180px; 
+
+    background-color: white;
+    color: #00bdca;
+    border: 3px solid #00bdca;
+    border-radius: 15px; 
+    
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+    letter-spacing: 0.05em;
+    
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.ghost-button i {
+    font-size: 50px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.ghost-button:hover {
+    background-color: #00bdca;
+    color: white; 
+    transform: translateY(-5px); 
+    box-shadow: 0 8px 20px rgba(0, 189, 202, 0.3);
+}
+
+.ghost-button:hover i {
+    transform: scale(1.1);
+}
+
+.ghost-button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .page-header-area {
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .backbutton-container {
+        position: static;
+        transform: none;
+        align-self: flex-start;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+
+    .action-buttons {
+        gap: 20px; 
+    }
+
+    .ghost-button {
+        width: 100%; 
+        max-width: 300px; 
+        height: 150px; 
+        font-size: 16px;
+    }
+    
+    .ghost-button i {
+        font-size: 40px;
+        margin-bottom: 15px;
+    }
+} */
+
+/* @charset "UTF-8";
+
+
+body {
+    margin: 0;
+    padding-top: 80px;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    background-color: #f9f9f9;
+}
+
+.page-header-area {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto 30px auto;
+    position: relative;
+    min-height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: calc(100vh - 250px);
+    padding-bottom: 50px;
+    width: 100%;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 40px;
+    padding: 10px 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.ghost-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    width: 250px;
+    height: 180px;
+    
+    background-color: white;
+    color: #00bdca;
+    border: 3px solid #00bdca;
+    border-radius: 15px;
+    
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.ghost-button i {
+    font-size: 50px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.arrow-icon {
+    font-size: 24px !important;
+    margin-bottom: 0 !important;
+    margin-top: 10px;
+}
+
+.ghost-button:hover {
+    background-color: #00bdca;
+    color: white;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 189, 202, 0.3);
+}
+
+.ghost-button:hover i {
+    transform: scale(1.1);
+}
+
+.ghost-button:active {
+    transform: translateY(0);
+}
+
+.submenu-container {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.5s ease-in-out;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.submenu-container.active {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 30px;
+    padding-bottom: 20px;
+    border-top: 1px dashed #ddd;
+    padding-top: 30px;
+}
+
+.submenu-title {
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.sub-ghost {
+    width: 220px;
+    height: 160px;
+    border-width: 2px;
+    font-size: 16px;
+}
+.sub-ghost i {
+    font-size: 40px;
+}
+
+@media (max-width: 768px) {
+    .page-header-area {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .backbutton-container {
+        position: static;
+        transform: none;
+        align-self: flex-start;
+    }
+
+    .action-buttons {
+        gap: 20px;
+    }
+
+    .ghost-button {
+        width: 100%;
+        max-width: 300px;
+        height: 120px;
+        flex-direction: row;
+        gap: 15px;
+    }
+
+    .ghost-button i {
+        font-size: 30px;
+        margin-bottom: 0;
+    }
+    
+    .arrow-icon {
+        margin-top: 0;
+        margin-left: auto;
+        margin-right: 15px;
+    }
+} */
+
+@charset "UTF-8";
+
+/* --- 基本設定 --- */
+body {
+  margin: 0;
+  padding-top: 80px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background-color: #f9f9f9;
+}
+
+/* --- ヘッダーエリア --- */
+.page-header-area {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  min-height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+/* --- コンテンツエリア --- */
+.content-wrapper {
+  /* 画面中央寄せの基準 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 180px);
+  padding-bottom: 50px;
+  width: 100%;
+}
+
+/* --- メニューグループ（重要） --- */
+.menu-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* これがボタンを中央に配置する鍵 */
+  width: 100%;
+}
+
+/* 非表示用クラス */
+.hidden {
+  display: none !important;
+}
+
+/* アニメーション */
+.fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- ボタン配置エリア --- */
+.action-buttons {
+  display: flex;
+  gap: 40px;
+  padding: 0 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1000px; /* ここを固定幅にすることで位置ずれ防止 */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* --- ゴーストボタン --- */
+.ghost-button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 250px;
+  height: 180px;
+
+  background-color: white;
+  color: #00bdca;
+  border: 3px solid #00bdca;
+  border-radius: 15px;
+
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 18px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.ghost-button i {
+  font-size: 50px;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease;
+}
+
+.arrow-icon {
+  position: absolute;
+  bottom: 15px;
+  margin-bottom: 0 !important;
+  font-size: 24px !important;
+}
+
+.ghost-button:hover {
+  background-color: #00bdca;
+  color: white;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 189, 202, 0.3);
+}
+.ghost-button:hover i {
+  transform: scale(1.1);
+}
+
+/* --- ▼▼▼ 小さな戻るボタンエリア ▼▼▼ --- */
+.back-btn-row {
+  width: 100%;
+  max-width: 1000px; /* action-buttonsと同じ幅に合わせる */
+  display: flex;
+  justify-content: flex-end; /* 右端に寄せる */
+  padding: 0 20px;
+  margin-top: 15px;
+  box-sizing: border-box;
+}
+
+.small-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px; /* 小さめに */
+
+  background-color: transparent;
+  color: #888;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.small-back-btn:hover {
+  background-color: #888;
+  color: white;
+  border-color: #888;
+}
+
+/* スマホ対応 */
+@media (max-width: 768px) {
+  .page-header-area {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .backbutton-container {
+    position: static;
+    transform: none;
+    align-self: flex-start;
+  }
+  .ghost-button {
+    width: 100%;
+    max-width: 300px;
+    height: 150px;
+  }
+}

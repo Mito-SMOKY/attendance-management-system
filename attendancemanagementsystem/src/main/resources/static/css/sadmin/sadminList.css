@@ -1,0 +1,243 @@
+@charset "UTF-8";
+
+/* --- 基本設定 --- */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+}
+
+/* ヘッダー位置の調整（必要に応じて） */
+.header-container {
+  width: 100%;
+  margin-bottom: 60px; /* ヘッダー下の余白 */
+  padding-top: 80px;
+}
+
+/* ▼▼▼ メインラップ：ここで横幅800px中央揃えを制御 ▼▼▼ */
+.main-wrapper {
+  width: 800px; /* 幅を固定 */
+  max-width: 95%; /* スマホ対策 */
+  margin: 0 auto; /* 左右自動で中央寄せ */
+  padding-bottom: 50px;
+}
+
+/* --- タイトルエリア（戻るボタン＋タイトル） --- */
+.top-section {
+  position: relative; /* 戻るボタンの基準点 */
+  display: flex;
+  justify-content: center; /* タイトルを中央に */
+  align-items: center;
+  height: 50px;
+  margin-bottom: 30px;
+}
+
+/* タイトル文字 */
+.page-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+/* --- 検索エリア --- */
+.search-area {
+  display: flex;
+  justify-content: left; /* 左寄せ */
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid #999;
+  border-radius: 4px;
+  background: #fff;
+  width: 320px;
+  height: 38px;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  flex-grow: 1;
+  padding: 0 10px;
+  font-size: 16px;
+  background: transparent;
+}
+
+.search-box button {
+  border: none;
+  background: transparent;
+  border-left: 1px solid #ccc;
+  padding: 0 15px;
+  cursor: pointer;
+  font-size: 15px;
+  color: #333;
+  height: 100%;
+}
+.search-box button:hover {
+  color: #00bdca;
+}
+
+.filter-btn {
+  width: 40px;
+  height: 38px;
+  border: 1px solid #999;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  color: #00bdca;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.filter-btn:hover {
+  background: #f0f0f0;
+}
+
+/* --- テーブルエリア --- */
+.table-area {
+  width: 100%; /* 親のmain-wrapper(800px)に合わせる */
+  border: 1px solid #ccc;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 16px;
+}
+
+.admin-table th {
+  background-color: #00bdca; /* ヘッダー色 */
+  color: #fff;
+  padding: 12px;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 12px;
+  border: 1px solid #ccc;
+  color: #333;
+  vertical-align: middle;
+}
+
+/* ▼▼▼ 名前リンク（指定カラー #00bdca） ▼▼▼ */
+.clickable-name {
+  color: #00bdca !important;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: bold;
+}
+.clickable-name:hover {
+  color: #009bad !important;
+}
+
+/* 〇と× */
+.status-circle,
+.status-cross {
+  font-weight: bold;
+  color: #333;
+  font-size: 1.2em;
+}
+
+/* フィルターボタンがONの状態 */
+.filter-btn.active {
+  background-color: #00bdca;
+  color: #fff;
+  border-color: #00bdca;
+}
+
+.modal-overlay {
+  display: none; /* 初期状態は非表示 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明の黒背景 */
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+/* JavaScriptで .active を付けたときに表示 */
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 30px;
+  width: 400px;
+  max-width: 90%;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.modal-title {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 20px;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+  text-align: left;
+  padding-left: 20%; /* 中央寄せっぽく調整 */
+}
+
+.radio-label {
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.radio-label input[type="radio"] {
+  transform: scale(1.2); /* ラジオボタンを少し大きく */
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* ボタン共通 */
+.btn-cancel,
+.btn-apply {
+  padding: 10px 25px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.btn-cancel {
+  background-color: #ccc;
+  color: #333;
+}
+.btn-cancel:hover {
+  background-color: #bbb;
+}
+
+.btn-apply {
+  background-color: #00bdca;
+  color: #fff;
+}
+.btn-apply:hover {
+  background-color: #009bad;
+}
