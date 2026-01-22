@@ -101,6 +101,48 @@ public class MdTimetableController {
         return "redirect:/admin/mdTimetable";
     }
 
+    // --- 削除専用画面の表示 ---
+    @GetMapping("/delete")
+    public String showDeleteForm(Model model) {
+        // DTOの初期化
+        MdTimetableDto dto = new MdTimetableDto();
+        
+        // 年度の初期値セットなど
+        setInitialYearAndTerm(dto); 
+        
+        model.addAttribute("mdTimetableDto", dto);
+        
+        // クラスなどのプルダウン用データをセット
+        setupCommonAttributes(model); 
+
+        return "admin/mdTimetableDelete";
+    }
+
+    // --- 削除実行処理 ---
+    @PostMapping("/delete")
+    public String executeDelete(@ModelAttribute MdTimetableDto dto, RedirectAttributes redirectAttributes) {
+        
+        // 必須チェック
+        if (dto.getDepartmentId() == null || dto.getStartDate() == null || dto.getEndDate() == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "クラスと期間は必須です。");
+            return "redirect:/admin/mdTimetable/delete";
+        }
+
+        try {
+            // Serviceの削除処理を呼ぶ
+            mdTimetableService.deleteRangeSchedule(dto);
+            
+            redirectAttributes.addFlashAttribute("successMessage", 
+                "削除完了: " + dto.getStartDate() + " ～ " + dto.getEndDate() + " のデータを削除しました。");
+                
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "削除中にエラーが発生しました。");
+        }
+
+        return "redirect:/admin/mdTimetable/delete";
+    }
+
     // 日別編集画面の表示処理
     @GetMapping("/daily")
     public String daily(@RequestParam(name = "date", required = false) LocalDate date,

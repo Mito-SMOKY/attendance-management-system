@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -64,6 +65,12 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
     
     // 指定したユーザIDの時間割エンティティの特定の日付・時限のエンティティを取得
     Optional<TimetableEntity> findByUserIdAndDateAndSlotId(Integer userId, LocalDate date, Integer slotId);
+
+    // 指定期間・指定学科のデータを一括削除
+    @Modifying
+    @Query("DELETE FROM TimetableEntity t WHERE t.department.departmentId = :deptId AND t.date BETWEEN :startDate AND :endDate")
+    void deleteByDepartmentAndDateRange(@Param("deptId") Integer deptId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
 
     // 参照画面用
     @Query("SELECT t FROM TimetableEntity t " +
