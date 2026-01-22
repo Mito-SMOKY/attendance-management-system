@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>時間割管理 - 一括削除</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/mdTimetable.css}">
+    
+    <link rel="stylesheet" th:href="@{/css/admin/mdTimetableDelete.css}">
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+    
+    <script th:src="@{/js/admin/mdTimetable.js}"></script>
+</head>
+<body>
+    <div class="main-container">
+        
+        <h2>時間割管理</h2>
+
+        <div class="mode-tabs">
+            <a th:href="@{/admin/mdTimetable}" class="tab-link">半期一括登録</a>
+            <a th:href="@{/admin/mdTimetable/daily}" class="tab-link">日別編集</a>
+            <a th:href="@{/admin/mdTimetable/view}" class="tab-link">時間割参照</a>
+            <a th:href="@{/admin/mdTimetable/delete}" class="tab-link active-tab" style="color: #dc3545;">一括削除</a>
+        </div>
+
+        <div class="delete-container">
+            
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+            <div class="warning-box">
+                <div class="warning-title">
+                    <span>⚠️</span> 時間割データの一括削除
+                </div>
+                <div class="warning-text">
+                    <p>指定した期間・クラスの時間割データを<strong>完全に削除</strong>します。</p>
+                    <p>「半期すべて」や「特定の1週間」を指定して削除する場合に使用してください。<br>
+                    ※この操作は元に戻せません。</p>
+                </div>
+            </div>
+
+            <form th:action="@{/admin/mdTimetable/delete}" method="post" th:object="${mdTimetableDto}" onsubmit="return confirm('【最終確認】\n\n本当に削除しますか？\n指定期間のデータが全て消えます。');">
+                
+                <div class="search-condition-area">
+                    <div class="condition-row">
+                        <label>期間目安セット</label>
+                        <div style="display: flex; gap: 10px;">
+                            <select id="yearSelect" th:field="*{year}" onchange="setAutoDates()">
+                                <option value="2025">2025年度</option>
+                                <option value="2026">2026年度</option>
+                            </select>
+                            <select id="termSelect" th:field="*{term}" onchange="setAutoDates()">
+                                <option value="1">前期</option>
+                                <option value="2">後期</option>
+                            </select>
+                            <button type="button" class="btn-secondary" onclick="setAutoDates()">日付を自動入力</button>
+                        </div>
+                    </div>
+
+                    <div class="condition-row">
+                        <label>対象クラス <span class="badge-required" style="color:red; font-size:0.8em;">(必須)</span></label>
+                        <select id="departmentId" th:field="*{departmentId}" class="searchable-select" required>
+                            <option value="">クラスを選択してください</option>
+                            <option th:each="dept : ${departmentOptions}" 
+                                    th:value="${dept.key}" 
+                                    th:text="${dept.value}"></option>
+                        </select>
+                    </div>
+
+                    <div class="condition-row">
+                        <label>削除対象期間 <span class="badge-required" style="color:red; font-size:0.8em;">(必須)</span></label>
+                        <div class="date-range-box">
+                            <input type="text" id="startDate" th:field="*{startDate}" placeholder="開始日" required>
+                            <span>～</span>
+                            <input type="text" id="endDate" th:field="*{endDate}" placeholder="終了日" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="delete-btn-area">
+                    <button type="submit" class="btn-danger-large">
+                        指定期間のデータを削除する
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
