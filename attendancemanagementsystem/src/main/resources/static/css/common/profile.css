@@ -167,24 +167,6 @@ body {
     display: none;
 }
 
-/* さらに表示ボタン */
-.show-more-button {
-    background: none;
-    border: none;
-    color: #20a0b2;
-    cursor: pointer;
-    padding: 5px 0;
-    font-size: 0.95rem;
-    text-align: left;
-    display: block;
-    width: 100%;
-}
-.show-more-button:hover {
-    text-decoration: underline;
-}
-.hidden-button {
-    display: none;
-}
 
 /* レスポンシブ対応（画面幅が狭い場合） */
 @media (max-width: 600px) {
@@ -367,36 +349,42 @@ input::placeholder{
     display: none;
 }
 
+
+
+/* さらに表示ボタン */
 .read-more-4 {
     position: relative;
 }
 
 .read-more-4 p {
     display: -webkit-box;
-    position: relative;
-    margin-bottom: 10px;
-    overflow: hidden;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4; /* 開く前に見せたい行数を指定 */
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 40px;
 }
 
 .read-more-4:has(:checked) p {
     display: block;
 }
 
-.read-more-4 p::after {
+.read-more-4::after {
     display: block;
     position: absolute;
     left: 0;
-    bottom: 0;
+    bottom: 0; 
     width: 100%;
-    height: 60px;
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0) 0, hsla(0, 0%, 100%, .9) 50%, hsla(0, 0%, 100%, .9) 0, #fff);
+    height: 80px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.9) 70%, #fff);
     content: '';
+    z-index: 1; 
+    pointer-events: none; 
 }
 
-.read-more-4:has(:checked) p::after {
-    content: none;
+.read-more-4:has(:checked)::after {
+    display: none;
 }
 
 .read-more-4 label {
@@ -440,4 +428,8 @@ input::placeholder{
 
 .read-more-4 input {
     display: none;
+}
+
+.read-more-4 label {
+    z-index: 2;
 }

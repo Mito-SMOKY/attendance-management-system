@@ -177,10 +177,10 @@ a {
   position: relative; /* 子要素の基準位置にする */
 }
 
-/* 「その他 ▼」の文字 */
+/* 「その他 ▼」の文字*/
 .dropdown-toggle {
   cursor: pointer;
-}
+} 
 
 /* ドロップダウンの中身（初期状態は非表示） */
 .dropdown-menu {

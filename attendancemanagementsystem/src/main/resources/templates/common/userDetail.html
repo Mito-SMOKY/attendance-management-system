@@ -70,11 +70,15 @@
             </div>
 
             <div class="card subject-details-card">
-                <h2 class="card-title">
+                <h2 class="card-title-big">
                     <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
                         <span class="card-title-big">受講教科詳細</span>
                     </div>
                     <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+                        <span>担当教科詳細</span>
+                    </div>
+
+                    <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
                         <span>担当教科詳細</span>
                     </div>
                 </h2>
