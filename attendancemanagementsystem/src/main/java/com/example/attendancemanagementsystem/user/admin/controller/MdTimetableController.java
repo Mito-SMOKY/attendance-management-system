@@ -40,7 +40,7 @@ public class MdTimetableController {
     @Autowired private TimeSlotRepository timeSlotRepository;
     @Autowired private GeminiService geminiService;
 
-    // AIで解析した結果をJSONで返す
+    // 時間割画像を解析するAPI
     @PostMapping("/analyze-image")
     @ResponseBody
     public ResponseEntity<String> analyzeImage(@RequestParam("file") MultipartFile file) {
@@ -52,6 +52,15 @@ public class MdTimetableController {
         String jsonResult = geminiService.analyzeTimetableImage(file);
         
         return ResponseEntity.ok(jsonResult);
+    }
+
+    // 行事予定表PDFを解析するAPI
+    @PostMapping("/analyzePdf")
+    @ResponseBody
+    public String analyzeSchedulePdf(@RequestParam("file") MultipartFile file, 
+                                    @RequestParam("year") Integer year,
+                                    @RequestParam(name = "targetGrade", defaultValue = "1") Integer targetGrade) {
+        return geminiService.extractHolidaysFromPdf(file, year, targetGrade);
     }
 
     // 現在の日付に基づいて年度と学期の初期値を設定する処理

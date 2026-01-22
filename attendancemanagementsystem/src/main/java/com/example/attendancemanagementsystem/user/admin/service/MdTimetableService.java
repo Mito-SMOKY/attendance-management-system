@@ -2,12 +2,15 @@ package com.example.attendancemanagementsystem.user.admin.service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter; 
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,6 +75,52 @@ public class MdTimetableService {
         DepartmentEntity department = departmentRepository.findById(deptId)
                 .orElseThrow(() -> new RuntimeException("Department not found ID:" + deptId));
 
+        // 除外日リストの作成 (★強化版)
+        Set<LocalDate> skipDates = new HashSet<>();
+        String excludedStr = dto.getExcludedDates();
+
+        // ログ: 受け取った文字列を確認
+        System.out.println("【Debug】除外日文字列(Raw): " + excludedStr);
+
+        if (excludedStr != null && !excludedStr.trim().isEmpty()) {
+            
+            // JSON形式の記号（ブラケットやクォート）を除去して綺麗にする
+            String cleanStr = excludedStr.replaceAll("[\\[\\]\"']", "");
+
+            // カンマ(半角・全角)、読点、改行、スペースなどで分割
+            String[] dates = cleanStr.split("[,、\n\r\\s]+");
+            
+            // 対応するフォーマット定義 (ハイフン、スラッシュ、ゼロ埋め有無に対応)
+            DateTimeFormatter[] formatters = {
+                DateTimeFormatter.ISO_LOCAL_DATE,       // 2025-04-29
+                DateTimeFormatter.ofPattern("yyyy/MM/dd"), // 2025/04/29
+                DateTimeFormatter.ofPattern("yyyy/M/d")    // 2025/4/29
+            };
+
+            for (String d : dates) {
+                String cleanDate = d.trim();
+                if (cleanDate.isEmpty()) continue;
+                
+                boolean parsed = false;
+                for (DateTimeFormatter fmt : formatters) {
+                    try {
+                        skipDates.add(LocalDate.parse(cleanDate, fmt));
+                        parsed = true;
+                        break; // 成功したらループを抜ける
+                    } catch (Exception e) {
+                        // 次のフォーマットを試行
+                    }
+                }
+                
+                if (!parsed) {
+                    System.err.println("【Warning】日付として解析できませんでした: " + cleanDate);
+                }
+            }
+        }
+        
+        // ログ: 実際に除外される日付リスト
+        System.out.println("【Debug】登録スキップ対象の日付: " + skipDates);
+
         List<TimetableEntity> entitiesToSave = new ArrayList<>();
         LocalDate current = dto.getStartDate();
         LocalDate end = dto.getEndDate();
@@ -85,6 +134,14 @@ public class MdTimetableService {
 
         // 指定期間の日付ループ
         while (!current.isAfter(end)) {
+
+            // 除外日に含まれる場合はスキップ
+            if (skipDates.contains(current)) {
+                System.out.println("Skip: " + current + " (除外日のためスキップ)");
+                current = current.plusDays(1);
+                continue;
+            }
+
             String dayOfWeekKey = current.getDayOfWeek().name();
             
             // 全時限ループ

@@ -13,7 +13,7 @@ $(document).ready(function() {
     });
 
     // --- 2. Flatpickr (一括登録用・期間選択) ---
-    // startとendを別々に初期化して連動させる方式に変更（バグ回避のため）
+    // startとendを別々に初期化して連動させる方式
     const startDateInput = document.getElementById("startDate");
     const endDateInput = document.getElementById("endDate");
 
@@ -23,11 +23,11 @@ $(document).ready(function() {
         const fpEnd = flatpickr("#endDate", {
             locale: "ja",
             dateFormat: "Y-m-d",
-            allowInput: true // 手入力も許可
+            allowInput: true 
         });
 
         // 開始日の設定
-        const fpStart = flatpickr("#startDate", {
+        flatpickr("#startDate", {
             locale: "ja",
             dateFormat: "Y-m-d",
             allowInput: true,
@@ -54,13 +54,11 @@ $(document).ready(function() {
 
 /**
  * 年度と学期から、開始日・終了日の目安をセットする
- * Flatpickrを使っている場合は .setDate() で値を更新する
  */
 function setAutoDates() {
     const year = document.getElementById('yearSelect').value;
     const term = document.getElementById('termSelect').value;
     
-    // Flatpickrのインスタンスを取得
     const startElem = document.getElementById("startDate");
     const endElem = document.getElementById("endDate");
 
@@ -75,7 +73,7 @@ function setAutoDates() {
         endStr = (parseInt(year) + 1) + '-03-31';
     }
 
-    // Flatpickrが適用されている場合は専用メソッドでセット
+    // Flatpickrにセット
     if (startElem && startElem._flatpickr) {
         startElem._flatpickr.setDate(startStr);
     } else if (startElem) {
@@ -90,7 +88,7 @@ function setAutoDates() {
 }
 
 /**
- * AI画像解析のアップロード処理
+ * AI画像解析のアップロード処理 (時間割画像用)
  */
 async function uploadImage() {
     const fileInput = document.getElementById('timetableImage');
@@ -135,15 +133,65 @@ async function uploadImage() {
     }
 }
 
+/**
+ * ★追加: 行事予定表PDFをアップロードして休日を抽出
+ */
+async function uploadSchedulePdf() {
+    const fileInput = document.getElementById('schedulePdf');
+    const loadingMsg = document.getElementById('pdfLoadingMsg');
+    const analyzeBtn = document.getElementById('analyzePdfBtn');
+    const yearSelect = document.getElementById('yearSelect');
+    const outputArea = document.getElementById('excludedDates');
+
+    if (fileInput.files.length === 0) {
+        alert("PDFファイルを選択してください");
+        return;
+    }
+
+    loadingMsg.style.display = 'block';
+    analyzeBtn.disabled = true;
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    formData.append("year", yearSelect.value); // 年度も送る
+
+    try {
+        // コントローラーへの送信
+        const response = await fetch('/admin/mdTimetable/analyze-schedule', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) throw new Error("Server Error");
+
+        // 結果(JSON配列)を受け取る
+        const dateList = await response.json(); 
+        console.log("除外日リスト:", dateList);
+
+        if (dateList.length === 0) {
+            alert("休日が見つかりませんでした。\nPDFの内容を確認するか、手動で入力してください。");
+        } else {
+            // テキストエリアにカンマ区切りでセット
+            outputArea.value = dateList.join(', ');
+            alert(dateList.length + "日分の休日・休講日を抽出しました！\n登録時にこれらの日はスキップされます。");
+        }
+
+    } catch (e) {
+        console.error(e);
+        alert("解析に失敗しました。");
+    } finally {
+        loadingMsg.style.display = 'none';
+        analyzeBtn.disabled = false;
+    }
+}
+
+/**
+ * 解析データを画面のプルダウンに反映
+ */
 function applyTimetableData(data) {
     let count = 0;
     data.forEach(item => {
-        // 例: scheduleMap[1]['MONDAY']
         const nameBase = `scheduleMap[${item.slot}]['${item.day}']`;
-        
-        // select要素を探す
-        // 注意: HTML上のname属性は th:field によって生成されるため、
-        // 実際のDOMでは name="scheduleMap[1]['MONDAY'].subjectId" のようになっている
         const subjectEl = $(`select[name="${nameBase}.subjectId"]`);
         const roomEl    = $(`select[name="${nameBase}.classroomId"]`);
         const teacherEl = $(`select[name="${nameBase}.userId"]`);
@@ -151,7 +199,7 @@ function applyTimetableData(data) {
         if (subjectEl.length === 0) return; 
 
         if (item.subjectId) {
-            subjectEl.val(item.subjectId).trigger('change'); // Select2更新用
+            subjectEl.val(item.subjectId).trigger('change');
             count++;
         }
         if (item.classroomId && roomEl.length > 0) {
@@ -165,7 +213,7 @@ function applyTimetableData(data) {
 }
 
 /**
- * 一括登録前の重複チェック
+ * 重複チェック後に送信
  */
 async function checkAndSubmit() {
     const deptId = document.getElementById('departmentId').value;
@@ -188,22 +236,14 @@ async function checkAndSubmit() {
         const data = await response.json();
 
         if (data.exists) {
-            // データがある場合の警告メッセージ
             const msg = "【⚠️ データ重複警告】\n\n" + 
-                        "指定された期間内に、既に以下のデータが見つかりました。\n" +
-                        "--------------------------------------------------\n" +
-                        "■ 重複期間: " + data.minDate + " ～ " + data.maxDate + "\n" +
-                        "■ データ数: " + data.count + " コマ\n" +
-                        "--------------------------------------------------\n\n" +
-                        "登録を実行すると、これらのデータは今回の内容で\n" +
-                        "上書き（更新）されます。\n\n" +
-                        "本当によろしいですか？";
+                        "指定期間内に既にデータがあります。\n" +
+                        "上書き（更新）してもよろしいですか？";
             
             if (confirm(msg)) {
                 form.submit();
             }
         } else {
-            // データがない場合の確認
             if (confirm("時間割を一括登録します。よろしいですか？")) {
                 form.submit();
             }
@@ -211,7 +251,6 @@ async function checkAndSubmit() {
 
     } catch (error) {
         console.error("Check Error:", error);
-        // エラー時は安全策として普通の確認を出して進める
         if (confirm("通信エラーが発生しましたが、登録を続行しますか？")) {
             form.submit();
         }
@@ -235,7 +274,6 @@ function setReferenceDate() {
         dateStr = year + '-10-01';
     }
 
-    // Flatpickrに日付をセット
     if (dateInput._flatpickr) {
         dateInput._flatpickr.setDate(dateStr);
     } else {

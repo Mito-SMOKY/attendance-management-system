@@ -7,6 +7,7 @@
     <link rel="stylesheet" th:href="@{/css/admin/mdTimetable.css}">
     
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
     
@@ -15,7 +16,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/rangePlugin.js"></script>
 
     <script th:src="@{/js/admin/mdTimetable.js}"></script>
 </head>
@@ -42,27 +42,53 @@
             <a th:href="@{/admin/mdTimetable/view}" class="tab-link">時間割参照</a>
         </div>
 
-        <div class="ai-section">
-            <h3 class="ai-title">
-                📷 AI自動入力 <span class="beta-badge">Beta</span>
-            </h3>
-            <div class="ai-controls">
-                <input type="file" id="timetableImage" accept="image/*, application/pdf" class="file-input">
-                <button type="button" onclick="uploadImage()" class="btn-analyze" id="analyzeBtn">
-                    画像を読み込んで反映
-                </button>
-            </div>
-            <p class="ai-description">
-                ※時間割の画像(写真・スクショ)ファイルを選択してください。<br>
-                ※AIが「科目・教室・教員」を読み取り、自動で選択肢をセットします。
-            </p>
-            <div id="loadingMsg" class="loading-msg">
-                ⏳ AIが解析中です... そのままお待ちください (5～10秒程度)
-            </div>
-        </div>
-
         <form id="registerForm" th:action="@{/admin/mdTimetable/register}" th:object="${mdTimetableDto}" method="post">
-            
+
+            <div class="ai-section">
+                <h3 class="ai-title">
+                    📷 AI自動入力 <span class="beta-badge">Beta</span>
+                </h3>
+                <div class="ai-controls">
+                    <input type="file" id="timetableImage" accept="image/*, application/pdf" class="file-input">
+                    <button type="button" onclick="uploadImage()" class="btn-analyze" id="analyzeBtn">
+                        画像を読み込んで反映
+                    </button>
+                </div>
+                <p class="ai-description">
+                    ※時間割の画像(写真・スクショ)ファイルを選択してください。<br>
+                    ※AIが「科目・教室・教員」を読み取り、自動で選択肢をセットします。
+                </p>
+                <div id="loadingMsg" class="loading-msg">
+                    ⏳ AIが解析中です... そのままお待ちください (5～10秒程度)
+                </div>
+            </div>
+
+            <div class="ai-section" style="background: #fff0f5; border-color: #ffb6c1;">
+                <h3 class="ai-title" style="color: #c71585;">
+                    📅 年間行事から休日を除外 <span class="beta-badge">New</span>
+                </h3>
+                <div class="ai-controls">
+                    <input type="file" id="schedulePdf" accept="application/pdf" class="file-input">
+                    <button type="button" onclick="uploadSchedulePdf()" class="btn-analyze" id="analyzePdfBtn" style="background: #d87093; border-color: #d87093;">
+                        予定表を読み込んで除外日を抽出
+                    </button>
+                </div>
+                <p class="ai-description">
+                    ※「年間行事予定表.pdf」をアップロードすると、休講日や長期休暇を自動判定します。<br>
+                    ※抽出された日付は、時間割登録時に<strong>スキップ（登録なし）</strong>されます。
+                </p>
+                
+                <div class="form-group" style="margin-top: 15px;">
+                    <label style="font-weight:bold; color:#d87093;">登録を除外する日付 (カンマ区切り):</label>
+                    <textarea th:field="*{excludedDates}" id="excludedDates" class="form-control" rows="2" 
+                              placeholder="例: 2025-04-29, 2025-05-03... (自動入力されますが手修正も可能です)"
+                              style="width: 100%; max-width: 800px; border-color: #ffb6c1;"></textarea>
+                </div>
+                <div id="pdfLoadingMsg" class="loading-msg">
+                    ⏳ スケジュール解析中... (10～20秒ほどかかります)
+                </div>
+            </div>
+
             <div class="setting-area">
                 <div class="setting-row">
                     <div class="form-group">
@@ -109,7 +135,7 @@
                         <input type="text" th:field="*{endDate}" id="endDate" class="form-control" placeholder="終了日" required style="width: 140px; background-color: white;">
                     </div>
                     <p class="warning-text">
-                        ※開始日をクリックするとカレンダーが開きます。期間をなぞって選択してください。
+                        ※開始日をクリックするとカレンダーが開きます。
                     </p>
                 </div>
             </div>
