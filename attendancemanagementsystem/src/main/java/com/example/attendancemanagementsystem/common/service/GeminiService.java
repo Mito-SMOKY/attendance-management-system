@@ -205,40 +205,40 @@ public class GeminiService {
     }
 
 
-   // PDFから休講日リストを抽出する
-    public String extractHolidaysFromPdf(MultipartFile file, int year, int targetGrade) {
+   // PDFから「学期の期間」と「休日」を同時に抽出する
+    public String extractHolidaysFromPdf(MultipartFile file, int year, int term, int targetGrade) {
         try {
-            // Gemini 2.0 Flash URL
             String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiKey;
-
-            // PDFをBase64に変換
             byte[] pdfBytes = file.getBytes();
             String base64Pdf = Base64.getEncoder().encodeToString(pdfBytes);
 
-            // 対象学年の文字列を作成 (例: "1年生")
             String gradeLabel = targetGrade + "年生";
+            String termLabel = (term == 1) ? "前期" : "後期";
 
-            // プロンプト
+            // プロンプト修正
             String promptText = 
-                "このPDFは " + year + "年度 の学校の年間行事予定表です。\n" +
-                "この中から、**「" + gradeLabel + "」** の学生にとって、授業が行われない日（休日・休講・長期休暇）を全て特定してください。\n\n" +
+                "あなたは学校の教務システム管理者です。添付のPDFから" + year + "年度の行事予定を読み取り、以下の情報を抽出してください。\n\n" +
                 
-                "【判定ルール（優先度高）】\n" +
-                "1. **学年固有のスケジュール**: 行事予定表に記載されている「" + gradeLabel + "」の授業開始日や終了日を厳密に読み取ってください。\n" +
-                "   - 例: '1年生授業開始' が4/7の場合、4/1〜4/6は休日として扱ってください。\n" +
-                "   - 他の学年のスケジュールと混同しないようにしてください。\n" +
-                "2. **期間の展開**: '夏期休業'、'冬期休業'、'GW'、'閉寮' など、期間（例: '8/1 ～ 8/31' や '～9/12まで'）が示されている場合は、その期間に含まれる**全ての日付**を1日ずつ展開してリストに含めてください。\n\n" +
-                
-                "【その他の休日定義】\n" +
-                "・土曜日、日曜日、祝日、振替休日。\n" +
-                "・'休講'、'入試'、'式典'、'入構禁止' と記載されている日。\n" +
-                "・文字が赤くなっている日や、'休' のマークがある日。\n\n" +
+                "【タスク1: 期間の特定】\n" +
+                "**「" + gradeLabel + "」** の **「" + termLabel + "」** における**『授業開始日』**と**『授業終了日』**の日付を特定してください。\n" +
+                "※PDF内の表記例: '1年前期授業開始', '前期授業終了' など。\n" +
+                "※もし明確な終了日がなければ、学期の区切り（前期なら9月末、後期なら3月末）付近の授業最終日を推測してください。\n\n" +
 
-                "出力形式: YYYY-MM-DD 形式の日付文字列のJSONリストのみを返してください。\n" +
-                "例: [\"2025-04-01\", \"2025-04-02\", ..., \"2025-05-06\"]\n" +
-                "※余計なMarkdown記法（```jsonなど）は不要です。純粋なリストだけ返してください。";
-                
-            // JSONボディ作成
+                "【タスク2: 休日の抽出】\n" +
+                "タスク1で特定した **開始日から終了日までの期間内** に含まれる『授業が行われない日』を全てリスト化してください。\n" +
+                "・祝日、振替休日、創立記念日、開学記念日\n" +
+                "・学校行事（研修、旅行、ヤツロゲ、入試、式典など授業がない日）\n" +
+                "・長期休暇（夏休み・冬休み）が含まれる場合は、その期間中の平日全て\n\n" +
+
+                "【出力形式 (JSONのみ)】\n" +
+                "以下のJSONフォーマットのみを返してください。Markdownや説明は不要です。\n" +
+                "{\n" +
+                "  \"startDate\": \"YYYY-MM-DD\",\n" + 
+                "  \"endDate\": \"YYYY-MM-DD\",\n" +   
+                "  \"holidays\": [\"YYYY-MM-DD\", \"YYYY-MM-DD\", ...]\n" + 
+                "}";
+
+            // JSONボディ作成（共通処理）
             ObjectMapper mapper = new ObjectMapper();
             String jsonBody = "{"
                     + "\"contents\": [{"
@@ -252,7 +252,7 @@ public class GeminiService {
                     + "}]"
                     + "}";
 
-            // 送信
+            // 送信（共通処理）
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(apiUrl))
@@ -262,20 +262,18 @@ public class GeminiService {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             
-            // レスポンス解析 
             JsonNode root = mapper.readTree(response.body());
             if (root.has("candidates")) {
                 String text = root.path("candidates").get(0).path("content").path("parts").get(0).path("text").asText();
-
                 // クリーニング
-                text = text.replaceAll("```json", "").replaceAll("```", "").trim();
-                return text; 
+                return text.replaceAll("```json", "").replaceAll("```", "").trim();
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "[]";
+        // エラー時は空のJSON構造を返す
+        return "{ \"startDate\": \"\", \"endDate\": \"\", \"holidays\": [] }";
     }
 
     // 文字列の正規化

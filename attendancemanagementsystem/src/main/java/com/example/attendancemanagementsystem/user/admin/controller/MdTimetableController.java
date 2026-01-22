@@ -59,8 +59,9 @@ public class MdTimetableController {
     @ResponseBody
     public String analyzeSchedulePdf(@RequestParam("file") MultipartFile file, 
                                     @RequestParam("year") Integer year,
+                                    @RequestParam("term") Integer term, 
                                     @RequestParam(name = "targetGrade", defaultValue = "1") Integer targetGrade) {
-        return geminiService.extractHolidaysFromPdf(file, year, targetGrade);
+        return geminiService.extractHolidaysFromPdf(file, year, term, targetGrade);
     }
 
     // 現在の日付に基づいて年度と学期の初期値を設定する処理

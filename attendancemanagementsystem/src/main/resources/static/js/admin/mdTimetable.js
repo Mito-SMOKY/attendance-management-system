@@ -54,6 +54,7 @@ $(document).ready(function() {
 
 /**
  * 年度と学期から、開始日・終了日の目安をセットする
+ * (手動ボタン用)
  */
 function setAutoDates() {
     const year = document.getElementById('yearSelect').value;
@@ -134,17 +135,45 @@ async function uploadImage() {
 }
 
 /**
- * ★追加: 行事予定表PDFをアップロードして休日を抽出
+ * ★修正: 行事予定表PDF解析
+ * (期間の自動セット ＆ 休日の抽出)
  */
 async function uploadSchedulePdf() {
     const fileInput = document.getElementById('schedulePdf');
     const loadingMsg = document.getElementById('pdfLoadingMsg');
     const analyzeBtn = document.getElementById('analyzePdfBtn');
+    
     const yearSelect = document.getElementById('yearSelect');
+    const termSelect = document.getElementById('termSelect'); // 学期も送信
     const outputArea = document.getElementById('excludedDates');
+    
+    // 日付入力欄の取得
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+
+    // 1. クラスプルダウンから表示テキスト（例: "情報システム科 1年"）を取得
+    const selectedText = $("#departmentId option:selected").text(); 
+    
+    // 2. "1年" や "2年" という数字を抜き出す
+    const gradeMatch = selectedText.match(/([0-9]+)年/);
+    let targetGrade = 1; // デフォルト
+    
+    if (gradeMatch) {
+        targetGrade = gradeMatch[1];
+    } else {
+        if ($("#departmentId").val() !== "" && !confirm("クラス名から学年が読み取れませんでした。\n1年生として処理して良いですか？")) {
+            return;
+        }
+    }
 
     if (fileInput.files.length === 0) {
         alert("PDFファイルを選択してください");
+        return;
+    }
+
+    // クラス未選択チェック
+    if ($("#departmentId").val() === "") {
+        alert("先に対象クラス（学科）を選択してください。\n※学年を特定するために必要です。");
         return;
     }
 
@@ -153,32 +182,56 @@ async function uploadSchedulePdf() {
 
     const formData = new FormData();
     formData.append("file", fileInput.files[0]);
-    formData.append("year", yearSelect.value); // 年度も送る
+    formData.append("year", yearSelect.value); 
+    formData.append("term", termSelect.value); // ★学期を追加
+    formData.append("targetGrade", targetGrade);
 
     try {
-        // コントローラーへの送信
-        const response = await fetch('/admin/mdTimetable/analyze-schedule', {
+        const response = await fetch('/admin/mdTimetable/analyzePdf', {
             method: 'POST',
             body: formData
         });
 
-        if (!response.ok) throw new Error("Server Error");
+        if (!response.ok) throw new Error("Server Error: " + response.status);
 
-        // 結果(JSON配列)を受け取る
-        const dateList = await response.json(); 
-        console.log("除外日リスト:", dateList);
+        // ★修正: JSONオブジェクトを受け取る { startDate, endDate, holidays }
+        const result = await response.json(); 
+        console.log("解析結果:", result);
 
-        if (dateList.length === 0) {
-            alert("休日が見つかりませんでした。\nPDFの内容を確認するか、手動で入力してください。");
+        // --- 1. 期間の自動セット ---
+        if (result.startDate && result.endDate) {
+            // Flatpickr経由で値をセット
+            if (startDateInput && startDateInput._flatpickr) startDateInput._flatpickr.setDate(result.startDate);
+            else if (startDateInput) startDateInput.value = result.startDate;
+
+            if (endDateInput && endDateInput._flatpickr) endDateInput._flatpickr.setDate(result.endDate);
+            else if (endDateInput) endDateInput.value = result.endDate;
+        }
+
+        // --- 2. 休日リストのセット ---
+        const dateList = result.holidays || [];
+
+        if (dateList.length === 0 && (!result.startDate || !result.endDate)) {
+            // 期間も休日も取れなかった場合
+            alert("PDFから有効な情報を読み取れませんでした。");
         } else {
-            // テキストエリアにカンマ区切りでセット
-            outputArea.value = dateList.join(', ');
-            alert(dateList.length + "日分の休日・休講日を抽出しました！\n登録時にこれらの日はスキップされます。");
+            // 休日があればセット
+            if (dateList.length > 0) {
+                outputArea.value = dateList.join(', ');
+            }
+
+            // メッセージ作成
+            let msg = `【${targetGrade}年生】のスケジュール解析完了\n`;
+            if (result.startDate && result.endDate) {
+                msg += `■ 期間: ${result.startDate} ～ ${result.endDate}\n`;
+            }
+            msg += `■ 休日: ${dateList.length}日分を抽出しました`;
+            alert(msg);
         }
 
     } catch (e) {
         console.error(e);
-        alert("解析に失敗しました。");
+        alert("解析に失敗しました。サーバーエラーが発生した可能性があります。");
     } finally {
         loadingMsg.style.display = 'none';
         analyzeBtn.disabled = false;
