@@ -3,7 +3,7 @@
 <!-- 履歴から前画面に戻るボタン -->
 <div th:fragment="historyBackButton">
   <button type="button" onclick="history.back()" class="backbutton">
-    戻る
+    <　戻る
   </button>
 </div>
 
@@ -14,7 +14,7 @@
     th:onclick="'location.href=\'' + @{${url}} + '\''"
     class="backbutton"
   >
-    戻る
+    <　戻る
   </button>
 </div>
 
@@ -111,7 +111,7 @@
             <a th:href="@{/admin/tmpAccount}">仮アカウント管理</a>
             <a th:href="@{/admin/master-data}">マスタデータ管理</a>
             <a th:href="@{/admin/nfc/idle}">NFC管理</a>
-            <a th:href="@{/admin/timeTableList}">時間割一覧</a>
+            <a th:href="@{/admin/mdTimetable}">時間割一覧</a>
             <a th:href="@{/session}">授業実施コンソール</a>
           </div>
         </li>
@@ -146,7 +146,7 @@
             <a th:href="@{/admin/tmpAccount}">仮アカウント管理</a>
             <a th:href="@{/admin/master-data}">マスタデータ管理</a>
             <a th:href="@{/admin/nfc/idle}">NFC管理</a>
-            <a th:href="@{/admin/timeTableList}">時間割一覧</a>
+            <a th:href="@{/admin/mdTimetable}">時間割一覧</a>
             <a th:href="@{/session}">授業実施コンソール</a>
           </div>
         </li>
