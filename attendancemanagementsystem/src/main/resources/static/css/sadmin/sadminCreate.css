@@ -1,0 +1,154 @@
+@charset "UTF-8";
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+}
+
+.header-container {
+  width: 100%;
+  margin-bottom: 60px;
+  padding-top: 60px;
+}
+.main-wrapper {
+  width: 800px;
+  max-width: 95%;
+  margin: 0 auto;
+  padding-bottom: 50px;
+}
+
+.top-section {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  margin-bottom: 30px;
+}
+.page-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+.info-container {
+  background: #fff;
+  padding: 35px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eee;
+}
+
+.info-header {
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+}
+.info-header h3 {
+  margin: 0;
+  color: #00bdca;
+  font-size: 24px;
+}
+
+.detail-box {
+  border: 2px solid #00bdca;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.detail-row {
+  display: flex;
+  border-bottom: 1px solid #bcebf0;
+  min-height: 60px;
+}
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  width: 35%;
+  background: #00bdca;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.badge-required {
+  background: #fff;
+  color: #00bdca;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.detail-value {
+  width: 65%;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+}
+
+.detail-value input,
+.auth-select {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.detail-value input:focus,
+.auth-select:focus {
+  border-color: #00bdca;
+}
+
+.mt-20 {
+  margin-top: 25px;
+}
+
+/* パスワード表示切り替え */
+.password-container {
+  position: relative;
+}
+.toggle-eye {
+  position: absolute;
+  right: 30px;
+  cursor: pointer;
+  color: #aaa;
+  font-size: 18px;
+}
+.toggle-eye:hover {
+  color: #00bdca;
+}
+
+/* 登録ボタン */
+.action-buttons {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+}
+.btn-register {
+  background: #00bdca;
+  color: #fff;
+  border: none;
+  padding: 12px 60px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 18px;
+  box-shadow: 0 4px 10px rgba(0, 189, 202, 0.3);
+  transition: all 0.3s;
+}
+.btn-register:hover {
+  background: #009bad;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 189, 202, 0.4);
+}

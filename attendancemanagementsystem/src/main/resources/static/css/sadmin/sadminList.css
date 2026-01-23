@@ -241,3 +241,27 @@ body {
 .btn-apply:hover {
   background-color: #009bad;
 }
+
+/* --- 新規登録ボタン --- */
+.btn-create-new {
+  position: absolute;
+  right: 0; /* 右端に配置 */
+  background-color: #00bdca;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 15px;
+  box-shadow: 0 4px 6px rgba(0, 189, 202, 0.3);
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-create-new:hover {
+  background-color: #009bad;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 189, 202, 0.4);
+}

@@ -1,0 +1,390 @@
+@charset "UTF-8";
+
+/* --- 基本設定 --- */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+}
+
+/* ヘッダー位置の調整 */
+.header-container {
+  width: 100%;
+  margin-bottom: 60px;
+  padding-top: 60px;
+}
+
+/* メインラップ */
+.main-wrapper {
+  width: 800px;
+  max-width: 95%;
+  margin: 0 auto;
+  padding-bottom: 50px;
+}
+
+/* --- タイトルエリア --- */
+.top-section {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  margin-bottom: 30px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+/* --- 詳細情報の枠 --- */
+.info-container {
+  background: #fff;
+  padding: 35px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eee;
+}
+
+/* ヘッダーエリア */
+.info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+}
+
+.info-header h3 {
+  margin: 0;
+  /* 基本のテーマカラー（水色）は維持 */
+  color: #00bdca;
+  font-size: 24px;
+}
+
+/* 編集ボタンのスタイル */
+.btn-edit-mode {
+  background: #fff;
+  border: 2px solid #00bdca;
+  color: #00bdca;
+  padding: 6px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-edit-mode:hover {
+  background: #00bdca;
+  color: white;
+}
+
+/* 編集中（トグルON）の状態 */
+.btn-edit-mode.editing {
+  background-color: #999;
+  border-color: #999;
+  color: #fff;
+}
+.btn-edit-mode.editing:hover {
+  background-color: #777;
+}
+
+/* --- 入力エリア --- */
+.detail-box {
+  border: 2px solid #00bdca;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.detail-row {
+  display: flex;
+  border-bottom: 1px solid #bcebf0;
+  min-height: 50px;
+}
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  width: 35%;
+  background: #00bdca;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.detail-value {
+  width: 65%;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+/* 入力フォームの装飾 */
+.detail-value input,
+.auth-select {
+  text-align: center;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  outline: none;
+  width: 90%;
+  font-size: 18px;
+  padding: 5px;
+  background: transparent;
+  color: #333;
+}
+
+.detail-value input:disabled,
+.auth-select:disabled {
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: #333;
+  cursor: not-allowed;
+  opacity: 1;
+  -webkit-text-fill-color: #333;
+}
+
+.detail-value input:focus,
+.auth-select:focus {
+  border-bottom-color: #00bdca;
+}
+
+.mt-20 {
+  margin-top: 25px;
+}
+
+/* --- 下部ボタンエリア --- */
+.action-buttons {
+  margin-top: 35px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  min-height: 50px;
+}
+
+/* 削除ボタン（トリガー）は赤色のまま */
+.btn-delete {
+  border: 2px solid #dc3545; /* 赤 */
+  color: #dc3545;
+  background: #fff;
+  padding: 10px 25px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+}
+.btn-delete:hover {
+  background: #fff5f5;
+}
+
+.btn-confirm {
+  background: #00bdca;
+  color: #fff;
+  border: none;
+  padding: 10px 40px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  margin-left: auto;
+}
+.btn-confirm:hover {
+  background: #009bad;
+}
+
+/* --- 削除確認モーダル (赤色バージョン #dc3545) --- */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-box {
+  background: #fff;
+  width: 480px;
+  padding: 40px 30px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  position: relative;
+  /* ★変更: 赤色のボーダー */
+  border-top: 5px solid #dc3545;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* アイコン装飾 */
+.modal-icon {
+  /* ★変更: 赤色のアイコン */
+  color: #dc3545;
+  font-size: 40px;
+  /* ★変更: 薄い赤の背景 */
+  background: #fff5f5;
+  width: 80px;
+  height: 80px;
+  line-height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+}
+
+/* タイトルと警告 */
+.modal-title {
+  color: #333;
+  font-size: 22px;
+  margin: 0 0 10px;
+  font-weight: bold;
+}
+
+.modal-warning {
+  /* ★変更: 赤文字と薄い赤背景 */
+  color: #dc3545;
+  background: #fff5f5;
+  font-size: 13px;
+  font-weight: bold;
+  display: inline-block;
+  padding: 5px 15px;
+  border-radius: 20px;
+  margin-bottom: 25px;
+}
+
+/* ユーザー情報エリア */
+.modal-user-info {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: left;
+  display: inline-block;
+  width: 80%;
+  margin-bottom: 25px;
+  border-left: 4px solid #aaa;
+}
+
+.modal-user-info p {
+  margin: 5px 0;
+  font-size: 15px;
+  color: #555;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-user-info span {
+  font-weight: bold;
+  color: #333;
+}
+
+/* パスワード入力 */
+.modal-input-label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  text-align: left;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.password-wrapper {
+  position: relative;
+  width: 80%;
+  margin: 0 auto 30px;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding: 12px 45px 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+
+.password-wrapper input:focus {
+  outline: none;
+  /* ★変更: フォーカス時は赤色 */
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+}
+
+.toggle-eye {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #aaa;
+}
+.toggle-eye:hover {
+  /* ★変更: ホバー時に赤 */
+  color: #dc3545;
+}
+
+/* ボタン */
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn-modal-cancel {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #666;
+  padding: 10px 30px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-modal-cancel:hover {
+  background: #f8f9fa;
+}
+
+.btn-modal-delete {
+  /* ★変更: 削除実行ボタンは赤 */
+  background: #dc3545;
+  border: 1px solid #dc3545;
+  color: #fff;
+  padding: 10px 40px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(220, 53, 69, 0.3);
+  transition: all 0.2s;
+}
+.btn-modal-delete:hover {
+  /* ★変更: ホバー時は濃い赤 */
+  background: #bb2d3b;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+}
