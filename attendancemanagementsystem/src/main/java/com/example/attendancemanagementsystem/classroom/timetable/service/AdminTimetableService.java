@@ -1,4 +1,4 @@
-package com.example.attendancemanagementsystem.user.admin.service;
+package com.example.attendancemanagementsystem.classroom.timetable.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

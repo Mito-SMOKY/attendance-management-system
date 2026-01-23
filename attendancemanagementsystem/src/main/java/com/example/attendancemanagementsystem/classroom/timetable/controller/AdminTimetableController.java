@@ -1,4 +1,4 @@
-package com.example.attendancemanagementsystem.user.admin.controller;
+package com.example.attendancemanagementsystem.classroom.timetable.controller;
 
 import java.util.List;
 import java.util.Map;
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.attendancemanagementsystem.classroom.timetable.service.AdminTimetableService;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
-import com.example.attendancemanagementsystem.user.admin.service.AdminTimetableService;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
 @Controller

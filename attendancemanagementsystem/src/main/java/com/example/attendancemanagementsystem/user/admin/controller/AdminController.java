@@ -22,16 +22,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.attendancemanagementsystem.common.entity.ClassroomEntity;
-import com.example.attendancemanagementsystem.common.entity.Datalist; // ★追加
-import com.example.attendancemanagementsystem.common.entity.DatalistDetailEntity;
+import com.example.attendancemanagementsystem.common.entity.Datalist;
+import com.example.attendancemanagementsystem.common.entity.DatalistDetailEntity; // ★追加
 import com.example.attendancemanagementsystem.common.repository.DatalistDetailRepository;
 import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
 import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
 import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm;
-import com.example.attendancemanagementsystem.user.admin.service.AdminClassroomService;
-import com.example.attendancemanagementsystem.user.admin.service.AdminService; // ★追加
-import com.example.attendancemanagementsystem.user.admin.service.AdminSubjectService;
+import com.example.attendancemanagementsystem.user.admin.service.AdminService;
+// import com.example.attendancemanagementsystem.user.admin.service.AdminSubjectService; // ★追加
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
 @Controller
@@ -41,11 +39,8 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
-    @Autowired
-    private AdminSubjectService adminSubjectService;
-
-    @Autowired
-    private AdminClassroomService adminClassroomService; // ★追加
+    // @Autowired
+    // private AdminSubjectService adminSubjectService;
 
     @Autowired
     private DepartmentRepository departmentRepository; // ★追加
@@ -110,7 +105,7 @@ public class AdminController {
         if (!duplicateIds.isEmpty()) {
             // ★メッセージ変更: 全件キャンセルされたことを伝える
             String message = "以下のIDで重複が検出されたため、登録処理を中止しました（データは保存されていません）: " 
-                           + String.join(", ", duplicateIds);
+                        + String.join(", ", duplicateIds);
             redirectAttributes.addFlashAttribute("warningMessage", message);
             
             // エラー時は登録確認画面に戻るなどの配慮も可能ですが、
@@ -228,114 +223,55 @@ public class AdminController {
         return "admin/mdList"; 
     }
 
-    //  --- 12. 教科マスタ詳細画面 ---
-    // @GetMapping("/master/subject")
-    // public String showSubjectMaster(Model model) {
-    //     // クラス(学科)リストを取得 (IDを使うためEntityのリストを渡す)
-    //     model.addAttribute("departmentList", adminSubjectService.getAllDepartments());
+    // // --- 12. 教科情報マスタ詳細画面 (GET) ---
+    // // リンクに合わせてURLを変更 (/mdSubjectInformation → /master/SubjectInformation)
+    // @GetMapping("/master/SubjectInformation")
+    // public String showSubjectInformation(Model model) {
+    //     // テーブル表示用（ここはEntityのままでOKだが、念のため修正）
+    //     model.addAttribute("subjectInfoList", adminSubjectService.getSubjectInfoList());
         
-    //     // マトリクスデータ(行データ)を取得
-    //     model.addAttribute("subjectDetailList", adminSubjectService.getSubjectMatrixData());
+    //     // ドロップダウン用には「軽量版メソッド」を使う
+    //     model.addAttribute("teacherList", adminSubjectService.getSimpleTeacherList());       // ← 変更
+    //     model.addAttribute("majorList", adminSubjectService.getSimpleMajorList());           // ← 変更
+    //     model.addAttribute("departmentList", adminSubjectService.getSimpleDepartmentList()); // ← 変更
+    //     //これDB参照してない可用性0ゾーン
+    //     model.addAttribute("gradeList", java.util.Arrays.asList(1, 2, 3)); 
         
-    //     return "admin/mdSubject";
+    //     return "admin/mdSubjectInformation";
     // }
 
-    // --- 教科マスタ保存 (POST) ---
-    // @PostMapping("/master/subject/save")
-    // public String saveSubjectMaster(
-    //         // チェックされたセルの値 ("subjectId-departmentId") をリストで受け取る
-    //         @RequestParam(name = "activePairs", required = false) List<String> activePairs,
+    // // --- 保存処理 (POST) ---
+    // // こちらも合わせてURLを変更 (/mdSubjectInformation/save → /master/SubjectInformation/save)
+    // @PostMapping("/master/SubjectInformation/save")
+    // public String saveSubjectInformation(
+    //         @RequestParam(name = "subjectId", required = false) List<Integer> subjectIds,
+    //         @RequestParam(name = "subjectName", required = false) List<String> subjectNames,
+    //         @RequestParam(name = "teacherId", required = false) List<Integer> teacherIds,
+    //         @RequestParam(name = "courseCount", required = false) List<Integer> courseCounts,
+    //         @RequestParam(name = "majorId", required = false) List<Integer> majorIds,
+    //         @RequestParam(name = "departmentId", required = false) List<Integer> departmentIds,
+    //         @RequestParam(name = "grade", required = false) List<Integer> grades,
     //         RedirectAttributes redirectAttributes) {
         
     //     try {
-    //         adminSubjectService.saveSubjectMatrix(activePairs);
-    //         redirectAttributes.addFlashAttribute("successMessage", "教科とクラスの紐づけを保存しました。");
+    //         // ▼ 修正: 引数を7つ渡すように変更
+    //         adminSubjectService.saveSubjectList(
+    //             subjectIds,
+    //             subjectNames,
+    //             teacherIds,
+    //             courseCounts,
+    //             majorIds,
+    //             departmentIds,
+    //             grades
+    //         );
+            
+    //         redirectAttributes.addFlashAttribute("successMessage", "変更を保存しました。");
     //     } catch (Exception e) {
     //         e.printStackTrace();
-    //         redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+    //         redirectAttributes.addFlashAttribute("errorMessage", "保存中にエラーが発生しました。");
     //     }
 
-    //     return "redirect:/admin/master/subject";
+    //     //リダイレクト先も新しいURLに変更
+    //     return "redirect:/admin/master/SubjectInformation";
     // }
-
-    // --- 13. 教室マスタ詳細画面 (一覧表示) ---
-    // Serviceからデータを取得して画面に渡すように変更
-    @GetMapping("/master/classroom")
-    public String showClassroomMaster(Model model) {
-        List<ClassroomEntity> list = adminClassroomService.getAllClassrooms();
-        model.addAttribute("classroomList", list);
-        return "admin/mdClassroom";
-    }
-
-    // --- 13.5 教室マスタ保存 (POST) ---
-    // ★追加: 編集・削除・追加を一括保存する処理
-    @PostMapping("/master/classroom/save")
-    public String saveClassroomMaster(
-            @RequestParam(name = "classroomId", required = false) List<Integer> classroomIds,
-            @RequestParam(name = "classroomName", required = false) List<String> classroomNames,
-            @RequestParam(name = "macAddress", required = false) List<String> macAddresses,
-            RedirectAttributes redirectAttributes) {
-        
-        try {
-            adminClassroomService.saveClassroomList(classroomIds, classroomNames, macAddresses);
-            redirectAttributes.addFlashAttribute("successMessage", "教室情報を保存しました。");
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
-        }
-
-        return "redirect:/admin/master/classroom";
-    }
-
-    // --- 12. 教科情報マスタ詳細画面 (GET) ---
-    // リンクに合わせてURLを変更 (/mdSubjectInformation → /master/SubjectInformation)
-    @GetMapping("/master/SubjectInformation")
-    public String showSubjectInformation(Model model) {
-        // テーブル表示用（ここはEntityのままでOKだが、念のため修正）
-        model.addAttribute("subjectInfoList", adminSubjectService.getSubjectInfoList());
-        
-        // ドロップダウン用には「軽量版メソッド」を使う
-        model.addAttribute("teacherList", adminSubjectService.getSimpleTeacherList());       // ← 変更
-        model.addAttribute("majorList", adminSubjectService.getSimpleMajorList());           // ← 変更
-        model.addAttribute("departmentList", adminSubjectService.getSimpleDepartmentList()); // ← 変更
-        //これDB参照してない可用性0ゾーン
-        model.addAttribute("gradeList", java.util.Arrays.asList(1, 2, 3)); 
-        
-        return "admin/mdSubjectInformation";
-    }
-
-    // --- 保存処理 (POST) ---
-    // こちらも合わせてURLを変更 (/mdSubjectInformation/save → /master/SubjectInformation/save)
-    @PostMapping("/master/SubjectInformation/save")
-    public String saveSubjectInformation(
-            @RequestParam(name = "subjectId", required = false) List<Integer> subjectIds,
-            @RequestParam(name = "subjectName", required = false) List<String> subjectNames,
-            @RequestParam(name = "teacherId", required = false) List<Integer> teacherIds,
-            @RequestParam(name = "courseCount", required = false) List<Integer> courseCounts,
-            @RequestParam(name = "majorId", required = false) List<Integer> majorIds,
-            @RequestParam(name = "departmentId", required = false) List<Integer> departmentIds,
-            @RequestParam(name = "grade", required = false) List<Integer> grades,
-            RedirectAttributes redirectAttributes) {
-        
-        try {
-            // ▼ 修正: 引数を7つ渡すように変更
-            adminSubjectService.saveSubjectList(
-                subjectIds,
-                subjectNames,
-                teacherIds,
-                courseCounts,
-                majorIds,
-                departmentIds,
-                grades
-            );
-            
-            redirectAttributes.addFlashAttribute("successMessage", "変更を保存しました。");
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", "保存中にエラーが発生しました。");
-        }
-
-        //リダイレクト先も新しいURLに変更
-        return "redirect:/admin/master/SubjectInformation";
-    }
 }
