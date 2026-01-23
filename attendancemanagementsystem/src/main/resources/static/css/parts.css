@@ -136,15 +136,15 @@ a {
 .backbutton-container {
   /* 固定表示にしたい場合（スクロールしてもついてくる） */
   position: fixed;
-  top: 80px; /* ヘッダー(60px) + 余白 */
-  left: 20px;
+  top: 100px; /* ヘッダー(60px) + 余白 */
+  left: 10px;
   z-index: 900;
 }
 
 .backbutton {
   display: flex;
   align-items: center;
-  gap: 10px; /* アイコンと文字の間隔 */
+  gap: 20px; /* アイコンと文字の間隔 */
   
   background-color: #fff;
   color: #00acbd; /* テーマカラー */
@@ -154,10 +154,12 @@ a {
   border-radius: 4px; /* 少しだけ角を丸くする（完全に真四角が良い場合は 0 にしてください） */
   /* ▲▲▲▲▲▲▲▲▲▲▲ */
   
-  padding: 10px 25px;
+  padding: 10px 20px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
+  margin-left: 50px;
+  margin-bottom: 30px;
   
   transition: all 0.3s ease; /* アニメーション設定 */
   box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* うっすら影 */
