@@ -28,16 +28,15 @@ import com.example.attendancemanagementsystem.common.repository.DatalistDetailRe
 import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
 import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
 import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm;
-import com.example.attendancemanagementsystem.user.admin.service.AdminService;
-// import com.example.attendancemanagementsystem.user.admin.service.AdminSubjectService; // ★追加
+import com.example.attendancemanagementsystem.user.admin.service.AdminCreateStudentService;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
 @Controller
 @RequestMapping("/admin")
-public class AdminController {
+public class AdminCreateStudentController {
 
     @Autowired
-    private AdminService adminService;
+    private AdminCreateStudentService adminService;
 
     // @Autowired
     // private AdminSubjectService adminSubjectService;
@@ -57,11 +56,6 @@ public class AdminController {
         return 3;
     }
 
-
-    @GetMapping("/studentList")
-    public String showStudentList() {
-        return "admin/studentList";
-    }
 
     @GetMapping("/tmpAccount")
     public String showTmpAccount() {

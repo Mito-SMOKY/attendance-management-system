@@ -32,7 +32,7 @@ import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm
 import com.example.attendancemanagementsystem.user.admin.model.TempAccountData;
 
 @Service
-public class AdminService {
+public class AdminCreateStudentService {
 
     @Autowired
     private DatalistRepository datalistRepository;
