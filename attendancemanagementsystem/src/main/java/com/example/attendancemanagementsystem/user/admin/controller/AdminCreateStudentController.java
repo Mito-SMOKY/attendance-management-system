@@ -38,11 +38,8 @@ public class AdminCreateStudentController {
     @Autowired
     private AdminCreateStudentService adminService;
 
-    // @Autowired
-    // private AdminSubjectService adminSubjectService;
-
     @Autowired
-    private DepartmentRepository departmentRepository; // ★追加
+    private DepartmentRepository departmentRepository; 
 
     @Autowired
     private DatalistDetailRepository datalistDetailRepository;
