@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <title>登録完了</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
       body {
         font-family: sans-serif;
@@ -45,6 +47,19 @@
     </style>
   </head>
   <body>
+    <div class="header-container">
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
+    </div>
+
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/manualInput')}"></div>
+    </div>
+
     <div class="container">
       <h1>登録完了！</h1>
       <p>アカウント情報の保存が完了しました。</p>
@@ -55,7 +70,7 @@
 
       <form
         id="csvDownloadForm"
-        th:action="@{/admin/download-manual-csv}"
+        th:action="@{/admin/downloadManualCsv}"
         th:object="${manualForm}"
         method="post"
       >
@@ -75,11 +90,6 @@
 
         <button type="submit" class="btn btn-dl">CSVをダウンロード</button>
       </form>
-
-      <br />
-      <a th:href="@{/admin/creation-history}" class="btn btn-hist"
-        >履歴一覧へ移動</a
-      >
     </div>
 
     <script>

@@ -6,7 +6,7 @@
     <title>アカウント管理</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/admin/adminAccountManage.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/accountHome.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -21,7 +21,7 @@
     </div>
     
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/admin/studentList')}"></div>
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
     </div>
     
     <div class="account-manage-container">
@@ -34,20 +34,15 @@
                 <i class="fa-solid fa-file-arrow-up" style="margin-right: 10px;"></i>
                 ファイルアップロード
             </a>
-            
             <a th:href="@{/admin/manualInput}" class="menu-btn">
                 <i class="fa-solid fa-keyboard" style="margin-right: 10px;"></i>
                 手動入力
             </a>
-            
-            <a th:href="@{/admin/history}" class="menu-btn">
+            <a th:href="@{/admin/accountHistory}" class="menu-btn">
                 <i class="fa-solid fa-clock-rotate-left" style="margin-right: 10px;"></i>
                 作成履歴
             </a>
-            
         </div>
-
     </div>
-
 </body>
 </html>

@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <title>手動登録</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
       /* 既存のスタイル */
       body {
@@ -63,10 +65,24 @@
     </style>
   </head>
   <body>
+
+    <div class="header-container">
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
+    </div>
+
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/accountHome')}"></div>
+    </div>
+
     <h1>手動でのアカウント登録</h1>
     <p>登録したい学生の情報を入力してください。</p>
 
-    <form th:action="@{/admin/save-manual-accounts}" method="post">
+    <form th:action="@{/admin/saveManualAccounts}" method="post">
       <div class="batch-setting">
         <h3>基本設定（全員に適用）</h3>
         <div class="input-row">
@@ -156,9 +172,6 @@
       <br /><br />
       <button type="submit" class="btn btn-save">登録実行</button>
     </form>
-
-    <br />
-    <a th:href="@{/admin/tmpAccount}">メニューに戻る</a>
 
     <script>
       function addAccount() {

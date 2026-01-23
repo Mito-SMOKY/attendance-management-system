@@ -96,3 +96,44 @@ body {
     color: #0056b3;
     text-decoration: none;
 }
+
+.message-area {
+    width: 90%;
+    margin: 0 auto 20px auto;
+    text-align: center;
+}
+
+.alert {
+    padding: 10px 15px;
+    border-radius: 4px;
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+}
+
+/* 詳細ボタンのスタイル調整 */
+.btn-detail {
+    color: #fff;
+    background-color: #007bff;
+    padding: 5px 15px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.btn-detail:hover {
+    background-color: #0056b3;
+}

@@ -166,3 +166,59 @@ body {
 .top-btn:hover {
     background-color: #f0fcfd;
 }
+
+.warning-box {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    text-align: left;
+    font-size: 0.95em;
+    width: 90%;
+    margin: 0 auto 20px auto;
+}
+
+.warning-highlight {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.list-container {
+    text-align: center;
+    padding-bottom: 50px;
+}
+.info-table-wrapper,
+.account-table-wrapper {
+    width: 90%;
+    margin: 0 auto;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    }
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f8f9fa;
+}
+
+.button-area {
+    margin-top: 30px;
+}
+.action-btn {
+    padding: 10px 30px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+}

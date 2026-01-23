@@ -1,26 +1,71 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ファイルアップロード</title>
-  </head>
-  <body>
-    <h1>ファイル一括登録</h1>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminCsvUpload.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
 
-    <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red"></p>
+    <div class="header-container">
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
+    </div>
 
-    <form
-      th:action="@{/admin/upload-file}"
-      method="post"
-      enctype="multipart/form-data"
-    >
-      <label>CSVファイルを選択:</label>
-      <input type="file" name="file" accept=".csv" required />
-      <br /><br />
-      <button type="submit">読み込み</button>
-    </form>
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/accountHome')}"></div>
+    </div>
 
-    <br />
-    <a th:href="@{/admin/tmpAccount}">戻る</a>
-  </body>
+    <div class="upload-container">
+        
+        <h1 class="page-title">ファイル一括登録</h1>
+
+        <div class="description-area">
+            <p>生徒名、所属、学籍番号を入力してCSVファイルを<br>アップロードするとユーザーの仮アカウントを作成します。</p>
+        </div>
+
+        <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red; font-weight: bold; text-align: center;"></p>
+
+        <form id="uploadForm" 
+            method="post" 
+            enctype="multipart/form-data" 
+            th:action="@{/admin/uploadFile}" 
+            class="upload-form">
+            
+            <div class="file-input-wrapper">
+                <label for="csvFile" class="file-label-btn">
+                    <i class="fas fa-cloud-upload-alt"></i> CSVファイルを選択
+                </label>
+                
+                <input type="file" id="csvFile" name="file" accept=".csv" class="file-input-hidden" required onchange="showFileName(this)">
+            </div>
+
+            <p id="fileName" style="margin-top: 10px; font-size: 0.9em; color: #555;">ファイルが選択されていません</p>
+
+            <button type="submit" class="submit-btn">読み込み</button>
+
+        </form>
+
+    </div>
+
+    <script>
+        function showFileName(input) {
+            const fileNameArea = document.getElementById('fileName');
+            if (input.files && input.files.length > 0) {
+                fileNameArea.innerText = "選択中: " + input.files[0].name;
+            } else {
+                fileNameArea.innerText = "ファイルが選択されていません";
+            }
+        }
+    </script>
+
+</body>
 </html>

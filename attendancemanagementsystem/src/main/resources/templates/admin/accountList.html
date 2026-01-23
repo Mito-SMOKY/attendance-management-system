@@ -5,63 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>登録内容確認</title>
     <link rel="stylesheet" th:href="@{/css/parts.css}" />
-    <link rel="stylesheet" th:href="@{/css/admin/adminAccountList.css}" />
+    <link rel="stylesheet" th:href="@{/css/admin/accountList.css}" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
     <style>
-      .warning-box {
-        background-color: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeeba;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 5px;
-        text-align: left;
-        font-size: 0.95em;
-        width: 90%;
-        margin: 0 auto 20px auto;
-      }
-      .warning-highlight {
-        font-weight: bold;
-        text-decoration: underline;
-      }
-      .list-container {
-        text-align: center;
-        padding-bottom: 50px;
-      }
-      .info-table-wrapper,
-      .account-table-wrapper {
-        width: 90%;
-        margin: 0 auto;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-      }
-      th,
-      td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: left;
-      }
-      th {
-        background-color: #f8f9fa;
-      }
-      .button-area {
-        margin-top: 30px;
-      }
-      .action-btn {
-        padding: 10px 30px;
-        background-color: #28a745;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1.1em;
-      }
+      
     </style>
   </head>
   <body>
@@ -75,14 +25,7 @@
     </div>
 
     <div class="backbutton-container">
-      <button
-        type="button"
-        class="back-btn"
-        onclick="history.back()"
-        style="border: none; background: none; cursor: pointer"
-      >
-        <i class="fa-solid fa-arrow-left"></i> 戻る
-      </button>
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/upload')}"></div>
     </div>
 
     <div class="list-container">
@@ -97,12 +40,7 @@
           >平文のパスワードを確認できるのは、元のCSVファイルのみとなります。</span
         >
       </div>
-
-      <form
-        method="post"
-        th:action="@{/admin/save-temp-accounts}"
-        th:object="${datalistForm}"
-      >
+        <form method="post" th:action="@{/admin/saveTempAccounts}" th:object="${datalistForm}">
         <input type="hidden" th:field="*{datalistName}" />
         <input type="hidden" th:field="*{academicYear}" />
         <input type="hidden" th:field="*{grade}" />
@@ -144,22 +82,13 @@
                 <td th:text="${stat.count}"></td>
                 <td th:text="${acc.loginId}"></td>
                 <td th:text="${acc.name}"></td>
-
                 <td>
                   <span th:text="${acc.password}"></span>
-                  <input
-                    type="hidden"
-                    th:field="*{tempAccounts[__${stat.index}__].loginId}"
-                  />
-                  <input
-                    type="hidden"
-                    th:field="*{tempAccounts[__${stat.index}__].name}"
-                  />
-                  <input
-                    type="hidden"
-                    th:field="*{tempAccounts[__${stat.index}__].password}"
-                  />
-                </td>
+                  
+                  <input type="hidden" th:field="*{tempAccounts[__${stat.index}__].loginId}" />
+                  <input type="hidden" th:field="*{tempAccounts[__${stat.index}__].name}" />
+                  <input type="hidden" th:field="*{tempAccounts[__${stat.index}__].password}" />
+                  </td>
               </tr>
             </tbody>
           </table>

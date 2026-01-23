@@ -53,94 +53,119 @@ public class AdminCreateStudentController {
         return 3;
     }
 
-
-    @GetMapping("/tmpAccount")
-    public String showTmpAccount() {
-        return "admin/tmpAccount";
+    //アカウント管理画面
+    @GetMapping("/accountHome")
+    public String showAccountHome() {
+        return "admin/accountHome";
     }
 
-    @GetMapping("/accountManage")
-    public String showAccountManage() {
-        return "admin/accountManage";
-    }
-
+    // ファイル読み込み画面表示用
     @GetMapping("/upload")
     public String showFileUploadPage() {
-        return "admin/csvUpload";
+        return "admin/upload"; 
     }
 
-    // ★修正箇所: アップロード後に csvName へ遷移
-    // ★修正: handleFileUpload メソッド
-    @PostMapping("/upload-file")
+    // ファイル受信時
+    @PostMapping("/uploadFile") 
     public String handleFileUpload(@RequestParam("file") MultipartFile file, Model model) {
         try {
             DatalistForm form = adminService.parseAccountFile(file);
             model.addAttribute("datalistForm", form);
             
-            // ★追加: csvName画面のプルダウン用に学科リストを渡す
+            // プルダウン用に学科リストを渡す
             model.addAttribute("departmentList", departmentRepository.findAll());
 
-            return "admin/csvName"; 
+            return "admin/uploadFile"; 
+
         } catch (Exception e) {
             model.addAttribute("errorMessage", "ファイルの読み込みに失敗しました: " + e.getMessage());
-            return "admin/csvUpload";
+            return "admin/upload";
         }
     }
 
-    @PostMapping("/save-temp-accounts")
+    //登録確認画面
+    @PostMapping("/accountList")
+    public String postAccountList(@ModelAttribute DatalistForm form, Model model) {
+
+        // これで名前だけでなく、生徒リストや学科情報もすべて受け取れます
+        model.addAttribute("datalistForm", form);
+        return "admin/accountList"; 
+    }
+
+    //登録処理
+    @PostMapping("/saveTempAccounts")
     public String saveTempAccounts(@ModelAttribute DatalistForm form, RedirectAttributes redirectAttributes) {
         
-        // 重複があった場合は、そのIDリストが返ってくる（保存はされていない）
+        // 重複があった場合は、そのIDリストが返ってくる
         List<String> duplicateIds = adminService.saveDatalist(form, getCurrentUserId());
         
         if (!duplicateIds.isEmpty()) {
-            // ★メッセージ変更: 全件キャンセルされたことを伝える
+
+            // 全件キャンセルされたことを伝える
             String message = "以下のIDで重複が検出されたため、登録処理を中止しました（データは保存されていません）: " 
                         + String.join(", ", duplicateIds);
             redirectAttributes.addFlashAttribute("warningMessage", message);
+
+            return "redirect:/admin/upload";
             
-            // エラー時は登録確認画面に戻るなどの配慮も可能ですが、
-            // 今回は仕様通り履歴画面(または一覧)へ戻します
         } else {
             redirectAttributes.addFlashAttribute("successMessage", "すべてのデータが正常に登録されました。");
+
+            return "redirect:/admin/tempAccountList/" + form.getDataListId() + "?origin=register";
         }
-        
-        return "redirect:/admin/creation-history";
     }
 
-    @GetMapping("/creation-history")
-    public String showCreationHistory(Model model) {
-        model.addAttribute("datalists", adminService.getAllDatalists());
-        return "admin/creation_history";
-    }
-
-    // @GetMapping("/manual-input")
-    // public String showManualAccountPage() {
-    //     return "admin/manual_input";
-    // }
-
-    @GetMapping("/manual-input")
-    public String showManualAccountPage(Model model) {
-        // ★追加: プルダウン用に全学科・クラスを取得して画面に渡す
-        model.addAttribute("departmentList", departmentRepository.findAll());
+    //仮アカウント一覧
+    @GetMapping("/tempAccountList/{id}")
+    public String tempAccountList(@PathVariable Integer id,
+                                @RequestParam(required = false) String origin, 
+                                Model model) {
         
-        // フォームの初期化（空のリストを入れておくなど）
-        model.addAttribute("manualAccountForm", new ManualAccountForm());
-        
-        return "admin/manual_input";
-    }
-
-    @GetMapping("/temp-account-list/{id}")
-    public String showTempAccountList(@PathVariable("id") Integer id, Model model) {
         Datalist datalist = adminService.getDatalistById(id);
         model.addAttribute("datalist", datalist);
-        
-        // ★変更: メソッド名修正 (OrderByLoginIdAsc)
         List<DatalistDetailEntity> details = datalistDetailRepository.findByDatalistIdOrderByLoginIdAsc(id);
         model.addAttribute("details", details);
+
+        // 戻るボタンのURLを動的に決める
+        String backUrl; 
+
+        if ("register".equals(origin)) {
+            backUrl = "/admin/upload"; 
+
+        } else {
+            
+            //履歴一覧から来た場合
+            backUrl = "/admin/accountHistory";
+        }
+
+        model.addAttribute("backUrl", backUrl);
         
-        return "admin/temp_account_list";
+        return "admin/tempAccountList";
     }
+
+    //手動入力画面
+    @GetMapping("/manualInput")
+    public String showManualAccountPage(Model model) {
+
+        // プルダウン用に全学科・クラスを取得
+        model.addAttribute("departmentList", departmentRepository.findAll());
+        
+        // フォームの初期化
+        model.addAttribute("manualAccountForm", new ManualAccountForm());
+        
+        return "admin/manualInput";
+    }
+
+    //作成履歴画面
+    @GetMapping("/accountHistory")
+    public String showCreationHistory(Model model) {
+        model.addAttribute("datalists", adminService.getAllDatalists());
+        return "admin/accountHistory";
+    }
+
+    
+
+    
 
     @GetMapping("/download-temp-file/{id}")
     public ResponseEntity<byte[]> downloadTempAccountFile(@PathVariable("id") Integer id) {
@@ -165,19 +190,19 @@ public class AdminCreateStudentController {
         return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
     }
 
-    // --- 手動入力データの保存 ---
-    @PostMapping("/save-manual-accounts")
+    // 手動入力データの保存 
+    @PostMapping("/saveManualAccounts")
     public String saveManualAccounts(@ModelAttribute ManualAccountForm form, Model model) {
         adminService.saveDatalistFromForm(form, getCurrentUserId());
         
-        // 2. 完了画面にフォームデータ（平文パスワード入り）を渡す
+        // フォームデータを渡す
         model.addAttribute("manualForm", form);
         
-        return "admin/manual_result";
+        return "admin/manualResult";
     }
 
-    // --- 11. 手動登録完了後のCSVダウンロード ---
-    @PostMapping("/download-manual-csv")
+    // 手動登録完了後のCSVダウンロード 
+    @PostMapping("/downloadManualCsv")
     public ResponseEntity<byte[]> downloadManualCsv(@ModelAttribute ManualAccountForm form) {
         
         byte[] csvData = adminService.createCsvFromForm(form);
@@ -198,71 +223,4 @@ public class AdminCreateStudentController {
 
         return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
     } 
-
-    // --- csvName.htmlからの遷移用 ---
-    // ★修正: 引数を @ModelAttribute DatalistForm に変更
-    @PostMapping("/account-list")
-    public String postAccountList(@ModelAttribute DatalistForm form, Model model) {
-        // これで名前だけでなく、生徒リスト(tempAccounts)や学科情報もすべて受け取れます
-        model.addAttribute("datalistForm", form);
-        return "admin/accountList"; 
-    }
-    
-    // --- 11. マスタデータ管理メニュー画面 ---
-    @GetMapping("/master-data")
-    public String showMasterDataMenu() {
-        return "admin/mdList"; 
-    }
-
-    // // --- 12. 教科情報マスタ詳細画面 (GET) ---
-    // // リンクに合わせてURLを変更 (/mdSubjectInformation → /master/SubjectInformation)
-    // @GetMapping("/master/SubjectInformation")
-    // public String showSubjectInformation(Model model) {
-    //     // テーブル表示用（ここはEntityのままでOKだが、念のため修正）
-    //     model.addAttribute("subjectInfoList", adminSubjectService.getSubjectInfoList());
-        
-    //     // ドロップダウン用には「軽量版メソッド」を使う
-    //     model.addAttribute("teacherList", adminSubjectService.getSimpleTeacherList());       // ← 変更
-    //     model.addAttribute("majorList", adminSubjectService.getSimpleMajorList());           // ← 変更
-    //     model.addAttribute("departmentList", adminSubjectService.getSimpleDepartmentList()); // ← 変更
-    //     //これDB参照してない可用性0ゾーン
-    //     model.addAttribute("gradeList", java.util.Arrays.asList(1, 2, 3)); 
-        
-    //     return "admin/mdSubjectInformation";
-    // }
-
-    // // --- 保存処理 (POST) ---
-    // // こちらも合わせてURLを変更 (/mdSubjectInformation/save → /master/SubjectInformation/save)
-    // @PostMapping("/master/SubjectInformation/save")
-    // public String saveSubjectInformation(
-    //         @RequestParam(name = "subjectId", required = false) List<Integer> subjectIds,
-    //         @RequestParam(name = "subjectName", required = false) List<String> subjectNames,
-    //         @RequestParam(name = "teacherId", required = false) List<Integer> teacherIds,
-    //         @RequestParam(name = "courseCount", required = false) List<Integer> courseCounts,
-    //         @RequestParam(name = "majorId", required = false) List<Integer> majorIds,
-    //         @RequestParam(name = "departmentId", required = false) List<Integer> departmentIds,
-    //         @RequestParam(name = "grade", required = false) List<Integer> grades,
-    //         RedirectAttributes redirectAttributes) {
-        
-    //     try {
-    //         // ▼ 修正: 引数を7つ渡すように変更
-    //         adminSubjectService.saveSubjectList(
-    //             subjectIds,
-    //             subjectNames,
-    //             teacherIds,
-    //             courseCounts,
-    //             majorIds,
-    //             departmentIds,
-    //             grades
-    //         );
-            
-    //         redirectAttributes.addFlashAttribute("successMessage", "変更を保存しました。");
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //         redirectAttributes.addFlashAttribute("errorMessage", "保存中にエラーが発生しました。");
-    //     }
-
-    //     //リダイレクト先も新しいURLに変更
-    //     return "redirect:/admin/master/SubjectInformation";
-    // }
 }

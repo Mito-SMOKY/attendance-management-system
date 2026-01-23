@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.attendancemanagementsystem.common.entity.ClassroomEntity;
 import com.example.attendancemanagementsystem.classroom.classplace.service.MdClassroomService;
+import com.example.attendancemanagementsystem.common.entity.ClassroomEntity;
 
 @Controller
 @RequestMapping("/admin")
@@ -20,6 +20,11 @@ public class MdClassroomController {
 
     @Autowired
     private MdClassroomService mdClassroomService;
+
+    @GetMapping("/master-data")
+    public String showMasterDataMenu() {
+        return "admin/mdList"; 
+    }
 
     // 教室マスタ詳細画面 
     @GetMapping("/master/classroom")

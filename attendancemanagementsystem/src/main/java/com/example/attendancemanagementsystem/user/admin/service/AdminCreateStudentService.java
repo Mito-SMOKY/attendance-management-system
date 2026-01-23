@@ -126,6 +126,9 @@ public class AdminCreateStudentService {
             datalist.setStudents(students);
             Datalist savedDatalist = datalistRepository.save(datalist);
 
+            //みゆがDTOにデータを追加したからそれに伴っての変更
+            form.setDataListId(savedDatalist.getDataListId());
+
             // 在籍情報保存
             saveEnrollments(savedDatalist, form.getAcademicYear(), form.getGrade(), department);
 

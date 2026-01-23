@@ -2,7 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
-    <title>リスト詳細</title>
+    <title>仮アカウント一覧</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/accountHome.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
       body {
         padding: 20px;
@@ -46,7 +50,19 @@
     </style>
   </head>
   <body>
-    <h1>リスト詳細確認</h1>
+    <div class="header-container">
+      <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+    <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+        <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+    </div>
+  
+    <div class="backbutton-container">
+      <div th:replace="~{fragments/_parts :: backButton(url=${backUrl})}"></div>
+    </div>
+    
+    <h1>仮アカウント一覧</h1>
 
     <div class="info-box">
       <p>
@@ -103,6 +119,6 @@
     </table>
 
     <br /><br />
-    <a th:href="@{/admin/creation-history}" class="btn">← 履歴一覧に戻る</a>
+    <a th:href="@{/admin/accountHome}" class="btn">← topに戻る</a>
   </body>
 </html>

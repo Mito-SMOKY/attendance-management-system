@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>作成履歴</title>
+    <title>作成履歴一覧</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/admin/adminAccountHistory.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/accountHistory.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -21,37 +21,61 @@
     </div>
 
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/admin/accountManage')}"></div>
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/accountHome')}"></div>
     </div>
 
     <div class="history-container">
         
         <div class="page-title-wrapper">
-            <h1 class="page-title">作成履歴</h1>
+            <h1 class="page-title">作成履歴一覧</h1>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                システムに登録された仮アカウントリストの一覧です。
+            </p>
+        </div>
+
+        <div class="message-area">
+            <div th:if="${successMessage}" class="alert alert-success">
+                <span th:text="${successMessage}"></span>
+            </div>
+            <div th:if="${warningMessage}" class="alert alert-warning">
+                <span th:text="${warningMessage}"></span>
+            </div>
         </div>
 
         <div class="table-wrapper">
             <table class="history-table">
                 <colgroup>
-                    <col style="width: 25%;"> <col style="width: 25%;"> <col style="width: 50%;"> </colgroup>
+                    <col style="width: 35%;"> <col style="width: 35%;"> <col style="width: 30%;"></colgroup>
                 <thead>
                     <tr>
-                        <th>作成日時</th>
+                        <th>リスト名</th>
                         <th>作成者</th>
-                        <th>データリスト名</th>
+                        <th>作成日時</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="history : ${historyList}">
-                        <td th:text="${history.createdAt}">2025-03-01</td>
-                        <td th:text="${history.creatorName}">**********</td>
+                    <tr th:each="item : ${datalists}">
                         <td>
-                            <a href="#" class="data-link" th:text="${history.dataListName}">2025年度_SE_M_1_AA</a>
+                            <a th:href="@{/admin/tempAccountList/{id}(id=${item.dataListId}, origin='history')}"
+                                th:text="${item.dataListName}"
+                                style="color: #007bff; text-decoration: underline; cursor: pointer;">
+                                リスト名
+                            </a>
                         </td>
+                        
+                        <td>
+                            <span th:text="${item.creatorUser.name}">名前</span>
+                            <br>
+                            <small style="color: #777;">(<span th:text="${item.creatorUser.loginId}">ID</span>)</small>
+                        </td>
+
+                        <td th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-01 12:00:00</td>
                     </tr>
                     
-                    <tr th:if="${historyList == null or historyList.isEmpty()}">
-                        <td colspan="3" style="text-align: center; padding: 20px;">データがありません。</td>
+                    <tr th:if="${#lists.isEmpty(datalists)}">
+                        <td colspan="4" style="text-align: center; padding: 20px; color: #666;">
+                            履歴はありません。
+                        </td>
                     </tr>
                 </tbody>
             </table>
