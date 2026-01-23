@@ -3,42 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>生徒一覧</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/admin/studentList.css}">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
 
+    <!-- ヘッダー -->
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
     </div>
     
+    <!-- 戻るボタン -->
     <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
     </div>
 
+    <!-- 生徒一覧リスト -->
     <div class="student-list-container">
         
         <h1 class="page-title">生徒一覧</h1>
 
-        <div class="search-filter-area">
-            
-            <form class="search-form" onsubmit="return false;">
-                <input type="text" id="searchInput" class="search-input" placeholder="検索キーワードを入力">
+        <!-- 検索絞り込み -->
+        <div class="top-controls">
+
+            <form class="search-form-3" onsubmit="return false;">
+                <label>
+                    <input type="text" id="keywordSearch" placeholder="名前や学籍番号を入力">
+                </label>
+                <button type="button" id="searchBtn" aria-label="検索"></button>
             </form>
 
-            <button type="button" id="searchBtn" class="tool-btn search-btn">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
+            <!-- 絞り込みモーダル -->
+            <div class="modal-2__wrap">
+                <input type="radio" id="modal-2__open" class="modal-2__open-input" name="modal-2__trigger"/>
 
-            <button type="button" class="tool-btn filter-btn">
-                <i class="fa-solid fa-sliders"></i>
-            </button>
-            
+                <label for="modal-2__open" class="modal-2__open-label">
+                    <img th:src="@{/image/filter.png}" alt="絞り込み" class="label-icon" style="width: 24px; height: 24px;">
+                </label>
+
+                <input type="radio" id="modal-2__close" name="modal-2__trigger"/>
+
+                <div class="modal-2">
+                    <div class="modal-2__content-wrap">
+                        <label for="modal-2__close" class="modal-2__close-label">×</label>
+
+                        <div class="modal-2__content">
+                            <div style="color: #00acbd; font-weight: bold; font-size: 1.5rem; margin-top: 10px;">絞り込み</div><br/>
+
+                            <div style="font-weight: bold; margin-bottom: 5px;">学年</div>
+                            <div class="checkbox-1">
+                                <label><input type="radio" name="gradeFilter" value="" checked onchange="executeSearch()"/> 全て</label>
+                                <label><input type="radio" name="gradeFilter" value="1" onchange="executeSearch()"/> 1年</label>
+                                <label><input type="radio" name="gradeFilter" value="2" onchange="executeSearch()"/> 2年</label>
+                                <label><input type="radio" name="gradeFilter" value="3" onchange="executeSearch()"/> 3年</label>
+                            </div>
+                            <br/>
+
+                            <div style="font-weight: bold; margin-bottom: 5px;">学科</div>
+                            <div class="select-wrapper">
+                                <select class="form-select" id="departmentFilter" onchange="executeSearch()">
+                                    <option value="">全ての学科</option>
+                                </select>
+                            </div>
+                            <br/>
+
+                            <div style="font-weight: bold; margin-bottom: 5px;">コース</div>
+                            <div class="select-wrapper">
+                                <select class="form-select" id="courseFilter" onchange="executeSearch()">
+                                    <option value="">全てのコース</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <label for="modal-2__close">
+                        <div class="modal-2__background"></div>
+                    </label>
+                </div>
+            </div>
         </div>
+        <!-- ------------------------------------------ -->
 
         <div class="table-wrapper">
             <table class="student-table">
@@ -59,7 +114,7 @@
                     </tr>
                 </thead>
                 <tbody id="studentTableBody">
-                </tbody>
+                    </tbody>
             </table>
         </div>
 
@@ -68,6 +123,5 @@
     </div>
 
     <script th:src="@{/js/admin/studentList.js}"></script>
-
 </body>
 </html>

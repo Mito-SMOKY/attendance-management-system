@@ -1,7 +1,6 @@
 @charset "UTF-8";
 
 body {
-    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
     margin: 0;
     color: #333;
 }
@@ -116,7 +115,6 @@ body {
 .td-slot {
     font-weight: bold;
     font-size: 1.4rem;
-    font-family: sans-serif;
 }
 
 .td-subject {
