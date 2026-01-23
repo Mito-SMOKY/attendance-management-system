@@ -1,30 +1,37 @@
+@charset "UTF-8";
+
 /* --- ベースとリセット --- */
 body {
     margin: 0;
 }
 
-.container{
+.container {
     align-items: center;
     margin-left: auto;
     margin-right: auto;
 }
 
+/* --- 下の白いカード部分 --- */
 .notificationPage {
-    transform: scale(0.90);
-    /* max-width: 80%; */
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
 /* --- 検索とフィルターのコントロール --- */
 .top-controls {
-    justify-content: center;
-    margin-top: 70px;
+    width: 90%;
+    max-width: 1200px;
+    margin: 70px auto 10px auto;
     display: flex;
-    gap: 10px; /* 要素間のスペース */
+    justify-content: flex-start;
     align-items: center;
+    gap: 10px;
 }
 
 #keywordSearch,
@@ -32,31 +39,28 @@ body {
     padding: 10px 15px;
     border-radius: 5px;
     font-size: 16px;
-    flex-grow: 1; /* キーワード検索欄を広げる */
+    flex-grow: 1;
 }
 
 #keywordSearch {
-    max-width: 350px; /* 検索バーの幅を制限 */
+    max-width: 350px;
 }
 
 #notificationTypeFilter {
-    max-width: 200px; /* 絞り込みドロップダウンの幅を制限 */
+    max-width: 200px;
 }
 
-/* 検索・フィルタアイコン（添付画像を参考にした配置） */
+/* 検索・フィルタアイコン */
 .search-icon,
 .filter-icon {
     background-color: #fff;
     border-radius: 5px;
     cursor: pointer;
     padding: 10px 15px;
-    background-color: #fff;
     border: 1px solid #ccc;
-    
 }
 
-.search-form-3{
-
+.search-form-3 {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -65,7 +69,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
     font-size: 1rem;
-    
+    background-color: #fff;
 }
 
 .search-form-3 input {
@@ -78,7 +82,7 @@ body {
     outline: none;
 }
 
-.search-form-3 input::placeholder{
+.search-form-3 input::placeholder {
     color: #777777;
 }
 
@@ -103,14 +107,14 @@ body {
 
 /* --- 通知一覧テーブル --- */
 .notification-table-container {
-    overflow-x: auto; /* テーブルが画面幅を超えた場合、スクロール可能にする */
+    overflow-x: auto;
 }
 
 .notification-table {
     width: 100%;
-    border-collapse: separate; 
+    border-collapse: separate;
     border-spacing: 0;
-    table-layout: fixed; 
+    table-layout: fixed;
 }
 
 /* ヘッダーのスタイル */
@@ -128,7 +132,7 @@ body {
 .notification-table td {
     padding: 12px 15px;
     border-bottom: 1px solid #eee;
-    vertical-align: top; 
+    vertical-align: top;
 }
 
 /* 行のホバー効果 */
@@ -136,11 +140,11 @@ body {
     background-color: #f9f9f9;
 }
 
-/* --- カラム幅の設定 (添付画像を参考) --- */
+/* --- カラム幅の設定 --- */
 .col-date {
-    width: 15%; 
+    width: 15%;
     min-width: 90px;
-    font-weight: bold; /* 日付を強調 */
+    font-weight: bold;
     color: #555;
 }
 .col-time {
@@ -150,18 +154,16 @@ body {
 }
 .col-detail {
     width: 75%;
-    /* リンクの色を青に設定 */
 }
 
 /* リンクスタイル */
 .notification-table a {
-    color: #007bff; 
+    color: #007bff;
     text-decoration: none;
 }
 .notification-table a:hover {
     text-decoration: underline;
 }
-
 
 /* モーダル */
 .modal-2__wrap input {
@@ -179,15 +181,16 @@ body {
     align-items: center;
     width: 15px;
     height: auto;
-    margin:0 auto;
+    margin: 0;
     padding: .8em 2em;
     border: none;
     border-radius: 5px;
     outline: 1px solid #00acbd;
     font-size: 1em;
+    background-color: #fff;
 }
 
-.label-icon{
+.label-icon {
     width: 20px;
     height: auto;
 }
@@ -196,7 +199,6 @@ body {
     background-color: #fff;
     color: #2589d0;
     outline: 1px solid #2589d0;
-  
 }
 
 .modal-2 {
@@ -261,12 +263,8 @@ body {
 }
 
 @keyframes modal-2-animation {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
+    0% { opacity: 0; }
+    100% { opacity: 1; }
 }
 
 @media only screen and (max-width: 520px) {
@@ -274,23 +272,20 @@ body {
         max-width: 90%;
         padding: .94em 2.1em .94em 2.6em;
     }
-
     .modal-2__close-label {
         top: -17px;
         right: -4%;
     }
-
     .modal-2__content-wrap {
         width: 90vw;
     }
-
     .modal-2__content {
         padding: 33px 21px 35px;
         max-width: 100%;
     }
 }
 
-/* モーダル内のチェックボックス */
+/* --- モーダル内のチェックボックス (四角形) --- */
 .checkbox-1 {
     display: flex;
     flex-wrap: wrap;
@@ -337,6 +332,61 @@ body {
     display: none;
 }
 
+
+/* --- ★追加: ラジオボタン用のスタイル (丸形) --- */
+/* inputは非表示、擬似要素で円を描画する */
+.radio-1 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5em 2em;
+    border: none;
+}
+
+.radio-1 label {
+    display: flex;
+    align-items: center;
+    gap: 0 .5em;
+    position: relative;
+    cursor: pointer;
+}
+
+/* 共通設定 */
+.radio-1 label::before,
+.radio-1 label:has(:checked)::after {
+    content: '';
+}
+
+/* 外側の円 (未選択時) */
+.radio-1 label::before {
+    width: 17px;
+    height: 17px;
+    border-radius: 50%; /* 丸くする */
+    background-color: #e6edf3;
+}
+
+/* 選択された時の背景色 */
+.radio-1 label:has(:checked)::before {
+    background-color: #2589d0;
+}
+
+/* 選択された時の中心の白い点 */
+.radio-1 label:has(:checked)::after {
+    position: absolute;
+    top: 50%;
+    left: 4.5px; /* 位置調整 */
+    transform: translateY(-50%);
+    
+    width: 8px;
+    height: 8px;
+    border-radius: 50%; /* 丸い点 */
+    background-color: #fff;
+}
+
+.radio-1 input {
+    display: none; /* 元のラジオボタンを消す */
+}
+
+
 /* リスト内の星アイコン */
 .star-btn {
     cursor: pointer;
@@ -346,28 +396,24 @@ body {
     margin-left: 10px;
 }
 
-/* ブックマークONの時 */
 .star-btn.active {
-    color: #f39c12; 
+    color: #f39c12;
 }
 
-/* ホバー時の動き */
 .star-btn:hover {
     transform: scale(1.2);
     color: #f1c40f;
 }
 
-/* ページネーション全体のレイアウト */
+/* ページネーション */
 .pagination-container {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 10px;
-    /* margin-bottom: 10px; */
-    gap: 8px; /* ボタン同士の間隔 */
+    gap: 8px;
 }
 
-/* ページ番号ボタンの共通デザイン */
 .page-btn {
     min-width: 40px;
     height: 40px;
@@ -384,27 +430,23 @@ body {
     transition: all 0.2s;
 }
 
-/* マウスホバー時 */
 .page-btn:hover:not(:disabled) {
     background-color: #e9ecef;
     border-color: #ddd;
 }
 
-/* 現在表示中のページボタン */
 .page-btn.active {
     background-color: #00acbd;
     color: #ffffff;
     border-color: #00acbd;
 }
 
-/* 「前へ」「次へ」ボタンが無効（disabled）の時 */
 .page-btn:disabled {
     color: #ccc;
     cursor: not-allowed;
     background-color: #f8f9fa;
 }
 
-/* 省略記号 (...) */
 .pagination-ellipsis {
     padding: 0 5px;
     color: #6c757d;
