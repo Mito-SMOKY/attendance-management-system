@@ -39,10 +39,8 @@
         <!-- タブ -->
         <div class="mode-tabs">
             
-            <a th:href="@{/admin/mdTimetable/delete}" class="tab-link active-tab" style="color: #dc3545;">一括削除</a>
-
             <div class="tooltip-001">
-                <a th:href="@{/admin/mdTimetable}" class="tab-link">半期一括登録</a>
+                <a th:href="@{/admin/mdTimetable}" class="tab-link">一括登録</a>
                 <span>前期、後期ごとに時間割を登録できます</span>
             </div>
 
@@ -54,6 +52,11 @@
             <div class="tooltip-001">
                 <a th:href="@{/admin/mdTimetable/view}" class="tab-link">時間割参照</a>
                 <span>登録済みの時間割を見ることができます</span>
+            </div>
+
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable/delete}" class="tab-link">一括削除</a>
+                <span>時間割を削除できます</span>
             </div>
             
         </div>

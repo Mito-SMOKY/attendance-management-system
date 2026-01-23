@@ -1,4 +1,4 @@
-package com.example.attendancemanagementsystem.user.admin.controller;
+package com.example.attendancemanagementsystem.classroom.timetable.controller;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -18,14 +18,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.attendancemanagementsystem.classroom.timetable.dto.MdTimetableDto;
+import com.example.attendancemanagementsystem.classroom.timetable.service.MdTimetableService;
 import com.example.attendancemanagementsystem.common.repository.ClassroomRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
 import com.example.attendancemanagementsystem.common.repository.TimeSlotRepository;
 import com.example.attendancemanagementsystem.common.repository.TimetableRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.common.service.GeminiService;
-import com.example.attendancemanagementsystem.user.admin.dto.MdTimetableDto;
-import com.example.attendancemanagementsystem.user.admin.service.MdTimetableService;
 
 @Controller
 @RequestMapping("/admin/mdTimetable")

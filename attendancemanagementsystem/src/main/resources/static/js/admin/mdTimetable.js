@@ -4,13 +4,6 @@
  */
 
 $(document).ready(function() {
-    // --- 1. Select2の初期化 ---
-    // $('.searchable-select').select2({
-    //     language: "ja",
-    //     width: '100%',
-    //     placeholder: "選択してください",
-    //     allowClear: true
-    // });
 
     // --- 2. Flatpickr (一括登録用・期間選択) ---
     // startとendを別々に初期化して連動させる方式
@@ -134,10 +127,7 @@ async function uploadImage() {
     }
 }
 
-/**
- * ★修正: 行事予定表PDF解析
- * (期間の自動セット ＆ 休日の抽出)
- */
+/* 期間の自動セット ＆ 休日の抽出*/
 async function uploadSchedulePdf() {
     const fileInput = document.getElementById('schedulePdf');
     const loadingMsg = document.getElementById('pdfLoadingMsg');
@@ -194,7 +184,6 @@ async function uploadSchedulePdf() {
 
         if (!response.ok) throw new Error("Server Error: " + response.status);
 
-        // ★修正: JSONオブジェクトを受け取る { startDate, endDate, holidays }
         const result = await response.json(); 
         console.log("解析結果:", result);
 

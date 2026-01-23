@@ -1,4 +1,4 @@
-package com.example.attendancemanagementsystem.user.admin.service;
+package com.example.attendancemanagementsystem.classroom.timetable.service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.attendancemanagementsystem.classroom.timetable.dto.MdTimetableDto;
+import com.example.attendancemanagementsystem.classroom.timetable.dto.MdTimetableDto.Cell;
 import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
 import com.example.attendancemanagementsystem.common.entity.TimeSlotEntity;
@@ -26,8 +28,6 @@ import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepos
 import com.example.attendancemanagementsystem.common.repository.TimeSlotRepository;
 import com.example.attendancemanagementsystem.common.repository.TimetableRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
-import com.example.attendancemanagementsystem.user.admin.dto.MdTimetableDto;
-import com.example.attendancemanagementsystem.user.admin.dto.MdTimetableDto.Cell;
 
 @Service
 public class MdTimetableService {
