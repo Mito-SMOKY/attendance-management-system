@@ -14,20 +14,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.attendancemanagementsystem.attendance.display.dto.SubjectAttendanceDto;
+import com.example.attendancemanagementsystem.common.dto.AttendanceMetricsDto;
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
 import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
+import com.example.attendancemanagementsystem.common.entity.SubjectFaculty;
 import com.example.attendancemanagementsystem.common.entity.TimetableEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
-import com.example.attendancemanagementsystem.common.entity.SubjectFaculty; // ★修正: SubjectFacultyEntity -> SubjectFaculty
 import com.example.attendancemanagementsystem.common.repository.AttendanceRepository;
 import com.example.attendancemanagementsystem.common.repository.ClassroomRepository;
 import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository;
 import com.example.attendancemanagementsystem.common.repository.StudentRepository;
+import com.example.attendancemanagementsystem.common.repository.SubjectFacultyRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
 import com.example.attendancemanagementsystem.common.repository.TimetableRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
-import com.example.attendancemanagementsystem.common.repository.SubjectFacultyRepository;
+import com.example.attendancemanagementsystem.common.service.AttendanceCalculationService;
 
 @Service
 @Transactional(readOnly = true)
@@ -41,6 +43,7 @@ public class SubjectAttendanceService {
     private final ClassroomRepository classroomRepository;
     private final EnrollmentsRepository enrollmentsRepository;
     private final SubjectFacultyRepository subjectFacultyRepository;
+    private final AttendanceCalculationService attendanceCalculationService;
 
     public SubjectAttendanceService(
             UsersRepository usersRepository,
@@ -50,7 +53,8 @@ public class SubjectAttendanceService {
             SubjectRepository subjectRepository,
             ClassroomRepository classroomRepository,
             EnrollmentsRepository enrollmentsRepository,
-            SubjectFacultyRepository subjectFacultyRepository) {
+            SubjectFacultyRepository subjectFacultyRepository,
+            AttendanceCalculationService attendanceCalculationService) {
         this.usersRepository = usersRepository;
         this.studentRepository = studentRepository;
         this.timetableRepository = timetableRepository;
@@ -59,6 +63,7 @@ public class SubjectAttendanceService {
         this.classroomRepository = classroomRepository;
         this.enrollmentsRepository = enrollmentsRepository;
         this.subjectFacultyRepository = subjectFacultyRepository;
+        this.attendanceCalculationService = attendanceCalculationService;
     }
 
     public SubjectAttendanceDto getAttendanceDetails(String loginId, Integer subjectId, Integer year, Integer month) {
@@ -93,15 +98,15 @@ public class SubjectAttendanceService {
         subjectRepository.findById(subjectId).ifPresent(s -> {
             dto.setSubjectName(s.getSubjectName());
             dto.setRequiredClasses(30); 
+            // 初期値として仮置きするが、後で共通ロジックで上書きされる
             dto.setMaxAbsenceClasses(10); 
         });
 
-        // ★修正: SubjectFacultyEntity -> SubjectFaculty に変更
+        // 担当教員取得
         List<SubjectFaculty> facultyList = subjectFacultyRepository.findBySubjectId(subjectId);
         String teacherNames = "未定";
         if (!facultyList.isEmpty()) {
             teacherNames = facultyList.stream()
-                // SubjectFaculty から getUserId() を使って UsersEntity を取得
                 .map(sf -> usersRepository.findById(sf.getUserId()).map(UsersEntity::getName).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(", "));
@@ -130,11 +135,13 @@ public class SubjectAttendanceService {
         List<SubjectAttendanceDto.DailyDetail> dailyList = new ArrayList<>();
         DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("MM/dd(E)", Locale.JAPANESE);
 
+        // 日付ごとにグルーピング
         Map<LocalDate, List<TimetableEntity>> dailyMap = timetables.stream()
                 .collect(Collectors.groupingBy(TimetableEntity::getDate));
         List<Map.Entry<LocalDate, List<TimetableEntity>>> sortedEntries = new ArrayList<>(dailyMap.entrySet());
         sortedEntries.sort(Map.Entry.comparingByKey());
 
+        // 日別ループ
         for (Map.Entry<LocalDate, List<TimetableEntity>> entry : sortedEntries) {
             LocalDate date = entry.getKey();
             List<TimetableEntity> tts = entry.getValue();
@@ -151,13 +158,11 @@ public class SubjectAttendanceService {
                     classroomName = "未定";
                 }
 
-                // 以前あったTimetableから教員名を取得する処理は削除済み
-
                 String statusSymbol = "-";
                 AttendanceEntity att = attendances.stream()
                         .filter(a -> a.getSession() != null 
-                                  && a.getSession().getTimeTable() != null 
-                                  && a.getSession().getTimeTable().getTimeTableId().equals(tt.getTimeTableId()))
+                                && a.getSession().getTimeTable() != null 
+                                && a.getSession().getTimeTable().getTimeTableId().equals(tt.getTimeTableId()))
                         .findFirst().orElse(null);
 
                 if (att != null && att.getStatus() != null) {
@@ -194,26 +199,13 @@ public class SubjectAttendanceService {
         dto.setEarlyLeaveClasses(monthlyEarlyLeave);
         dto.setOfficialAbsentClasses(monthlyOfficial);
         dto.setOfficialPendingClasses(monthlyPending);
-
-        int totalPresent  = attendanceRepository.countByStatusTotal(userId, subjectId, 1);
-        int totalAbsent   = attendanceRepository.countByStatusTotal(userId, subjectId, 2);
-        int totalLate     = attendanceRepository.countByStatusTotal(userId, subjectId, 3);
-        int totalOfficial = attendanceRepository.countByStatusTotal(userId, subjectId, 4);
-        int totalEarlyLeave = attendanceRepository.countByStatusTotal(userId, subjectId, 7);
-
-        int totalAllTime = totalPresent + totalAbsent + totalLate + totalOfficial + totalEarlyLeave; 
         
-        if (totalAllTime > 0) {
-            double rate = (double) (totalPresent + totalOfficial) / totalAllTime;
-            dto.setCurrentAttendanceRate(rate);
-        } else {
-            dto.setCurrentAttendanceRate(0.0);
-        }
+        // 7. 共通ロジックで出席率・残り欠席可能日数を計算してセット
+        AttendanceMetricsDto metrics = attendanceCalculationService.calculateAttendanceMetrics(userId, subjectId);
 
-        int maxLimit = dto.getMaxAbsenceClasses();
-        int remaining = maxLimit - totalAbsent;
-        if (remaining < 0) remaining = 0;
-        dto.setMaxAbsenceClasses(remaining);
+        // 結果のセット
+        dto.setCurrentAttendanceRate(metrics.getAttendanceRate());
+        dto.setMaxAbsenceClasses(metrics.getRemainingAbsenceDays());
 
         return dto;
     }

@@ -76,4 +76,7 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
             @Param("date") LocalDate date, 
             @Param("slotId") Integer slotId
     );
+
+    //指定した科目IDの時間割エンティティ数をカウント
+    int countBySubjectId(Integer subjectId);
 }

@@ -1,0 +1,66 @@
+@charset "UTF-8";
+
+/* requestMain.css */
+
+body {
+    margin: 0;
+    padding-top: 80px; /* ヘッダーの高さ分確保 */
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    background-color: #f9f9f9; /* 背景色（任意） */
+}
+
+/* メインコンテンツのコンテナ */
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 150px); /* 画面中央に配置 */
+}
+
+/* ボタンを並べるエリア */
+.action-buttons {
+    display: flex;
+    gap: 40px; /* ボタン同士の間隔 */
+    padding: 20px;
+    justify-content: center;
+    flex-wrap: wrap; /* 画面幅が狭まった時に折り返す設定（レスポンシブ指定なしでも最低限の崩れ防止） */
+}
+
+/* ボタンのスタイル */
+.ghost-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 250px;
+    height: 180px;
+    background-color: white;
+    color: #5BBEB9; /* テーマカラー */
+    border: 3px solid #5BBEB9;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 20px; /* 文字数が多いボタンもあるため少し調整 */
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* 軽い影を追加 */
+}
+
+/* アイコンのスタイル */
+.ghost-button i {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+/* テキストのスタイル */
+.ghost-button span {
+    text-align: center;
+    padding: 0 10px; /* 改行時のための余白 */
+}
+
+/* ホバー時の挙動 */
+.ghost-button:hover {
+    background-color: #5BBEB9;
+    color: white;
+    transform: translateY(-5px); /* 少し浮き上がる */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
