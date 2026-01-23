@@ -109,4 +109,13 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
             @Param("date") LocalDate date, 
             @Param("slotId") Integer slotId
     );
+
+    //重複の要約情報を取得（最小日付、最大日付、件数）
+    @Query("SELECT MIN(t.date), MAX(t.date), COUNT(t) FROM TimetableEntity t " +
+        "WHERE t.department.departmentId = :deptId " +
+        "AND t.date BETWEEN :startDate AND :endDate")
+    List<Object[]> findOverlapSummary(@Param("deptId") Integer deptId, 
+                                    @Param("startDate") LocalDate startDate, 
+                                    @Param("endDate") LocalDate endDate);
+
 }
