@@ -122,7 +122,7 @@
                             </p>
 
                             <div id="loadingMsg" class="loading-msg">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#00bdca">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#00bdca" margin-left="10px">
                                     <circle cx="12" cy="2" r="0">
                                         <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin="0"
                                                 keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
@@ -182,7 +182,7 @@
                                 ※抽出された日付は<strong>時間割の適用期間から除外</strong>されます。
                             </p>
                             
-                            <div id="loadingMsg" class="loading-msg">
+                            <div id="pdfLoadingMsg" class="loading-msg">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#00bdca">
                                     <circle cx="12" cy="2" r="0">
                                         <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin="0"
@@ -236,7 +236,7 @@
                         <label class="label">適用期間:</label>
                         <div class="date-inputs">
                             <input type="text" th:field="*{startDate}" id="startDate" class="date-form" placeholder="開始日">
-                            <span>～</span>
+                            <span>~</span>
                             <input type="text" th:field="*{endDate}" id="endDate" class="date-form" placeholder="終了日">
                         </div>
                         <p class="warning-text">

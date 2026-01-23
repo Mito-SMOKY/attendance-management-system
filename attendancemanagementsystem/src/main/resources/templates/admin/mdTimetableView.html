@@ -15,50 +15,82 @@
 </head>
 
 <body>
+     <!-- ヘッダー -->
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
     </div>
 
+    <!-- 戻るボタン -->
     <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
     </div>
 
     <div class="timetable-container">
-        <h1 class="page-title">時間割参照</h1>
 
+        <!-- タブ -->
         <div class="mode-tabs">
-            <a th:href="@{/admin/mdTimetable}" class="tab-link">半期一括登録</a>
-            <a th:href="@{/admin/mdTimetable/daily}" class="tab-link">日別編集</a>
-            <a th:href="@{/admin/mdTimetable/view}" class="tab-link active-tab">時間割参照</a>
-            <a th:href="@{/admin/mdTimetable/delete}" class="tab-link active-tab" style="color: #dc3545;">一括削除</a>
+            
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable}" class="tab-link">一括登録</a>
+                <span>前期、後期ごとに時間割を登録できます</span>
+            </div>
+
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable/daily}" class="tab-link ">日別編集</a>
+                <span>日・時限単位で時間割の変更ができます</span>
+            </div>
+
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable/view}" class="tab-link active-tab">時間割参照</a>
+                <span>登録済みの時間割を見ることができます</span>
+            </div>
+
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable/delete}" class="tab-link">一括削除</a>
+                <span>時間割を削除できます</span>
+            </div>
+            
         </div>
 
-        <form th:action="@{/admin/mdTimetable/view}" method="get" class="setting-area">
-            <div class="setting-row center-align" style="border-bottom:1px dashed #ddd; padding-bottom:10px; margin-bottom:15px;">
-                <label>年度:</label>
-                <select name="year" id="yearSelect" class="searchable-select" style="width:100px;" onchange="setReferenceDate()">
-                    <option th:each="y : ${#numbers.sequence(mdTimetableDto.year - 1, mdTimetableDto.year + 1)}"
-                            th:value="${y}" 
-                            th:text="${y} + '年度'"
-                            th:selected="${y == mdTimetableDto.year}">
-                    </option>
-                </select>
+        <div class="page-title">時間割参照</div>
 
-                <label>学期:</label>
-                <select name="term" id="termSelect" class="searchable-select" style="width:100px;" onchange="setReferenceDate()">
-                    <option value="1" th:selected="${mdTimetableDto.term == 1}">前期</option>
-                    <option value="2" th:selected="${mdTimetableDto.term == 2}">後期</option>
-                </select>
-                
-                <button type="button" onclick="setReferenceDate()" class="btn-secondary">
-                    ← この学期の基準日にリセット
+        <form th:action="@{/admin/mdTimetable/view}" method="get" class="setting-area">
+
+            <div class="setting-row">
+                <div class="form-group">
+                    <label>年度:</label>
+                    <select name="year" id="yearSelect" class="date-form" onchange="setReferenceDate()">
+                        <option th:each="y : ${#numbers.sequence(mdTimetableDto.year - 1, mdTimetableDto.year + 1)}"
+                                th:value="${y}" 
+                                th:text="${y} + '年度'"
+                                th:selected="${y == mdTimetableDto.year}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>学期:</label>
+                    <select name="term" id="termSelect" class="date-form" onchange="setReferenceDate()">
+                        <option value="1" th:selected="${mdTimetableDto.term == 1}">前期</option>
+                        <option value="2" th:selected="${mdTimetableDto.term == 2}">後期</option>
+                    </select>
+                </div>
+
+                <button type="btn-secondary" onclick="setReferenceDate()" class="btn-secondary">
+                        学期の基準日にリセット
                 </button>
+
             </div>
 
             <div class="setting-row">
                 <div class="form-group">
-                    <label>表示基準日 (この日を含む週を表示):</label>
-                    <input type="text" name="date" id="dateInput" th:value="${mdTimetableDto.startDate}" class="form-control" required style="width: 150px; background-color: white;">
+                    <label>表示基準日:</label>
+                    <input type="text" name="date" id="dateInput" th:value="${mdTimetableDto.startDate}" class="date-form" required style="width: 150px; background-color: white;">
                 </div>
                 
                 <div class="form-group">
@@ -91,9 +123,11 @@
                 </thead>
                 <tbody>
                     <tr th:each="ts : ${timeSlots}">
-                        <td style="font-weight:bold; background:#eee; text-align:center;">
-                            <span th:text="${ts.slotId} + '限'"></span><br>
-                            <span style="font-size:0.8em; font-weight:normal;" th:text="${ts.startTime} + '～' + ${ts.endTime}"></span>
+                        <td class="td">
+                            <div class="td-container">
+                                <span th:text="${ts.slotId} + '限'"></span>
+                                <span th:text="${ts.startTime} + '～' + ${ts.endTime}"></span>
+                            </div>
                         </td>
                         
                         <td th:each="day : ${ {'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'} }">

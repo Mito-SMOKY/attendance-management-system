@@ -96,7 +96,6 @@ async function uploadImage() {
 
     loadingMsg.style.display = 'block';
     analyzeBtn.disabled = true;
-    analyzeBtn.textContent = "解析中...";
 
     const formData = new FormData();
     formData.append("file", fileInput.files[0]);
@@ -123,7 +122,6 @@ async function uploadImage() {
     } finally {
         loadingMsg.style.display = 'none';
         analyzeBtn.disabled = false;
-        analyzeBtn.textContent = "画像を読み込んで反映";
     }
 }
 
