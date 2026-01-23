@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>日別時間割編集</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/mdTimetableDaily.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+    
+</head>
+
+<body>
+    <!-- ヘッダー -->
+    <div class="header-container">
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
+    </div>
+
+    <!-- 戻るボタン -->
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
+    </div>
+
+
+    <div class="timetable-container">
+        
+        <div th:if="${successMessage}" class="success-message">
+            <span th:text="${successMessage}"></span>
+        </div>
+        
+        <!-- タブ -->
+        <div class="mode-tabs">
+            
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable}" class="tab-link">一括登録</a>
+                <span>前期、後期ごとに時間割を登録できます</span>
+            </div>
+
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable/daily}" class="tab-link active-tab">日別編集</a>
+                <span>日・時限単位で時間割の変更ができます</span>
+            </div>
+
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable/view}" class="tab-link">時間割参照</a>
+                <span>登録済みの時間割を見ることができます</span>
+            </div>
+
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable/delete}" class="tab-link">一括削除</a>
+                <span>時間割を削除できます</span>
+            </div>
+            
+        </div>
+
+        <div class="page-title">日時別 時間割編集</div>
+
+        <form th:action="@{/admin/mdTimetable/daily}" method="get" class="setting-area">
+            <div class="setting-row">
+                <div class="form-group">
+                    <label>対象日:</label>
+                    <input type="text" id="dateInput" name="date" th:value="${mdTimetableDto.startDate}" class="date-form" >
+                </div>
+                
+                <div class="form-group">
+                    <label>クラス:</label>
+                    <select name="departmentId" class="searchable-select">
+                        <option value="">選択してください</option>
+                        <option th:each="entry : ${departmentOptions}" 
+                                th:value="${entry.key}" 
+                                th:text="${entry.value}"
+                                th:selected="${entry.key == mdTimetableDto.departmentId}">
+                        </option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-primary">表示</button>
+            </div>
+        </form>
+
+        <div th:if="${mdTimetableDto.departmentId != null}">
+            <form th:action="@{/admin/mdTimetable/daily/update}" th:object="${mdTimetableDto}" method="post">
+                <input type="hidden" th:field="*{departmentId}">
+                <input type="hidden" th:field="*{startDate}">
+                
+                <div class="table-wrapper">
+                    <table class="timetable-table">
+                        <thead>
+                            <tr>
+                                <th style="width:10%;">時限</th>
+                                <th>
+                                    <span th:text="${mdTimetableDto.startDate}"></span> 
+                                    (<span th:text="${#temporals.dayOfWeekName(mdTimetableDto.startDate)}"></span>)
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="ts : ${timeSlots}">
+                                <td style="font-weight:bold; background:#eee; text-align:center;">
+                                    <span th:text="${ts.slotId} + '限'"></span><br>
+                                    <span style="font-size:0.8em; font-weight:normal;" th:text="${ts.startTime} + '～' + ${ts.endTime}"></span>
+                                </td>
+                                <td th:with="dayKey=${mdTimetableDto.startDate.dayOfWeek.name()}">
+                                    <div class="daily-cell">
+                                        <select th:field="*{scheduleMap[__${ts.slotId}__]['__${dayKey}__'].subjectId}" class="searchable-select" style="flex:1;">
+                                            <option value="">(教科なし)</option>
+                                            <option th:each="sub : ${subjectList}" th:value="${sub.subjectId}" th:text="${sub.subjectName}"></option>
+                                        </select>
+                                        <select th:field="*{scheduleMap[__${ts.slotId}__]['__${dayKey}__'].classroomId}" class="searchable-select">
+                                            <option value="">(教室未定)</option>
+                                            <option th:each="room : ${classroomList}" th:value="${room.classroomId}" th:text="${room.classroomName}"></option>
+                                        </select>
+                                        <select th:field="*{scheduleMap[__${ts.slotId}__]['__${dayKey}__'].userId}" class="searchable-select">
+                                            <option value="">(教員未定)</option>
+                                            <option th:each="teacher : ${teacherList}" th:value="${teacher.userId}" th:text="${teacher.name}"></option>
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="button-area">
+                    <button type="submit" class="btn-primary" onclick="return confirm('この内容で更新しますか？元のデータは上書きされます。');">
+                        保存する
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div th:if="${mdTimetableDto.departmentId == null}" style="text-align:center; margin-top:50px; color:#666;">
+            <p>日付とクラスを選択して「読込」ボタンを押してください。</p>
+        </div>
+    </div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+
+<script th:src="@{/js/admin/mdTimetable.js}"></script>
+
+</body>
+</html>

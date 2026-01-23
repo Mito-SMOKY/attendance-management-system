@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
@@ -24,6 +25,9 @@ public interface EnrollmentsRepository extends JpaRepository<EnrollmentsEntity, 
 
     // 学科IDで検索
     List<EnrollmentsEntity> findByDepartment_DepartmentId(Integer departmentId);
+
+    // その学科に所属するアクティブな生徒を1件取得
+    EnrollmentsEntity findFirstByDepartmentAndIsActiveTrue(DepartmentEntity department);
 
     // 学科IDと学年で検索 
     @Query("SELECT e FROM EnrollmentsEntity e WHERE e.department.departmentId = :deptId AND e.grade = :grade")
