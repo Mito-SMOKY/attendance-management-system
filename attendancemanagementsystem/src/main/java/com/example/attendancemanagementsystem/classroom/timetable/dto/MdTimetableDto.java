@@ -1,4 +1,4 @@
-package com.example.attendancemanagementsystem.user.admin.dto;
+package com.example.attendancemanagementsystem.classroom.timetable.dto;
 
 import java.time.LocalDate;
 import java.util.HashMap;
