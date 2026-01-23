@@ -12,7 +12,12 @@
 <body>
 
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
     </div>
 
     <label class="selectbox-3">
@@ -28,9 +33,9 @@
     <script th:src="@{/js/admin/timetable.js}" defer></script>
     
     <div class="timetable-container" id="timetableContainer"
-         th:data-week-start="${weekStart}"
-         th:data-initial-date="${initialDate}"
-         th:data-initial-user-id="${initialUserId}">
+        th:data-week-start="${weekStart}"
+        th:data-initial-date="${initialDate}"
+        th:data-initial-user-id="${initialUserId}">
         
         <div class="timetable-header">
             
@@ -65,6 +70,5 @@
             </table>
         </div>
     </div>
-
 </body>
 </html>

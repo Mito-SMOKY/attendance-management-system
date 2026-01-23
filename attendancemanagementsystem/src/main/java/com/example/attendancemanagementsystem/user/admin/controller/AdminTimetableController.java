@@ -23,34 +23,33 @@ public class AdminTimetableController {
     @Autowired
     private AdminTimetableService adminTimetableService;
 
-    // ヘルパーメソッド: ログイン中のユーザーID(LoginId)を取得
+    // ログイン中のユーザーIDを取得
     private String getCurrentUserLoginId(CustomUserDetails userDetails) {
         if (userDetails != null) {
             return userDetails.getUsername(); 
         }
-        return "admin001"; // フォールバック
+        return "admin001"; 
     }
 
-    // 画面表示用: /admin/timetable
+    // 画面表示用
     @GetMapping("/timetable")
     public String showTimetablePage(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
         
-        // 1. 全ての管理者を取得してプルダウン用に渡す
+        // 全ての管理者を取得してプルダウン用に渡す
         List<UsersEntity> adminList = adminTimetableService.getAllAdmins();
         model.addAttribute("adminUsers", adminList);
 
-        // 2. 初期表示用に現在のログインユーザーのID(LoginId)を渡す
+        // 現在のログインユーザーのIDを渡す
         model.addAttribute("initialUserId", getCurrentUserLoginId(userDetails));
 
         return "admin/timetable";
     }
 
-    // API用: 時間割データの取得
+    // 時間割データの取得
     @GetMapping("/api/timetabledata")
     @ResponseBody
     public Map<String, Object> getTimetableData(@RequestParam("date") String dateStr,
                                                 @RequestParam("userId") String targetLoginId) {
-        // Serviceに処理を委譲
         return adminTimetableService.getTimetableData(dateStr, targetLoginId);
     }
 }

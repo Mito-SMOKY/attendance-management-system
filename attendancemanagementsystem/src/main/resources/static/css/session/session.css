@@ -1,4 +1,8 @@
 @charset "UTF-8";
+body{
+    font-family: inherit !important;
+}
+
 
 .setting-container { 
     /* display: flex; */
@@ -31,6 +35,7 @@
     border-radius: 5px;
     font-size: 1em;
     cursor: pointer;
+    font-weight: bold;
 }
 
 .btn-secondary{
@@ -39,4 +44,31 @@
 
 .btn-primary{
     background-color: #00bdca;
+}
+
+/* モーダルウィンドウ */
+.modal-title{
+    color: #ffffff;
+}
+
+
+.btn-danger{
+    color: #ffffff;
+    padding: 10px 20px;
+    border: 1px solid ;
+    border-color: #d04b4b;
+    background-color: #d04b4b;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.bg-warning {
+    background-color: #e7bd27 !important;
+    height: 50px;
+}
+
+.modal-content{
+    text-align: center;
 }
