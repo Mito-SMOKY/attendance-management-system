@@ -143,6 +143,13 @@ public class AdminCreateStudentController {
         return "admin/tempAccountList";
     }
 
+    //作成履歴画面
+    @GetMapping("/accountHistory")
+    public String showCreationHistory(Model model) {
+        model.addAttribute("datalists", adminService.getAllDatalists());
+        return "admin/accountHistory";
+    }
+
     //手動入力画面
     @GetMapping("/manualInput")
     public String showManualAccountPage(Model model) {
@@ -156,12 +163,6 @@ public class AdminCreateStudentController {
         return "admin/manualInput";
     }
 
-    //作成履歴画面
-    @GetMapping("/accountHistory")
-    public String showCreationHistory(Model model) {
-        model.addAttribute("datalists", adminService.getAllDatalists());
-        return "admin/accountHistory";
-    }
 
     // 手動入力データの保存 
     @PostMapping("/saveManualAccounts")
