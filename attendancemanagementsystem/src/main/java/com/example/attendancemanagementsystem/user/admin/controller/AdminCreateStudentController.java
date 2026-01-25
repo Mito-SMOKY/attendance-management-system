@@ -163,10 +163,18 @@ public class AdminCreateStudentController {
         return "admin/accountHistory";
     }
 
+    // 手動入力データの保存 
+    @PostMapping("/saveManualAccounts")
+    public String saveManualAccounts(@ModelAttribute ManualAccountForm form, Model model) {
+        adminService.saveDatalistFromForm(form, getCurrentUserId());
+        
+        // フォームデータを渡す
+        model.addAttribute("manualForm", form);
+        
+        return "admin/manualResult";
+    }
     
-
-    
-
+    //csvファイル画面
     @GetMapping("/download-temp-file/{id}")
     public ResponseEntity<byte[]> downloadTempAccountFile(@PathVariable("id") Integer id) {
         
@@ -188,17 +196,6 @@ public class AdminCreateStudentController {
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 
         return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
-    }
-
-    // 手動入力データの保存 
-    @PostMapping("/saveManualAccounts")
-    public String saveManualAccounts(@ModelAttribute ManualAccountForm form, Model model) {
-        adminService.saveDatalistFromForm(form, getCurrentUserId());
-        
-        // フォームデータを渡す
-        model.addAttribute("manualForm", form);
-        
-        return "admin/manualResult";
     }
 
     // 手動登録完了後のCSVダウンロード 
