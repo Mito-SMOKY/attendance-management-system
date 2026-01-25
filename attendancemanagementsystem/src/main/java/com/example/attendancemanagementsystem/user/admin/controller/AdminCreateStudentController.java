@@ -132,7 +132,10 @@ public class AdminCreateStudentController {
         if ("register".equals(origin)) {
             backUrl = "/admin/upload"; 
 
-        } else {
+        }else if ("send".equals(origin)){
+            backUrl = "/admin/manualInput";
+        }
+        else{
             
             //履歴一覧から来た場合
             backUrl = "/admin/accountHistory";
@@ -166,24 +169,43 @@ public class AdminCreateStudentController {
 
     // 手動入力データの保存 
     @PostMapping("/saveManualAccounts")
-    public String saveManualAccounts(@ModelAttribute ManualAccountForm form, Model model) {
-        adminService.saveDatalistFromForm(form, getCurrentUserId());
+    public String saveManualAccounts(@ModelAttribute ManualAccountForm form, RedirectAttributes redirectAttributes) {
         
-        // フォームデータを渡す
-        model.addAttribute("manualForm", form);
+        Datalist savedDatalist = adminService.saveDatalistFromForm(form, getCurrentUserId());
         
-        return "admin/manualResult";
+        if (savedDatalist == null) {
+            // 保存されたデータが無い場合（全員重複などで保存されなかった場合）
+            redirectAttributes.addFlashAttribute("warningMessage", "登録できるデータがありませんでした（すべて重複またはエラー）。");
+            return "redirect:/admin/manualInput"; 
+        }
+
+        // IDを取得
+        Integer newId = savedDatalist.getDataListId();
+        redirectAttributes.addFlashAttribute("successMessage", "登録が完了しました。");
+
+        // 詳細画面へリダイレクト
+        String redirectUrl = "redirect:/admin/tempAccountList/" + newId + "?origin=send";
+        
+        // チェックボックスがONなら
+        if (form.isDownloadCsv()) {
+            redirectUrl += "&download=true";
+        }
+
+        return redirectUrl;
     }
     
-    //csvファイル画面
-    @GetMapping("/download-temp-file/{id}")
-    public ResponseEntity<byte[]> downloadTempAccountFile(@PathVariable("id") Integer id) {
+    // CSVをダウンロードする処理
+    @GetMapping("/downloadCsv/{id}")
+    public ResponseEntity<byte[]> downloadCsvById(@PathVariable Integer id) {
         
+        // CSVの中身の作成
         byte[] csvData = adminService.createCsvFile(id);
         
+        // リストの情報を取得する
         Datalist datalist = adminService.getDatalistById(id);
         String fileName = datalist.getDataListName() + ".csv";
         
+        // 日本語のファイル名が文字化けしないように変換する
         String encodedFileName;
         try {
             encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replace("+", "%20");
@@ -191,34 +213,13 @@ public class AdminCreateStudentController {
             encodedFileName = "download.csv";
         }
 
+        // ヘッダーの作成
         HttpHeaders headers = new HttpHeaders();
+        
+        // 保存処理
         headers.setContentType(MediaType.parseMediaType("text/csv; charset=UTF-8"));
         headers.setContentDispositionFormData("attachment", encodedFileName);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-
         return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
     }
-
-    // 手動登録完了後のCSVダウンロード 
-    @PostMapping("/downloadManualCsv")
-    public ResponseEntity<byte[]> downloadManualCsv(@ModelAttribute ManualAccountForm form) {
-        
-        byte[] csvData = adminService.createCsvFromForm(form);
-        
-        String fileName = form.getDataListName() + ".csv";
-        
-        String encodedFileName;
-        try {
-            encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replace("+", "%20");
-        } catch (Exception e) {
-            encodedFileName = "download.csv";
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("text/csv; charset=UTF-8"));
-        headers.setContentDispositionFormData("attachment", encodedFileName);
-        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-
-        return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
-    } 
 }

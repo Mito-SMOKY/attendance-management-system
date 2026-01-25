@@ -4,64 +4,10 @@
     <meta charset="UTF-8" />
     <title>手動登録</title>
     <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/createAccount/manualInput.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-      /* 既存のスタイル */
-      body {
-        padding: 20px;
-        font-family: sans-serif;
-        max-width: 800px;
-        margin: 0 auto;
-      }
-      .input-group {
-        margin-bottom: 15px;
-        border: 1px solid #eee;
-        padding: 15px;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-      }
-      .input-row {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 10px;
-        align-items: center;
-      }
-      label {
-        font-weight: bold;
-        width: 120px;
-      } /* 少し幅を広げました */
-      input,
-      select {
-        padding: 5px;
-        width: 200px;
-      }
-      .btn {
-        padding: 10px 20px;
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 4px;
-        margin-right: 10px;
-      }
-      .btn-add {
-        background-color: #17a2b8;
-      }
-      .btn-remove {
-        background-color: #dc3545;
-      }
-      .btn-save {
-        background-color: #28a745;
-        font-size: 16px;
-        margin-top: 20px;
-      }
-
-      .batch-setting {
-        background-color: #e9ecef;
-        padding: 15px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-        border-left: 5px solid #007bff;
-      }
+      
     </style>
   </head>
   <body>
@@ -83,6 +29,7 @@
     <p>登録したい学生の情報を入力してください。</p>
 
     <form th:action="@{/admin/saveManualAccounts}" method="post">
+      
       <div class="batch-setting">
         <h3>基本設定（全員に適用）</h3>
         <div class="input-row">
@@ -169,45 +116,16 @@
         － 最後の枠を削除
       </button>
 
-      <br /><br />
+      <br />
+
+      <div class="checkbox-container">
+        <input type="checkbox" id="dl-check" name="downloadCsv" value="true" checked>
+        <label for="dl-check">登録完了後にCSVファイルをダウンロードする</label>
+      </div>
+
       <button type="submit" class="btn btn-save">登録実行</button>
     </form>
 
-    <script>
-      function addAccount() {
-        const container = document.getElementById("account-container");
-        const count = container.children.length; // 現在の要素数
-
-        // 新しい入力グループを作成
-        const newGroup = document.createElement("div");
-        newGroup.className = "input-group";
-        newGroup.innerHTML = `
-                <h3>No.${count + 1}</h3>
-                <div class="input-row">
-                    <label>ログインID</label>
-                    <input type="text" name="accounts[${count}].studentNumber" required>
-                </div>
-                <div class="input-row">
-                    <label>氏名</label>
-                    <input type="text" name="accounts[${count}].name" required>
-                </div>
-                <div class="input-row">
-                    <label>パスワード</label>
-                    <input type="text" name="accounts[${count}].password" required>
-                </div>
-            `;
-
-        container.appendChild(newGroup);
-      }
-
-      function removeAccount() {
-        const container = document.getElementById("account-container");
-        if (container.children.length > 1) {
-          container.removeChild(container.lastElementChild);
-        } else {
-          alert("これ以上削除できません");
-        }
-      }
-    </script>
+    <script th:src="@{/js/createAccount/manualInput.js}"></script>
   </body>
 </html>

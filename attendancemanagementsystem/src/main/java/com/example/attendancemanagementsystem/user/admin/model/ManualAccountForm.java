@@ -22,6 +22,30 @@ public class ManualAccountForm {
 
     private List<ManualAccountData> accounts;
 
+    // ★★★ これを追加してください！ (ここから) ★★★
+    // チェックボックスの状態を受け取る変数
+    private boolean downloadCsv;
+
+    // 保存後にIDを保持するための変数
+    private Integer dataListId;
+
+    public boolean isDownloadCsv() {
+        return downloadCsv;
+    }
+
+    public void setDownloadCsv(boolean downloadCsv) {
+        this.downloadCsv = downloadCsv;
+    }
+
+    public Integer getDataListId() {
+        return dataListId;
+    }
+
+    public void setDataListId(Integer dataListId) {
+        this.dataListId = dataListId;
+    }
+    // ★★★ (ここまで) ★★★
+
     // --- Getter / Setter ---
 
     // 以前のエラー「undefined method getDataListName」を消すためにこの名前が必要です

@@ -274,6 +274,7 @@ public class AdminCreateStudentService {
     }
 
     // 7. CSVファイル生成 (ダウンロード用)
+    @Transactional(readOnly = true)
     public byte[] createCsvFile(Integer datalistId) {
         Datalist datalist = getDatalistById(datalistId);
         StringBuilder sb = new StringBuilder();
