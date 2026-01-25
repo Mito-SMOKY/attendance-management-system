@@ -56,13 +56,13 @@ public class AdminCreateStudentController {
     //アカウント管理画面
     @GetMapping("/accountHome")
     public String showAccountHome() {
-        return "admin/accountHome";
+        return "createAccount/accountHome";
     }
 
     // ファイル読み込み画面表示用
     @GetMapping("/upload")
     public String showFileUploadPage() {
-        return "admin/upload"; 
+        return "createAccount/upload"; 
     }
 
     // ファイル受信時
@@ -75,11 +75,12 @@ public class AdminCreateStudentController {
             // プルダウン用に学科リストを渡す
             model.addAttribute("departmentList", departmentRepository.findAll());
 
-            return "admin/uploadFile"; 
+            return "createAccount/uploadFile"; 
 
         } catch (Exception e) {
             model.addAttribute("errorMessage", "ファイルの読み込みに失敗しました: " + e.getMessage());
-            return "admin/upload";
+
+            return "createAccount/upload";
         }
     }
 
@@ -89,7 +90,8 @@ public class AdminCreateStudentController {
 
         // これで名前だけでなく、生徒リストや学科情報もすべて受け取れます
         model.addAttribute("datalistForm", form);
-        return "admin/accountList"; 
+        
+        return "createAccount/accountList"; 
     }
 
     //登録処理
@@ -103,7 +105,7 @@ public class AdminCreateStudentController {
 
             // 全件キャンセルされたことを伝える
             String message = "以下のIDで重複が検出されたため、登録処理を中止しました（データは保存されていません）: " 
-                        + String.join(", ", duplicateIds);
+                            + String.join(", ", duplicateIds);
             redirectAttributes.addFlashAttribute("warningMessage", message);
 
             return "redirect:/admin/upload";
@@ -118,8 +120,8 @@ public class AdminCreateStudentController {
     //仮アカウント一覧
     @GetMapping("/tempAccountList/{id}")
     public String tempAccountList(@PathVariable Integer id,
-                                @RequestParam(required = false) String origin, 
-                                Model model) {
+                                    @RequestParam(required = false) String origin, 
+                                    Model model) {
         
         Datalist datalist = adminService.getDatalistById(id);
         model.addAttribute("datalist", datalist);
@@ -130,9 +132,11 @@ public class AdminCreateStudentController {
         String backUrl; 
 
         if ("register".equals(origin)) {
+        
             backUrl = "/admin/upload"; 
 
         }else if ("send".equals(origin)){
+
             backUrl = "/admin/manualInput";
         }
         else{
@@ -143,14 +147,15 @@ public class AdminCreateStudentController {
 
         model.addAttribute("backUrl", backUrl);
         
-        return "admin/tempAccountList";
+        return "createAccount/tempAccountList";
     }
 
     //作成履歴画面
     @GetMapping("/accountHistory")
     public String showCreationHistory(Model model) {
         model.addAttribute("datalists", adminService.getAllDatalists());
-        return "admin/accountHistory";
+        
+        return "createAccount/accountHistory";
     }
 
     //手動入力画面
@@ -163,7 +168,7 @@ public class AdminCreateStudentController {
         // フォームの初期化
         model.addAttribute("manualAccountForm", new ManualAccountForm());
         
-        return "admin/manualInput";
+        return "createAccount/manualInput";
     }
 
 
@@ -174,8 +179,10 @@ public class AdminCreateStudentController {
         Datalist savedDatalist = adminService.saveDatalistFromForm(form, getCurrentUserId());
         
         if (savedDatalist == null) {
+
             // 保存されたデータが無い場合（全員重複などで保存されなかった場合）
             redirectAttributes.addFlashAttribute("warningMessage", "登録できるデータがありませんでした（すべて重複またはエラー）。");
+
             return "redirect:/admin/manualInput"; 
         }
 
@@ -183,7 +190,7 @@ public class AdminCreateStudentController {
         Integer newId = savedDatalist.getDataListId();
         redirectAttributes.addFlashAttribute("successMessage", "登録が完了しました。");
 
-        // 詳細画面へリダイレクト
+        // 詳細画面へリダイレクト.
         String redirectUrl = "redirect:/admin/tempAccountList/" + newId + "?origin=send";
         
         // チェックボックスがONなら

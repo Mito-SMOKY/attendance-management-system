@@ -86,6 +86,8 @@
     <br /><br />
     <a th:href="@{/admin/accountHome}" class="btn">← topに戻る</a>
 
+    <input type="hidden" id="dataListIdValue" th:value="${datalist.dataListId}">
+
     <script th:src="@{/js/createAccount/tempAccountList.js}"></script>
   </body>
 </html>
