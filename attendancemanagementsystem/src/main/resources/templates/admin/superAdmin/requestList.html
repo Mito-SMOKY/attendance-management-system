@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">申請一覧</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/requestList.css}">
+    <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+    </div>
+    
+    <div class="backbutton-container" style="max-width: 1000px; margin: 20px auto;">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/userManagement')}"></div>
+    </div>
+
+    <main class="main-container">
+        
+        <h2 class="main-title">申請承認・履歴一覧</h2>
+        
+        <div th:if="${#lists.isEmpty(requestList)}" style="text-align: center; padding: 40px; color: #666;">
+            <i class="fa-regular fa-folder-open" style="font-size: 3em; margin-bottom: 15px;"></i>
+            <p>現在、あなた宛ての申請はありません。</p>
+        </div>
+
+        <table class="approval-table" th:unless="${#lists.isEmpty(requestList)}">
+            <thead>
+                <tr>
+                    <th>申請日時</th>
+                    <th>申請者 (管理者)</th>
+                    <th>申請内容</th>
+                    <th>状態</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="req : ${requestList}">
+                    <td th:text="${req.createdAt}">2026/01/26 10:00</td>
+                    <td th:text="${req.requesterName}">管理者 太郎</td>
+                    <td th:text="${req.type}">アカウント削除</td>
+                    <td>
+                        <span class="status-badge"
+                            th:classappend="${
+                                req.statusCode == 1 ? 'status-pending' : 
+                                req.statusCode == 2 ? 'status-approved' : 
+                                req.statusCode == 3 ? 'status-rejected' : ''
+                            }"
+                            th:text="${req.status}">
+                            承認待ち
+                        </span>
+                    </td>
+                    <td>
+                        <a th:href="@{/admin/approval/detail/{id}(id=${req.requestId})}" class="action-btn">
+                            確認
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </main>
+
+</body>
+</html>

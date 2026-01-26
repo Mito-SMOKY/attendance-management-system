@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.attendancemanagementsystem.attendance.display.dto.SubjectListDto;
+import com.example.attendancemanagementsystem.common.dto.AttendanceMetricsDto; // 追加
 import com.example.attendancemanagementsystem.common.entity.NotificationEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.NotificationRepository;
@@ -68,6 +69,23 @@ public class NotificationMessageService {
     public void createRequestRejectedNotification(UsersEntity student, UsersEntity approver, String rejectionReason) {
         create(student, approver.getUserId(), NotificationType.REQUEST_REJECTED, null, 
             student.getName(), rejectionReason);
+    }
+
+    //欠席時通知作成
+    @Transactional
+    public void createAbsenceNotification(UsersEntity student, String subjectName, AttendanceMetricsDto metrics) {
+        // NotificationType.ABSENCE_ALERT を使用
+        // bodyArgsの順番: 1.ユーザー名, 2.科目名, 3.残り欠席数, 4.出席率(%)
+        create(
+            student, 
+            SYSTEM_SENDER_ID, 
+            NotificationType.ABSENCE_ALERT, 
+            subjectName, // 件名の%s用
+            student.getName(), 
+            subjectName, 
+            metrics.getRemainingAbsenceDays(), 
+            metrics.getAttendanceRatePercent()
+        );
     }
 
     // 共通保存処理

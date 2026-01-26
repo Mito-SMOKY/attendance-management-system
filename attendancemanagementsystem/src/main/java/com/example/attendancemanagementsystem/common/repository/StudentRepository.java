@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 
@@ -18,6 +19,7 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Integer>
     // UsersEntity をもとに StudentEntity を検索するメソッド
     Optional<StudentEntity> findByUser(UsersEntity user);
 
+    // 学科と学年で生徒を取得するメソッド
     @Query("SELECT s FROM StudentEntity s JOIN s.enrollments e " +
         "WHERE e.department.departmentId = :departmentId " +
         "AND e.grade = :grade " +
@@ -27,4 +29,30 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Integer>
             @Param("departmentId") Integer departmentId, 
             @Param("grade") Integer grade, 
             @Param("currentYear") Integer currentYear);
+
+    // キーワード検索とステータスIDリストでフィルタリング
+    @Query("SELECT s FROM StudentEntity s " +
+        "JOIN s.users u " + 
+        "WHERE (u.name LIKE %:keyword% OR u.loginId LIKE %:keyword%) " +
+        "AND s.studentStatusId IN :statusIds")
+    Page<StudentEntity> searchByKeywordAndStatusIn(
+            @Param("keyword") String keyword, 
+            @Param("statusIds") List<Integer> statusIds, 
+            Pageable pageable);
+
+
+    // ステータスIDリストでフィルタリング
+    @Query("SELECT s FROM StudentEntity s " +
+        "WHERE s.studentStatusId IN :statusIds")
+    Page<StudentEntity> findByStatusIn(
+            @Param("statusIds") List<Integer> statusIds, 
+            Pageable pageable);
+
+    // キーワード検索のみ
+    @Query("SELECT s FROM StudentEntity s " +
+        "JOIN s.users u " + 
+        "WHERE u.name LIKE %:keyword% OR u.loginId LIKE %:keyword%")
+    Page<StudentEntity> searchByKeyword(
+            @Param("keyword") String keyword, 
+            Pageable pageable);
 }

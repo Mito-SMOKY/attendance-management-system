@@ -1,0 +1,80 @@
+@charset "UTF-8";
+
+body {
+    background-color: #f9f9f9;
+}
+
+.main-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.main-title {
+    font-size: 24px;
+    color: #333;
+    border-left: 6px solid #539DA4;
+    padding-left: 15px;
+    margin-bottom: 30px;
+}
+
+/* テーブルスタイル */
+.approval-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.approval-table th, .approval-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.approval-table th {
+    background-color: #539DA4;
+    color: #fff;
+    font-weight: normal;
+    white-space: nowrap;
+}
+
+.approval-table tr:hover {
+    background-color: #f0f8ff;
+}
+
+/* ステータスバッジ */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #fff;
+    min-width: 80px;
+    text-align: center;
+}
+
+.status-pending { background-color: #f39c12; }
+.status-approved { background-color: #27ae60; opacity: 0.8; } 
+.status-rejected { background-color: #e74c3c; opacity: 0.8; } 
+
+/* 詳細ボタン */
+.action-btn {
+    display: inline-block;
+    padding: 6px 15px;
+    background-color: #fff;
+    border: 1px solid #539DA4;
+    color: #539DA4;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background-color: #539DA4;
+    color: #fff;
+}

@@ -1,0 +1,144 @@
+@charset "UTF-8";
+
+/* --- 戻るボタンの位置・大きさ調整 --- */
+.backbutton-container {
+    width: 100%;
+    max-width: 800px; /* 詳細ボックスの幅に合わせる */
+    margin: 20px auto 10px auto; /* 上20px, 下10px の余白を確保して重なりを防止 */
+    padding: 0;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 10;
+}
+
+/* 戻るボタン自体の微調整（もしボタンが大きすぎる場合） */
+.backbutton-container a {
+    display: inline-block;
+    padding: 5px 15px; /* 内側の余白を少し調整 */
+    font-size: 0.95rem; /* 文字サイズを適正化 */
+    background-color: #fff; /* 背景色を明示 */
+    border: 1px solid #539DA4; /* 枠線 */
+    border-radius: 4px;
+    text-decoration: none;
+    color: #539DA4;
+}
+
+.backbutton-container a:hover {
+    background-color: #f0f8ff;
+}
+
+/* --- ここから下は既存のスタイル --- */
+
+/* テーブル全体のスタイル */
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.history-table th, .history-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.history-table th {
+    background-color: #f8f9fa;
+    color: #333;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.history-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* ステータスバッジ */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #fff;
+    min-width: 80px;
+    text-align: center;
+}
+
+/* ステータス別の色 */
+.status-pending { background-color: #f39c12; } /* 承認待ち: オレンジ */
+.status-approved { background-color: #27ae60; } /* 承認: 緑 */
+.status-rejected { background-color: #e74c3c; } /* 拒否: 赤 */
+
+/* 詳細ボタン */
+.detail-btn {
+    display: inline-block;
+    padding: 6px 15px;
+    background-color: #539DA4;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    transition: opacity 0.2s;
+}
+
+.detail-btn:hover {
+    opacity: 0.8;
+}
+
+/* --- 詳細画面用 --- */
+.detail-box {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 800px;
+    margin: 0 auto;
+    /* margin-top は backbutton-container で余白を取ったので不要、または微調整 */
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.detail-row {
+    margin-bottom: 20px;
+    display: flex;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 15px;
+}
+
+.detail-label {
+    width: 150px;
+    font-weight: bold;
+    color: #555;
+    flex-shrink: 0;
+}
+
+.detail-value {
+    color: #333;
+    flex-grow: 1;
+}
+
+.student-list-box {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    margin-top: 5px;
+}
+
+.student-list-item {
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+.student-list-item:last-child {
+    border-bottom: none;
+}
