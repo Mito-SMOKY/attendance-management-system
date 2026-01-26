@@ -87,29 +87,28 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
 
     // 指定した教員・日付・時間帯の簡易時間割情報を取得
     @Query("SELECT new map(" +
-        "  sub.subjectId as subjectId, " +
-        "  room.classroomId as classroomId, " +
-        "  dept.departmentId as departmentId, " +
-        "  ds.grade as targetGrade, " +       
-        "  m.majorId as majorId, " +
-        "  c.courseId as courseId " +
-        ") " +
-        "FROM TimetableEntity t " +
-        "JOIN t.subject sub " +               
-        "JOIN t.classroom room " +            
-        "JOIN t.department dept " +           
-        "JOIN dept.major m " +
-        "LEFT JOIN m.course c " +
-        "JOIN DepartmentSubject ds ON ds.department = dept AND ds.subject = sub " +
-        "WHERE t.userId = :userId " +         
-        "AND t.date = :date " +               
-        "AND t.slotId = :slotId")            
+            "  sub.subjectId as subjectId, " +
+            "  room.classroomId as classroomId, " +
+            "  dept.departmentId as departmentId, " +
+            "  t.grade as targetGrade, " +  
+            "  m.majorId as majorId, " +
+            "  c.courseId as courseId " +
+            ") " +
+            "FROM TimetableEntity t " +
+            "JOIN t.subject sub " +
+            "JOIN t.classroom room " +
+            "JOIN t.department dept " +
+            "JOIN dept.major m " +
+            "LEFT JOIN m.course c " +
+            "WHERE t.userId = :userId " +
+            "AND t.date = :date " +
+            "AND t.slotId = :slotId")
     Map<String, Object> findSimpleTimetableData(
             @Param("userId") Integer userId, 
             @Param("date") LocalDate date, 
             @Param("slotId") Integer slotId
     );
-
+    
     //指定した科目IDの時間割エンティティ数をカウント
     int countBySubjectId(Integer subjectId);
 
@@ -126,10 +125,11 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
         @Param("departmentId") Integer departmentId
     );
 
+    //登録されている時間割データの検索
     @Query("SELECT MIN(t.date), MAX(t.date), COUNT(t) " +
-       "FROM TimetableEntity t " +
-       "WHERE t.department.departmentId = :departmentId " +
-       "AND t.date BETWEEN :startDate AND :endDate")
+        "FROM TimetableEntity t " +
+        "WHERE t.department.departmentId = :departmentId " +
+        "AND t.date BETWEEN :startDate AND :endDate")
     List<Object[]> findOverlapSummary(
         @Param("departmentId") Integer departmentId, 
         @Param("startDate") LocalDate startDate, 

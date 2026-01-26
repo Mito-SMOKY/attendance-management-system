@@ -1,9 +1,8 @@
 // 定数定義
 const API_BASE = '/session';
 
-// 共通関数
+// 共通関数: プルダウンの初期化
 function resetSelect(el, defaultText) {
-    // プルダウンを初期化
     el.innerHTML = '';
     const def = document.createElement('option');
     def.text = defaultText;
@@ -16,29 +15,39 @@ function resetSelect(el, defaultText) {
 
 // アクティブセッションIDを取得
 async function fetchActiveSessionId(userId) {
-    // API呼び出し
     try {
         const res = await fetch(`${API_BASE}/api/active/check?userId=${userId}`);
         if (res.ok) {
             const data = await res.json();
             return data.sessionId; 
         }
-    } catch (e) { console.error(e); alert("アクティブセッション情報の取得に失敗しました"); }
+    } catch (e) { 
+        console.error(e); 
+        alert("アクティブセッション情報の取得に失敗しました"); 
+    }
     return null;
 }
 
-//連動プルダウン読み込み関数
+// --- 連動プルダウン読み込み関数群 ---
+
+// 学科 -> コース読み込み
 async function loadCourses(majorId) {
     const courseSelect = document.getElementById('courseId');
     resetSelect(courseSelect, "読み込み中...");
+    
+    // 下位のプルダウンもリセット
     resetSelect(document.getElementById('grade'), "コースを選択してください");
     resetSelect(document.getElementById('departmentId'), "学年を選択してください");
-    if (!majorId) { resetSelect(courseSelect, "学科を選択してください"); return; }
+    
+    if (!majorId) { 
+        resetSelect(courseSelect, "学科を選択してください"); 
+        return; 
+    }
 
-    // API呼び出し
     try {
         const res = await fetch(`${API_BASE}/api/options/courses?majorId=${majorId}`);
         const data = await res.json();
+        
         resetSelect(courseSelect, "選択してください");
         data.forEach(item => {
             const op = document.createElement('option');
@@ -47,20 +56,29 @@ async function loadCourses(majorId) {
             courseSelect.add(op);
         });
         courseSelect.disabled = false;
-    } catch (e) { console.error(e); alert("コース情報の取得に失敗しました"); }
+    } catch (e) { 
+        console.error(e); 
+        alert("コース情報の取得に失敗しました"); 
+    }
 }
 
-// 学年読み込み
+// コース -> 学年読み込み
 async function loadGrades(courseId) {
     const gradeSelect = document.getElementById('grade');
     resetSelect(gradeSelect, "読み込み中...");
+    
+    // 下位のプルダウンもリセット
     resetSelect(document.getElementById('departmentId'), "学年を選択してください");
-    if (!courseId) { resetSelect(gradeSelect, "コースを選択してください"); return; }
+    
+    if (!courseId) { 
+        resetSelect(gradeSelect, "コースを選択してください"); 
+        return; 
+    }
 
-    // API呼び出し
     try {
         const res = await fetch(`${API_BASE}/api/options/grades?courseId=${courseId}`);
         const data = await res.json();
+        
         resetSelect(gradeSelect, "選択してください");
         data.forEach(g => {
             const op = document.createElement('option');
@@ -69,20 +87,28 @@ async function loadGrades(courseId) {
             gradeSelect.add(op);
         });
         gradeSelect.disabled = false;
-    } catch (e) { console.error(e); alert("学年情報の取得に失敗しました"); }
+    } catch (e) { 
+        console.error(e); 
+        alert("学年情報の取得に失敗しました"); 
+    }
 }
 
-// クラス読み込み
+// 学年 -> クラス(Department)読み込み
 async function loadClasses(grade) {
     const courseId = document.getElementById('courseId').value;
     const classSelect = document.getElementById('departmentId');
+    
     resetSelect(classSelect, "読み込み中...");
-    if (!courseId || !grade) { resetSelect(classSelect, "学年を選択してください"); return; }
+    
+    if (!courseId || !grade) { 
+        resetSelect(classSelect, "学年を選択してください"); 
+        return; 
+    }
 
-    // API呼び出し
     try {
         const res = await fetch(`${API_BASE}/api/options/classes?courseId=${courseId}&grade=${grade}`);
         const data = await res.json();
+        
         resetSelect(classSelect, "選択してください");
         data.forEach(item => {
             const op = document.createElement('option');
@@ -91,58 +117,87 @@ async function loadClasses(grade) {
             classSelect.add(op);
         });
         classSelect.disabled = false;
-    } catch (e) { console.error(e); alert("クラス情報の取得に失敗しました"); }
+    } catch (e) { 
+        console.error(e); 
+        alert("クラス情報の取得に失敗しました"); 
+    }
 }
 
-
-// プルダウン連動設定
+// --- イベントリスナー設定 ---
 document.addEventListener('DOMContentLoaded', () => {
+    // 学科変更時
     const majorEl = document.getElementById('majorId');
     if(majorEl) majorEl.addEventListener('change', function() { loadCourses(this.value); });
 
+    // コース変更時
     const courseEl = document.getElementById('courseId');
     if(courseEl) courseEl.addEventListener('change', function() { loadGrades(this.value); });
 
+    // 学年変更時
     const gradeEl = document.getElementById('grade');
     if(gradeEl) gradeEl.addEventListener('change', function() { loadClasses(this.value); });
 });
 
-//時間割自動入力
+
+// --- 時間割自動入力処理 ---
 window.fillTimetable = async function() {
     const userId = document.getElementById('userId').value;
     const date = document.getElementById('date').value;
     const slotId = document.getElementById('slotId').value;
-    if (!slotId) { alert("時限を選択してください"); return; }
+    
+    if (!date || !slotId) { 
+        alert("日付と時限を選択してください"); 
+        return; 
+    }
 
-    // API呼び出し
     try {
+        // APIから時間割データを取得
         const res = await fetch(`${API_BASE}/api/timetable/get?userId=${userId}&date=${date}&slotId=${slotId}`);
-        if (!res.ok) throw new Error("この日時の時間割は見つかりませんでした");
         
-        // データ設定
+        if (!res.ok) {
+            // 200以外の場合はデータなしとみなす
+            throw new Error("この日時の時間割は見つかりませんでした");
+        }
+        
         const data = await res.json();
         
-        // 各フィールドに値を設定
+        // 1. 科目と教室をセット
         if (data.subjectId) document.getElementById('subjectId').value = data.subjectId;
         if (data.classroomId) document.getElementById('classroomId').value = data.classroomId;
+
+        // 2. 学科・コース・学年・クラスを順番にセット（awaitで完了を待つのが重要）
         if (data.majorId) {
             document.getElementById('majorId').value = data.majorId;
+            
+            // コース一覧を読み込み完了まで待機
             await loadCourses(data.majorId);
+            
             if (data.courseId) {
                 document.getElementById('courseId').value = data.courseId;
+                
+                // 学年一覧を読み込み完了まで待機
                 await loadGrades(data.courseId);
+                
                 if (data.targetGrade) {
                     document.getElementById('grade').value = data.targetGrade;
+                    
+                    // クラス一覧を読み込み完了まで待機
                     await loadClasses(data.targetGrade);
-                    if (data.departmentId) document.getElementById('departmentId').value = data.departmentId;
+                    
+                    if (data.departmentId) {
+                        document.getElementById('departmentId').value = data.departmentId;
+                    }
                 }
             }
         }
-    } catch (e) { alert(e.message); }
+    } catch (e) { 
+        console.warn(e);
+        alert(e.message); 
+    }
 };
 
 
-// 授業開始
+// --- 授業開始処理 ---
 window.startSession = async function() {
     const data = {
         date: document.getElementById('date').value,
@@ -155,12 +210,12 @@ window.startSession = async function() {
         classroomId: document.getElementById('classroomId').value
     };
 
+    // 必須チェック
     if (!data.date || !data.slotId || !data.departmentId || !data.subjectId || !data.classroomId) {
         alert("すべての項目を選択してください。");
         return;
     }
 
-    // API呼び出し
     try {
         const response = await fetch(`${API_BASE}/start`, {
             method: 'POST',
@@ -168,7 +223,7 @@ window.startSession = async function() {
             body: JSON.stringify(data)
         });
 
-        // 正常時: 新規ウィンドウで授業画面を開く
+        // 正常時: 授業画面を開く
         if (response.ok) {
             const json = await response.json();
             const uniqueWindowName = 'SessionWindow_' + json.sessionId;
@@ -180,53 +235,41 @@ window.startSession = async function() {
             return;
         }
 
-        // --- エラーハンドリングの変更部分 ---
-        
-        // 1. エラーメッセージをJSONからきれいに取り出す
+        // エラーハンドリング
         let errorMsg = "エラーが発生しました";
         try {
-            // クローンして読み取らないと、後で再読み込みできない場合があるが、ここでは1回きりでOK
             const errData = await response.json();
-            if (errData.message) {
-                errorMsg = errData.message; // メッセージ本文のみ抽出
-            }
+            if (errData.message) errorMsg = errData.message;
         } catch (e) {
-            // JSONパース失敗時はテキストとして取得
             errorMsg = await response.text(); 
         }
 
-        // 2. ステータスコードによる分岐
+        // 409 Conflict: 実施中の授業がある場合 -> モーダル表示
         if (response.status === 409) {
-            // 409 Conflict: 実施中の授業がある場合のみモーダルを表示
             const msgEl = document.getElementById('conflictMessage');
-            if(msgEl) msgEl.innerText = errorMsg; // きれいなメッセージを表示
+            if(msgEl) msgEl.innerText = errorMsg;
 
             const userId = document.getElementById('userId').value;
             let conflictId = await fetchActiveSessionId(userId);
 
-            // 古いhiddenフィールドからも取得を試みる
+            // API取得失敗時のバックアップ
             if (!conflictId) {
                 const oldHidden = document.getElementById('activeSessionId');
                 if(oldHidden) conflictId = oldHidden.value;
             }
             
-            // モーダルにセッションIDをセット
-            const conflictInput = document.getElementById('conflictSessionId');
-            if(conflictInput) conflictInput.value = conflictId || ''; 
-
-            // モーダル表示
+            document.getElementById('conflictSessionId').value = conflictId || ''; 
+            
             const modalEl = document.getElementById('conflictModal');
             const modal = new bootstrap.Modal(modalEl);
             modal.show();
             
         } else {
-            // 400 Bad Request (重複) や 500 Error の場合はアラートのみ
-            // モーダルは表示しない
+            // その他のエラー
             alert(errorMsg);
         }
 
     } catch (err) {
-        // fetch自体の失敗など
         alert("通信エラーが発生しました: " + err.message);
     }
 };
@@ -234,15 +277,17 @@ window.startSession = async function() {
 // 未終了の授業を開く
 window.openConflictSession = function() {
     const sessionId = document.getElementById('conflictSessionId').value;
-    if (!sessionId || sessionId === "null") {
+    if (!sessionId || sessionId === "null" || sessionId === "") {
         alert("セッションIDが特定できませんでした。\n「強制終了」を選んでください。");
         return;
     }
+    
+    // モーダルを閉じる
     const modalEl = document.getElementById('conflictModal');
     const modal = bootstrap.Modal.getInstance(modalEl);
     modal.hide();
 
-    // 一意のウィンドウ名で開く
+    // ウィンドウを開く
     const uniqueWindowName = 'SessionWindow_' + sessionId;
     window.open(
         `${API_BASE}/active/${sessionId}`, 
@@ -256,29 +301,26 @@ window.forceEndSession = async function() {
     if (!confirm("本当に強制終了しますか？\n（出席データは確定されず、授業は終了扱いになります）")) {
         return;
     }
+    
     try {
         let sessionId = document.getElementById('conflictSessionId').value;
         const userId = document.getElementById('userId').value;
 
-        // セッションIDがなければ再取得
         if (!sessionId) {
             sessionId = await fetchActiveSessionId(userId);
         }
 
-        // API呼び出し
         const payload = { 
             sessionId: sessionId ? parseInt(sessionId) : null,
             userId: parseInt(userId)
         };
         
-        // 強制終了API呼び出し
         const forceEndResponse = await fetch(`${API_BASE}/api/force-end`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
         
-        // 正常時: ブロードキャストで通知し、再試行
         if (forceEndResponse.ok) {
             if (sessionId) {
                 const channel = new BroadcastChannel('attendance_channel');
@@ -290,7 +332,6 @@ window.forceEndSession = async function() {
             }
             alert("強制終了しました。自動的に再試行します。");
             
-            // モーダルを閉じる
             const modalEl = document.getElementById('conflictModal');
             const modal = bootstrap.Modal.getInstance(modalEl);
             modal.hide();
@@ -300,11 +341,7 @@ window.forceEndSession = async function() {
             startSession(); 
         } else {
             const text = await forceEndResponse.text();
-            if(forceEndResponse.status === 400) {
-                alert("強制終了エラー(400): IDが特定できませんでした。");
-            } else {
-                throw new Error(text);
-            }
+            alert("強制終了できませんでした: " + text);
         }
     } catch (err) {
         alert("強制終了エラー: " + err.message);
