@@ -190,13 +190,8 @@ public class AdminCreateStudentController {
         Integer newId = savedDatalist.getDataListId();
         redirectAttributes.addFlashAttribute("successMessage", "登録が完了しました。");
 
-        // 詳細画面へリダイレクト.
-        String redirectUrl = "redirect:/admin/tempAccountList/" + newId + "?origin=send";
-        
-        // チェックボックスがONなら
-        if (form.isDownloadCsv()) {
-            redirectUrl += "&download=true";
-        }
+        // デフォルトでcsvのダウンロード
+        String redirectUrl = "redirect:/admin/tempAccountList/" + newId + "?origin=send&download=true";
 
         return redirectUrl;
     }

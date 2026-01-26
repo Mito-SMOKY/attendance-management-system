@@ -6,9 +6,6 @@
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/createAccount/manualInput.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-      
-    </style>
   </head>
   <body>
 
@@ -27,6 +24,10 @@
 
     <h1>手動でのアカウント登録</h1>
     <p>登録したい学生の情報を入力してください。</p>
+    
+    <div th:if="${warningMessage}" style="color: #856404; background: #fff3cd; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+        <span th:text="${warningMessage}"></span>
+    </div>
 
     <form th:action="@{/admin/saveManualAccounts}" method="post">
       
@@ -34,23 +35,12 @@
         <h3>基本設定（全員に適用）</h3>
         <div class="input-row">
           <label>リスト名:</label>
-          <input
-            type="text"
-            name="dataListName"
-            placeholder="例: 2025年度新入生"
-            required
-          />
+          <input type="text" name="dataListName" placeholder="例: 2025年度新入生" required />
         </div>
 
         <div class="input-row">
           <label>年度:</label>
-          <input
-            type="number"
-            name="academicYear"
-            placeholder="2025"
-            value="2025"
-            required
-          />
+          <input type="number" name="academicYear" placeholder="2025" value="2025" required />
         </div>
 
         <div class="input-row">
@@ -65,11 +55,9 @@
         <div class="input-row">
           <label>学科・クラス:</label>
           <select name="departmentId">
-            <option
-              th:each="dept : ${departmentList}"
-              th:value="${dept.departmentId}"
-              th:text="${(dept.major != null ? dept.major.majorName : '(学科不明)') + ' : ' + dept.className}"
-            >
+            <option th:each="dept : ${departmentList}"
+                    th:value="${dept.departmentId}"
+                    th:text="${(dept.major != null ? dept.major.majorName : '(学科不明)') + ' : ' + dept.className}">
               情報システム学科 : Aクラス
             </option>
           </select>
@@ -81,30 +69,15 @@
           <h3>No.1</h3>
           <div class="input-row">
             <label>ログインID</label>
-            <input
-              type="text"
-              name="accounts[0].studentNumber"
-              placeholder="ST001"
-              required
-            />
+            <input type="text" name="accounts[0].studentNumber" placeholder="ST001" required />
           </div>
           <div class="input-row">
             <label>氏名</label>
-            <input
-              type="text"
-              name="accounts[0].name"
-              placeholder="山田 太郎"
-              required
-            />
+            <input type="text" name="accounts[0].name" placeholder="山田 太郎" required />
           </div>
           <div class="input-row">
             <label>パスワード</label>
-            <input
-              type="text"
-              name="accounts[0].password"
-              placeholder="初期パスワード"
-              required
-            />
+            <input type="text" name="accounts[0].password" placeholder="初期パスワード" required />
           </div>
         </div>
       </div>
@@ -117,11 +90,6 @@
       </button>
 
       <br />
-
-      <div class="checkbox-container">
-        <input type="checkbox" id="dl-check" name="downloadCsv" value="true" checked>
-        <label for="dl-check">登録完了後にCSVファイルをダウンロードする</label>
-      </div>
 
       <button type="submit" class="btn btn-save">登録実行</button>
     </form>
