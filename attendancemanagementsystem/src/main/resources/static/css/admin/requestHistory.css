@@ -1,12 +1,18 @@
 /* テーブル全体のスタイル */
 
+.main-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
 .page-title{
     text-align: center;
     border-bottom: 2px solid #00bdca;
     padding-bottom: 10px;
     font-size: 2rem;
     font-weight: bold;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
     color: #333;
     letter-spacing: 2px;
     margin-top: 80px;
@@ -138,4 +144,49 @@
     background-color: #fff;
     padding: 10px;
     border-radius: 4px;
+}
+
+/* --- ページネーション --- */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 35px;
+    height: 35px;
+    padding: 0 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.page-link:hover {
+    background-color: #f0f8ff;
+    border-color: #00bdca;
+    color: #00bdca;
+}
+
+.page-link.active {
+    background-color: #00bdca;
+    color: #fff;
+    border-color: #00bdca;
+    pointer-events: none;
+}
+
+.page-link.disabled {
+    color: #ccc;
+    pointer-events: none;
+    background-color: #f9f9f9;
+    border-color: #eee;
 }

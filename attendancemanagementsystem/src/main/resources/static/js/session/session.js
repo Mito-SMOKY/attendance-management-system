@@ -1,6 +1,16 @@
 // 定数定義
 const API_BASE = '/session';
 
+function showModal(modalId) {
+    const el = document.getElementById(modalId);
+    if(el) el.classList.add('show');
+}
+
+function hideModal(modalId) {
+    const el = document.getElementById(modalId);
+    if(el) el.classList.remove('show');
+}
+
 // 共通関数
 function resetSelect(el, defaultText) {
     // プルダウンを初期化
@@ -216,8 +226,7 @@ window.startSession = async function() {
 
             // モーダル表示
             const modalEl = document.getElementById('conflictModal');
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
+            showModal('conflictModal');
             
         } else {
             // 400 Bad Request (重複) や 500 Error の場合はアラートのみ
@@ -239,8 +248,7 @@ window.openConflictSession = function() {
         return;
     }
     const modalEl = document.getElementById('conflictModal');
-    const modal = bootstrap.Modal.getInstance(modalEl);
-    modal.hide();
+    hideModal('conflictModal');
 
     // 一意のウィンドウ名で開く
     const uniqueWindowName = 'SessionWindow_' + sessionId;
@@ -292,8 +300,7 @@ window.forceEndSession = async function() {
             
             // モーダルを閉じる
             const modalEl = document.getElementById('conflictModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            modal.hide();
+            hideModal('conflictModal');
             document.getElementById('conflictSessionId').value = '';
             
             // 再試行
