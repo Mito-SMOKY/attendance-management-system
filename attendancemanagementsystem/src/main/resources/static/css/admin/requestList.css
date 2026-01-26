@@ -1,8 +1,3 @@
-@charset "UTF-8";
-
-body {
-    background-color: #f9f9f9;
-}
 
 .main-container {
     max-width: 1000px;
@@ -10,12 +5,16 @@ body {
     padding: 0 20px;
 }
 
-.main-title {
-    font-size: 24px;
+.page-title {
     color: #333;
-    border-left: 6px solid #539DA4;
-    padding-left: 15px;
-    margin-bottom: 30px;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #00bdca;
+    padding-bottom: 10px;
+    margin-top: 100px;
+    margin-bottom: 20px;
+    padding-left: 20px;
+    text-align: center;
+    font-weight: bold;
 }
 
 /* テーブルスタイル */
@@ -26,16 +25,17 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     border-radius: 8px;
     overflow: hidden;
+    table-layout: fixed;
 }
 
 .approval-table th, .approval-table td {
-    padding: 15px;
+    padding: 12px;
     text-align: left;
     border-bottom: 1px solid #eee;
 }
 
 .approval-table th {
-    background-color: #539DA4;
+    background-color: #00bdca;
     color: #fff;
     font-weight: normal;
     white-space: nowrap;
@@ -66,8 +66,8 @@ body {
     display: inline-block;
     padding: 6px 15px;
     background-color: #fff;
-    border: 1px solid #539DA4;
-    color: #539DA4;
+    border: 1px solid #00bdca;
+    color: #00bdca;
     text-decoration: none;
     border-radius: 4px;
     font-size: 0.9em;
@@ -75,6 +75,65 @@ body {
 }
 
 .action-btn:hover {
-    background-color: #539DA4;
+    background-color: #00bdca;
     color: #fff;
+}
+
+/* --- ページネーション --- */
+.pagination-area {
+    margin-top: 30px;
+    margin-bottom: 50px;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    gap: 5px;
+    align-items: center;
+}
+
+.pagination li a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 35px;
+    height: 35px;
+    text-decoration: none;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.pagination li a:hover {
+    background-color: #ededed;
+}
+
+/* 現在のページ */
+.pagination li.active a {
+    background-color: #00bdca;
+    color: white;
+    border-color: #00bdca;
+    pointer-events: none;
+}
+
+/* ボタン無効時 */
+.pagination li.disabled a {
+    color: #ccc;
+    background-color: #f9f9f9;
+    pointer-events: none;
+}
+
+/* ...の表示 */
+.pagination li.dots {
+    padding: 0 5px;
+    color: #999;
+    font-weight: bold;
+    display: flex;
+    align-items: flex-end;
+    height: 30px;
 }

@@ -1,35 +1,17 @@
-@charset "UTF-8";
-
-/* --- 戻るボタンの位置・大きさ調整 --- */
-.backbutton-container {
-    width: 100%;
-    max-width: 800px; /* 詳細ボックスの幅に合わせる */
-    margin: 20px auto 10px auto; /* 上20px, 下10px の余白を確保して重なりを防止 */
-    padding: 0;
-    box-sizing: border-box;
-    position: relative;
-    z-index: 10;
-}
-
-/* 戻るボタン自体の微調整（もしボタンが大きすぎる場合） */
-.backbutton-container a {
-    display: inline-block;
-    padding: 5px 15px; /* 内側の余白を少し調整 */
-    font-size: 0.95rem; /* 文字サイズを適正化 */
-    background-color: #fff; /* 背景色を明示 */
-    border: 1px solid #539DA4; /* 枠線 */
-    border-radius: 4px;
-    text-decoration: none;
-    color: #539DA4;
-}
-
-.backbutton-container a:hover {
-    background-color: #f0f8ff;
-}
-
-/* --- ここから下は既存のスタイル --- */
-
 /* テーブル全体のスタイル */
+
+.page-title{
+    text-align: center;
+    border-bottom: 2px solid #00bdca;
+    padding-bottom: 10px;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 50px;
+    color: #333;
+    letter-spacing: 2px;
+    margin-top: 80px;
+}
+
 .history-table {
     width: 100%;
     border-collapse: collapse;
@@ -45,8 +27,8 @@
 }
 
 .history-table th {
-    background-color: #f8f9fa;
-    color: #333;
+    background-color: #00bdca;
+    color: #fff;
     font-weight: bold;
     white-space: nowrap;
 }
@@ -61,14 +43,14 @@
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 0.85em;
-    font-weight: bold;
+    font-weight: normal;
     color: #fff;
     min-width: 80px;
     text-align: center;
 }
 
 /* ステータス別の色 */
-.status-pending { background-color: #f39c12; } /* 承認待ち: オレンジ */
+.status-pending { background-color: #e7a234; } /* 承認待ち: オレンジ */
 .status-approved { background-color: #27ae60; } /* 承認: 緑 */
 .status-rejected { background-color: #e74c3c; } /* 拒否: 赤 */
 
@@ -76,7 +58,7 @@
 .detail-btn {
     display: inline-block;
     padding: 6px 15px;
-    background-color: #539DA4;
+    background-color: #00bdca;
     color: #fff;
     text-decoration: none;
     border-radius: 4px;
@@ -89,6 +71,11 @@
 }
 
 /* --- 詳細画面用 --- */
+
+.main-container{
+    margin-top: 80px;
+}
+
 .detail-box {
     background: #fff;
     padding: 30px;
@@ -141,4 +128,14 @@
 }
 .student-list-item:last-child {
     border-bottom: none;
+}
+
+.student-list-box {
+    max-height: 300px; /* 300pxはお好みで調整してください */
+    overflow-y: auto; 
+    width: 100%;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 4px;
 }

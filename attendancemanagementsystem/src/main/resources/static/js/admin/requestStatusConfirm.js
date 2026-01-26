@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     icon: 'warning',
                     title: '入力エラー',
                     text: '変更後のステータスを選択してください。',
-                    confirmButtonColor: '#539DA4'
+                    confirmButtonColor: '#00bdca'
                 });
                 return;
             }
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     icon: 'warning',
                     title: '入力エラー',
                     text: '申請先（承認者）を選択してください。',
-                    confirmButtonColor: '#539DA4'
+                    confirmButtonColor: '#00bdca'
                 });
                 return;
             }
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     icon: 'warning',
                     title: '選択エラー',
                     text: '対象の生徒が選択されていません。',
-                    confirmButtonColor: '#539DA4'
+                    confirmButtonColor: '#00bdca'
                 });
                 return;
             }
@@ -56,8 +56,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 text: "この操作は取り消せません。",
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#539DA4',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#00bdca',
+                cancelButtonColor: 'rgb(215, 76, 76)',
                 confirmButtonText: 'はい、申請します',
                 cancelButtonText: 'キャンセル'
             }).then((result) => {
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const requestData = {
             targetIds: targetIds,
-            targetStatusId: parseInt(targetStatusId), // ★追加: ステータスID
+            targetStatusId: parseInt(targetStatusId), 
             remarks: remarks,
             approverId: parseInt(approverId)
         };
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon: 'success',
                 title: '完了',
                 text: 'ステータス変更申請が完了しました。',
-                confirmButtonColor: '#539DA4',
+                confirmButtonColor: '#00bdca',
                 confirmButtonText: 'メニューへ戻る'
             }).then(() => {
                 window.location.href = '/admin/request/menu'; 
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon: 'error',
                 title: 'エラー',
                 text: '申請に失敗しました。時間をおいて再度お試しください。',
-                confirmButtonColor: '#539DA4'
+                confirmButtonColor: '#00bdca'
             });
         });
     }

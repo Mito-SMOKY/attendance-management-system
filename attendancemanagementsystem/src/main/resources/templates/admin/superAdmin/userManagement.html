@@ -14,83 +14,87 @@
 <body>
 
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
-    </div>
-    
-    <div class="page-header-area">
-        <h2 class="page-title">ユーザー管理</h2>
+        <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
     </div>
 
-    <div class="content-wrapper">
-        
-        <div id="main-menu-group" class="menu-group fade-in">
-            <div class="action-buttons">
-                <a th:href="@{/admin/sadminList}" class="ghost-button">
-                    <i class="fa-solid fa-users-gear"></i>
-                    <span>管理者一覧</span>
-                </a>
+    <div class="main-container">
 
-                <div class="ghost-button" onclick="showStudentMenu()">
-                    <i class="fa-solid fa-user-graduate"></i>
-                    <span>生徒管理</span>
-                    <i class="fa-solid fa-chevron-right arrow-icon"></i>
-                </div>
+        <div class="page-title">ユーザー管理</div>
 
-                <div class="ghost-button" onclick="showHistoryMenu()">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                    <span>データ変更履歴</span>
-                    <i class="fa-solid fa-chevron-right arrow-icon"></i>
-                </div>
-            </div>
-        </div>
+        <div class="content-wrapper">
 
-        <div id="student-menu-group" class="menu-group fade-in hidden">
-            <div class="action-buttons">
-                <a th:href="@{/admin/request/select(mode='status')}" class="ghost-button">
-                    <i class="fa-solid fa-user-pen"></i>
-                    <span>生徒ステータス変更</span>
-                </a>
-                <a th:href="@{/admin/request/select(mode='delete')}" class="ghost-button">
-                    <i class="fa-solid fa-user-xmark"></i>
-                    <span>生徒削除</span>
-                </a>
-                <a th:href="@{/admin/request/select(mode='course')}" class="ghost-button">
-                    <i class="fa-solid fa-school"></i>
-                    <span>生徒学科・コース</span>
-                </a>
-            </div>
-            <div class="back-btn-row">
-                <div class="small-back-btn" onclick="backToMainMenu()">
-                    <i class="fa-solid fa-reply"></i> メニューに戻る
+            
+            
+            <div id="main-menu-group" class="menu-group fade-in">
+                <div class="action-buttons">
+                    <a th:href="@{/admin/sadminList}" class="ghost-button">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>管理者一覧</span>
+                    </a>
+
+                    <div class="ghost-button" onclick="showStudentMenu()">
+                        <i class="fa-solid fa-user-graduate"></i>
+                        <span>生徒管理</span>
+                        <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                    </div>
+
+                    <div class="ghost-button" onclick="showHistoryMenu()">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>データ変更履歴</span>
+                        <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div id="history-menu-group" class="menu-group fade-in hidden">
-            <div class="action-buttons">
-                
-                <a th:href="@{/admin/history/adminDelete}" class="ghost-button">
-                    <i class="fa-solid fa-user-slash"></i>
-                    <span>管理者削除履歴</span>
-                </a>
-
-                <a th:href="@{/admin/history/adminCreate}" class="ghost-button">
-                    <i class="fa-solid fa-user-plus"></i>
-                    <span>管理者作成履歴</span>
-                </a>
-
-                <a th:href="@{/admin/approval/list}" class="ghost-button">
-                    <i class="fa-solid fa-list-check"></i>
-                    <span>申請履歴</span>
-                </a>
-
-            </div>
-
-            <div class="back-btn-row">
-                <div class="small-back-btn" onclick="backToMainMenu()">
-                    <i class="fa-solid fa-reply"></i> メニューに戻る
+            <div id="student-menu-group" class="menu-group fade-in hidden">
+                <div class="action-buttons">
+                    <a th:href="@{/admin/request/select(mode='status')}" class="ghost-button">
+                        <i class="fa-solid fa-user-pen"></i>
+                        <span>生徒ステータス変更</span>
+                    </a>
+                    <a th:href="@{/admin/request/select(mode='delete')}" class="ghost-button">
+                        <i class="fa-solid fa-user-xmark"></i>
+                        <span>生徒削除</span>
+                    </a>
+                    <a th:href="@{/admin/request/select(mode='course')}" class="ghost-button">
+                        <i class="fa-solid fa-school"></i>
+                        <span>生徒学科・コース</span>
+                    </a>
+                </div>
+                <div class="back-btn-row">
+                    <div class="small-back-btn" onclick="backToMainMenu()">
+                        <i class="fa-solid fa-reply"></i> メニューに戻る
+                    </div>
                 </div>
             </div>
+
+            <div id="history-menu-group" class="menu-group fade-in hidden">
+                <div class="action-buttons">
+                    
+                    <a th:href="@{/admin/history/adminDelete}" class="ghost-button">
+                        <i class="fa-solid fa-user-slash"></i>
+                        <span>管理者削除履歴</span>
+                    </a>
+
+                    <a th:href="@{/admin/history/adminCreate}" class="ghost-button">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>管理者作成履歴</span>
+                    </a>
+
+                    <a th:href="@{/admin/approval/list}" class="ghost-button">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>申請履歴</span>
+                    </a>
+
+                </div>
+
+                <div class="back-btn-row">
+                    <div class="small-back-btn" onclick="backToMainMenu()">
+                        <i class="fa-solid fa-reply"></i> メニューに戻る
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
