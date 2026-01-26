@@ -95,7 +95,7 @@ public class AdminCreateStudentController {
                 // 学科名を取得
                 String majorName = (dept.getMajor() != null) ? dept.getMajor().getMajorName() : "";
                 
-                // 表示用の文字列を作成 (例: 情報システム学科 Aクラス)
+                // 表示用の文字列を作成 
                 String displayDeptName = majorName;
                 
                 // 画面に渡す
