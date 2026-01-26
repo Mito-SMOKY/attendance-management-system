@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders; // PDF用
+import org.springframework.http.MediaType;   // PDF用
+import org.springframework.http.ResponseEntity; // PDF用
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -61,18 +61,54 @@ public class SuperAdminController {
         return "admin/sadminInfo";
     }
 
-    // --- 4. 更新処理 (必要に応じて有効化) ---
-    /*
+    // --- 4. 更新処理 (有効化しました) ---
     @PostMapping("/sadmin/update")
-    public String updateAdminDetail(...) { ... }
-    */
+    public String updateAdminDetail(
+            @ModelAttribute SuperAdminDetailDto form,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            // 操作者IDを渡して更新実行
+            superAdminService.updateAdmin(form, userDetails.getUserId());
+            redirectAttributes.addFlashAttribute("successMessage", "管理者情報を更新しました。");
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "更新失敗: " + e.getMessage());
+        }
+        
+        // 詳細画面へリダイレクト
+        return "redirect:/admin/sadminInfo/" + form.getUserId();
+    }
 
-    // --- 5. 削除処理 (必要に応じて有効化) ---
-    /*
+    // --- 5. 削除処理 (有効化しました) ---
     @PostMapping("/sadmin/delete")
-    public String deleteAdmin(...) { ... }
-    */
-
+    public String deleteAdmin(
+            @RequestParam("targetID") Integer targetId,
+            @RequestParam("password") String password,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            // 削除実行
+            boolean isDeleted = superAdminService.deleteAdmin(targetId, password, userDetails.getUserId());
+            
+            if (isDeleted) {
+                redirectAttributes.addFlashAttribute("successMessage", "管理者を削除しました。");
+                return "redirect:/admin/sadminList"; // 一覧へ戻る
+            } else {
+                // パスワード間違いの場合
+                redirectAttributes.addFlashAttribute("errorMessage", "パスワードが正しくありません。");
+                return "redirect:/admin/sadminInfo/" + targetId;
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "削除中にエラーが発生しました: " + e.getMessage());
+            return "redirect:/admin/sadminInfo/" + targetId;
+        }
+    }
+    
     // --- 6. 新規作成画面表示 ---
     @GetMapping("/sadminCreate")
     public String showAdminCreate(Model model) {
@@ -82,20 +118,15 @@ public class SuperAdminController {
         return "admin/sadminCreate";
     }
 
-    // --- 7. 新規作成実行 (POST) ---
+    // --- 7. 新規作成実行 ---
     @PostMapping("/sadmin/create")
     public String createAdmin(
             @ModelAttribute SuperAdminCreateDto form,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             RedirectAttributes redirectAttributes) {
-        
         try {
-            // ServiceからログIDを受け取る
             Integer logId = superAdminService.createAdmin(form, userDetails.getUserId());
-            
-            // 完了画面へリダイレクト (IDを渡す)
             return "redirect:/admin/sadminCreateSuccess?id=" + logId;
-
         } catch (Exception e) {
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("errorMessage", "登録失敗: " + e.getMessage());
@@ -103,22 +134,18 @@ public class SuperAdminController {
         }
     }
 
-    // --- 8. 登録完了画面表示 (GET) ---
+    // --- 8. 登録完了画面表示 ---
     @GetMapping("/sadminCreateSuccess")
     public String showCreateSuccess(@RequestParam("id") Integer logId, Model model) {
         model.addAttribute("logId", logId);
         return "admin/sadminCreateSuccess";
     }
 
-    // --- 9. PDFダウンロード処理 (GET) ---
+    // --- 9. PDFダウンロード ---
     @GetMapping("/sadmin/download-pdf/{id}")
     public ResponseEntity<byte[]> downloadPdf(@PathVariable("id") Integer logId) {
-        // PDFバイト配列を取得
         byte[] pdfBytes = superAdminService.generateRegistrationPdf(logId);
-        
-        // ファイル名設定
         String fileName = "admin_credentials_" + logId + ".pdf";
-
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")

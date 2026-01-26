@@ -135,11 +135,55 @@
               class="btn-confirm"
               id="btnSave"
               type="button"
-              onclick="saveUser()"
+              onclick="openUpdateModal()"
               style="display: none"
             >
               確定
             </button>
+          </div>
+
+          <div id="updateModal" class="modal-overlay">
+            <div class="modal-box">
+              <div class="modal-icon" style="color: #00bdca">
+                <i class="fa-solid fa-file-pen"></i>
+              </div>
+
+              <h2 class="modal-title">変更内容を保存しますか？</h2>
+              <p class="modal-desc" style="margin-bottom: 20px">
+                セキュリティ保護のため、<br />あなたのパスワードを入力してください。
+              </p>
+
+              <p class="modal-input-label">操作者パスワード</p>
+              <div class="password-wrapper">
+                <input
+                  type="password"
+                  id="updatePassword"
+                  name="currentAdminPassword"
+                  placeholder="パスワードを入力"
+                />
+                <i
+                  class="fa-solid fa-eye-slash toggle-eye"
+                  onclick="toggleUpdatePasswordVisibility()"
+                ></i>
+              </div>
+
+              <div class="modal-buttons">
+                <button
+                  type="button"
+                  class="btn-modal-cancel"
+                  onclick="closeUpdateModal()"
+                >
+                  キャンセル
+                </button>
+                <button
+                  type="button"
+                  class="btn-confirm"
+                  onclick="submitUpdate()"
+                >
+                  保存する
+                </button>
+              </div>
+            </div>
           </div>
         </form>
       </div>
