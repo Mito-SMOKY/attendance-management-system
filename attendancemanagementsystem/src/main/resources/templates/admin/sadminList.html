@@ -62,14 +62,14 @@
         <table class="admin-table" id="adminTable">
           <thead>
             <tr>
-              <th class="col-id">管理者番号</th>
+              <th class="col-id">ログインID</th>
               <th class="col-name">氏名</th>
               <th class="col-auth">上位権限</th>
             </tr>
           </thead>
           <tbody>
             <tr th:each="user : ${sadminList}">
-              <td th:text="${user.UserID}"></td>
+              <td th:text="${user.LoginID}"></td>
 
               <td>
                 <a

@@ -95,6 +95,7 @@ public class SuperAdminService {
             if (admin.getUser() == null) continue;
             Map<String, Object> map = new HashMap<>();
             map.put("UserID", admin.getUserId());
+            map.put("LoginID", admin.getUser().getLoginId());
             map.put("Name", admin.getUser().getName());
             map.put("authority", (admin.getAdminLevelId() == 1) ? "1" : "0"); 
             resultList.add(map);
