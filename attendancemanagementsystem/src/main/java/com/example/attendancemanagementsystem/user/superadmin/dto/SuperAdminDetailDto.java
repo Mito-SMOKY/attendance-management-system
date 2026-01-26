@@ -2,13 +2,22 @@ package com.example.attendancemanagementsystem.user.superadmin.dto;
 
 public class SuperAdminDetailDto {
     private Integer userId;
+    
+    // ★追加: ログインID
+    private String loginId;
+    
     private String name;
     private String email;
-    private Integer adminLevelID; // 画面では 1(上位) or 0(一般) として扱います
+    private Integer adminLevelID;
 
-    // --- Getter / Setter (Lombokがない場合用) ---
+    // --- Getter / Setter ---
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
+    
+    // ★追加
+    public String getLoginId() { return loginId; }
+    public void setLoginId(String loginId) { this.loginId = loginId; }
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public String getEmail() { return email; }

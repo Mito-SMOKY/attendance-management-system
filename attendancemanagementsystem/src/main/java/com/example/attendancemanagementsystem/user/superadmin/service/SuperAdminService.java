@@ -111,6 +111,7 @@ public class SuperAdminService {
         
         SuperAdminDetailDto dto = new SuperAdminDetailDto();
         dto.setUserId(admin.getUserId());
+        dto.setLoginId(admin.getUser().getLoginId());
         dto.setName(admin.getUser().getName());
         dto.setEmail(admin.getUser().getEmail());
         dto.setAdminLevelID(admin.getAdminLevelId() == 1 ? 1 : 0);

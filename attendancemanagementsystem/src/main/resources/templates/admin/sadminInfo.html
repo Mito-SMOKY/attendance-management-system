@@ -28,6 +28,21 @@
       </div>
 
       <div class="info-container">
+        <div
+          th:if="${errorMessage}"
+          style="color: red; margin-bottom: 15px; text-align: center"
+        >
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span th:text="${errorMessage}"></span>
+        </div>
+        <div
+          th:if="${successMessage}"
+          style="color: green; margin-bottom: 15px; text-align: center"
+        >
+          <i class="fa-solid fa-check"></i>
+          <span th:text="${successMessage}"></span>
+        </div>
+
         <div class="info-header">
           <h3>登録情報</h3>
           <button
@@ -46,20 +61,20 @@
           method="post"
           th:object="${sadminInfo}"
         >
+          <input type="hidden" id="userId" name="userId" th:value="*{userId}" />
+
           <div class="detail-box">
             <div class="detail-row">
-              <div class="detail-label">管理者番号</div>
-              <div class="detail-value" th:text="*{userId}"></div>
-              <input
-                type="hidden"
-                id="userId"
-                name="userId"
-                th:value="*{userId}"
-              />
+              <div class="detail-label">ログインID</div>
+              <div class="detail-value" th:text="*{loginId}"></div>
+              <input type="hidden" id="loginIdHidden" th:value="*{loginId}" />
             </div>
 
             <div class="detail-row">
-              <div class="detail-label">氏名</div>
+              <div class="detail-label">
+                氏名
+                <span class="badge-required" style="display: none">必須</span>
+              </div>
               <div class="detail-value">
                 <input
                   type="text"
@@ -67,6 +82,7 @@
                   name="name"
                   th:value="*{name}"
                   disabled
+                  required
                 />
               </div>
             </div>
@@ -80,16 +96,10 @@
                   class="auth-select"
                   disabled
                 >
-                  <option
-                    value="1"
-                    th:selected="*{adminLevelID == 1 || adminLevelID == '1'}"
-                  >
+                  <option value="1" th:selected="*{adminLevelID == 1}">
                     〇 (上位権限)
                   </option>
-                  <option
-                    value="0"
-                    th:selected="*{adminLevelID == 0 || adminLevelID == '0'}"
-                  >
+                  <option value="0" th:selected="*{adminLevelID == 0}">
                     ✕ (一般権限)
                   </option>
                 </select>
@@ -145,14 +155,23 @@
         <p class="modal-warning">※この操作は取り消せません</p>
 
         <div class="modal-user-info">
-          <p>管理者番号：<span id="modalUserIdDisplay"></span></p>
-          <p>氏名：<span id="modalUserNameDisplay"></span></p>
+          <p>
+            ログインID：<span
+              id="modalLoginIdDisplay"
+              style="font-weight: bold"
+            ></span>
+          </p>
+          <p>
+            氏名：<span
+              id="modalUserNameDisplay"
+              style="font-weight: bold"
+            ></span>
+          </p>
         </div>
 
         <form id="deleteForm" th:action="@{/admin/sadmin/delete}" method="post">
           <input type="hidden" id="deleteTargetId" name="targetID" />
-
-          <p class="modal-input-label">パスワードを入力してください</p>
+          <p class="modal-input-label">あなたのパスワードを入力してください</p>
           <div class="password-wrapper">
             <input
               type="password"
