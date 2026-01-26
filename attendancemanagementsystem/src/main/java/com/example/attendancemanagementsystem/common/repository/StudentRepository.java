@@ -2,8 +2,9 @@ package com.example.attendancemanagementsystem.common.repository;
 
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -16,7 +17,7 @@ import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 public interface StudentRepository extends JpaRepository<StudentEntity, Integer>, JpaSpecificationExecutor<StudentEntity> {
 
     // UsersEntity をもとに StudentEntity を検索するメソッド
-    Optional<StudentEntity> findByUsers(UsersEntity users);
+    Optional<StudentEntity> findByUser(UsersEntity user);
 
     // 学科と学年で生徒を取得するメソッド
     @Query("SELECT s FROM StudentEntity s JOIN s.enrollments e " +

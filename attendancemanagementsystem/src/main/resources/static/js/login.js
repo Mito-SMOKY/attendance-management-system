@@ -144,7 +144,7 @@ window.addEventListener('load', () => {
                         sessionStorage.setItem('animationPlayed', 'true');
                     }, 500); // 消えるアニメーション時間
                 },); 
-            }, 1500); // 移動にかかる時間（CSSの1.5sと合わせる）
-        }, 2200); // 最初の波紋待機
+            }, 1300); // 移動にかかる時間（CSSの1.5sと合わせる）
+        }, 2500); // 最初の波紋待機
     }
 });

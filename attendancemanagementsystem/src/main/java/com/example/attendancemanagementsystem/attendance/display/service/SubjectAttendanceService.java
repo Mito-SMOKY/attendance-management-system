@@ -73,7 +73,7 @@ public class SubjectAttendanceService {
         // 1. ユーザー・生徒特定
         UsersEntity user = usersRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + loginId));
-        StudentEntity student = studentRepository.findByUsers(user)
+        StudentEntity student = studentRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Student not found for user: " + loginId));
         int userId = student.getUserId();
 

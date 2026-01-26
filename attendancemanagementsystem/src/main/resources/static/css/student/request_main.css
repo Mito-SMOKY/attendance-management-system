@@ -3,7 +3,6 @@
 body {
     margin: 0;
     padding-top: 80px;
-    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
 }
 
 /* メインコンテンツのコンテナ */
@@ -50,7 +49,6 @@ body {
 
 /* アイコンなどを追加したくなった時用の余白 */
 .ghost-button::before {
-    font-family: "Font Awesome 6 Free";
     font-weight: 900;
     margin-bottom: 15px;
     font-size: 40px;

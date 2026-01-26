@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
@@ -19,11 +20,14 @@ public interface EnrollmentsRepository extends JpaRepository<EnrollmentsEntity, 
     List<EnrollmentsEntity> findByStudent(StudentEntity student);
 
     // ユーザーとアクティブ状態で検索
-    @Query("SELECT e FROM EnrollmentsEntity e WHERE e.student.users = :user AND e.isActive = true")
+    @Query("SELECT e FROM EnrollmentsEntity e WHERE e.student.user = :user AND e.isActive = true")
     Optional<EnrollmentsEntity> findByUserAndIsActiveTrue(@Param("user") UsersEntity user);
 
     // 学科IDで検索
     List<EnrollmentsEntity> findByDepartment_DepartmentId(Integer departmentId);
+
+    // その学科に所属するアクティブな生徒を1件取得
+    EnrollmentsEntity findFirstByDepartmentAndIsActiveTrue(DepartmentEntity department);
 
     // 学科IDと学年で検索 
     @Query("SELECT e FROM EnrollmentsEntity e WHERE e.department.departmentId = :deptId AND e.grade = :grade")
@@ -72,4 +76,31 @@ public interface EnrollmentsRepository extends JpaRepository<EnrollmentsEntity, 
         @Param("courseId") Integer courseId, 
         @Param("grade") Integer grade
     );
+
+    //指定したクラス・学年に在籍する学生の名前を取得
+    @Query(value = """
+        SELECT u.Name 
+        FROM enrollments e
+        JOIN users u ON e.UserID = u.UserID
+        WHERE e.DepartmentID = :departmentId 
+        AND e.Grade = :grade 
+        AND e.IsActive = 1
+        ORDER BY u.Name ASC
+        """, nativeQuery = true)
+    List<String> findStudentNamesByClass(
+        @Param("departmentId") Integer departmentId, 
+        @Param("grade") Integer grade
+    );
+
+    //クラスの生徒IDと名前を取得する
+    @Query("SELECT s.userId, u.name " +
+        "FROM EnrollmentsEntity e " +
+        "JOIN e.student s " +
+        "JOIN s.user u " +
+        "WHERE e.department.departmentId = :departmentId " +
+        "AND e.grade = :grade " +
+        "ORDER BY s.userId ASC")
+    List<Object[]> findStudentIdAndNamesByClass(
+            @Param("departmentId") Integer departmentId, 
+            @Param("grade") Integer grade);
 }

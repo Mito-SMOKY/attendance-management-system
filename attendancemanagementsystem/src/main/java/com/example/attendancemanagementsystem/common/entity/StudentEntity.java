@@ -41,7 +41,7 @@ public class StudentEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "UserID") // DBのFKカラム名
-    private UsersEntity users;
+    private UsersEntity user;
 
     // Student(1) 対 Enrollments(多)
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -97,12 +97,12 @@ public class StudentEntity {
     }
 
     // 関連のゲッター・セッター
-    public UsersEntity getUsers() {
-        return users;
+    public UsersEntity getUser() {
+        return user;
     }
 
-    public void setUsers(UsersEntity users) {
-        this.users = users;
+    public void setUser(UsersEntity user) {
+        this.user = user;
     }
 
     public List<EnrollmentsEntity> getEnrollments() {

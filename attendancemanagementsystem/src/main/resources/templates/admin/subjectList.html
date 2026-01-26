@@ -3,63 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>教科一覧</title>
+    <title>担当教科一覧</title>
+    
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/common/subjectList.css}"> 
-
+    <link rel="stylesheet" th:href="@{/css/admin/subjectList.css}"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
     
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
     </div>
 
-    <!-- 教科一覧のコンテナ -->
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
+    </div>
+
     <div class="main-container">
-        <table class="subject-table">
-            <thead>
-                <tr>
-                    <th class="col-subject">教科名</th>
-                    <th class="col-teacher">担当教師</th>
-                    <th class="col-attendance">出席率</th>
-                </tr>
-            </thead>
+        <h2 class="page-title"> 教科一覧</h2>
 
-            <tbody>
-                <tr th:each="subject : ${subjectList}">
-                    <td class="subject-info-cell">
-                        <div th:text="${subject.courseName}" class="course-name"></div>
-                        <a th:href="@{/admin/subject_attendance(subjectId=${subject.subjectId})}" 
-                            th:text="${subject.subjectName}" 
-                            class="subject-name">
-                        </a>
-                    </td>
-                    
-                    <td th:text="${subject.teacherName}" class="teacher-name-cell"></td>
-                    
-                    <td class="attendance-cell">
-                        <span th:if="${subject.isAttendanceRisk()}" class="risk-warning">&#9888;</span>
+        <div class="top-controls">
+            <div class="search-form-3">
+                <label>
+                    <input type="text" id="searchInput" placeholder="教科名で検索">
+                </label>
+                <button type="button" id="searchBtn" aria-label="検索"></button>
+            </div>
 
-                        <span th:text="|${subject.attendedClasses}/${subject.totalClasses}コマ|"></span>
-                        
-                        <span th:text="|${#numbers.formatDecimal(subject.attendanceRate * 100, 0, 0)}%履修済|"></span>
-                        
-                        <!-- atenndanceRate=出席率の計算 
-                        現在までの授業数/現在までの受講数で算出-->
-                        <div class="attendance-bar-container">
-                            <div class="attendance-bar" 
-                                th:style="|width: ${#numbers.formatDecimal(subject.attendanceRate * 100, 0, 0)}%;|"
-                                th:classappend="${subject.isAttendanceRisk()} ? 'risk-bar' : ''">
-                            </div>
+            <div class="modal-2__wrap">
+                <input type="radio" id="modal-2__open" class="modal-2__open-input" name="modal-2__trigger"/>
+                <label for="modal-2__open" class="modal-2__open-label">
+                    <i class="fa-solid fa-filter" style="color: #00acbd; font-size: 1.2rem;"></i>
+                </label>
+                <input type="radio" id="modal-2__close" name="modal-2__trigger"/>
+
+                <div class="modal-2">
+                    <div class="modal-2__content-wrap">
+                        <label for="modal-2__close" class="modal-2__close-label">×</label>
+                        <div class="modal-2__content">
+                            <div style="color: #00acbd; font-weight: bold; font-size: 1.5rem; margin-top: 10px;">
+                                <i class="fa-solid fa-filter"></i> 絞り込み
+                            </div><br/>
+
+                            <div class="filter-box">学年</div>
+                            <fieldset class="checkbox-1" id="gradeFilterContainer"></fieldset>
+                            <br/>
+
+                            <div class="filter-box">クラス</div>
+                            <fieldset class="checkbox-1" id="classFilterContainer"></fieldset>
+                            <br/>
                         </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                    </div>
+                    <label for="modal-2__close"><div class="modal-2__background"></div></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-scroll-container">
+            <table class="subject-table">
+                <thead>
+                    <tr><th class="col-subject">教科・クラス情報</th></tr>
+                </thead>
+                <tbody id="subjectTableBody"></tbody>
+            </table>
+        </div>
     </div>
+
+    <script th:src="@{/js/admin/subjectList.js}"></script>
 
 </body>
 </html>

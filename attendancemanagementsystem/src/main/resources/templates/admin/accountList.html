@@ -1,83 +1,174 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>仮アカウント一覧</title>
-    
-    <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/admin/adminAccountList.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>登録内容確認</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}" />
+    <link rel="stylesheet" th:href="@{/css/admin/adminAccountList.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      .warning-box {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        text-align: left;
+        font-size: 0.95em;
+        width: 90%;
+        margin: 0 auto 20px auto;
+      }
+      .warning-highlight {
+        font-weight: bold;
+        text-decoration: underline;
+      }
+      .list-container {
+        text-align: center;
+        padding-bottom: 50px;
+      }
+      .info-table-wrapper,
+      .account-table-wrapper {
+        width: 90%;
+        margin: 0 auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background-color: #f8f9fa;
+      }
+      .button-area {
+        margin-top: 30px;
+      }
+      .action-btn {
+        padding: 10px 30px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.1em;
+      }
+    </style>
+  </head>
+  <body>
     <div class="header-container">
+      <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+    <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+        <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+    </div>
     </div>
 
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/admin/accountHistory')}"></div>
+      <button
+        type="button"
+        class="back-btn"
+        onclick="history.back()"
+        style="border: none; background: none; cursor: pointer"
+      >
+        <i class="fa-solid fa-arrow-left"></i> 戻る
+      </button>
     </div>
 
     <div class="list-container">
-        
-        <h1 class="page-title">仮アカウント一覧</h1>
+      <h1 class="page-title">登録内容の確認</h1>
+      <p>以下の内容で仮アカウントを一括登録しますか？</p>
+
+      <div class="warning-box">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <strong>重要なお知らせ</strong><br />
+        登録が完了すると、パスワードは暗号化されます。<br />
+        <span class="warning-highlight"
+          >平文のパスワードを確認できるのは、元のCSVファイルのみとなります。</span
+        >
+      </div>
+
+      <form
+        method="post"
+        th:action="@{/admin/save-temp-accounts}"
+        th:object="${datalistForm}"
+      >
+        <input type="hidden" th:field="*{datalistName}" />
+        <input type="hidden" th:field="*{academicYear}" />
+        <input type="hidden" th:field="*{grade}" />
+        <input type="hidden" th:field="*{departmentId}" />
 
         <div class="info-table-wrapper">
-            <table class="info-table">
-                <thead>
-                    <tr>
-                        <th>データリスト名</th>
-                        <th>作成者</th>
-                        <th>作成日時</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:if="${dataListName != null}">
-                        <td th:text="${dataListName}"></td>
-                        <td th:text="${creatorName}"></td>
-                        <td th:text="${createdAt}"></td>
-                    </tr>
-                </tbody>
-            </table>
+          <table>
+            <thead>
+              <tr>
+                <th>リスト名</th>
+                <th>年度</th>
+                <th>学年</th>
+                <th>学科ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td th:text="*{datalistName}"></td>
+                <td th:text="*{academicYear}"></td>
+                <td th:text="*{grade}"></td>
+                <td th:text="*{departmentId}"></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <div class="account-table-wrapper">
-            <table class="account-table">
-                <thead>
-                    <tr>
-                        <th class="col-name">名前</th>
-                        <th class="col-student-id">学籍番号</th>
-                        <th class="col-affiliation">所属ID</th>
-                        <th class="col-password">仮パスワード</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="account : ${accountList}">
-                        <td th:text="${account.name}"></td>
-                        <td th:text="${account.studentId}"></td>
-                        <td th:text="${account.affiliationId}"></td>
-                        <td th:text="${account.password}"></td>
-                    </tr>
-                </tbody>
-            </table>
+          <table>
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>ID</th>
+                <th>氏名</th>
+                <th>パスワード</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="acc, stat : *{tempAccounts}">
+                <td th:text="${stat.count}"></td>
+                <td th:text="${acc.loginId}"></td>
+                <td th:text="${acc.name}"></td>
+
+                <td>
+                  <span th:text="${acc.password}"></span>
+                  <input
+                    type="hidden"
+                    th:field="*{tempAccounts[__${stat.index}__].loginId}"
+                  />
+                  <input
+                    type="hidden"
+                    th:field="*{tempAccounts[__${stat.index}__].name}"
+                  />
+                  <input
+                    type="hidden"
+                    th:field="*{tempAccounts[__${stat.index}__].password}"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <div class="button-area">
-            <button type="button" class="action-btn export-btn" onclick="exportCsv()">ファイル出力</button>
-            
-            <a th:href="@{/admin/accountManage}" class="action-btn top-btn">アカウント作成TOPへ</a>
+          <button type="submit" class="action-btn">登録実行</button>
         </div>
-
+      </form>
     </div>
-
-    <script>
-        function exportCsv() {
-            // ファイル出力処理
-            alert("ファイル出力処理を実行します");
-            // location.href = '/admin/export-accounts';
-        }
-    </script>
-
-</body>
+  </body>
 </html>

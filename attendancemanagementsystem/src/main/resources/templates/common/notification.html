@@ -13,80 +13,76 @@
 <body>
 
     <div class="header-container">
-
         <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
             <div th:replace="~{fragments/_parts :: student-header}"></div>
         </div>
         <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
             <div th:replace="~{fragments/_parts :: admin-header}"></div>
         </div>
-
         <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
             <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
         </div>
-
     </div>
 
     <div class="container">
         <div class="top-controls">
-                <!-- <input type="text" id="keywordSearch" placeholder="タイトルをキーワード検索" onchange="fetchNotifications()"> -->
-                <form action="#" class="search-form-3">
-                    <label>
-                        <input type="text" id="keywordSearch" placeholder="キーワードを入力"onchange="fetchNotifications()">
-                    </label>
-                    <button type="submit" aria-label="検索"></button>
-                </form>
+            
+            <form action="#" class="search-form-3">
+                <input type="text" id="keywordSearch" placeholder="キーワードを入力" onchange="fetchNotifications(1)">
+                <button type="submit" aria-label="検索"></button>
+            </form>
 
-                    <div class="modal-2__wrap">
-                        <input type="radio" id="modal-2__open" class="modal-2__open-input" name="modal-2__trigger"/>
+            <div class="modal-2__wrap">
+                <input type="radio" id="modal-2__open" class="modal-2__open-input" name="modal-2__trigger"/>
 
-                        <!-- 絞り込みフィルター -->
-                        <label for="modal-2__open" class="modal-2__open-label">
-                            <img th:src="@{/image/filter.png}" alt="" class="label-icon">
-                        </label>
+                <label for="modal-2__open" class="modal-2__open-label">
+                    <img th:src="@{/image/filter.png}" alt="絞り込み" class="label-icon">
+                </label>
 
-                        <input type="radio" id="modal-2__close" name="modal-2__trigger"/>
+                <input type="radio" id="modal-2__close" name="modal-2__trigger"/>
 
-                        <div class="modal-2">
-                            <div class="modal-2__content-wrap">
-                                <label for="modal-2__close" class="modal-2__close-label">×</label>
+                <div class="modal-2">
+                    <div class="modal-2__content-wrap">
+                        <label for="modal-2__close" class="modal-2__close-label">×</label>
 
-                                <div class="modal-2__content">
-                                    <div style="color: #00acbd; font-weight: bold; font-size: 1.5rem; margin-top: 10px;">絞り込み</div><br/>
-                                    <fieldset class="checkbox-1">
-                                        <label>
-                                            <input type="checkbox" id="bookmarkFilter" onchange="fetchNotifications()"/>
-                                            ブックマークのみ表示
-                                        </label>
-                                    </fieldset>
-                                    <fieldset class="checkbox-1">
-                                        <label><input type="checkbox" name="statusFilter" value="unread" class="status-checkbox" onchange="fetchNotifications()"/>未読</label>
-                                        <label><input type="checkbox" name="statusFilter" value="read" class="status-checkbox" onchange="fetchNotifications()"/>既読</label>
-                                    </fieldset>
+                        <div class="modal-2__content">
+                            <div style="color: #00acbd; font-weight: bold; font-size: 1.5rem; margin-top: 10px;">絞り込み</div><br/>
+                            
+                            <fieldset class="checkbox-1">
+                                <label>
+                                    <input type="checkbox" id="bookmarkFilter" onchange="fetchNotifications(1)"/>
+                                    ブックマークのみ表示
+                                </label>
+                            </fieldset>
 
-                                    <div style="color: #00acbd; font-weight: bold; font-size: 1.5rem; margin-top: 10px;">通知タイプ</div><br/>
-                                    <fieldset class="checkbox-1">
-                                        <!-- 通知タイプによる絞り込み（随時変更） -->
-                                        <label><input type="checkbox" name="typeFilter" value="SYSTEM" class="type-checkbox" onchange="fetchNotifications()"/>システム通知</label>
-                                        <label><input type="checkbox" name="typeFilter" value="MAIL" class="type-checkbox" onchange="fetchNotifications()"/>メール</label>
-                                        <label><input type="checkbox" name="typeFilter" value="REQUEST" class="type-checkbox" onchange="fetchNotifications()"/>申請</label>
-                                        <label><input type="checkbox" name="typeFilter" value="GENERAL" class="type-checkbox" onchange="fetchNotifications()"/>全体向け</label>
-                                        </fieldset><br/>
-                                </div>
-                            </div>
-                            <label for="modal-2__close">
-                                <div class="modal-2__background"></div>
-                            </label>
+                            <div style="color: #00acbd; font-weight: bold; font-size: 1.5rem; margin-top: 10px;">ステータス</div><br/>
+                            <fieldset class="radio-1">
+                                <label>
+                                    <input type="radio" name="statusFilter" value="unread" class="status-radio" onclick="toggleRadio(this)"/>
+                                    未読
+                                </label>
+                                <label>
+                                    <input type="radio" name="statusFilter" value="read" class="status-radio" onclick="toggleRadio(this)"/>
+                                    既読
+                                </label>
+                            </fieldset>
+                            <div style="color: #00acbd; font-weight: bold; font-size: 1.5rem; margin-top: 10px;">通知タイプ</div><br/>
+                            <fieldset class="checkbox-1">
+                                <label><input type="checkbox" name="typeFilter" value="SYSTEM" class="type-checkbox" onchange="fetchNotifications(1)"/>システム通知</label>
+                                <label><input type="checkbox" name="typeFilter" value="MAIL" class="type-checkbox" onchange="fetchNotifications(1)"/>メール</label>
+                                <label><input type="checkbox" name="typeFilter" value="REQUEST" class="type-checkbox" onchange="fetchNotifications(1)"/>申請</label>
+                                <label><input type="checkbox" name="typeFilter" value="GENERAL" class="type-checkbox" onchange="fetchNotifications(1)"/>全体向け</label>
+                            </fieldset><br/>
                         </div>
                     </div>
+                    <label for="modal-2__close">
+                        <div class="modal-2__background"></div>
+                    </label>
+                </div>
+            </div>
         </div>
 
         <div class="notificationPage" id="notificationPage">
-        
-
-            <div class="tab-container" style="display: none;"></div> 
-            
-            <!-- 通知欄 -->
             <div class="notification-table-container">
                 <table class="notification-table">
                     <thead>
@@ -97,17 +93,15 @@
                         </tr>
                     </thead>
                     <tbody id="notificationList">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
             
             <div id="paginationContainer" class="pagination-container"></div>
-
         </div>
     </div>
 
 <script th:src="@{/js/notification.js}"></script>
 
 </body>
-
 </html>

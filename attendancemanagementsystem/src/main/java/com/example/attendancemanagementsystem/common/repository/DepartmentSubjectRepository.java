@@ -22,10 +22,33 @@ public interface DepartmentSubjectRepository extends JpaRepository<DepartmentSub
     @Query("SELECT DISTINCT d.subject FROM DepartmentSubject d WHERE d.id.departmentId = :departmentId ORDER BY d.subject.subjectName ASC")
     List<SubjectEntity> findSubjectsByDepartmentId(@Param("departmentId") Integer departmentId);
 
-    // コースIDにもとづくクラス名の取得
-    @Query("SELECT DISTINCT d.className FROM DepartmentEntity d " +
-        "WHERE d.major.course.courseId = :courseId " +
-        "ORDER BY d.className")
-    List<String> findClassNamesByCourseId(@Param("courseId") Integer courseId);
+    // 学科ID・学年にもとづく科目の取得
+    @Query("SELECT DISTINCT ds.subject FROM DepartmentSubject ds " +
+        "WHERE ds.id.departmentId = :departmentId " +
+        "AND ds.grade = :grade " +
+        "ORDER BY ds.subject.subjectName ASC")
+    List<SubjectEntity> findSubjectsByDepartmentIdAndGrade(
+            @Param("departmentId") Integer departmentId, 
+            @Param("grade") Integer grade);
     
+    //全教科・全クラスの組み合わせを取得
+    @Query("SELECT DISTINCT " + 
+        "  ds.department.departmentId, " + 
+        "  ds.subject.subjectId, " + 
+        "  ds.subject.subjectName, " +     
+        "  ds.department.major.course.courseName, " + 
+        "  ds.grade, " +                   
+        "  ds.department.className " +     
+        "FROM DepartmentSubject ds " +
+        "ORDER BY ds.grade ASC, ds.department.className ASC, ds.subject.subjectName ASC")
+    List<Object[]> findAllCurriculumRaw();
+    
+    //学科名とクラス名を取得する
+    @Query(value = """
+        SELECT m.MajorName, d.Class
+        FROM department d
+        JOIN major m ON d.MajorID = m.MajorID
+        WHERE d.DepartmentID = :departmentId
+        """, nativeQuery = true)
+    List<Object[]> findCourseAndClass(@Param("departmentId") Integer departmentId);
 }

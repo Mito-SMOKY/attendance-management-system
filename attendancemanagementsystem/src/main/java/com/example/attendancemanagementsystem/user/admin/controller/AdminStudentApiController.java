@@ -33,5 +33,23 @@ public class AdminStudentApiController {
         
         // Serviceの新しいメソッドを呼び出す（isPendingフラグ付き）
         return requestService.searchStudentsForSelection(mode, keyword, pageable);
+    // 生徒一覧取得API
+    @GetMapping("/students")
+    public Map<String, Object> getStudents(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "departmentId", required = false) Integer departmentId,
+            @RequestParam(name = "grade", required = false) Integer grade,
+            @RequestParam(name = "courseId", required = false) Integer courseId
+            ) {
+
+        return adminStudentService.searchStudents(page, size, keyword, departmentId, grade, courseId);
+    }
+
+    // フィルター選択肢取得API
+    @GetMapping("/search-options")
+    public Map<String, Object> getSearchOptions() {
+        return adminStudentService.getFilterOptions();
     }
 }

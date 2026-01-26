@@ -7,6 +7,10 @@ public class ManualAccountForm {
     // HTMLの name="dataListName" を受け取る
     private String dataListName;
 
+    private Integer departmentId; // 学科・クラスID
+    private Integer grade;        // 学年
+    private Integer academicYear; // 年度
+
     // HTMLの name="name[]" を受け取る
     private List<String> name;
     
@@ -15,6 +19,8 @@ public class ManualAccountForm {
     
     // HTMLの name="affiliationId[]" を受け取る
     private List<String> affiliationId;
+
+    private List<ManualAccountData> accounts;
 
     // --- Getter / Setter ---
 
@@ -49,5 +55,45 @@ public class ManualAccountForm {
 
     public void setAffiliationId(List<String> affiliationId) {
         this.affiliationId = affiliationId;
+    }
+
+    // public String getDataListName() {
+    //     return dataListName;
+    // }
+
+    // public void setDataListName(String dataListName) {
+    //     this.dataListName = dataListName;
+    // }
+
+    public Integer getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(Integer departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public Integer getGrade() {
+        return grade;
+    }
+
+    public void setGrade(Integer grade) {
+        this.grade = grade;
+    }
+
+    public Integer getAcademicYear() {
+        return academicYear;
+    }
+
+    public void setAcademicYear(Integer academicYear) {
+        this.academicYear = academicYear;
+    }
+
+    public List<ManualAccountData> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(List<ManualAccountData> accounts) {
+        this.accounts = accounts;
     }
 }
