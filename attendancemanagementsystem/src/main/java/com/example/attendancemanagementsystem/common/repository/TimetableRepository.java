@@ -109,4 +109,26 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
             @Param("date") LocalDate date, 
             @Param("slotId") Integer slotId
     );
-}
+
+    //曜日と教室を取得
+    @Query(value = """
+        SELECT t.Date, c.ClassroomName 
+        FROM timetable t 
+        LEFT JOIN classroom c ON t.ClassroomID = c.ClassroomID
+        WHERE t.SubjectID = :subjectId 
+        AND t.DepartmentID = :departmentId
+        """, nativeQuery = true)
+    List<Object[]> findScheduleAndRoom(
+        @Param("subjectId") Integer subjectId, 
+        @Param("departmentId") Integer departmentId
+    );
+
+    @Query("SELECT MIN(t.date), MAX(t.date), COUNT(t) " +
+       "FROM TimetableEntity t " +
+       "WHERE t.department.departmentId = :departmentId " +
+       "AND t.date BETWEEN :startDate AND :endDate")
+    List<Object[]> findOverlapSummary(
+        @Param("departmentId") Integer departmentId, 
+        @Param("startDate") LocalDate startDate, 
+        @Param("endDate") LocalDate endDate);
+    }
