@@ -12,44 +12,84 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
+    font-size: 16px;
     
-    font-size: 16px; 
-    background-color: #fff; /* 画像背景に合わせて白、または薄いグレー #f4f4f9 */
+    /* 全体の背景を薄いグレーに設定 */
+    background-color: #f4f7f6;
     color: #333;
+    
+    /* ヘッダー固定分の余白 */
+    padding-top: 120px;
+    padding-bottom: 50px;
+    text-align: center; /* コンテンツの中央揃え */
 }
 
 /* =========================================
-   レイアウトコンテナ
+   レイアウトコンテナ（白いカードデザイン）
    ========================================= */
 .history-container {
-    width: 90%;
+    width: 95%;
     max-width: 1000px;
     margin: 0 auto;
     
-    /* ヘッダーや戻るボタンとの間隔（統一設定） */
-    padding-top: 120px; 
-    padding-bottom: 50px;
+    /* 白い背景と影をつけてカード状にする */
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    padding: 40px;
+    
+    text-align: left; /* 内部テキストは左揃えに戻す */
 }
 
 /* =========================================
    ページタイトル
-   （教科マスタ等と統一したデザイン）
    ========================================= */
 .page-title-wrapper {
-    text-align: center; /* タイトルを中央揃え */
+    text-align: center;
+    margin-bottom: 30px;
 }
 
 .page-title {
     font-size: 2rem;
     font-weight: bold;
     color: #333;
-    margin: 0;
-    
-    /* 下線と余白の設定 */
+    margin-bottom: 10px;
     display: inline-block;        
-    border-bottom: 3px solid #539DA4; /* 水色の下線 */
-    padding-bottom: 5px;          
-    margin-bottom: 40px;          /* テーブルとの間隔 */
+    border-bottom: 3px solid #00bdca; /* 統一感のある水色 */
+    padding-bottom: 5px;  
+}
+
+.page-title-wrapper p {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* =========================================
+   メッセージエリア
+   ========================================= */
+.message-area {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
 }
 
 /* =========================================
@@ -57,83 +97,68 @@ body {
    ========================================= */
 .table-wrapper {
     width: 100%;
-    overflow-x: auto; /* 横幅が狭い場合にスクロール */
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #ddd; /* 外枠を薄く */
 }
 
 .history-table {
     width: 100%;
-    border-collapse: collapse; /* 枠線を重ねる */
-    border: 1px solid #333;    /* 外枠 */
+    border-collapse: collapse;
+    min-width: 600px; /* スマホで潰れすぎないように */
 }
 
 /* ヘッダーセル */
 .history-table th {
-    background-color: #00bdca; /* ヘッダー背景色（水色） */
-    color: white;              /* 文字色（白） */
-    font-weight: normal;       /* 画像を見ると太字ではないように見えるためnormal、太字がよければboldへ */
-    padding: 12px 10px;
-    border: 1px solid #333;    /* 枠線 */
-    text-align: left;          /* 画像に合わせて左寄せ（必要ならcenter） */
+    background-color: #00bdca; /* 統一感のある水色 */
+    color: #fff;
+    font-weight: normal;
+    padding: 15px 10px;
+    text-align: left;
+    white-space: nowrap;
 }
 
 /* データセル */
 .history-table td {
-    padding: 12px 10px;
-    border: 1px solid #333;    /* 枠線 */
-    vertical-align: middle;
-    background-color: #fff;
+    padding: 15px 10px;
+    border-bottom: 1px solid #eee; /* 薄い区切り線 */
     color: #333;
+    vertical-align: middle;
 }
 
-/* データリスト名のリンクスタイル */
-.data-link {
-    color: #007bff; /* リンクの青色 (画像のイメージに合わせる) */
+/* 偶数行の色を変えて読みやすく（ゼブラストライプ） */
+.history-table tr:nth-child(even) td {
+    background-color: #f9fcfd;
+}
+
+/* ホバー時の効果 */
+.history-table tr:hover td {
+    background-color: #f0fcfd;
+}
+
+/* リンクのスタイル */
+.history-table a {
+    color: #00bdca;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.history-table a:hover {
+    color: #008c96;
     text-decoration: underline;
-    cursor: pointer;
 }
 
-.data-link:hover {
-    color: #0056b3;
-    text-decoration: none;
+/* 小さな文字（IDなど） */
+.history-table small {
+    color: #888;
+    font-size: 0.85rem;
 }
 
-.message-area {
-    width: 90%;
-    margin: 0 auto 20px auto;
+/* データなしの場合 */
+.history-table td[colspan="4"] {
     text-align: center;
-}
-
-.alert {
-    padding: 10px 15px;
-    border-radius: 4px;
-    display: inline-block;
-    width: 100%;
-    margin-bottom: 10px;
-}
-
-.alert-success {
-    color: #155724;
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-warning {
-    color: #856404;
-    background-color: #fff3cd;
-    border: 1px solid #ffeeba;
-}
-
-/* 詳細ボタンのスタイル調整 */
-.btn-detail {
-    color: #fff;
-    background-color: #007bff;
-    padding: 5px 15px;
-    border-radius: 4px;
-    font-size: 0.9em;
-    text-decoration: none;
-    transition: background-color 0.3s;
-}
-
-.btn-detail:hover {
-    background-color: #0056b3;
+    padding: 30px;
+    color: #999;
+    background-color: #fff;
 }
