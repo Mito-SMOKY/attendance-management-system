@@ -15,7 +15,7 @@
 </head>
 
 <body>
-     <!-- ヘッダー -->
+    <!-- ヘッダー -->
     <div class="header-container">
         <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
             <div th:replace="~{fragments/_parts :: admin-header}"></div>
@@ -104,6 +104,17 @@
                         </option>
                     </select>
                 </div>
+
+                <div class="form-group" style="margin-left: 10px;">
+                        <label>学年</label>
+                        <div class="grade-btn-group">
+                            <input type="hidden" name="targetGrade" id="targetGrade" th:value="${mdTimetableDto.targetGrade}">
+                            <button type="button" class="grade-btn" data-value="1" th:classappend="${mdTimetableDto.targetGrade == 1} ? 'active'">1年</button>
+                            <button type="button" class="grade-btn" data-value="2" th:classappend="${mdTimetableDto.targetGrade == 2} ? 'active'">2年</button>
+                            <button type="button" class="grade-btn" data-value="3" th:classappend="${mdTimetableDto.targetGrade == 3} ? 'active'">3年</button>
+                            <button type="button" class="grade-btn" data-value="4" th:classappend="${mdTimetableDto.targetGrade == 4} ? 'active'">4年</button>
+                        </div>
+                    </div>
                 
                 <button type="submit" class="btn-primary">表示</button>
             </div>

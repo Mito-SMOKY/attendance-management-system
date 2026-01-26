@@ -2,14 +2,13 @@ package com.example.attendancemanagementsystem.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.FetchType; 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
 
 @Entity
 @Table(name = "enrollments")
@@ -20,11 +19,11 @@ public class EnrollmentsEntity {
     @Column(name = "EnrollmentsID")
     private Integer enrollmentsId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UserID")
     private StudentEntity student;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DepartmentID")
     private DepartmentEntity department;
 
@@ -36,7 +35,6 @@ public class EnrollmentsEntity {
 
     @Column(name = "IsActive")
     private Boolean isActive;
-
 
     // --- constructor ---
     public EnrollmentsEntity() {
@@ -51,13 +49,13 @@ public class EnrollmentsEntity {
         this.enrollmentsId = enrollmentsId;
     }
 
-        public StudentEntity getStudent() {
-            return student;
-        }
+    public StudentEntity getStudent() {
+        return student;
+    }
 
-        public void setStudent(StudentEntity student) {
-            this.student = student;
-        }
+    public void setStudent(StudentEntity student) {
+        this.student = student;
+    }
 
     public DepartmentEntity getDepartment() {
         return department;

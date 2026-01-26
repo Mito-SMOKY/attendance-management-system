@@ -101,9 +101,10 @@ public class MdTimetableController {
         return "redirect:/admin/mdTimetable";
     }
 
-    // --- 削除専用画面の表示 ---
+    // 削除専用画面の表示-
     @GetMapping("/delete")
     public String showDeleteForm(Model model) {
+
         // DTOの初期化
         MdTimetableDto dto = new MdTimetableDto();
         
@@ -118,7 +119,7 @@ public class MdTimetableController {
         return "admin/mdTimetableDelete";
     }
 
-    // --- 削除実行処理 ---
+    // 削除実行処理 
     @PostMapping("/delete")
     public String executeDelete(@ModelAttribute MdTimetableDto dto, RedirectAttributes redirectAttributes) {
         
@@ -129,7 +130,6 @@ public class MdTimetableController {
         }
 
         try {
-            // Serviceの削除処理を呼ぶ
             mdTimetableService.deleteRangeSchedule(dto);
             
             redirectAttributes.addFlashAttribute("successMessage", 
@@ -147,19 +147,21 @@ public class MdTimetableController {
     @GetMapping("/daily")
     public String daily(@RequestParam(name = "date", required = false) LocalDate date,
                         @RequestParam(name = "departmentId", required = false) Integer departmentId,
+                        @RequestParam(name = "targetGrade", defaultValue = "1") Integer targetGrade, // ★学年を追加
                         Model model) {
         
         MdTimetableDto dto;
 
         // 日付と学科が指定されている場合は既存データを取得
         if (date != null && departmentId != null) {
-            dto = mdTimetableService.getDailySchedule(departmentId, date);
+            dto = mdTimetableService.getDailySchedule(departmentId, targetGrade, date);
         } else {
 
             // 指定がない場合は新規作成として今日の日付等をセット
             dto = new MdTimetableDto();
             dto.setStartDate(date != null ? date : LocalDate.now());
             if (departmentId != null) dto.setDepartmentId(departmentId);
+            dto.setTargetGrade(targetGrade); 
         }
 
         model.addAttribute("mdTimetableDto", dto);
@@ -173,20 +175,33 @@ public class MdTimetableController {
     public String updateDaily(@ModelAttribute MdTimetableDto mdTimetableDto, RedirectAttributes redirectAttributes) {
         mdTimetableService.updateDailySchedule(mdTimetableDto);
         redirectAttributes.addFlashAttribute("successMessage", "保存しました！");
-        return "redirect:/admin/mdTimetable/daily?date=" + mdTimetableDto.getStartDate() + "&departmentId=" + mdTimetableDto.getDepartmentId();
+        return "redirect:/admin/mdTimetable/daily?date=" + mdTimetableDto.getStartDate() 
+            + "&departmentId=" + mdTimetableDto.getDepartmentId()
+            + "&targetGrade=" + mdTimetableDto.getTargetGrade(); 
     }
     
+    //登録図もの学年を取得するAPI
+    @GetMapping("/api/getRegisteredGrades")
+    @ResponseBody
+    public ResponseEntity<List<Integer>> getRegisteredGrades(@RequestParam("departmentId") Integer departmentId) {
+
+        // 存在する学年だけを返す
+        List<Integer> grades = timetableRepository.findGradesByDepartmentId(departmentId);
+        return ResponseEntity.ok(grades);
+    }
+
     // 指定期間・学科における重複データの存在チェックAPI
     @GetMapping("/check-overlap")
     @ResponseBody
     public Map<String, Object> checkOverlap(@RequestParam("departmentId") Integer departmentId,
+                                            @RequestParam(name = "targetGrade", defaultValue = "1") Integer targetGrade, 
                                             @RequestParam("startDate") LocalDate startDate,
                                             @RequestParam("endDate") LocalDate endDate) {
         
         Map<String, Object> result = new HashMap<>();
         
         // リポジトリから重複データの要約情報を取得
-        List<Object[]> summaryList = timetableRepository.findOverlapSummary(departmentId, startDate, endDate);
+        List<Object[]> summaryList = timetableRepository.findOverlapSummary(departmentId, targetGrade, startDate, endDate); 
         
         if (summaryList != null && !summaryList.isEmpty()) {
             Object[] summary = summaryList.get(0);
@@ -210,6 +225,7 @@ public class MdTimetableController {
     // 時間割参照専用画面の表示処理
     @GetMapping("/view")
     public String view(@RequestParam(name = "departmentId", required = false) Integer departmentId,
+                    @RequestParam(name = "targetGrade", defaultValue = "1") Integer targetGrade, 
                     @RequestParam(name = "date", required = false) LocalDate date,
                     @RequestParam(name = "year", required = false) Integer year,
                     @RequestParam(name = "term", required = false) Integer term,
@@ -221,6 +237,7 @@ public class MdTimetableController {
         dto.setYear(year);
         dto.setTerm(term);
         setInitialYearAndTerm(dto);
+        dto.setTargetGrade(targetGrade);
 
         // 表示基準日の設定
         if (date == null) {
@@ -240,8 +257,8 @@ public class MdTimetableController {
         if (departmentId != null) {
             dto.setDepartmentId(departmentId);
 
-            // 指定された日付（学期初め）を含む週のデータを取得
-            dto = mdTimetableService.getWeeklyScheduleView(departmentId, date);
+            // 指定された日付を含む週のデータを取得
+            dto = mdTimetableService.getWeeklyScheduleView(departmentId, targetGrade, date);
             
             // 検索条件を再設定
             if (dto.getYear() == null) dto.setYear(year);

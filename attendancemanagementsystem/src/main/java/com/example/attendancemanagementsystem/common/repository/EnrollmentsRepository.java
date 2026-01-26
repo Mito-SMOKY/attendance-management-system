@@ -24,13 +24,14 @@ public interface EnrollmentsRepository extends JpaRepository<EnrollmentsEntity, 
     Optional<EnrollmentsEntity> findByUserAndIsActiveTrue(@Param("user") UsersEntity user);
 
     // 学科IDで検索
-    List<EnrollmentsEntity> findByDepartment_DepartmentId(Integer departmentId);
+    @Query("SELECT e FROM EnrollmentsEntity e JOIN FETCH e.student WHERE e.department.departmentId = :departmentId")
+    List<EnrollmentsEntity> findByDepartment_DepartmentId(@Param("departmentId") Integer departmentId);
 
     // その学科に所属するアクティブな生徒を1件取得
     EnrollmentsEntity findFirstByDepartmentAndIsActiveTrue(DepartmentEntity department);
 
-    // 学科IDと学年で検索 
-    @Query("SELECT e FROM EnrollmentsEntity e WHERE e.department.departmentId = :deptId AND e.grade = :grade")
+    // 学科IDと学年で検索
+    @Query("SELECT e FROM EnrollmentsEntity e JOIN FETCH e.student WHERE e.department.departmentId = :deptId AND e.grade = :grade")
     List<EnrollmentsEntity> findByDepartmentIdAndGrade(@Param("deptId") Integer deptId, @Param("grade") Integer grade);
 
     // コースIDと学年で検索 
@@ -42,7 +43,7 @@ public interface EnrollmentsRepository extends JpaRepository<EnrollmentsEntity, 
         "AND e.IsActive = 1", nativeQuery = true)
     List<EnrollmentsEntity> findByCourseIdAndGrade(@Param("courseId") Integer courseId, @Param("grade") Integer grade);
 
-    // コースIDから学年リスト (★追加: これがないと学年プルダウンが出ません)
+    // コースIDから学年リスト
     @Query(value = "SELECT DISTINCT e.Grade FROM enrollments e " +
         "INNER JOIN department d ON e.DepartmentID = d.DepartmentID " +
         "INNER JOIN major m ON d.MajorID = m.MajorID " +
@@ -64,7 +65,7 @@ public interface EnrollmentsRepository extends JpaRepository<EnrollmentsEntity, 
         @Param("grade") Integer grade
     );
 
-    // コースIDと学年に基づく在籍クラス名の取得 (一応残しておきます)
+    // コースIDと学年に基づく在籍クラス名の取得
     @Query(value = "SELECT DISTINCT d.Class FROM enrollments e " +
         "INNER JOIN department d ON e.DepartmentID = d.DepartmentID " +
         "INNER JOIN major m ON d.MajorID = m.MajorID " +

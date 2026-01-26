@@ -24,14 +24,14 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
     @Query("SELECT DISTINCT t.department FROM TimetableEntity t WHERE t.date BETWEEN :startDate AND :endDate")
     List<DepartmentEntity> findDistinctDepartmentByDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-    // 指定した学科・日付のデータを全て削除する（更新時のクリア用）
-    void deleteByDepartment_DepartmentIdAndDate(Integer departmentId, LocalDate date);
+    // 指定した学科・学年・日付のデータを全て削除する（更新時のクリア用）
+    void deleteByDepartment_DepartmentIdAndGradeAndDate(Integer departmentId, Integer grade, LocalDate date);
     
-    // 指定した学科・日付のデータを取得する（読み込み用）
-    List<TimetableEntity> findByDepartment_DepartmentIdAndDateOrderBySlotIdAsc(Integer departmentId, LocalDate date);
+    // 指定した学科・学年・日付のデータを取得する（読み込み用）
+    List<TimetableEntity> findByDepartment_DepartmentIdAndGradeAndDateOrderBySlotIdAsc(Integer departmentId, Integer grade, LocalDate date);
 
-    //1件ピンポイントで探すメソッド
-    Optional<TimetableEntity> findByDepartment_DepartmentIdAndDateAndSlotId(Integer departmentId, LocalDate date, Integer slotId);
+    // 1件ピンポイントで探すメソッド
+    Optional<TimetableEntity> findByDepartment_DepartmentIdAndGradeAndDateAndSlotId(Integer departmentId, Integer grade, LocalDate date, Integer slotId);
 
     // メソッド名の "_DepartmentID" は、TimetableEntity内の departmentフィールドの中にある DepartmentID を指します
     List<TimetableEntity> findByDateAndDepartment_DepartmentIdOrderBySlotId(LocalDate date, Integer departmentId);
@@ -66,22 +66,27 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
     // 指定したユーザIDの時間割エンティティの特定の日付・時限のエンティティを取得
     Optional<TimetableEntity> findByUserIdAndDateAndSlotId(Integer userId, LocalDate date, Integer slotId);
 
-    // 指定期間・指定学科のデータを一括削除
+    // 指定期間・指定学科・指定学年のデータを一括削除
     @Modifying
-    @Query("DELETE FROM TimetableEntity t WHERE t.department.departmentId = :deptId AND t.date BETWEEN :startDate AND :endDate")
-    void deleteByDepartmentAndDateRange(@Param("deptId") Integer deptId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    @Query("DELETE FROM TimetableEntity t WHERE t.department.departmentId = :deptId AND t.grade = :grade AND t.date BETWEEN :startDate AND :endDate")
+    void deleteByDepartmentAndGradeAndDateRange(
+        @Param("deptId") Integer deptId, 
+        @Param("grade") Integer grade, 
+        @Param("startDate") LocalDate startDate, 
+        @Param("endDate") LocalDate endDate);
 
-
-    // 参照画面用
+    // 参照画面
     @Query("SELECT t FROM TimetableEntity t " +
         "LEFT JOIN FETCH t.subject " +
         "LEFT JOIN FETCH t.classroom " +
         "LEFT JOIN FETCH t.user " +
         "WHERE t.department.departmentId = :deptId " +
+        "AND t.grade = :grade " +
         "AND t.date BETWEEN :startDate AND :endDate " +
         "ORDER BY t.date ASC, t.slotId ASC")
     List<TimetableEntity> findForWeeklyView(
             @Param("deptId") Integer deptId, 
+            @Param("grade") Integer grade, 
             @Param("startDate") LocalDate startDate, 
             @Param("endDate") LocalDate endDate);
 
@@ -125,14 +130,19 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
         @Param("departmentId") Integer departmentId
     );
 
-    //登録されている時間割データの検索
+    // 登録されている時間割データの検索（学年条件を追加）
     @Query("SELECT MIN(t.date), MAX(t.date), COUNT(t) " +
         "FROM TimetableEntity t " +
         "WHERE t.department.departmentId = :departmentId " +
+        "AND t.grade = :grade " + 
         "AND t.date BETWEEN :startDate AND :endDate")
     List<Object[]> findOverlapSummary(
         @Param("departmentId") Integer departmentId, 
+        @Param("grade") Integer grade, 
         @Param("startDate") LocalDate startDate, 
         @Param("endDate") LocalDate endDate);
+
+    // 指定した学科IDで、データが存在する「学年」のリストを取得 (昇順)
+    @Query("SELECT DISTINCT t.grade FROM TimetableEntity t WHERE t.department = :departmentId ORDER BY t.grade")
+    List<Integer> findGradesByDepartmentId(@Param("departmentId") Integer departmentId);
 }
-    

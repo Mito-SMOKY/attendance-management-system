@@ -77,6 +77,13 @@
                                     th:text="${entry.value}">
                             </option>
                         </select>
+                        <div class="grade-btn-group">
+                            <input type="hidden" id="targetGrade" th:field="*{targetGrade}">
+                            <button type="button" class="grade-btn" data-value="1" th:classappend="${mdTimetableDto.targetGrade == 1} ? 'active'">1年</button>
+                            <button type="button" class="grade-btn" data-value="2" th:classappend="${mdTimetableDto.targetGrade == 2} ? 'active'">2年</button>
+                            <button type="button" class="grade-btn" data-value="3" th:classappend="${mdTimetableDto.targetGrade == 3} ? 'active'">3年</button>
+                            <button type="button" class="grade-btn" data-value="4" th:classappend="${mdTimetableDto.targetGrade == 4} ? 'active'">4年</button>
+                        </div>
                     </div>
 
                     <div class="form-group">
