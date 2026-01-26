@@ -14,7 +14,7 @@ body {
     padding: 0;
     
     font-size: 16px;
-    background-color: #f4f4f9;
+    background-color: #fff;
     color: #333;
 }
 
@@ -22,11 +22,14 @@ body {
    コンテナ設定
    ========================================= */
 .list-container {
-    width: 95%;
-    max-width: 1000px;
+    width: 90%;
+    max-width: 800px;
     margin: 0 auto;
+    
+    /* ヘッダー・戻るボタンとの間隔（統一） */
     padding-top: 120px; 
-    padding-bottom: 100px;
+    padding-bottom: 50px;
+    
     text-align: center;
 }
 
@@ -40,185 +43,112 @@ body {
     margin: 0;
     
     display: inline-block;        
-    border-bottom: 3px solid #539DA4;
+    border-bottom: 3px solid #00bdca; /* テーマカラー */
     padding-bottom: 5px;          
-    margin-bottom: 50px;
-}
-
-/* =========================================
-   1. データリスト情報テーブル (上部)
-   ========================================= */
-.info-table-wrapper {
-    width: 100%;
-    max-width: 800px; 
-    margin: 0 auto 40px auto;
-}
-
-.info-table {
-    width: 100%;
-    border-collapse: collapse;
-    border: 1px solid #999;
-    background-color: #fff;
-    table-layout: fixed;
-}
-
-.info-table th {
-    background-color: #00bdca;
-    color: white;
-    padding: 10px;
-    border: 1px solid #999;
-    font-weight: normal;
-    width: 30%;
-}
-
-.info-table td {
-    padding: 10px;
-    border: 1px solid #999;
-    background-color: #fff;
-    text-align: center;
-}
-
-/* =========================================
-   2. アカウント一覧テーブル (下部)
-   ========================================= */
-.account-table-wrapper {
-    width: 100%;
-    max-width: 800px; 
-    margin: 0 auto 50px auto;
-    overflow-x: auto;
-}
-
-.account-table {
-    width: 100%;
-    border-collapse: collapse;
-    border: 1px solid #999;
-    background-color: #fff;
-    min-width: 600px; 
-}
-
-.account-table th {
-    background-color: #00bdca;
-    color: white;
-    padding: 12px 5px;
-    border: 1px solid #999;
-    font-weight: normal;
-    white-space: nowrap;
-}
-
-.account-table td {
-    padding: 10px 5px;
-    border: 1px solid #999;
-    background-color: #fff;
-    vertical-align: middle;
-    text-align: center;
-}
-
-/* 列幅の調整 */
-.col-name { width: 30%; }
-.col-student-id { width: 25%; }
-.col-affiliation { width: 20%; }
-.col-password { width: 25%; }
-
-/* =========================================
-   3. ボタンエリア
-   ========================================= */
-.button-area {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 40px;
-}
-
-.action-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-decoration: none;
-    
-    width: 300px;
-    height: 50px;
-    
-    font-size: 1.1rem;
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-/* ファイル出力ボタン */
-.export-btn {
-    background-color: #00bdca;
-    color: white;
-    border: 1px solid #00bdca;
-}
-
-.export-btn:hover {
-    opacity: 0.9;
-}
-
-/* アカウント作成TOPへボタン */
-.top-btn {
-    background-color: #fff;
-    color: 00bdca;
-    border: 2px solid #00bdca;
-}
-
-.top-btn:hover {
-    background-color: #f0fcfd;
-}
-
-.warning-box {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
-    padding: 15px;
     margin-bottom: 20px;
-    border-radius: 5px;
-    text-align: left;
-    font-size: 0.95em;
-    width: 90%;
-    margin: 0 auto 20px auto;
+}
+
+p {
+    margin-bottom: 30px;
+    color: #666;
+}
+
+/* =========================================
+   警告ボックス
+   ========================================= */
+.warning-box {
+    background-color: #fff8e1; /* 薄い黄色 */
+    color: #d35400; /* オレンジ系の文字 */
+    border: 1px solid #ffe0b2;
+    padding: 15px;
+    margin-bottom: 40px;
+    border-radius: 8px;
+    text-align: center; /* 中身も中央揃え */
+    font-size: 0.95rem;
+    line-height: 1.6;
 }
 
 .warning-highlight {
     font-weight: bold;
-    text-decoration: underline;
+    color: #e74c3c; /* 赤字で強調 */
 }
 
-.list-container {
-    text-align: center;
-    padding-bottom: 50px;
-}
+/* =========================================
+   テーブル共通設定
+   ========================================= */
 .info-table-wrapper,
 .account-table-wrapper {
-    width: 90%;
-    margin: 0 auto;
+    width: 100%;
+    margin-bottom: 40px;
+    overflow-x: auto; /* 横スクロール対応 */
 }
+
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
-    }
-th,
-td {
+    margin: 0 auto;
+    background-color: #fff;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center; /* 中央揃えに統一 */
     border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
 }
 
+/* ヘッダーデザイン */
 th {
-    background-color: #f8f9fa;
+    background-color: #00bdca; /* テーマカラー */
+    color: #fff;
+    font-weight: normal;
+    white-space: nowrap;
 }
 
-.button-area {
-    margin-top: 30px;
+/* セルデザイン */
+td {
+    color: #333;
+    font-size: 0.95rem;
 }
+
+/* ストライプ（偶数行に色付け） */
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* =========================================
+   ボタンエリア
+   ========================================= */
+.button-area {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+}
+
 .action-btn {
-    padding: 10px 30px;
-    background-color: #28a745;
-    color: white;
+    width: 200px;
+    height: 50px;
+    
+    background-color: #00bdca; /* テーマカラー */
+    color: #fff;
+    
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
+    
+    font-size: 1.2rem;
+    font-weight: bold;
     cursor: pointer;
-    font-size: 1.1em;
+    transition: all 0.3s;
+    
+    box-shadow: 0 4px 6px rgba(0, 189, 202, 0.2);
+}
+
+.action-btn:hover {
+    background-color: #009ba6;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 189, 202, 0.3);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
 }

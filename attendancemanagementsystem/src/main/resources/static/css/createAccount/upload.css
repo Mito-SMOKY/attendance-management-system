@@ -45,7 +45,7 @@ body {
     
     /* 下線と余白の設定 */
     display: inline-block;        
-    border-bottom: 3px solid #539DA4; /* 水色の下線 */
+    border-bottom: 3px solid #00bdca; /* テーマカラー */
     padding-bottom: 5px;          
     margin-bottom: 60px;          /* 説明文との間隔 */
 }
@@ -88,7 +88,7 @@ body {
     display: inline-block;
     padding: 10px 20px;
     background-color: #fff;
-    color: #539DA4; /* 水色文字 */
+    color: #00bdca; /* 文字色をテーマカラーに */
     border: 1px solid #333; /* 黒枠 */
     border-radius: 5px;
     font-weight: bold;
@@ -108,15 +108,15 @@ body {
 
 /* --- テンプレート情報エリア --- */
 .template-info-area {
-    text-align: left; /* 左揃えにするか、中央ブロックにするか */
+    text-align: left; 
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* 左端を揃える */
+    align-items: flex-start;
     gap: 5px;
 }
 
 .template-link {
-    color: #539DA4; /* リンク色（画像の水色に合わせるならこちら、青なら#007bff） */
+    color: #00bdca; /* リンク色 */
     text-decoration: underline;
     font-size: 0.95rem;
 }
@@ -127,24 +127,36 @@ body {
     color: #333;
 }
 
-/* --- アップロードボタン --- */
+/* --- アップロードボタン（修正箇所） --- */
 .submit-btn {
     margin-top: 20px;
     width: 200px;
     height: 50px;
     
-    background-color: #fff;
-    color: #333;
-    border: 1px solid #333;
+    /* ▼▼▼ 色の変更 ▼▼▼ */
+    background-color: #00bdca; /* 背景を水色に */
+    color: #fff;               /* 文字を白に */
+    border: none;              /* 枠線なし（または border: 1px solid #00bdca;） */
+    /* ▲▲▲ 色の変更 ▲▲▲ */
+
     border-radius: 8px;
     
     font-size: 1.2rem;
-    font-weight: bold; /* 画像では通常の太さに見えますが、ボタンらしくboldにしています */
+    font-weight: bold; 
     cursor: pointer;
     transition: all 0.3s;
+    
+    /* 影をつけて少し浮かせる（お好みで削除可） */
+    box-shadow: 0 4px 6px rgba(0, 189, 202, 0.2);
 }
 
 .submit-btn:hover {
-    background-color: #f9f9f9;
-    opacity: 0.8;
+    background-color: #009ba6; /* ホバー時は少し濃く */
+    transform: translateY(-2px); /* 少し上に動く */
+    box-shadow: 0 6px 8px rgba(0, 189, 202, 0.3);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
 }

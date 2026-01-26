@@ -21,12 +21,14 @@ body {
 /* =========================================
    コンテナ設定
    ========================================= */
-.name-input-container {
+.upload-container {
     width: 90%;
-    max-width: 600px;
+    max-width: 600px; /* フォームが見やすい幅 */
     margin: 0 auto;
+    
     padding-top: 120px; 
     padding-bottom: 50px;
+    
     text-align: center;
 }
 
@@ -40,131 +42,128 @@ body {
     margin: 0;
     
     display: inline-block;        
-    border-bottom: 3px solid #539DA4;
+    border-bottom: 3px solid #00bdca; /* テーマカラー */
     padding-bottom: 5px;          
-    margin-bottom: 50px;
+    margin-bottom: 30px;
+}
+
+.description-area {
+    margin-bottom: 40px;
+    font-size: 1rem;
+    color: #666;
 }
 
 /* =========================================
-   ファイル情報エリア
+   フォームエリア
    ========================================= */
-.file-info-area {
-    text-align: left;
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px; /* 各項目の間隔 */
     width: 100%;
-    max-width: 450px;
-    margin: 0 auto 20px auto;
 }
 
-.file-name {
-    font-size: 1.5rem;
+/* フォームグループ（ラベル＋入力） */
+.form-group {
+    width: 100%;
+    max-width: 400px; /* 入力欄の最大幅 */
+    text-align: left;
+}
+
+/* ラベルデザイン */
+.input-label {
+    display: block;
+    margin-bottom: 8px;
     font-weight: bold;
-    margin: 0 0 5px 0;
-}
-
-.file-count {
     font-size: 1rem;
-    margin: 0;
     color: #333;
 }
 
-/* =========================================
-   入力フォームエリア
-   ========================================= */
-.input-section {
-    margin-bottom: 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* 必須バッジ */
+.required-badge {
+    background-color: #e74c3c;
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
 }
 
-.input-wrapper {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 5px;
-}
-
-/* テキスト入力欄 */
-.name-input {
-    width: 300px;
+/* 入力フィールド共通（テキスト・数値・セレクト） */
+.styled-input {
+    width: 100%;
     height: 45px;
     padding: 0 15px;
     font-size: 1rem;
-    border: 1px solid #999;
+    
+    border: 1px solid #ccc;
     border-radius: 8px;
-    outline: none;
-}
-
-.name-input:focus {
-    border-color: #539DA4;
-}
-
-.name-input::placeholder {
-    color: #ccc;
-}
-
-/* 決定ボタン */
-.decide-btn {
-    height: 45px;
-    padding: 0 20px;
     background-color: #fff;
-    border: 1px solid #333;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
+    
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* フォーカス時のデザイン */
+.styled-input:focus {
+    border-color: #00bdca; /* テーマカラー */
+    box-shadow: 0 0 0 3px rgba(0, 189, 202, 0.1);
+}
+
+/* セレクトボックスの矢印調整（ブラウザ標準でもOKだが、念のため） */
+select.styled-input {
     cursor: pointer;
-    transition: background-color 0.3s;
-    white-space: nowrap;
+    appearance: none; /* 標準の矢印を消す（モダンブラウザ用） */
+    /* 独自の矢印アイコンを表示 */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
 }
 
-.decide-btn:hover {
-    background-color: #f0f0f0;
-}
-
-/* エラーメッセージ */
-.error-text {
-    color: red;
-    font-size: 0.9rem;
-    margin: 5px 0 0 0;
-    font-weight: bold;
+/* Select wrapper for consistent positioning */
+.select-wrapper {
+    position: relative;
     width: 100%;
-    max-width: 450px;
-    text-align: left;
-    padding-left: 5px;
 }
 
 /* =========================================
-   アクションエリア (作成ボタン)
+   ボタンエリア
    ========================================= */
 .action-area {
+    margin-top: 20px;
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+    justify-content: center;
 }
 
-.action-desc {
-    font-size: 1.1rem;
-    margin: 0;
-}
-
-/* 作成ボタン（デザイン修正：水色背景） */
-.create-btn {
+/* 確認画面へボタン（前の画面と同一デザイン） */
+.submit-btn {
     width: 200px;
     height: 50px;
     
-    background-color: #539DA4; /* 共通テーマカラー */
-    color: white;
-    
-    border: 1px solid #539DA4;
+    background-color: #00bdca; /* テーマカラー */
+    color: #fff;
+    border: none;
     border-radius: 8px;
     
     font-size: 1.2rem;
     font-weight: bold;
     cursor: pointer;
-    transition: opacity 0.3s;
+    transition: all 0.3s;
+    
+    box-shadow: 0 4px 6px rgba(0, 189, 202, 0.2);
 }
 
-.create-btn:hover {
-    opacity: 0.9;
+.submit-btn:hover {
+    background-color: #009ba6;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 189, 202, 0.3);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
