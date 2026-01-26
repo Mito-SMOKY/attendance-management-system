@@ -53,7 +53,7 @@
                 <th>リスト名</th>
                 <th>年度</th>
                 <th>学年</th>
-                <th>学科ID</th>
+                <th>学科・クラス</th>
               </tr>
             </thead>
             <tbody>
@@ -61,7 +61,7 @@
                 <td th:text="*{datalistName}"></td>
                 <td th:text="*{academicYear}"></td>
                 <td th:text="*{grade}"></td>
-                <td th:text="*{departmentId}"></td>
+                <td th:text="${departmentName}"></td>
               </tr>
             </tbody>
           </table>

@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.attendancemanagementsystem.common.entity.Datalist;
 import com.example.attendancemanagementsystem.common.entity.DatalistDetailEntity; // ★追加
+import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.repository.DatalistDetailRepository;
 import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
 import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
@@ -87,6 +88,20 @@ public class AdminCreateStudentController {
     //登録確認画面
     @PostMapping("/accountList")
     public String postAccountList(@ModelAttribute DatalistForm form, Model model) {
+
+        if (form.getDepartmentId() != null) {
+            DepartmentEntity dept = departmentRepository.findById(form.getDepartmentId()).orElse(null);
+            if (dept != null) {
+                // 学科名を取得
+                String majorName = (dept.getMajor() != null) ? dept.getMajor().getMajorName() : "";
+                
+                // 表示用の文字列を作成 (例: 情報システム学科 Aクラス)
+                String displayDeptName = majorName;
+                
+                // 画面に渡す
+                model.addAttribute("departmentName", displayDeptName);
+            }
+        }
 
         // これで名前だけでなく、生徒リストや学科情報もすべて受け取れます
         model.addAttribute("datalistForm", form);
