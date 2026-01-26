@@ -110,6 +110,9 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
             @Param("slotId") Integer slotId
     );
 
+    //指定した科目IDの時間割エンティティ数をカウント
+    int countBySubjectId(Integer subjectId);
+
     //曜日と教室を取得
     @Query(value = """
         SELECT t.Date, c.ClassroomName 
@@ -131,4 +134,5 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
         @Param("departmentId") Integer departmentId, 
         @Param("startDate") LocalDate startDate, 
         @Param("endDate") LocalDate endDate);
-    }
+}
+    

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">申請履歴</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/requestHistory.css}">
+    <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/request/menu')}"></div>
+    </div>
+
+    <main class="main-container" style="max-width: 1000px; margin: 30px auto; padding: 0 20px;">
+        
+        <h2 class="main-title">申請履歴一覧</h2>
+        
+        <div th:if="${#lists.isEmpty(historyList)}" style="text-align: center; padding: 40px; color: #666;">
+            <i class="fa-regular fa-folder-open" style="font-size: 3em; margin-bottom: 15px;"></i>
+            <p>申請履歴はありません。</p>
+        </div>
+
+        <table class="history-table" th:unless="${#lists.isEmpty(historyList)}">
+            <thead>
+                <tr>
+                    <th>申請日</th>
+                    <th>申請種別</th>
+                    <th>申請先 (承認者)</th>
+                    <th>状態</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="req : ${historyList}">
+                    <td th:text="${req.createdAt}">2026/01/23 10:00</td>
+                    <td th:text="${req.type}">生徒削除</td>
+                    <td th:text="${req.approverName}">管理者 太郎</td>
+                    <td>
+                        <span class="status-badge"
+                            th:classappend="${
+                                req.statusCode == 1 ? 'status-pending' : 
+                                req.statusCode == 2 ? 'status-approved' : 
+                                req.statusCode == 3 ? 'status-rejected' : ''
+                            }"
+                            th:text="${req.status}">
+                            承認待ち
+                        </span>
+                    </td>
+                    <td>
+                        <a th:href="@{/admin/request/history/{id}(id=${req.requestId})}" class="detail-btn">
+                            詳細
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </main>
+
+</body>
+</html>
