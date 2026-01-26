@@ -152,3 +152,97 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(0, 189, 202, 0.4);
 }
+/* ▼▼▼ 追加: モーダル用スタイル ▼▼▼ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-box {
+  background: #fff;
+  padding: 30px;
+  width: 450px;
+  max-width: 90%;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-icon {
+  font-size: 40px;
+  color: #00bdca;
+  margin-bottom: 15px;
+}
+.modal-title {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 20px;
+}
+.modal-desc {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+
+.modal-input-area {
+  text-align: left;
+  margin-bottom: 25px;
+}
+.modal-label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+}
+.modal-input-wrapper {
+  position: relative;
+}
+.modal-input-wrapper input {
+  width: 100%;
+  padding: 10px 40px 10px 10px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+.modal-input-wrapper .toggle-eye {
+  right: 10px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+.btn-cancel {
+  background: #ccc;
+  color: #fff;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.btn-confirm {
+  background: #00bdca;
+  color: #fff;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.btn-confirm:hover {
+  background: #009bad;
+}

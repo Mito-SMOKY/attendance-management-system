@@ -129,29 +129,36 @@ public class SuperAdminService {
         administratorRepository.save(admin);
     }
 
-    // --- 4. 新規管理者作成メソッド (修正: Email削除 & 平文保存) ---
+    // --- 4. 新規管理者作成メソッド (修正: 操作者認証を追加) ---
     @Transactional
     public Integer createAdmin(SuperAdminCreateDto dto, Integer operatorId) {
         
+        // ★追加: 操作実行者(自分)のパスワード確認
+        UsersEntity currentUser = usersRepository.findById(operatorId)
+            .orElseThrow(() -> new RuntimeException("操作ユーザーが見つかりません"));
+
+        if (dto.getCurrentAdminPassword() == null || 
+            !passwordEncoder.matches(dto.getCurrentAdminPassword(), currentUser.getPassword())) {
+            throw new RuntimeException("操作用パスワードが正しくありません。");
+        }
+
+        // 1. 重複チェック
         if (usersRepository.findByLoginId(dto.getLoginId()).isPresent()) {
             throw new RuntimeException("このログインIDは既に使用されています: " + dto.getLoginId());
         }
 
-        // Users保存
+        // 2. Users保存
         UsersEntity newUser = new UsersEntity();
         newUser.setLoginId(dto.getLoginId());
         newUser.setName(dto.getName());
-        
-        // ★修正: Emailセット処理を削除 (nullで保存されます)
-        // newUser.setEmail(dto.getEmail()); 
-        
+        // emailセットなし
         newUser.setPassword(passwordEncoder.encode(dto.getPassword())); // DBはハッシュ化
         newUser.setUserTypeId(2); 
         
         usersRepository.save(newUser);
         usersRepository.flush(); 
 
-        // Administrator保存
+        // 3. Administrator保存
         AdministratorEntity newAdmin = new AdministratorEntity();
         newAdmin.setUser(newUser); 
         newAdmin.setUserId(newUser.getUserId());
@@ -159,13 +166,13 @@ public class SuperAdminService {
         
         entityManager.persist(newAdmin); // 強制INSERT
 
-        // ログ保存
+        // 4. ログ保存
         try {
             CreationLogEntity log = new CreationLogEntity(
                 operatorId,
                 newUser.getName(),
                 newUser.getLoginId(),
-                dto.getPassword() // ★平文パスワードを保存(PDF用)
+                dto.getPassword() // 平文パスワード(PDF用)
             );
             creationLogRepository.save(log);
             return log.getLogId(); 

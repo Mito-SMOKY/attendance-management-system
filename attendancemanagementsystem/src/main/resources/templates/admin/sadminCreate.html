@@ -38,6 +38,14 @@
           method="post"
           th:object="${adminForm}"
         >
+          <div
+            th:if="${errorMessage}"
+            style="color: red; margin-bottom: 15px; text-align: center"
+          >
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span th:text="${errorMessage}"></span>
+          </div>
+
           <div class="detail-box">
             <div class="detail-row">
               <div class="detail-label">
@@ -97,16 +105,65 @@
                 />
                 <i
                   class="fa-solid fa-eye-slash toggle-eye"
-                  onclick="togglePassword()"
+                  onclick="togglePassword('password', this)"
                 ></i>
               </div>
             </div>
           </div>
 
           <div class="action-buttons">
-            <button class="btn-register" type="button" onclick="submitCreate()">
+            <button
+              class="btn-register"
+              type="button"
+              onclick="showConfirmModal()"
+            >
               登録する
             </button>
+          </div>
+
+          <div id="confirmModal" class="modal-overlay">
+            <div class="modal-box">
+              <div class="modal-icon">
+                <i class="fa-solid fa-user-lock"></i>
+              </div>
+              <h3 class="modal-title">登録確認</h3>
+              <p class="modal-desc">
+                セキュリティ保護のため、<br />あなたのパスワードを入力して登録を確定してください。
+              </p>
+
+              <div class="modal-input-area">
+                <label class="modal-label">操作者パスワード</label>
+                <div class="modal-input-wrapper">
+                  <input
+                    type="password"
+                    id="currentAdminPassword"
+                    name="currentAdminPassword"
+                    placeholder="パスワードを入力"
+                  />
+                  <i
+                    class="fa-solid fa-eye-slash toggle-eye"
+                    onclick="togglePassword('currentAdminPassword', this)"
+                  ></i>
+                </div>
+              </div>
+
+              <div class="modal-actions">
+                <button
+                  type="button"
+                  class="btn-cancel"
+                  onclick="closeConfirmModal()"
+                >
+                  キャンセル
+                </button>
+                <button
+                  type="button"
+                  class="btn-confirm"
+                  onclick="submitCreate()"
+                >
+                  確定
+                </button>
+              </div>
+            </div>
           </div>
         </form>
       </div>

@@ -1,55 +1,75 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // パスワード表示切り替え
-  window.togglePassword = function () {
-    const passInput = document.getElementById("password");
-    const icon = document.querySelector(".toggle-eye");
-
-    if (passInput && icon) {
-      if (passInput.type === "password") {
-        passInput.type = "text";
-        icon.classList.remove("fa-eye-slash");
-        icon.classList.add("fa-eye");
+  // パスワード表示切り替え (共通化)
+  window.togglePassword = function (inputId, iconElement) {
+    const input = document.getElementById(inputId);
+    if (input && iconElement) {
+      if (input.type === "password") {
+        input.type = "text";
+        iconElement.classList.remove("fa-eye-slash");
+        iconElement.classList.add("fa-eye");
       } else {
-        passInput.type = "password";
-        icon.classList.remove("fa-eye");
-        icon.classList.add("fa-eye-slash");
+        input.type = "password";
+        iconElement.classList.remove("fa-eye");
+        iconElement.classList.add("fa-eye-slash");
       }
     }
   };
 
-  // 登録ボタン押下時の処理
-  window.submitCreate = function () {
+  // モーダル表示
+  window.showConfirmModal = function () {
     const form = document.getElementById("createForm");
 
-    // ブラウザ標準バリデーション
+    // 必須項目の簡易チェック (HTML5のバリデーションを実行)
     if (!form.reportValidity()) {
-      return;
+      return; // 未入力があれば吹き出しを出して終了
     }
 
-    // 簡易チェック (空文字など)
-    const loginId = document.getElementById("loginId").value.trim();
-    const name = document.getElementById("userName").value.trim();
-    const pass = document.getElementById("password").value;
+    // モーダルを表示
+    const modal = document.getElementById("confirmModal");
+    modal.classList.add("active");
 
-    if (!loginId || !name || !pass) {
-      alert("必須項目を入力してください。");
-      return;
-    }
+    // モーダル内のパスワード欄にフォーカス
+    setTimeout(() => {
+      document.getElementById("currentAdminPassword").focus();
+    }, 100);
+  };
 
-    if (!confirm("この内容で管理者を登録しますか？")) {
+  // モーダル閉じる
+  window.closeConfirmModal = function () {
+    const modal = document.getElementById("confirmModal");
+    modal.classList.remove("active");
+    // 入力値をクリア
+    document.getElementById("currentAdminPassword").value = "";
+  };
+
+  // 確定（フォーム送信）
+  window.submitCreate = function () {
+    const currentPassInput = document.getElementById("currentAdminPassword");
+
+    if (!currentPassInput.value) {
+      alert("パスワードを入力してください。");
       return;
     }
 
     // 送信
-    form.submit();
+    document.getElementById("createForm").submit();
   };
 
-  // リアルタイム入力制限 (ログインIDは半角英数のみ)
+  // ログインIDの入力制限
   const loginIdInput = document.getElementById("loginId");
   if (loginIdInput) {
     loginIdInput.addEventListener("input", function () {
-      // 全角文字などを削除
       this.value = this.value.replace(/[^a-zA-Z0-9]/g, "");
+    });
+  }
+
+  // モーダル外クリックで閉じる
+  const modal = document.getElementById("confirmModal");
+  if (modal) {
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) {
+        closeConfirmModal();
+      }
     });
   }
 });
