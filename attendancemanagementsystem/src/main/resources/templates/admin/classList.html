@@ -13,11 +13,16 @@
 <body>
 
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
     </div>
 
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/login')}"></div>
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
     </div>
 
     <div class="list-container">
@@ -25,69 +30,52 @@
         <h1 class="page-title">授業一覧</h1>
 
         <div class="controls-area">
-            
-
-            <div class="search-section">
-                <form action="#" method="get" class="search-form-row">
-                    <input type="text" name="searchDate" class="search-input" value="20240814">
-                    <button type="submit" class="search-btn">
-                        検索 <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
-                </form>
+            <form th:action="@{/admin/dailyClassList}" method="get" class="search-form-3">
+                <input  type="text" 
+                        name="date" 
+                        id="dateInput"
+                        required 
+                        maxlength="8" 
+                        pattern="\d{8}" 
+                        autocomplete="off"
+                        title="数字8桁（YYYYMMDD）で入力してください"
+                        th:value="${viewData.searchDate}" 
+                        placeholder="yyyyMMdd">
                 
-                <div class="error-message">日付が正しくない又は未定です</div>
-            </div>
+                <input type="hidden" name="userId" th:value="${currentUserId}">
+                
+                <button type="submit" aria-label="検索"></button>
+            </form>
             
         </div>
-
-        <div class="date-header">2024/11/14(木)</div>
+        
+        <div class="date-header" th:text="${viewData.headerDate}"></div>
 
         <div class="table-wrapper">
             <table class="class-list-table">
-                <colgroup>
-                    <col class="col-period">
-                    <col class="col-subject">
-                </colgroup>
                 <thead>
                     <tr>
-                        <th>時限</th>
-                        <th>教科名/教室名</th>
+                        <th class="period-header col-period">時限</th>
+                        <th class="subject-header col-subject">教科</th>
+                        <th class="classroom-header col-classroom">教室</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="period-cell">1</td>
+
+                    <tr th:each="entry : ${viewData.periods}" th:with="p=${entry.value}">
+                        <td class="period-cell" th:text="${entry.key}">1</td>
+                        
                         <td class="subject-cell">
-                            <a href="#" class="subject-link"></a>
-                            <span class="room-name"></span>
+                            <th:block th:if="${p != null && p.hasClass}">
+                                <a th:href="@{/admin/class/detail/{id}(id=${p.sessionId})}" 
+                                class="subject-link"
+                                th:text="${p.subjectName}">教科名</a>
+                            </th:block>
+                            <span th:if="${p == null || !p.hasClass}" style="color:#ccc;">授業データがありません</span>
                         </td>
-                    </tr>
-                    <tr>
-                        <td class="period-cell">2</td>
-                        <td class="subject-cell">
-                            <a href="#" class="subject-link"></a>
-                            <span class="room-name"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="period-cell">3</td>
-                        <td class="subject-cell">
-                            <a href="#" class="subject-link"></a>
-                            <span class="room-name"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="period-cell">4</td>
-                        <td class="subject-cell">
-                            <a href="#" class="subject-link"></a>
-                            <span class="room-name"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="period-cell">5</td>
-                        <td class="subject-cell">
-                            <a href="#" class="subject-link"></a>
-                            <span class="room-name"></span>
+
+                        <td class="classroom-cell">
+                            <span th:text="${p != null && p.hasClass ? p.classroomName : '-'}">教室名</span>
                         </td>
                     </tr>
                 </tbody>
@@ -95,6 +83,8 @@
         </div>
 
     </div>
+
+    <script  th:src="@{/js/admin/classList.js}"></script>
 
 </body>
 </html>

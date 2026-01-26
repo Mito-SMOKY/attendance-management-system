@@ -12,9 +12,7 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
-    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
     font-size: 16px; 
-    background-color: #f4f4f9;
     color: #333;
 }
 
@@ -22,36 +20,36 @@ body {
    レイアウトコンテナ
    ========================================= */
 .info-container {
-    width: 95%;
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1300px;
     margin: 0 auto;
     /* ヘッダー(約80px) + 余白 */
-    padding-top: 120px; 
     padding-bottom: 50px;
 }
 
 /* =========================================
    ページヘッダーエリア (戻るボタンとタイトルを格納)
    ========================================= */
-.page-header-wrapper {
+/* .page-header-wrapper {
     position: relative; /* 子要素配置の基準 */
-    display: flex;
-    justify-content: center; /* タイトルを中央に */
-    align-items: center;     /* 垂直中央 */
-    height: 50px;
-    margin-bottom: 30px;     /* 下のコンテンツとの間隔 */
-    width: 100%;
-}
+    /* display: flex; */
+    /* justify-content: center; タイトルを中央に */
+    /* align-items: center;     垂直中央 */
+    /* height: 50px; */
+    /* margin-bottom: 30px;     下のコンテンツとの間隔 */
+    /* width: 100%; */
+/* } */ 
 
 /* --- タイトル --- */
 .page-title {
-    font-size: 2rem;
-    font-weight: bold;
     color: #333;
-    margin: 0;
-    border-bottom: 3px solid #00bdca;
-    padding-bottom: 5px;
-    line-height: 1.2;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #00bdca;
+    padding-bottom: 10px;
+    margin-top: 120px;
+    margin-bottom: 20px;
+    padding-left: 20px;
+    text-align: center;
 }
 
 /* --- 戻るボタン (parts.cssの影響を完全に打ち消して配置) --- */
@@ -98,6 +96,7 @@ a.backbutton:hover {
    ========================================= */
 .main-content-area {
     display: flex;
+    width: 100%;
     gap: 30px;
     align-items: flex-start;
     flex-wrap: wrap;
@@ -105,8 +104,8 @@ a.backbutton:hover {
 
 /* --- 左側エリア (生徒名・検索・教科リスト) --- */
 .left-sidebar-area {
-    flex: 0 0 280px; /* 固定幅 */
     display: flex;
+    flex: 0 0 280px; /* 固定幅 */
     flex-direction: column;
     gap: 20px;
 }
@@ -187,15 +186,16 @@ a.backbutton:hover {
 .subject-list a {
     display: block;
     padding: 12px 15px;
-    color: #333;
+    color: #00bdca;
     text-decoration: none;
     font-weight: bold;
     transition: background-color 0.3s;
 }
 
 .subject-list a:hover {
-    background-color: #f0f8f9;
+    /* background-color: #f0f8f9; */
     color: #00bdca;
+    text-decoration: underline;
 }
 
 
@@ -226,17 +226,18 @@ a.backbutton:hover {
 .edit-btn {
     height: 40px;
     padding: 0 30px;
-    border: 1px solid #707070;
+    border: 1px solid #00bdca;
     border-radius: 4px;
     background-color: #fff;
-    color: #333;
+    color: #00bdca;
     font-size: 1rem;
     cursor: pointer;
     font-weight: bold;
     transition: background-color 0.3s;
 }
+
 .edit-btn:hover {
-    background-color: #f0f0f0;
+    background-color: #dfdfdf;
 }
 
 /* 出欠状況サマリーテーブル */
@@ -271,22 +272,38 @@ a.backbutton:hover {
 /* 時間割テーブル */
 .table-wrapper {
     width: 100%;
+    max-height: 500px; 
+    overflow-y: auto;
+    overflow-x: auto;   
     border: 1px solid #999;
     background-color: white;
-    overflow-x: auto;
+    position: relative;
 }
 
 .schedule-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     text-align: center;
     min-width: 700px;
 }
 
+.schedule-table thead th{
+    position: sticky;   
+    top: 0;   
+    z-index: 10;
+    background-color: #00bdca; 
+    color: white;
+    font-weight: normal;
+    padding: 12px 0;
+    font-size: 1rem;
+}
+
 .schedule-table th,
 .schedule-table td {
-    border: 1px solid #999;
-    padding: 10px 5px;
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+    padding: 0;
     vertical-align: middle;
 }
 
@@ -299,17 +316,22 @@ a.backbutton:hover {
 }
 
 .schedule-table tbody td {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: #333;
     height: 70px;
 }
 
+/* セル内のコンテンツラッパー */
 .cell-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 5px;
+    width: 100%;
+    height: 100%;
+    padding: 5px;
+    box-sizing: border-box;
 }
 
 .subject-name {
@@ -317,21 +339,101 @@ a.backbutton:hover {
     font-size: 1rem;
 }
 
+/* ステータスタグ (○×などの文字) */
+/* 以前の丸い背景スタイルを解除し、シンプルな文字表示にします */
 .status-tag {
     display: inline-block;
-    font-size: 0.8rem;
-    padding: 3px 12px;
-    border-radius: 15px;
-    color: white;
-    font-weight: normal;
-    min-width: 60px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: inherit;
+    background-color: transparent; 
+    padding: 0;
+    border-radius: 0;
+    min-width: auto;
 }
 
-/* ステータス色 */
-.bg-present { background-color: #66BB6A; }
-.bg-sick { background-color: #EF5350; }
-.bg-late { background-color: #FFCA28; color: #333; }
-.bg-early { background-color: #FFA726; }
-.bg-suspend { background-color: #78909C; }
-.bg-public { background-color: #42A5F5; }
-.bg-other { background-color: #AB47BC; }
+/* --- studentInfo.css に以下を追加・修正 --- */
+
+/* テーブル自体への設定 */
+.student-table { /* ← HTML側のtableタグについているクラス名に合わせてください */
+    width: 100%;
+    table-layout: fixed; /* ★重要：これを指定するとセルの幅が均等に固定されます */
+    border-collapse: collapse;
+}
+
+/* 1列目（日付・曜日）の設定 */
+.student-table th:first-child,
+.student-table td:first-child {
+    width: 20%;       /* 日付列の幅を固定（お好みで調整してください） */
+    /* white-space: nowrap; */
+    text-align: center;
+}
+
+/* 2列目以降（1限～4限...）の設定 */
+.student-table th:not(:first-child),
+.student-table td:not(:first-child) {
+    width: auto; 
+    padding: 8px;
+}
+
+/* テーブルの列幅計算を「固定」モードにする */
+.schedule-table {
+    width: 100%;
+    table-layout: fixed; 
+    border-collapse: collapse;
+}
+
+/* 1列目（日付列）の幅を固定する */
+/* th.date-col がHTMLにあるためそれを利用 */
+.schedule-table th.date-col {
+    width: 100px; 
+}
+
+/* 全てのセル（th, td）に対する設定 */
+.schedule-table th,
+.schedule-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* ステータスごとの背景色・文字色設定*/
+.bg-present .status-icon { color: #28a745; font-weight: bold; font-size: 1.2em;} /* 出席*/
+.bg-sick  .status-icon { color: #dc3545; font-weight: bold; font-size: 1.2em;} /* 欠席*/
+.bg-late .status-icon { color: #ffc107; font-weight: bold; font-size: 1.2em;} /* 遅刻 */
+.bg-early .status-icon { color: #333;font-weight: bold; font-size: 1.2em; } /* 早退*/
+.bg-suspend .status-icon { color: #333; font-weight: bold; font-size: 1.2em; } /* 出停*/
+.bg-public .status-icon { color: #333; font-weight: bold; font-size: 1.2em;} /* 公欠 */
+.bg-other .status-icon { color: #333; font-weight: bold; font-size: 1.2em;} /* その他 */
+
+.view-mode, .edit-mode {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%; 
+    gap: 5px; 
+}
+
+.cell-content .view-mode[style*="display: none"],
+.cell-content .edit-mode[style*="display: none"] {
+    display: none !important;
+}
+
+.subject-name {
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.edit-mode .subject-name {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.status-select {
+    box-sizing: border-box;
+    height: 28px; /* 高さを明示的に固定 */
+}
