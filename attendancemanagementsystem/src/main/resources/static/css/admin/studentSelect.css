@@ -11,9 +11,7 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
-    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
     font-size: 16px; 
-    background-color: #f4f4f9;
     color: #333;
 }
 
@@ -21,14 +19,16 @@ body {
     width: 95%;
     max-width: 1200px;
     margin: 0 auto;
-    padding-top: 120px; 
+    padding-top: 80px; 
     padding-bottom: 50px;
 }
 
 .page-title {
     text-align: center;
+    border-bottom: 2px solid #00bdca;
+    padding-bottom: 10px;
     font-size: 2rem;
-    font-weight: normal;
+    font-weight: bold;
     margin-bottom: 30px;
     color: #333;
     letter-spacing: 2px;
@@ -46,7 +46,7 @@ body {
     height: 40px;
     width: 300px;
     padding: 5px 10px;
-    border: 1px solid #707070;
+    border: 1px solid #999999;
     border-radius: 5px;
     font-size: 1rem;
     background-color: white;
@@ -56,10 +56,10 @@ body {
     height: 40px;
     width: 45px;
     background-color: white;
-    border: 1px solid #707070;
+    border: 1px solid #999999;
     border-radius: 5px;
     cursor: pointer;
-    color: #539DA4;
+    color: #00bdca;
     font-size: 1.2rem;
 }
 
@@ -92,7 +92,7 @@ body {
 }
 
 .submit-btn:hover {
-    background-color: #009bad;
+    background-color: #00bdca;
 }
 
 .submit-btn:disabled {
@@ -132,7 +132,7 @@ body {
 
 /* チェックボックスのスタイル調整 */
 input[type="checkbox"] {
-    transform: scale(1.5); /* 少し大きくする */
+    transform: scale(1.5); 
     cursor: pointer;
 }
 

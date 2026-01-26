@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 状態欄の表示作成
             let statusDisplay = status;
             if (isPending) {
-                statusDisplay += ' <span style="color:red; font-weight:bold; font-size:0.8em; margin-left:5px;">(申請中)</span>';
+                statusDisplay += ' <p style="color:red; font-weight:bold; font-size:0.8em; margin-left:5px;">(申請中)</p>';
             }
 
             row.innerHTML = `
