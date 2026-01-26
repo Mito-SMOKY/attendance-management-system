@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.attendancemanagementsystem.user.admin.service.AdminStudentListService;
 import com.example.attendancemanagementsystem.user.admin.service.RequestService;
 
 @RestController
@@ -20,6 +21,8 @@ public class AdminStudentApiController {
     @Autowired
     private RequestService requestService;
 
+    @Autowired
+    private AdminStudentListService adminStudentService;
 
     // API用: 申請対象生徒の検索・取得
     @GetMapping("/request-target")
@@ -33,6 +36,8 @@ public class AdminStudentApiController {
         
         // Serviceの新しいメソッドを呼び出す（isPendingフラグ付き）
         return requestService.searchStudentsForSelection(mode, keyword, pageable);
+    }
+
     // 生徒一覧取得API
     @GetMapping("/students")
     public Map<String, Object> getStudents(

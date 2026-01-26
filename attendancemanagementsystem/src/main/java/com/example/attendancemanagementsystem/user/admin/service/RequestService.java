@@ -9,10 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,6 +18,10 @@ import org.springframework.stereotype.Service;
 import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.repository.StudentRepository;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 
 @Service("adminRequestService")
 public class RequestService {
@@ -139,9 +139,9 @@ public class RequestService {
             map.put("userId", s.getUserId());
             
             // ユーザー情報
-            if (s.getUsers() != null) {
-                map.put("loginId", s.getUsers().getLoginId());
-                map.put("name", s.getUsers().getName());
+            if (s.getUser() != null) {
+                map.put("loginId", s.getUser().getLoginId());
+                map.put("name", s.getUser().getName());
             } else {
                 map.put("loginId", "");
                 map.put("name", "");
