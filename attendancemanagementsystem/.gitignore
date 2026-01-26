@@ -35,3 +35,6 @@ build/
 #ローカル開発用のテストcontroller
 TestController.java
 Dummymodel
+
+# 実際のAPIキーが入った設定ファイルは無視する
+src/main/resources/application.properties

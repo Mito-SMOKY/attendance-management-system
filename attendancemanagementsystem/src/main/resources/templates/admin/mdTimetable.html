@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>時間割一括登録</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/mdTimetable.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/mdTimetableDaily.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+    
+    
+</head>
+<body>
+    <!-- ヘッダー -->
+    <div class="header-container">
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
+    </div>
+
+    <!-- 戻るボタン -->
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
+    </div>
+
+
+    <div class="timetable-container">
+        
+        <div th:if="${successMessage}" class="success-message">
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <!-- タブ -->
+        <div class="mode-tabs">
+            
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable}" class="tab-link active-tab">一括登録</a>
+                <span>前期、後期ごとに時間割を登録できます</span>
+            </div>
+
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable/daily}" class="tab-link ">日別編集</a>
+                <span>日・時限単位で時間割の変更ができます</span>
+            </div>
+
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable/view}" class="tab-link">時間割参照</a>
+                <span>登録済みの時間割を見ることができます</span>
+            </div>
+
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable/delete}" class="tab-link">一括削除</a>
+                <span>時間割を削除できます</span>
+            </div>
+            
+        </div>
+
+        <div class="page-title">時間割登録</div>
+
+        <form id="registerForm" th:action="@{/admin/mdTimetable/register}" th:object="${mdTimetableDto}" method="post">
+
+            <div class="setting-area">
+                <div class="setting-row">
+                    <div class="form-group">
+                        <label>対象クラス(学科):</label>
+                        <select th:field="*{departmentId}" id="departmentId" class="select-box" required style="width: 300px;">
+                            <option value="">選択してください</option>
+                            <option th:each="entry : ${departmentOptions}" 
+                                    th:value="${entry.key}" 
+                                    th:text="${entry.value}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>年度:</label>
+                        <select th:field="*{year}" id="yearSelect" class="select-box" style="width:100px;">
+                            <option th:each="y : ${#numbers.sequence(mdTimetableDto.year - 1, mdTimetableDto.year + 1)}"
+                                    th:value="${y}" 
+                                    th:text="${y} + '年度'">
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>学期:</label>
+                        <select th:field="*{term}" id="termSelect" class="select-box" style="width:100px;">
+                            <option value="1">前期</option>
+                            <option value="2">後期</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="button" onclick="setAutoDates()" class="btn-secondary">
+                            日付目安を入力
+                        </button>
+                    </div>
+                </div>
+
+                <div class="main-container">
+
+                    <!-- 時間割登録 -->
+                    <div class="container-1">
+                        <details class="accordion-002">
+                            <summary><span class="ai-title">画像から自動入力</span></summary>
+                            <div class="ai-controls">
+                                <input type="file" id="timetableImage" accept="image/*, application/pdf" class="file-input">
+                                <button type="button" onclick="uploadImage()" class="btn-analyze" id="analyzeBtn">
+                                    読み込み
+                                </button>
+                            </div>
+                            <p class="ai-description">
+                                ※時間割の画像(PDF・スクリーンショット)ファイルを選択してください。<br>
+                                ※「科目・教室・教員」を読み取り、自動で選択肢をセットします。
+                            </p>
+
+                            <div id="loadingMsg" class="loading-msg">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#00bdca" margin-left="10px">
+                                    <circle cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin="0"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(45 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".125s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(90 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".25s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(135 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".375s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(180 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".5s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(225 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".625s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(270 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".75s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(315 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".875s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(180 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".5s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                </svg>
+                                読み込み中... そのままお待ちください
+                            </div>
+
+                        </details>
+
+                    </div>
+
+                    <!-- 年間休日除外 -->
+                    <div class="container-1">
+                        <details class="accordion-002">
+                            <summary><span class="ai-title">年間行事から休日を除外</span></summary>
+                            <div class="ai-controls">
+                                <input type="file" id="schedulePdf" accept="application/pdf" class="file-input">
+                                <button type="button" onclick="uploadSchedulePdf()" class="btn-analyze" id="analyzePdfBtn">
+                                    読み込み
+                                </button>
+                            </div>
+                            <p class="ai-description">
+                                ※「年間行事予定表.pdf」をアップロードすると、休講日や長期休暇を自動判定します。<br>
+                                ※抽出された日付は<strong>時間割の適用期間から除外</strong>されます。
+                            </p>
+                            
+                            <div id="pdfLoadingMsg" class="loading-msg">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#00bdca">
+                                    <circle cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin="0"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(45 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".125s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(90 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".25s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(135 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".375s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(180 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".5s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(225 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".625s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(270 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".75s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(315 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".875s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                    <circle transform="rotate(180 12 12)" cx="12" cy="2" r="0">
+                                        <animate attributeName="r" values="0;2;0;0" dur="1s" repeatCount="indefinite" begin=".5s"
+                                                keySplines=".2 .2 .4 .8;.2 .2 .4 .8;.2 .2 .4 .8" calcMode="spline"/>
+                                    </circle>
+                                </svg>
+                                読み込み中... そのままお待ちください
+                            </div>
+
+                        </details>
+
+                    </div>
+
+                </div>
+
+                
+                <div class="period-setting">
+                    <div>
+                        <label class="label">適用期間:</label>
+                        <div class="date-inputs">
+                            <input type="text" th:field="*{startDate}" id="startDate" class="date-form" placeholder="開始日">
+                            <span>~</span>
+                            <input type="text" th:field="*{endDate}" id="endDate" class="date-form" placeholder="終了日">
+                        </div>
+                        <p class="warning-text">
+                            ※開始日をクリックするとカレンダーが開きます。
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label">登録を除外する日付:</label>
+                        <textarea th:field="*{excludedDates}" id="excludedDates" class="form-control" rows="2" 
+                                placeholder="例: YYYY-MM-DD形式、カンマ区切りで入力してください  (自動入力されますが手修正も可能です。)">
+                        </textarea>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="table-wrapper">
+                <table class="timetable-table">
+                    <thead>
+                        <tr>
+                            <th>時限</th>
+                            <th>月曜日</th>
+                            <th>火曜日</th>
+                            <th>水曜日</th>
+                            <th>木曜日</th>
+                            <th>金曜日</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="ts : ${timeSlots}">
+                            <td class="td">
+                                <div class="td-container">
+                                    <span th:text="${ts.slotId} + '限'"></span>
+                                    <span th:text="${ts.startTime} + '～' + ${ts.endTime}"></span>
+                                </div>
+                            </td>
+                            <td th:each="day : ${ {'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'} }">
+                                <div class="cell-input">
+                                    <select th:field="*{scheduleMap[__${ts.slotId}__]['__${day}__'].subjectId}" class="select-box">
+                                        <option value="">(教科なし)</option>
+                                        <option th:each="sub : ${subjectList}" th:value="${sub.subjectId}" th:text="${sub.subjectName}"></option>
+                                    </select>
+                                    <select th:field="*{scheduleMap[__${ts.slotId}__]['__${day}__'].classroomId}" class="select-box">
+                                        <option value="">(教室未定)</option>
+                                        <option th:each="room : ${classroomList}" th:value="${room.classroomId}" th:text="${room.classroomName}"></option>
+                                    </select>
+                                    <select th:field="*{scheduleMap[__${ts.slotId}__]['__${day}__'].userId}" class="select-box">
+                                        <option value="">(教員未定)</option>
+                                        <option th:each="teacher : ${teacherList}" th:value="${teacher.userId}" th:text="${teacher.name}"></option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="button-area">
+                <button type="button" class="btn-primary" onclick="checkAndSubmit()">
+                    この内容で一括登録する
+                </button>
+            </div>
+        </form>
+    </div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+
+<script th:src="@{/js/admin/mdTimetable.js}"></script>
+
+</body>
+</html>

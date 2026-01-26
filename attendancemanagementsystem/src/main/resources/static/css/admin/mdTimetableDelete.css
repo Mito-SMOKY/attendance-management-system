@@ -1,0 +1,194 @@
+
+/* =========================================
+   削除画面コンテンツのスタイル
+   ========================================= */
+.timetable-container {
+    max-width: 1400px;
+    margin: 60px auto 0;
+    padding: 20px;
+}
+
+.delete-container {
+    max-width: 100%;
+    margin: 0 auto; /* 中央寄せ */
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+/* 警告ボックス */
+
+.box-004 {
+    display: flex;
+    grid-gap: 0 .7em;
+    margin: 0 auto;
+    padding: 1em;
+    border-radius: 5px;
+    background-color: #ffebee;
+    color: #333333;
+    margin-bottom: 30px;
+    border-radius: 4px;
+}
+
+.box-004::before {
+    width: 24px;
+    height: 24px;
+    content: '';
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12.8659 3.00017L22.3922 19.5002C22.6684 19.9785 22.5045 20.5901 22.0262 20.8662C21.8742 20.954 21.7017 21.0002 21.5262 21.0002H2.47363C1.92135 21.0002 1.47363 20.5525 1.47363 20.0002C1.47363 19.8246 1.51984 19.6522 1.60761 19.5002L11.1339 3.00017C11.41 2.52187 12.0216 2.358 12.4999 2.63414C12.6519 2.72191 12.7782 2.84815 12.8659 3.00017ZM10.9999 16.0002V18.0002H12.9999V16.0002H10.9999ZM10.9999 9.00017V14.0002H12.9999V9.00017H10.9999Z' fill='%23f06060'%3E%3C/path%3E%3C/svg%3E");
+}
+
+.box-004 p {
+    margin: 0;
+    padding: 0 0 0 .7em;
+    border-left: 1px solid #f06060;
+}
+
+.warning-title {
+    color: #dc3545;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.warning-text {
+    font-size: 0.95em;
+    line-height: 1.6;
+    color: #555;
+}
+
+/* フォームエリア */
+
+.btn-secondary {
+    width: 120px;
+    height: 45px;
+    background-color: #868f97;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.search-condition-area {
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 30px;
+}
+
+.condition-row {
+    margin-bottom: 25px;
+}
+
+.condition-row label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 0.95em;
+}
+
+/* 日付入力の横並び調整 */
+.date-range-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-range-box input {
+    padding: 10px;
+    border: 1px solid #00bdca;
+    border-radius: 4px;
+    width: 160px;
+    font-size: 1em;
+}
+
+/* メインの削除ボタン */
+.delete-btn-area {
+    text-align: center;
+    margin-top: 40px;
+    padding-bottom: 20px;
+}
+
+.btn-danger-large {
+    background-color: #dc3545;
+    color: white;
+    padding: 15px 30px;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px; /* 丸みのあるボタン */
+    cursor: pointer;
+    box-shadow: 0 4px 2px rgba(220, 53, 69, 0.3);
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-danger-large:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(220, 53, 69, 0.4);
+}
+
+.btn-danger-large:active {
+    transform: translateY(0);
+}
+
+.badge-reqired{
+     color:red; 
+     font-size:0.8em;
+}
+
+.success-message {
+    width: 45%;
+    display: flex;
+    align-items: center;
+    grid-gap: 0 .7em;
+    margin: 0 auto;
+    padding: 1em;
+    border-radius: 5px;
+    background-color: #ecffe9;
+    color: #333333;
+}
+
+.success-message::before {
+    width: 16px;
+    height: 8px;
+    border-bottom: 3px solid #86d67c;
+    border-left: 3px solid #86d67c;
+    transform: rotate(-45deg) translate(2.5px, -2.5px);
+    content: '';
+}
+
+.success-message p {
+    margin: 0;
+    padding: 0 0 0 .7em;
+    border-left: 1px solid #86d67c;
+}
+
+.error-message {
+    display: flex;
+    grid-gap: 0 .7em;
+    margin: 0 auto;
+    padding: 1em;
+    border-radius: 5px;
+    background-color: #ffebee;
+    color: #333333;
+}
+
+.error-message::before {
+    width: 24px;
+    height: 24px;
+    content: '';
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12.8659 3.00017L22.3922 19.5002C22.6684 19.9785 22.5045 20.5901 22.0262 20.8662C21.8742 20.954 21.7017 21.0002 21.5262 21.0002H2.47363C1.92135 21.0002 1.47363 20.5525 1.47363 20.0002C1.47363 19.8246 1.51984 19.6522 1.60761 19.5002L11.1339 3.00017C11.41 2.52187 12.0216 2.358 12.4999 2.63414C12.6519 2.72191 12.7782 2.84815 12.8659 3.00017ZM10.9999 16.0002V18.0002H12.9999V16.0002H10.9999ZM10.9999 9.00017V14.0002H12.9999V9.00017H10.9999Z' fill='%23f06060'%3E%3C/path%3E%3C/svg%3E");
+}
+
+.error-message p {
+    margin: 0;
+    padding: 0 0 0 .7em;
+    border-left: 1px solid #f06060;
+}
