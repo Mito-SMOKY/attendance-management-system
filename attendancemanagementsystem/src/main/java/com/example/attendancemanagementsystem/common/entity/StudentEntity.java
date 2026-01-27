@@ -1,7 +1,9 @@
 package com.example.attendancemanagementsystem.common.entity;
 
-import java.time.LocalDateTime; // LocalDateTime をインポート
-import java.util.List; // List をインポート
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -9,6 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -19,28 +22,25 @@ import jakarta.persistence.Table;
 public class StudentEntity {
 
     @Id
-    @Column(name = "UserID") // PKでありFKでもある
+    @Column(name = "UserID")
     private Integer userId;
 
     @Column(name = "StudentStatusID")
-    private Integer studentStatusId; // ※本来は StudentStatusEntity への @ManyToOne
+    private Integer studentStatusId;
 
-    @Column(name = "DataListID")
-    private Integer dataListId; // ※本来は DataListEntity への @ManyToOne
+    // ★修正: 重複エラー回避のため、こちらは読み取り専用にする
+    @Column(name = "DataListID", insertable = false, updatable = false)
+    private Integer dataListId;
 
-    @Column(name = "CreatedAt")
+    @Column(name = "CreatedAt", insertable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @Column(name = "DeleteFlag")
-    private boolean deleteFlag;
 
     // --- 関連定義 ---
 
     // Student(1) 対 Users(1)
-    // @MapsId を使い、このエンティティのPK(userId)が、関連する"users"エンティティのPKからマッピングされることを示す
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "UserID") // DBのFKカラム名
+    @JoinColumn(name = "UserID")
     private UsersEntity user;
 
     // Student(1) 対 Enrollments(多)
@@ -50,6 +50,12 @@ public class StudentEntity {
     // Student(1) 対 Attendance(多)
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AttendanceEntity> attendances;
+
+    // ★こちらが DataListID の管理（保存・更新）を担当する
+    @ManyToOne
+    @JoinColumn(name = "DataListID", nullable = false)
+    @JsonIgnore
+    private Datalist datalist;
 
     // --- constructor ---
     public StudentEntity() {
@@ -88,15 +94,6 @@ public class StudentEntity {
         this.createdAt = createdAt;
     }
 
-    public boolean isDeleteFlag() {
-        return deleteFlag;
-    }
-
-    public void setDeleteFlag(boolean deleteFlag) {
-        this.deleteFlag = deleteFlag;
-    }
-
-    // 関連のゲッター・セッター
     public UsersEntity getUser() {
         return user;
     }
@@ -119,5 +116,13 @@ public class StudentEntity {
 
     public void setAttendances(List<AttendanceEntity> attendances) {
         this.attendances = attendances;
+    }
+
+    public Datalist getDatalist() {
+        return datalist;
+    }
+
+    public void setDatalist(Datalist datalist) {
+        this.datalist = datalist;
     }
 }

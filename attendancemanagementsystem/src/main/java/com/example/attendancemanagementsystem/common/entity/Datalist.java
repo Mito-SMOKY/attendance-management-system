@@ -35,7 +35,7 @@ public class Datalist {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "datalist", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Student> students;
+    private List<StudentEntity> students;
 
     @ManyToOne
     @JoinColumn(name = "Creator", insertable = false, updatable = false)
@@ -77,11 +77,11 @@ public class Datalist {
         this.createdAt = createdAt;
     }
 
-    public List<Student> getStudents() {
+    public List<StudentEntity> getStudents() {
         return students;
     }
 
-    public void setStudents(List<Student> students) {
+    public void setStudents(List<StudentEntity> students) {
         this.students = students;
     }
 
