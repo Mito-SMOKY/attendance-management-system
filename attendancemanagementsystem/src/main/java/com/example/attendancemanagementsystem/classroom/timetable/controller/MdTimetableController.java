@@ -175,9 +175,15 @@ public class MdTimetableController {
     public String updateDaily(@ModelAttribute MdTimetableDto mdTimetableDto, RedirectAttributes redirectAttributes) {
         mdTimetableService.updateDailySchedule(mdTimetableDto);
         redirectAttributes.addFlashAttribute("successMessage", "保存しました！");
-        return "redirect:/admin/mdTimetable/daily?date=" + mdTimetableDto.getStartDate() 
-            + "&departmentId=" + mdTimetableDto.getDepartmentId()
-            + "&targetGrade=" + mdTimetableDto.getTargetGrade(); 
+        redirectAttributes.addAttribute("date", mdTimetableDto.getStartDate());
+        redirectAttributes.addAttribute("departmentId", mdTimetableDto.getDepartmentId());
+        
+        // 学年が null でない場合のみパラメータに追加する
+        if (mdTimetableDto.getTargetGrade() != null) {
+            redirectAttributes.addAttribute("targetGrade", mdTimetableDto.getTargetGrade());
+        }
+
+        return "redirect:/admin/mdTimetable/daily";
     }
     
     //登録図もの学年を取得するAPI

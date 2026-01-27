@@ -84,13 +84,10 @@
 
                 <div class="form-group">
                     <label>学年</label>
-                    <div class="grade-btn-group">
-                        <input type="hidden" name="targetGrade" th:value="${mdTimetableDto.targetGrade}">
-                        <button type="button" class="grade-btn" data-value="1" th:classappend="${mdTimetableDto.targetGrade == 1} ? 'active'">1年</button>
-                        <button type="button" class="grade-btn" data-value="2" th:classappend="${mdTimetableDto.targetGrade == 2} ? 'active'">2年</button>
-                        <button type="button" class="grade-btn" data-value="3" th:classappend="${mdTimetableDto.targetGrade == 3} ? 'active'">3年</button>
-                        <button type="button" class="grade-btn" data-value="4" th:classappend="${mdTimetableDto.targetGrade == 4} ? 'active'">4年</button>
-                    </div>
+                    <input type="number" name="targetGrade" id="targetGrade" 
+                        th:value="${mdTimetableDto.targetGrade}" min="1" max="8"
+                        style="width: 70px; height: 38px; padding: 5px; border: 1px solid #aaa; border-radius: 4px; text-align: center;"
+                        placeholder="1">
                 </div>
                 
                 <button type="submit" class="btn-primary">表示</button>

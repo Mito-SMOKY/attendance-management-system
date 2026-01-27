@@ -92,29 +92,22 @@
                     <label>表示基準日:</label>
                     <input type="text" name="date" id="dateInput" th:value="${mdTimetableDto.startDate}" class="date-form" required style="width: 150px; background-color: white;">
                 </div>
-                
-                <div class="form-group">
-                    <label>クラス:</label>
-                    <select name="departmentId" class="searchable-select" required style="min-width: 300px;">
-                        <option value="">選択してください</option>
-                        <option th:each="entry : ${departmentOptions}" 
-                                th:value="${entry.key}" 
-                                th:text="${entry.value}"
-                                th:selected="${entry.key == mdTimetableDto.departmentId}">
-                        </option>
-                    </select>
-                </div>
 
-                <div class="form-group" style="margin-left: 10px;">
-                        <label>学年</label>
-                        <div class="grade-btn-group">
-                            <input type="hidden" name="targetGrade" id="targetGrade" th:value="${mdTimetableDto.targetGrade}">
-                            <button type="button" class="grade-btn" data-value="1" th:classappend="${mdTimetableDto.targetGrade == 1} ? 'active'">1年</button>
-                            <button type="button" class="grade-btn" data-value="2" th:classappend="${mdTimetableDto.targetGrade == 2} ? 'active'">2年</button>
-                            <button type="button" class="grade-btn" data-value="3" th:classappend="${mdTimetableDto.targetGrade == 3} ? 'active'">3年</button>
-                            <button type="button" class="grade-btn" data-value="4" th:classappend="${mdTimetableDto.targetGrade == 4} ? 'active'">4年</button>
-                        </div>
-                    </div>
+                <select name="departmentId" id="departmentId" class="searchable-select" style="width: 300px;">
+                    <option value="">クラスを選択してください</option>
+                    <option th:each="dept : ${departmentOptions}" 
+                            th:value="${dept.key}" 
+                            th:text="${dept.value}"
+                            th:selected="${dept.key == mdTimetableDto.departmentId}"></option>
+                </select>
+
+                <div class="form-group">
+                    <label>学年:</label>
+                    <select name="targetGrade" id="targetGrade" class="searchable-select" style="min-width: 100px;"
+                            th:data-selected="${mdTimetableDto.targetGrade}">
+                        <option value="">-</option>
+                        </select>
+                </div>
                 
                 <button type="submit" class="btn-primary">表示</button>
             </div>

@@ -143,6 +143,6 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
         @Param("endDate") LocalDate endDate);
 
     // 指定した学科IDで、データが存在する「学年」のリストを取得 (昇順)
-    @Query("SELECT DISTINCT t.grade FROM TimetableEntity t WHERE t.department = :departmentId ORDER BY t.grade")
+    @Query("SELECT DISTINCT t.grade FROM TimetableEntity t WHERE t.department.departmentId = :departmentId ORDER BY t.grade")
     List<Integer> findGradesByDepartmentId(@Param("departmentId") Integer departmentId);
 }

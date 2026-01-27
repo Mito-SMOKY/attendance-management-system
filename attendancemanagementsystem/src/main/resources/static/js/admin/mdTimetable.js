@@ -5,6 +5,82 @@
 
 $(document).ready(function() {
 
+    // --- 1. Select2と連動した学年リストの動的読み込み (参照・削除画面用) ---
+    // ★修正: URL判定(isViewOrDeletePage)を削除し、要素の有無だけで判断するように変更
+    const $deptSelect = $('#departmentId'); // 学科セレクトボックス
+    const $gradeSelect = $('#targetGrade'); // 学年セレクトボックス
+
+    // 画面上に「学科」と「学年」のセレクトボックスが両方ある場合のみ実行
+    if ($deptSelect.length && $gradeSelect.length) {
+        
+        // ① 学科が変更された時の処理 (Select2対応のためjQueryを使用)
+        $deptSelect.on('change', function() {
+            updateGradeOptions();
+        });
+
+        // ② 画面読み込み時にも実行 (戻るボタンや再表示時、初期値がある場合用)
+        if ($deptSelect.val()) {
+            updateGradeOptions();
+        }
+    }
+
+    function updateGradeOptions() {
+        const deptId = $deptSelect.val();
+        // 現在選択されている学年（あればHTMLのdata属性やvalueから取得）
+        const currentGrade = $gradeSelect.data('selected') || $gradeSelect.val();
+
+        // 学科が空ならリセットして終了
+        if (!deptId) {
+            $gradeSelect.empty().append('<option value="">-</option>');
+            return;
+        }
+
+        // サーバーからデータ取得
+        $.ajax({
+            url: '/admin/mdTimetable/api/getRegisteredGrades',
+            type: 'GET',
+            data: { departmentId: deptId },
+            dataType: 'json',
+            success: function(grades) {
+                // セレクトボックスをクリア
+                $gradeSelect.empty();
+
+                if (grades.length === 0) {
+                    $gradeSelect.append('<option value="">データなし</option>');
+                } else {
+                    // データあり：optionを追加
+                    
+                    // 必要であれば「-」や「選択」を追加
+                    // $gradeSelect.append('<option value="">-</option>');
+
+                    $.each(grades, function(index, grade) {
+                        const option = $('<option>', {
+                            value: grade,
+                            text: grade + '年'
+                        });
+
+                        // 保持していた値と同じなら選択状態にする
+                        if (String(grade) === String(currentGrade)) {
+                            option.prop('selected', true);
+                        }
+                        $gradeSelect.append(option);
+                    });
+
+                    // もし何も選択されておらず、かつデータがある場合は先頭を自動選択する
+                    // (データロード後に即座に表示可能にするため)
+                    if (!$gradeSelect.val() && grades.length > 0 && !currentGrade) {
+                        $gradeSelect.val(grades[0]).trigger('change');
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("学年データの取得に失敗:", error);
+                $gradeSelect.empty().append('<option value="">取得エラー</option>');
+            }
+        });
+    }
+
+
     // --- 2. Flatpickr (一括登録用・期間選択) ---
     // startとendを別々に初期化して連動させる方式
     const startDateInput = document.getElementById("startDate");
@@ -40,6 +116,7 @@ $(document).ready(function() {
         });
     }
 });
+
 
 /* =========================================
  * 一括登録画面 (mdTimetable.html) 用
@@ -126,7 +203,7 @@ async function uploadImage() {
 }
 
 /**
- * ★修正: 行事予定表PDF解析
+ * 行事予定表PDF解析
  * (期間の自動セット ＆ 休日の抽出)
  */
 async function uploadSchedulePdf() {
@@ -141,9 +218,9 @@ async function uploadSchedulePdf() {
     const startDateInput = document.getElementById('startDate');
     const endDateInput = document.getElementById('endDate');
 
-    // ★修正: 学年は「クラス」から推測せず、画面の「学年プルダウン」から直接取得する
+    // 学年は「クラス」から推測せず、画面の「学年プルダウン」から直接取得する
     const targetGradeSelect = document.getElementById('targetGrade');
-    const targetGrade = targetGradeSelect ? targetGradeSelect.value : null;
+    const targetGrade = targetGradeSelect ? targetGradeSelect.value : "";
 
     if (fileInput.files.length === 0) {
         alert("PDFファイルを選択してください");
@@ -164,7 +241,7 @@ async function uploadSchedulePdf() {
     formData.append("year", yearSelect.value); 
     formData.append("term", termSelect.value); 
     
-    // ★ここで選択した学年をパラメータとして渡す
+    // ここで選択した学年をパラメータとして渡す
     formData.append("targetGrade", targetGrade);
 
     try {
@@ -212,6 +289,7 @@ async function uploadSchedulePdf() {
         analyzeBtn.disabled = false;
     }
 }
+
 /**
  * 解析データを画面のプルダウンに反映
  */
@@ -264,7 +342,7 @@ async function checkAndSubmit() {
 
         if (data.exists) {
             const msg = "【⚠️ データ重複警告】\n\n" + 
-                        "指定期間内に既にデータがあります。\n" +
+                        "指定期間内に既にデータがあります。\n" + 
                         "上書き（更新）してもよろしいですか？";
             
             if (confirm(msg)) {
@@ -283,103 +361,6 @@ async function checkAndSubmit() {
         }
     }
 }
-
-/**
- * ★追加: 学科選択時に、その学科で「登録済みの学年」だけをプルダウンにセットする
- * (参照画面・削除画面用)
- */
-function updateRegisteredGradesForButtons() {
-    const deptSelect = document.getElementById('departmentId') || document.querySelector('select[name="departmentId"]');
-    // 学年の隠しフィールド
-    const gradeInput = document.getElementById('targetGrade') || document.querySelector('input[name="targetGrade"]');
-    
-    if (!deptSelect || !gradeInput) return;
-    
-    // 学年ボタンのグループを取得
-    const group = gradeInput.closest('.grade-toggle-group');
-    if (!group) return; // ボタン形式じゃない場合は何もしない
-
-    const deptId = deptSelect.value;
-    const buttons = group.querySelectorAll('.grade-btn');
-
-    // 学科未選択なら全ボタン無効化して終了
-    if (!deptId) {
-        buttons.forEach(btn => {
-            btn.disabled = true;
-            btn.classList.remove('active');
-        });
-        gradeInput.value = "";
-        return;
-    }
-
-    // APIコール
-    fetch(`/admin/mdTimetable/api/getRegisteredGrades?departmentId=${deptId}`)
-        .then(response => response.json())
-        .then(grades => {
-            let isCurrentValueValid = false;
-            const currentVal = parseInt(gradeInput.value);
-
-            buttons.forEach(btn => {
-                const btnVal = parseInt(btn.getAttribute('data-value'));
-                
-                // 取得したリストに含まれているかチェック
-                if (grades.includes(btnVal)) {
-                    // データあり -> 有効化
-                    btn.disabled = false;
-                    btn.title = ""; // ツールチップ解除
-                    
-                    if (btnVal === currentVal) isCurrentValueValid = true;
-                } else {
-                    // データなし -> 無効化
-                    btn.disabled = true;
-                    btn.classList.remove('active');
-                    btn.title = "データがありません";
-                }
-            });
-
-            // もし選択中の学年が無効になった（または未選択の）場合、
-            // 有効な学年のうち一番小さいものを自動選択する
-            if (!isCurrentValueValid) {
-                gradeInput.value = ""; // 一旦クリア
-                
-                // 有効なボタンの先頭をクリック状態にする
-                const firstValidBtn = group.querySelector('.grade-btn:not(:disabled)');
-                if (firstValidBtn) {
-                    firstValidBtn.click(); // クリックイベントを発火させて値をセット
-                }
-            }
-        })
-        .catch(error => {
-            console.error('学年データの取得に失敗:', error);
-        });
-}
-// 画面読み込み時にイベントリスナーを設定
-document.addEventListener('DOMContentLoaded', function() {
-    const deptSelect = document.getElementById('departmentId') || document.querySelector('select[name="departmentId"]');
-    
-    if (deptSelect) {
-        // 学科プルダウンがある場合のみ動作
-        
-        // 今の画面が「参照」か「削除」かを判定する簡易ロジック
-        // (URLに 'view' か 'delete' が含まれている、または特定のクラスがある等)
-        const isViewOrDeletePage = location.pathname.includes('/view') || location.pathname.includes('/delete');
-
-        if (isViewOrDeletePage) {
-            // 変更時に発火
-            deptSelect.addEventListener('change', updateRegisteredGrades);
-            
-            // 初期表示時にも実行 (再読み込み時など値を復元するため)
-            // ただし、HTML側でth:selectedされている値を優先するため、少し遅延させるか、
-            // 現在の値を保持してから実行する
-            const gradeSelect = document.getElementById('targetGrade') || document.querySelector('select[name="targetGrade"]');
-            if (gradeSelect && deptSelect.value) {
-                // 現在の値を属性に保存しておく
-                gradeSelect.setAttribute('data-selected-grade', gradeSelect.value);
-                updateRegisteredGrades();
-            }
-        }
-    }
-});
 
 /* =========================================
  * 参照画面 (mdTimetableView.html) 用
