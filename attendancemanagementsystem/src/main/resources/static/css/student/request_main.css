@@ -49,6 +49,7 @@ body {
 
 /* アイコンなどを追加したくなった時用の余白 */
 .ghost-button::before {
+    font-family: "Font Awesome 6 Free";
     font-weight: 900;
     margin-bottom: 15px;
     font-size: 40px;
