@@ -94,10 +94,6 @@ public class StudentEntity {
         this.createdAt = createdAt;
     }
 
-    public UsersEntity getUser() {
-        return user;
-    }
-
     public void setUser(UsersEntity user) {
         this.user = user;
     }

@@ -15,4 +15,7 @@ public interface RequestRepository extends JpaRepository<RequestEntity, Integer>
 
     //ステータス指定で取得 (例: 申請中のものだけ取得)
     List<RequestEntity> findByStatus(Integer status);
+
+    // 特定のユーザーが承認者である申請データを、作成日が新しい順に取得する
+    List<RequestEntity> findByApproverIdOrderByCreatedAtDesc(Integer approverId);
 }

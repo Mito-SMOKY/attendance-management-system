@@ -1,0 +1,245 @@
+@charset "UTF-8";
+
+/* --- 共通レイアウト --- */
+.main-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.backbutton-container {
+    max-width: 1000px; margin: 0 auto; padding: 20px 20px 0;
+}
+
+.page-title {
+    color: #333; 
+    font-size: 1.8rem;
+    border-bottom: 2px solid #00bdca;
+    padding-bottom: 10px; 
+    margin-bottom: 20px; 
+    padding-left: 10px;
+    margin-top: 100px;
+    text-align: center;
+}
+
+/* --- コントロールバー --- */
+.control-bar {
+    display: flex; justify-content: flex-start;
+    align-items: center; margin-bottom: 20px;
+}
+
+/* ★検索ボックス周りのスタイル */
+.search-wrapper {
+    position: relative; /* 候補リストの基準位置 */
+    width: 300px;
+}
+
+.search-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 10px 10px 35px; /* アイコン分の左余白 */
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px; /* 角丸に */
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.search-input:focus {
+    border-color: #00bdca;
+    box-shadow: 0 0 5px rgba(0, 172, 189, 0.2);
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+/* ローディングスピナー */
+.loader {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    margin-top: -8px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #00bdca;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* ★オートコンプリート候補リスト */
+.suggestion-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-top: 5px;
+    padding: 0;
+    list-style: none;
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+}
+.suggestion-item:last-child { border-bottom: none; }
+.suggestion-item:hover { background-color: #f0fbfc; }
+
+.suggest-name {
+    font-weight: bold;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.suggest-meta {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 2px;
+}
+
+.no-result {
+    padding: 15px;
+    color: #999;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.info-grid {
+    display: grid; 
+    grid-template-columns: 1.5fr 1fr;
+    gap: 20px; 
+    align-items: start;
+}
+.info-card, 
+.student-card {
+    background: #fff; 
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid #eee; 
+    padding: 20px;
+}
+.card-title {
+    margin: 0 0 15px 0; 
+    font-size: 1.1rem; 
+    color: #333; 
+    border-left: 5px solid #00bdca; 
+    padding-left: 10px;
+}
+.mt-20 { 
+    margin-top: 20px; 
+}
+
+/* テーブル共通 */
+.detail-table, 
+.student-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+}
+
+.detail-table th, 
+.student-table thead th {
+    text-align: left; 
+    padding: 12px;
+}
+
+.detail-table th { 
+    background-color: #f9fbfd; 
+    color: #555; 
+    border-bottom: 1px solid #eee; 
+    font-weight: normal; 
+}
+
+.detail-table td { 
+    padding: 12px; 
+    color: #333; 
+    border-bottom: 1px solid #eee; 
+    font-weight: bold; 
+}
+
+/* 学生リスト */
+.badge {
+    font-size: 0.8rem; 
+    background-color: #eee; 
+    color: #666;
+    padding: 2px 8px; 
+    border-radius: 10px;
+}
+
+.student-scroll-container {
+    max-height: 400px; 
+    overflow-y: auto;
+    border: 1px solid #eee; 
+    border-radius: 4px;
+}
+
+.student-table thead th {
+    position: sticky; 
+    top: 0; 
+    z-index: 1;
+    background-color: #00bdca; 
+    color: #fff; 
+    font-weight: normal;
+}
+
+.student-table td { 
+    border-bottom: 1px solid #eee; 
+    padding: 0; 
+}
+
+.student-link {
+    display: block; 
+    padding: 12px 15px; 
+    text-decoration: none; 
+    color: #333;
+}
+
+.student-link:hover { 
+    color: #00bdca; 
+    background-color: #f0fbfc; 
+}
+
+.student-link i { 
+    color: #ccc; 
+    margin-right: 8px; 
+}
+
+.suggestion-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 10px 15px; 
+    text-decoration: none; 
+    color: inherit; 
+    cursor: pointer;
+}
+
+.suggest-name {
+    font-weight: bold;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.suggest-meta {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 2px;
+}
+

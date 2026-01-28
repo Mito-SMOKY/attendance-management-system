@@ -1,0 +1,209 @@
+
+/* =========================================
+ * mdTimetableDaily.html (日別編集) 専用スタイル
+ * ========================================= */
+
+.timetable-container {
+    max-width: 1400px;
+    margin: 60px auto 0;
+    padding: 20px;
+}
+
+.page-title {
+    text-align: center;
+    border-bottom:2px solid #00bdca;
+    padding-bottom: 10px;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
+    letter-spacing: 2px;
+}
+
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* --- タブ切り替え --- */
+.mode-tabs {
+    width: 70%;
+    justify-self: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ddd; 
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.tab-link {
+    display: block;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #666;
+    font-weight: bold;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px; 
+    border-radius: 5px 5px 0 0;
+}
+
+.tab-link.active-tab {
+    background: #00bdca;
+    color: white;
+}
+
+.tab-link:hover:not(.active-tab) {
+    background: #e2e6ea;
+}
+
+.active-tab {
+    color: #00bdca;
+    border-bottom: 2px solid #00bdca;
+}
+
+/* --- 検索・設定エリア --- */
+.setting-area {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.setting-row {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* --- テーブルスタイル --- */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.timetable-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    table-layout: fixed;
+}
+
+.timetable-table th, .timetable-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    vertical-align: top;
+}
+
+.timetable-table th {
+    background-color: #00bdca;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+}
+
+/* 日別編集特有のセルレイアウト（横並び） */
+.daily-cell {
+    display: flex;
+    gap: 10px;
+}
+
+/* --- ボタン類 --- */
+.button-area {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn-primary {
+    background-color: #00bdca;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-primary:hover {
+    background-color: #009ba7;
+}
+
+/* Select2の高さ調整 */
+.select2-container .select2-selection--single {
+    height: 38px !important;
+    padding: 5px;
+}
+
+.date-form,
+.searchable-select{
+    width: 150px;
+    height: 45px;
+    padding: 5px 10px;
+    border: 1px solid ;
+    border-color: #00bdca;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
+    outline: none;
+}
+
+.searchable-select{ width: 350px !important;}
+
+/* ツールチップ */
+.tooltip-001 {
+    display: inline-block;
+    position: relative;
+}
+
+.tooltip-001 > div {
+    cursor: pointer;
+}
+
+.tooltip-001 > span {
+    display: flex;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: .5em 1em;
+    border-radius: 3px;
+    background-color: #00bdca;
+    color: #ffffff;
+    font-size: .9em;
+    white-space: nowrap;
+    transition: opacity .3s;
+}
+
+.tooltip-001 > span::before {
+    position: absolute;
+    top: -6px;
+    width: 9px;
+    height: 6px;
+    background-color: inherit;
+    clip-path: polygon(50% 0, 0 100%, 100% 100%);
+    content: '';
+}
+
+.tooltip-001:hover > span {
+    visibility: visible;
+    opacity: 1;
+}

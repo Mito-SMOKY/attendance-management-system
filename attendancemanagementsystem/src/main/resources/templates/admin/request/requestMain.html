@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者申請メニュー</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/requestMain.css}">
+    
+    <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="action-buttons">
+            
+            <a th:href="@{/admin/request/select(mode='delete')}" class="ghost-button">
+                <i class="fa-solid fa-user-xmark"></i>
+                <span>生徒削除申請</span>
+            </a>
+
+            <a th:href="@{/admin/request/select(mode='status')}" class="ghost-button">
+                <i class="fa-solid fa-user-pen"></i>
+                <span>ステータス変更申請</span>
+            </a>
+
+            <a th:href="@{/admin/request/select(mode='course')}" class="ghost-button">
+                <i class="fa-solid fa-school"></i>
+                <span>学科・コース変更申請</span>
+            </a>
+
+            <a th:href="@{/admin/request/history}" class="ghost-button">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>申請履歴</span>
+            </a>
+
+        </div>
+    </div>
+
+</body>
+</html>

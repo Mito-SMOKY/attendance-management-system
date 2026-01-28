@@ -12,9 +12,7 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
-    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
     font-size: 16px; 
-    background-color: #f4f4f9;
     color: #333;
 }
 
@@ -25,71 +23,185 @@ body {
     width: 95%;
     max-width: 1200px;
     margin: 0 auto;
-    /* ヘッダー固定分(約80px) + 余白 */
-    padding-top: 120px; 
+    padding: 20px;
     padding-bottom: 50px;
 }
 
-/* =========================================
-   ページタイトル
-   ========================================= */
 .page-title {
-    text-align: center;
-    font-size: 2rem;
-    font-weight: normal;
-    margin-bottom: 30px;
     color: #333;
-    letter-spacing: 2px;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #00acbd;
+    padding-bottom: 10px;
+    margin-top: 100px;
+    margin-bottom: 20px;
+    padding-left: 20px;
+    text-align: center;
 }
 
 /* =========================================
-   検索・フィルターエリア (左寄せ)
+   検索とフィルターのコントロール
    ========================================= */
-.search-filter-area {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* 要素間の間隔 */
-    margin-bottom: 20px;
+.top-controls {
     justify-content: flex-start;
-}
-
-/* 検索フォーム (入力欄のみ) */
-.search-form {
+    margin-bottom: 20px;
     display: flex;
+    gap: 10px;
     align-items: center;
 }
 
-/* 検索入力欄 */
-.search-input {
-    height: 40px;
-    width: 300px;
-    padding: 5px 10px; /* アイコンが外に出たので普通のパディング */
-    border: 1px solid #707070;
+/* 検索フォーム */
+.search-form-3 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    border: 1px solid #ccc;
     border-radius: 5px;
+    background-color: #fff;
     font-size: 1rem;
-    outline: none;
-    background-color: white;
+    max-width: 350px;
+    width: 100%;
 }
 
-/* --- ツールボタン共通スタイル (検索ボタン & フィルターボタン) --- */
-.tool-btn {
+.search-form-3 input {
+    width: 100%;
     height: 40px;
-    width: 45px;
-    background-color: white;
-    border: 1px solid #707070;
-    border-radius: 5px;
+    padding: 5px 15px;
+    border: none;
+    box-sizing: border-box;
+    font-size: 1em;
+    outline: none;
+}
+
+.search-form-3 input::placeholder {
+    color: #777;
+}
+
+.search-form-3 button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 40px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.search-form-3 button::after {
+    width: 20px;
+    height: 20px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z' fill='%23777777'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+    content: '';
+}
+
+/* =========================================
+   モーダルフィルター (Modal-2)
+   ========================================= */
+.modal-2__wrap {
+    position: relative;
+    display: inline-block;
+}
+
+/* ★修正: ラジオボタン（青い丸）を確実に消す設定 */
+input[type="radio"].modal-2__open-input,
+input[type="radio"]#modal-2__close,
+.modal-2__trigger {
+    display: none !important;
+    opacity: 0;
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+.modal-2__open-label {
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #539DA4; /* テーマカラー */
-    font-size: 1.2rem;
+    padding: 8px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     transition: background-color 0.3s;
 }
-.tool-btn:hover {
+
+.modal-2__open-label:hover {
     background-color: #f0f0f0;
 }
 
+.modal-2 {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+}
+
+#modal-2__open:checked ~ .modal-2 {
+    display: block;
+}
+
+.modal-2__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+.modal-2__content-wrap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    z-index: 20;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-2__close-label {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #999;
+}
+
+.modal-2__close-label:hover {
+    color: #333;
+}
+
+.checkbox-1 label {
+    display: inline-block;
+    margin-right: 15px;
+    cursor: pointer;
+    font-size: 1em;
+
+}
+
+.form-select{
+    width: 100%;
+    max-width: 180px;
+    box-sizing: border-box;
+    padding: 8px 4px;
+    font-size: 1rem;
+    text-align: left;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+}
 
 /* =========================================
    生徒一覧テーブル
@@ -111,49 +223,49 @@ body {
 
 .student-table th,
 .student-table td {
-    border: 1px solid #999;
+    border: 1px solid #ccc;
     padding: 12px 10px;
     vertical-align: middle;
 }
 
-/* ヘッダー行 */
 .student-table thead th {
-    background-color: #00bdca; /* 濃い青緑 */
+    background-color: #00bdca;
     color: white;
     font-weight: normal;
-    padding: 12px 0;
-    font-size: 1rem;
 }
 
-/* データ行 */
-.student-table tbody td {
-    font-size: 1rem;
-    color: #333;
+.student-name-link {
+    color: #00bdca;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+}
+.student-name-link:hover {
+    color: #00bdca;
+    text-decoration: underline;
 }
 
 /* =========================================
-   ページネーション (下部中央)
+   ページネーション
    ========================================= */
 .pagination {
     display: flex;
     justify-content: center;
+    gap: 8px; /* ボタン間の隙間を少し狭く */
     align-items: center;
-    gap: 10px;
-    margin-top: 30px;
 }
 
 .page-link {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 35px;
-    height: 35px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    display: inline-block;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
     text-decoration: none;
     color: #333;
-    background-color: white;
-    transition: background-color 0.3s;
+    border-radius: 4px;
+    background-color: #fff;
+    transition: all 0.2s;
 }
 
 .page-link:hover {
@@ -166,7 +278,9 @@ body {
     border-color: #00bdca;
 }
 
+/* ★追加: 省略記号(...)のスタイル */
 .page-dots {
-    color: #333;
+    color: #777;
+    margin: 0 4px;
     font-weight: bold;
 }

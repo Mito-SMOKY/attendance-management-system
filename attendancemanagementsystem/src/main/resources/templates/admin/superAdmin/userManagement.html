@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー管理</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/userManagement.css}">
+    
+    <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+    
+    <div class="page-header-area">
+        <h2 class="page-title">ユーザー管理</h2>
+    </div>
+
+    <div class="content-wrapper">
+        
+        <div id="main-menu-group" class="menu-group fade-in">
+            <div class="action-buttons">
+                <a th:href="@{/admin/sadminList}" class="ghost-button">
+                    <i class="fa-solid fa-users-gear"></i>
+                    <span>管理者一覧</span>
+                </a>
+
+                <div class="ghost-button" onclick="showStudentMenu()">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>生徒管理</span>
+                    <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                </div>
+
+                <div class="ghost-button" onclick="showHistoryMenu()">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>データ変更履歴</span>
+                    <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <div id="student-menu-group" class="menu-group fade-in hidden">
+            <div class="action-buttons">
+                <a th:href="@{/admin/request/select(mode='status')}" class="ghost-button">
+                    <i class="fa-solid fa-user-pen"></i>
+                    <span>生徒ステータス変更</span>
+                </a>
+                <a th:href="@{/admin/request/select(mode='delete')}" class="ghost-button">
+                    <i class="fa-solid fa-user-xmark"></i>
+                    <span>生徒削除</span>
+                </a>
+                <a th:href="@{/admin/request/select(mode='course')}" class="ghost-button">
+                    <i class="fa-solid fa-school"></i>
+                    <span>生徒学科・コース</span>
+                </a>
+            </div>
+            <div class="back-btn-row">
+                <div class="small-back-btn" onclick="backToMainMenu()">
+                    <i class="fa-solid fa-reply"></i> メニューに戻る
+                </div>
+            </div>
+        </div>
+
+        <div id="history-menu-group" class="menu-group fade-in hidden">
+            <div class="action-buttons">
+                
+                <a th:href="@{/admin/history/adminDelete}" class="ghost-button">
+                    <i class="fa-solid fa-user-slash"></i>
+                    <span>管理者削除履歴</span>
+                </a>
+
+                <a th:href="@{/admin/history/adminCreate}" class="ghost-button">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>管理者作成履歴</span>
+                </a>
+
+                <a th:href="@{/admin/requestList/list}" class="ghost-button">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>申請履歴</span>
+                </a>
+
+            </div>
+
+            <div class="back-btn-row">
+                <div class="small-back-btn" onclick="backToMainMenu()">
+                    <i class="fa-solid fa-reply"></i> メニューに戻る
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 生徒管理メニューを表示
+        function showStudentMenu() {
+            document.getElementById('main-menu-group').classList.add('hidden');
+            document.getElementById('student-menu-group').classList.remove('hidden');
+            document.getElementById('history-menu-group').classList.add('hidden');
+        }
+
+        // データ変更履歴メニューを表示
+        function showHistoryMenu() {
+            document.getElementById('main-menu-group').classList.add('hidden');
+            document.getElementById('student-menu-group').classList.add('hidden');
+            document.getElementById('history-menu-group').classList.remove('hidden');
+        }
+
+        // メインメニューに戻る
+        function backToMainMenu() {
+            document.getElementById('student-menu-group').classList.add('hidden');
+            document.getElementById('history-menu-group').classList.add('hidden');
+            document.getElementById('main-menu-group').classList.remove('hidden');
+        }
+    </script>
+
+</body>
+</html>

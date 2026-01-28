@@ -3,70 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf?.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
+    
     <title>生徒情報</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/admin/studentInfo.css}">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
 
+    <!-- ヘッダー -->
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
     </div>
-    
-    
+    <!-- 戻るボタン -->
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/studentList')}"></div>
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/studentList')}"></div>
     </div> 
 
+    <input type="hidden" id="studentIdHidden" th:value="${student.studentId}">
+    
     <div class="info-container">
         
         <div class="page-header-wrapper">
-
             <h1 class="page-title">生徒情報</h1>
         </div>
 
         <div class="main-content-area">
             
+            <!-- 詳細コンテナ -->
             <div class="left-sidebar-area">
                 
                 <div class="student-name-display">
-                    ○○ ×× さん
+                    <span th:text="${student.name}"></span>
                 </div>
 
-                <form class="sidebar-search-form">
-                    <input type="text" class="sidebar-search-input" placeholder="教科名を検索">
-                    <button type="submit" class="sidebar-search-btn">
+                <div class="sidebar-search-form">
+                    <input type="text" id="subjectSearchInput" 
+                        class="sidebar-search-input" 
+                        placeholder="教科名を検索" 
+                        th:value="${subjectKeyword}"
+                        onkeydown="if(event.key === 'Enter') searchSubject()">
+                    <button type="button" class="sidebar-search-btn" onclick="searchSubject()">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
-                </form>
+                </div>
 
                 <div class="subject-list-box">
                     <div class="sidebar-title">受講教科一覧</div>
-                    <ul class="subject-list">
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
+                    <ul class="subject-list" id="subjectListUl">
+                        <li th:each="subject : ${student.subjectList}" class="subject-item">
+                            <a th:href="@{/admin/student/{sid}/subject/{subid}(sid=${student.studentId}, subid=${subject.subjectId})}" 
+                                th:text="${subject.subjectName}">
+                                    教科名
+                            </a>
+                        </li>
+                        <li th:if="${#lists.isEmpty(student.subjectList)}" class="subject-item" style="color: #999; padding: 5px;">
+                            該当なし
+                        </li>
                     </ul>
                 </div>
             </div>
 
             <div class="attendance-detail-main">
                 
-                <div class="attendance-controls">
-                    <select class="month-select">
-                        <option value=""></option>
-                        <option value=""></option>
-                        <option value=""></option>
-                    </select>
-                    <button class="edit-btn">編集</button>
+                <!-- コントロール -->
+                <div class="attendance-controls" style="display: flex; align-items: center; gap: 10px;">
+                    <!-- 年月変更 -->
+                     <div>
+                        <form id="monthForm">
+                            <select id="monthPicker" name="month" class="month-select" onchange="changeMonth()">
+                                <option th:each="m : ${student.selectableMonths}"
+                                        th:value="${m}"
+                                        th:text="${m}"
+                                        th:selected="${m == currentYearMonth}">
+                                </option>
+                            </select>
+                        </form>
+                    </div>
+                    
+                    <!-- 編集保存ボタン -->
+                     <div>
+                        <button id="saveBtn" class="edit-btn" type="button" onclick="saveChanges()" 
+                                style="display:none; background-color: #00bdca; color: white; border: none;">保存</button>
+                        <button id="editBtn" class="edit-btn" type="button" onclick="toggleEditMode()">編集</button>
+                        
+                    </div>
+
                 </div>
 
                 <table class="status-summary-table">
@@ -74,145 +105,71 @@
                         <tr>
                             <th>出欠状況</th>
                             <th>出席</th>
-                            <th>病欠</th>
+                            <th>欠席</th>
                             <th>遅刻</th>
                             <th>早退</th>
                             <th>出停</th>
                             <th>公欠</th>
-                            <th>その他</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>日数</td>
-                            <td>日</td>
-                            <td>日</td>
-                            <td>日</td>
-                            <td>日</td>
-                            <td>日</td>
-                            <td>日</td>
-                            <td>日</td>
+                            <td th:text="${student.summary.attendanceCount} + '日'"></td>
+                            <td th:text="${student.summary.absenceCount} + '日'" style="color: #EF5350;"></td>
+                            <td th:text="${student.summary.lateCount} + '日'"></td>
+                            <td th:text="${student.summary.earlyLeaveCount} + '日'"></td>
+                            <td th:text="${student.summary.suspensionCount} + '日'"></td>
+                            <td th:text="${student.summary.publicAbsenceCount} + '日'"></td>
                         </tr>
                     </tbody>
                 </table>
 
                 <div class="table-wrapper">
-                    <table class="schedule-table">
+                    <table class="schedule-table student-table">
                         <colgroup>
                             <col style="width: 15%;"> 
-                            <col style="width: 17%;"> 
-                            <col style="width: 17%;"> 
-                            <col style="width: 17%;"> 
-                            <col style="width: 17%;"> 
-                            <col style="width: 17%;"> 
                         </colgroup>
                         <thead>
                             <tr>
                                 <th>日付</th>
-                                <th>1限目</th>
-                                <th>2限目</th>
-                                <th>3限目</th>
-                                <th>4限目</th>
-                                <th>5限目</th>
+                                <th th:each="header : ${student.periodHeaders}" th:text="${header}">1限目</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td></td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
+                            <tr th:each="day : ${student.scheduleList}"
+                                th:classappend="${day.absentDay} ? 'absent-row' : ''"> 
+                                
+                                <td th:text="${day.dateStr}"></td>
+                                
+                                <td th:each="period : ${day.periods}">
+                                    <div th:if="${period.hasClass}" 
+                                        class="cell-content"
+                                        th:classappend="${period.statusClass}">
+                                        <div class="view-mode">
+                                            <p class="subject-name" th:text="${period.subjectName}">教科名</p>
+                                            <p class="status-tag status-icon" th:text="${period.statusIcon}"></p>
+                                        </div>
+                                        <div class="edit-mode" style="display: none;">
+                                            <div class="subject-name" th:text="${period.subjectName}">教科名</div>
+                                            <select class="status-select" 
+                                                    th:data-date="${day.dateStr}" 
+                                                    th:data-period="${period.period}"
+                                                    style="width: 100%; font-size: 0.9rem; padding: 2px;">
+                                                <option value="出席" th:selected="${period.statusIcon == '〇'}">出席</option>
+                                                <option value="欠席" th:selected="${period.statusIcon == '✕'}">欠席</option>
+                                                <option value="遅刻" th:selected="${period.statusIcon == '△'}">遅刻</option>
+                                                <option value="早退" th:selected="${period.statusIcon == '早'}">早退</option>
+                                                <option value="公欠" th:selected="${period.statusIcon == '公'}">公欠</option>
+                                                <option value="公欠候補" th:selected="${period.statusIcon == '候'}">公欠候補</option>
+                                                <option value="出席停止" th:selected="${period.statusIcon == '停'}">出停</option>
+                                            </select>
+                                        </div>
+
                                     </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="cell-content">
-                                        <span class="subject-name"></span>
-                                        <span class="status-tag bg-present"></span>
+    
+                                    <div th:unless="${period.hasClass}" class="cell-content" style="color: #ccc; background-color: transparent;">
+                                        -
                                     </div>
                                 </td>
                             </tr>
@@ -222,6 +179,6 @@
             </div>
         </div>
     </div>
-
+    <script th:src="@{/js/admin/studentInfo.js}"></script>
 </body>
 </html>

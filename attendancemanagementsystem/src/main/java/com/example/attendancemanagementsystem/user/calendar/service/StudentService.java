@@ -2,7 +2,6 @@ package com.example.attendancemanagementsystem.user.calendar.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,7 @@ import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.AttendanceRepository;
 import com.example.attendancemanagementsystem.common.repository.CalendarRepository;
-import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository; // 追加
+import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository;
 import com.example.attendancemanagementsystem.common.repository.StudentRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.user.calendar.dto.AttendanceDto;
@@ -34,18 +33,18 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final AttendanceRepository attendanceRepository;
     private final CalendarRepository calendarRepository;
-    private final EnrollmentsRepository enrollmentsRepository; // 追加
+    private final EnrollmentsRepository enrollmentsRepository;
 
     public StudentService(UsersRepository usersRepository,
                         StudentRepository studentRepository,
                         AttendanceRepository attendanceRepository,
                         CalendarRepository calendarRepository,
-                        EnrollmentsRepository enrollmentsRepository) { // 追加
+                        EnrollmentsRepository enrollmentsRepository) {
         this.usersRepository = usersRepository;
         this.studentRepository = studentRepository;
         this.attendanceRepository = attendanceRepository;
         this.calendarRepository = calendarRepository;
-        this.enrollmentsRepository = enrollmentsRepository; // 追加
+        this.enrollmentsRepository = enrollmentsRepository;
     }
 
     /**
@@ -135,7 +134,7 @@ public class StudentService {
 
         // --- Step 2: 完全出席チェック (◎) ---
         boolean isAllPerfect = statusNames.stream().allMatch(s -> 
-               "出席".equals(s) 
+            "出席".equals(s) 
             || "公欠".equals(s) 
             || "公欠候補".equals(s) 
             || "出席停止".equals(s)

@@ -3,21 +3,30 @@
 /* 基本設定 */
 *, *::before, *::after { box-sizing: border-box; }
 body {
-    overflow-x: hidden; width: 100%; margin: 0; padding: 0;
-    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
-    font-size: 16px; background-color: #f4f4f9; color: #333;
+    overflow-x: hidden; 
+    width: 100%; 
+    margin: 0; 
+    padding: 0;
+    font-size: 16px;  color: #333;
 }
 
 /* コンテナ */
 .list-container {
-    width: 95%; max-width: 800px; margin: 0 auto;
-    padding-top: 120px; padding-bottom: 50px;
+    width: 95%; 
+    max-width: 800px; 
+    margin: 0 auto;
+    padding-top: 120px; 
+    padding-bottom: 50px;
 }
 
 /* タイトル */
 .page-title {
-    text-align: center; font-size: 2rem; font-weight: normal;
-    margin-bottom: 30px; color: #333; letter-spacing: 2px;
+    text-align: center; 
+    font-size: 2rem; 
+    font-weight: normal;
+    margin-bottom: 30px; 
+    color: #333; 
+    letter-spacing: 2px;
 }
 
 /* --- コントロールエリア（戻るボタン + 検索フォーム） --- */
@@ -38,64 +47,145 @@ body {
 }
 
 /* 検索フォーム行 */
-.search-form-row {
+
+.search-icon,
+.filter-icon {
+    background-color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 10px 15px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    
+}
+
+.search-form-3{
+
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    
 }
 
-/* 入力欄 */
-.search-input {
-    width: 180px; height: 38px; padding: 0 10px;
-    border: 2px solid #333; border-radius: 4px;
-    font-size: 1rem; outline: none; background-color: white;
+.search-form-3 input {
+    width: 150px;
+    height: 45px;
+    padding: 5px 15px;
+    border: none;
+    box-sizing: border-box;
+    font-size: 1em;
+    outline: none;
 }
 
-/* 検索ボタン */
-.search-btn {
-    height: 38px; padding: 0 20px;
-    background-color: #fff; border: 1px solid #707070;
-    border-radius: 4px; cursor: pointer;
-    font-size: 1rem; font-weight: bold; color: #333;
-    display: flex; align-items: center; gap: 5px;
+.search-form-3 input::placeholder{
+    color: #777777;
 }
-.search-btn:hover { background-color: #f0f0f0; }
-.search-btn i { color: #5aaeb6; }
+
+.search-form-3 button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 45px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.search-form-3 button::after {
+    width: 24px;
+    height: 24px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z' fill='%23777777'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    content: '';
+}
 
 /* エラーメッセージ */
 .error-message {
-    color: red; font-size: 0.85rem; font-weight: bold;
-    margin-top: 5px; margin-left: 2px;
+    color: red; 
+    font-size: 0.85rem; 
+    font-weight: bold;
+    margin-top: 5px; 
+    margin-left: 2px;
 }
 
 /* --- 日付ヘッダー (コントロールエリアの下) --- */
 .date-header {
-    font-size: 1.3rem; font-weight: bold; color: #003366;
-    margin-bottom: 10px; padding-left: 2px; text-align: left;
+    font-size: 1.3rem; 
+    font-weight: bold; 
+    color: #003366;
+    margin-bottom: 10px;
+    padding-left: 2px; 
+    text-align: left;
     clear: both; /* 回り込み防止 */
 }
 
 /* --- テーブル --- */
 .table-wrapper {
-    width: 100%; border: 1px solid #999;
+    width: 100%;
+    border: 1px solid #999;
 }
-.class-list-table {
-    width: 100%; border-collapse: collapse; text-align: center; background-color: white;
-}
-.class-list-table th, .class-list-table td {
-    border: 1px solid #999; padding: 12px 10px; vertical-align: middle;
-}
-.class-list-table thead th {
-    background-color: #539DA4; color: white; font-weight: normal;
-    padding: 10px 0; font-size: 1rem;
-}
-.col-period { width: 15%; }
-.col-subject { width: 85%; }
 
-.period-cell { font-size: 1.2rem; color: #333; }
-.subject-cell { text-align: left; padding-left: 40px; font-size: 1.1rem; }
-.subject-link {
-    color: #0056b3; text-decoration: none; font-weight: bold; margin-right: 15px;
+.class-list-table {
+    width: 100%; 
+    border-collapse: collapse; 
+    text-align: center; 
+    background-color: white;
 }
-.subject-link:hover { text-decoration: underline; }
-.room-name { color: #333; font-weight: normal; }
+
+.class-list-table th, .class-list-table td {
+    border: 1px solid #999; 
+    padding: 12px 10px; 
+    vertical-align: middle;
+}
+
+.class-list-table thead th {
+    background-color: #00bdca; 
+    color: white; 
+    font-weight: normal;
+    padding: 10px 0; 
+    font-size: 1rem;
+}
+
+.col-period { 
+    width: 15%; 
+}
+
+.col-subject { 
+    width: 50%; 
+}
+
+.col-classroom {
+    width: 35%;
+}
+
+.period-cell { font-size: 1.2rem; 
+    color: #333; 
+}
+
+.subject-cell { 
+    text-align: left; 
+    padding-left: 40px; 
+    font-size: 1.1rem; 
+}
+
+.subject-link {
+    color: #00bdca; 
+    text-decoration: none; 
+    font-weight: bold; 
+    margin-right: 15px;
+}
+
+.subject-link:hover { 
+    text-decoration: underline; 
+}
+
+.classroom-cell {
+    color: #333; 
+    font-weight: normal; 
+}

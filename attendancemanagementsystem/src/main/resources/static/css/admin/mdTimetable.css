@@ -1,0 +1,361 @@
+
+/* =========================================
+ * mdTimetable.html (一括登録) 専用スタイル
+ * ========================================= */
+
+/* --- コンテナ・基本レイアウト --- */
+.timetable-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.main-container{
+    width: 100%;
+    display: flex;
+    justify-self: center;
+    gap: 10px;
+    border-top: 1px dashed #ccc;
+    padding-top: 15px;
+    margin-top: 15px;
+}
+
+.container-1{
+    width: 100%;
+}
+
+.label {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.form-control{
+    width: 500px;
+    height: 45px;
+    padding: 5px 10px;
+    border: 1px solid;
+    border-color: #00bdca;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
+    outline: none;
+
+}
+
+
+/* --- AI解析エリア (この画面専用) --- */
+
+.select-box{
+    width: 200px !important;
+    height: 45px;
+    padding: 5px 10px;
+    border: 1px solid ;
+    border-color: #00bdca;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
+    outline: none;
+}
+
+.box-011 {
+    position: relative;
+    max-width: 600px;
+    margin: 1.9em auto 0;
+    padding: 1em 1.5em;
+    border: 2px solid #00bdca;
+    border-radius: 3px;
+}
+
+.box-011 span {
+    position: absolute;
+    top: -1.9em;
+    left: -2px;
+    padding: .2em .8em;
+    border-radius: 5px 5px 0 0;
+    background-color: #00bdca;
+    color: #fff;
+}
+
+.box-011 p {
+    margin: 0;
+    color: #333;
+}
+
+.ai-section {
+    /* background: #f0f8ff; */
+    padding: 15px;
+    border: 1px solid #00bdca;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.ai-title {
+    margin-top: 0;
+    color: #2c2c2c;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.beta-badge {
+    font-size: 0.8rem;
+    background: #ffc107;
+    color: #333;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.ai-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+
+.file-input {
+    padding: 5px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.ai-description {
+    font-size: 0.85rem;
+    margin: 10px 0 0;
+    color: #666;
+}
+
+.loading-msg {
+    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-left: 20px;
+    color: #333;
+    display: none;
+    font-weight: bold;
+
+}
+
+.btn-analyze {
+    background: #00bdca;
+    color: white;
+    border: 1px solid #00bdca;
+    padding: 5px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-analyze:hover {
+    background: #0097a2;
+}
+
+/* --- 設定フォームエリア --- */
+.setting-area {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.setting-row {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* 期間設定 (この画面専用) */
+.period-setting {
+    border-top: 1px dashed #ccc;
+    padding-top: 15px;
+    margin-top: 15px;
+    display: flex;
+    gap: 40px; 
+    align-items: flex-start; 
+}
+
+.period-setting > div:first-child {
+    flex: 0 0 auto;
+}
+
+.period-setting .form-group {
+    flex: 1; 
+    margin-top: 0;
+    width: 100%;
+    max-width: none; 
+}
+
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.warning-text {
+    font-size: 0.8rem;
+    color: #00bdca;
+    margin-top: 5px;
+}
+
+/* --- テーブルスタイル --- */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.timetable-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    table-layout: fixed;
+}
+
+.timetable-table th, .timetable-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    vertical-align: middle;
+}
+
+.timetable-table th {
+    background-color: #00bdca;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+}
+
+/* セル内の入力レイアウト */
+.cell-input {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* --- ボタン類 --- */
+.button-area {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn-primary {
+    background-color: #00bdca;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-primary:hover {
+    background-color: #00bdca;
+}
+
+.btn-secondary {
+    width: 120px;
+    height: 45px;
+    background-color: #868f97;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.btn-secondary:hover {
+    background-color: #666e76;
+}
+
+/* Select2の高さ調整 */
+.select2-container .select2-selection--single {
+    height: 38px !important;
+    padding: 5px;
+}
+
+
+/* アコーディオン */
+.accordion-002 {
+    /* max-width: 500px; */
+    margin-bottom: 7px;
+    border: 2px solid #00bdca;
+    border-radius: 5px;
+}
+
+.accordion-002 summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 1em 2em;
+    background-image:  url('data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2214%22%20cy%3D%2214%22%20r%3D%2214%22%20style%3D%22fill%3A%2300bdca%3B%22%2F%3E%0A%3C%2Fsvg%3E');
+    background-position: right calc(2em - 7px) center;
+    background-size: 22px;
+    background-repeat: no-repeat;
+    color: #00bdca;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.accordion-002 summary::-webkit-details-marker {
+    display: none;
+}
+
+.accordion-002 summary::after {
+    transform: translateY(-25%) rotate(45deg);
+    width: 5px;
+    height: 5px;
+    border-bottom: 3px solid #fff;
+    border-right: 3px solid #fff;
+    content: '';
+    transition: transform .3s;
+}
+
+.accordion-002[open] summary::after {
+    transform: rotate(225deg);
+}
+
+.accordion-002 p {
+    transform: translateY(-10px);
+    opacity: 0;
+    margin: 0;
+    padding: 0 2em 1.5em;
+    color: #333333;
+    transition: transform .5s, opacity .5s;
+}
+
+.accordion-002[open] p {
+    transform: none;
+    opacity: 1;
+}
+
+
+
+.td{
+    font-weight:bold; 
+    text-align:center; 
+    justify-self: center;
+    line-height: 1.4;
+}
+
+.td .span {
+    display: inline-block;
+}
+
+.td-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100%;
+}

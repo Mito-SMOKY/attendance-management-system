@@ -77,7 +77,7 @@ public class SearchService {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
-    // 補助メソッド: RootからPathを取得（ネスト対応）
+    // ヘルパーメソッド: RootからPathを取得（ドット表記対応）
     private <T> Path<String> getPath(Root<T> root, String attributeName) {
         Path<?> path = root;
         if (attributeName.contains(".")) {
