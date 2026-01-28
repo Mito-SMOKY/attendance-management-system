@@ -100,7 +100,7 @@
 
                         <select id="targetGrade" th:field="*{targetGrade}" 
                                 th:data-selected="${mdTimetableDto.targetGrade}"
-                                style="width: 100px; height: 38px; padding: 5px; border: 1px solid #aaa; border-radius: 4px;">
+                                class="date-form">
                             <option value="" th:if="${mdTimetableDto.targetGrade == null}">-</option>
                             <option th:if="${mdTimetableDto.targetGrade != null}" 
                                     th:value="${mdTimetableDto.targetGrade}" 

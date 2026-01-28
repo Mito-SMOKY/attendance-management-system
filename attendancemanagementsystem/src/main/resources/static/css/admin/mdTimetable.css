@@ -167,7 +167,7 @@
 
 .form-group {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 5px;
 }
 
