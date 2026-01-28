@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <title>手動登録</title>
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/createAccount/manualInput.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  </head>
-  <body>
+</head>
+<body>
 
     <div class="header-container">
         <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
@@ -31,18 +31,19 @@
         </div>
 
         <form th:action="@{/admin/saveManualAccounts}" method="post" class="main-form">
-          
-          <div class="batch-setting">
+        
+        <div class="batch-setting">
             <h3>基本設定（全員に適用）</h3>
             <div class="setting-grid">
                 <div class="input-item">
                     <label>リスト名</label>
                     <input type="text" name="dataListName" placeholder="例: 2025年度新入生" 
-                           required oninput="removeSpecialChars(this)" />
+                        required oninput="sanitizeListName(this)" />
                 </div>
                 <div class="input-item">
                     <label>年度</label>
-                    <input type="number" name="academicYear" placeholder="2025" value="2025" required />
+                    <input type="number" name="academicYear" placeholder="2025" 
+                        required max="9999" min="2000" />
                 </div>
                 <div class="input-item">
                     <label>学年</label>
@@ -62,56 +63,57 @@
                     </select>
                 </div>
             </div>
-          </div>
+        </div>
 
-          <div class="table-scroll-wrapper">
-              <table class="input-table">
-                  <thead>
-                      <tr>
-                          <th style="width: 50px;">No.</th>
-                          <th>ログインID</th>
-                          <th>氏名</th>
-                          <th>パスワード</th>
-                          <th style="width: 60px;">操作</th>
-                      </tr>
-                  </thead>
-                  <tbody id="account-container">
-                      <tr>
-                          <td class="row-num">1</td>
-                          <td>
-                              <input type="text" name="accounts[0].studentNumber" placeholder="ST001" 
-                                     required oninput="removeSpecialChars(this)" />
-                          </td>
-                          <td>
-                              <input type="text" name="accounts[0].name" placeholder="山田 太郎" 
-                                     required oninput="removeNameInvalidChars(this)" />
-                          </td>
-                          <td>
-                              <input type="text" name="accounts[0].password" 
-                                     placeholder="パスワード" required autocomplete="off" />
-                          </td>
-                          <td class="action-cell">
-                              <button type="button" class="btn-icon-delete" onclick="deleteRow(this)">
-                                  <i class="fa-solid fa-trash-can"></i>
-                              </button>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
-          </div>
+        <div class="table-scroll-wrapper">
+            <table class="input-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">No.</th>
+                        <th>ログインID</th>
+                        <th>氏名</th>
+                        <th>パスワード</th>
+                        <th style="width: 60px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="account-container">
+                    <tr>
+                        <td class="row-num">1</td>
+                        <td>
+                            <input type="text" name="accounts[0].studentNumber" placeholder="ST001" 
+                                   required oninput="sanitizeId(this)" />
+                        </td>
+                        <td>
+                            <input type="text" name="accounts[0].name" placeholder="例: 山田太郎" 
+                                   required oninput="sanitizeName(this)" />
+                        </td>
+                        <td>
+                            <input type="text" name="accounts[0].password" 
+                                   placeholder="パスワード" required autocomplete="off"
+                                   oninput="sanitizePassword(this)" />
+                        </td>
+                        <td class="action-cell">
+                            <button type="button" class="btn-icon-delete" onclick="deleteRow(this)">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-          <div class="action-footer">
-              <div class="edit-btns">
-                  <button type="button" class="btn btn-add" onclick="addAccount()">
+        <div class="action-footer">
+            <div class="edit-btns">
+                <button type="button" class="btn btn-add" onclick="addAccount()">
                     <i class="fa-solid fa-plus"></i> 行を追加
-                  </button>
-              </div>
-              
-              <button type="submit" class="btn btn-save">登録実行</button>
-          </div>
+                </button>
+            </div>
+            
+            <button type="submit" class="btn btn-save">登録実行</button>
+        </div>
         </form>
     </div>
 
     <script th:src="@{/js/createAccount/manualInput.js}"></script>
-  </body>
+</body>
 </html>

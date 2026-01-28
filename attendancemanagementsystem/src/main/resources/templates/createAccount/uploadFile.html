@@ -40,12 +40,16 @@
         >
             <div class="form-group">
                 <label class="input-label">年度 <span class="required-badge">必須</span></label>
+                
                 <input
                     type="number"
+                    id="academicYear"
                     th:field="*{academicYear}"
                     class="styled-input"
                     placeholder="例: 2025"
                     required
+                    min="2000"
+                    max="9999"
                 />
             </div>
 
@@ -81,6 +85,7 @@
                     class="styled-input"
                     placeholder="リスト名を入力"
                     required
+                    oninput="sanitizeListName(this)"
                 />
             </div>
 
@@ -104,5 +109,7 @@
             </div>
         </form>
     </div>
+
+    <script th:src="@{/js/createAccount/uploadFile.js}"></script>
 </body>
 </html>

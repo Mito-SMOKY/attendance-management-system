@@ -15,30 +15,29 @@ body {
     font-size: 16px;
     
     /* 全体の背景を薄いグレーに設定 */
-    background-color: #f4f7f6;
+    background-color: #fff;
     color: #333;
     
     /* ヘッダー固定分の余白 */
     padding-top: 120px;
     padding-bottom: 50px;
-    text-align: center; /* コンテンツの中央揃え */
+    text-align: center;
 }
 
 /* =========================================
-   レイアウトコンテナ（白いカードデザイン）
+   レイアウトコンテナ
    ========================================= */
 .history-container {
     width: 95%;
     max-width: 1000px;
     margin: 0 auto;
     
-    /* 白い背景と影をつけてカード状にする */
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     padding: 40px;
     
-    text-align: left; /* 内部テキストは左揃えに戻す */
+    text-align: left;
 }
 
 /* =========================================
@@ -55,8 +54,8 @@ body {
     color: #333;
     margin-bottom: 10px;
     display: inline-block;        
-    border-bottom: 3px solid #00bdca; /* 統一感のある水色 */
-    padding-bottom: 5px;  
+    border-bottom: 3px solid #00bdca;
+    padding-bottom: 5px;   
 }
 
 .page-title-wrapper p {
@@ -99,18 +98,18 @@ body {
     width: 100%;
     overflow-x: auto;
     border-radius: 8px;
-    border: 1px solid #ddd; /* 外枠を薄く */
+    border: 1px solid #ddd;
 }
 
 .history-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 600px; /* スマホで潰れすぎないように */
+    min-width: 600px;
 }
 
-/* ヘッダーセル */
+/* ヘッダー */
 .history-table th {
-    background-color: #00bdca; /* 統一感のある水色 */
+    background-color: #00bdca;
     color: #fff;
     font-weight: normal;
     padding: 15px 10px;
@@ -121,41 +120,50 @@ body {
 /* データセル */
 .history-table td {
     padding: 15px 10px;
-    border-bottom: 1px solid #eee; /* 薄い区切り線 */
+    border-bottom: 1px solid #eee;
     color: #333;
     vertical-align: middle;
 }
 
-/* 偶数行の色を変えて読みやすく（ゼブラストライプ） */
+/* ゼブラストライプ */
 .history-table tr:nth-child(even) td {
     background-color: #f9fcfd;
 }
 
-/* ホバー時の効果 */
 .history-table tr:hover td {
     background-color: #f0fcfd;
 }
 
-/* リンクのスタイル */
-.history-table a {
-    color: #00bdca;
+/* ----------------------------------------------------
+   【修正箇所】リンクのスタイル (強制適用)
+   ---------------------------------------------------- */
+.history-table td a {
+    /* !important を付けて強制的にこの色にします */
+    color: #00bdca !important;
     text-decoration: none;
     font-weight: bold;
     transition: color 0.3s;
 }
 
-.history-table a:hover {
-    color: #008c96;
+.history-table td a:hover {
+    /* ホバー時は少し濃い色へ */
+    color: #008c96 !important;
     text-decoration: underline;
+    cursor: pointer;
 }
 
-/* 小さな文字（IDなど） */
+.history-table td a:visited {
+    /* 訪問済みでも同じ色を維持したい場合 */
+    color: #00bdca !important;
+}
+
+/* 小さな文字 */
 .history-table small {
     color: #888;
     font-size: 0.85rem;
 }
 
-/* データなしの場合 */
+/* データなし */
 .history-table td[colspan="4"] {
     text-align: center;
     padding: 30px;
