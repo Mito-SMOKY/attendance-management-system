@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">申請詳細</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/requestHistory.css}">
+    <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/request/history')}"></div>
+    </div>
+
+    <main class="main-container" style="padding: 20px;">
+        
+        <div class="detail-box">
+            <div class="detail-header">
+                <h2 class="page-title" style="margin:0; color:#00bdca;">申請詳細情報</h2>
+                
+                <span class="status-badge"
+                    style="font-size: 1.1em; padding: 8px 15px;"
+                    th:classappend="${
+                        detail.statusCode == 1 ? 'status-pending' : 
+                        detail.statusCode == 2 ? 'status-approved' : 
+                        detail.statusCode == 3 ? 'status-rejected' : ''
+                    }"
+                    th:text="${detail.status}">
+                    承認待ち
+                </span>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">申請ID</div>
+                <div class="detail-value" th:text="${detail.requestId}">10</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">申請日時</div>
+                <div class="detail-value" th:text="${detail.createdAt}">2026/01/23 10:00</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">申請種別</div>
+                <div class="detail-value">
+                    <span th:text="${detail.type}" style="font-weight: bold;"></span>
+                    <span th:if="${detail.targetDetail}" 
+                        th:text="'（' + ${detail.targetDetail} + '）'"
+                        style="margin-left: 10px; color: #666;">
+                    </span>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">申請先</div>
+                <div class="detail-value" th:text="${detail.approverName}">承認者名</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">備考・理由</div>
+                <div class="detail-value" style="white-space: pre-wrap;" th:text="${detail.message}">ここに申請理由が表示されます。</div>
+            </div>
+
+            <div class="detail-row" style="border-bottom: none; display: block;">
+                <div class="detail-label" style="margin-bottom: 10px;">対象生徒 (<span th:text="${detail.students.size()}"></span>名)</div>
+                
+                <div class="student-list-box">
+                    <div th:each="st : ${detail.students}" class="student-list-item">
+                        <span th:text="${st.loginId}" style="font-family: monospace; margin-right: 10px;">st001</span>
+                        <span th:text="${st.name}">山田 太郎</span>
+                    </div>
+                    <div th:if="${#lists.isEmpty(detail.students)}" style="color:#999;">
+                        対象ユーザーなし
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>

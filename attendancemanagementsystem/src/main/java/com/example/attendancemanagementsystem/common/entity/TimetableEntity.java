@@ -1,9 +1,7 @@
 package com.example.attendancemanagementsystem.common.entity;
 
 import java.time.LocalDate;
-import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -42,6 +39,9 @@ public class TimetableEntity {
     @Column(name = "AcademicYear")
     private Integer academicYear;
 
+    @Column(name = "Grade")
+    private Integer grade;
+
     // --- 関連定義 ---
 
     // Timetable(多) 対 Department(1)
@@ -58,6 +58,11 @@ public class TimetableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ClassroomID", insertable = false, updatable = false)
     private ClassroomEntity classroom;
+
+    //教員情報の取得用（読み取り専用）
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UserID", insertable = false, updatable = false)
+    private UsersEntity user;
 
     @ManyToOne
     @JoinColumn(name = "SlotID", insertable = false, updatable = false)
@@ -132,6 +137,14 @@ public class TimetableEntity {
         this.academicYear = academicYear;
     }
 
+    public Integer getGrade() {
+        return grade;
+    }
+
+    public void setGrade(Integer grade) {
+        this.grade = grade;
+    }
+
     public DepartmentEntity getDepartment() {
         return department;
     }
@@ -140,7 +153,6 @@ public class TimetableEntity {
         this.department = department;
     }
 
-    // ★追加: SubjectEntityのGetter/Setter
     public SubjectEntity getSubject() {
         return subject;
     }
@@ -149,12 +161,19 @@ public class TimetableEntity {
         this.subject = subject;
     }
 
-    // ★追加: ClassroomEntityのGetter/Setter
     public ClassroomEntity getClassroom() {
         return classroom;
     }
 
     public void setClassroom(ClassroomEntity classroom) {
         this.classroom = classroom;
+    }
+
+    public UsersEntity getUser() { 
+        return user; 
+    }
+
+    public void setUser(UsersEntity user) { 
+        this.user = user; 
     }
 }

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>時間割管理 - 一括削除</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/mdTimetableDaily.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/mdTimetableDelete.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+    
+</head>
+    
+<body>
+    <!-- ヘッダー -->
+    <div class="header-container">
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
+    </div>
+
+    <!-- 戻るボタン -->
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
+    </div>
+
+    <div class="timetable-container">
+
+        <!-- タブ -->
+        <div class="mode-tabs">
+            
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable}" class="tab-link">一括登録</a>
+                <span>前期、後期ごとに時間割を登録できます</span>
+            </div>
+
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable/daily}" class="tab-link">日別編集</a>
+                <span>日・時限単位で時間割の変更ができます</span>
+            </div>
+
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable/view}" class="tab-link">時間割参照</a>
+                <span>登録済みの時間割を見ることができます</span>
+            </div>
+
+            <div class="tooltip-001">
+                <a th:href="@{/admin/mdTimetable/delete}" class="tab-link  active-tab">一括削除</a>
+                <span>時間割を削除できます</span>
+            </div>
+            
+        </div>
+        
+        <div class="page-title">時間割削除</div>
+
+        <div class="delete-container">
+
+            <div class="box-004">
+                <div class="warning-text">
+                    <div class="warning-title">
+                        <span>時間割データの一括削除</span>
+                    </div>
+                    <p>指定した期間・クラスの時間割データを<strong>完全に削除</strong>します。「半期すべて」や「特定の1週間」を指定して削除する場合に使用してください。</p>
+                    <p>※この操作は元に戻せません。</p>
+                </div>
+            </div>
+
+            <form th:action="@{/admin/mdTimetable/delete}" method="post" th:object="${mdTimetableDto}" onsubmit="return confirm('【最終確認】\n\n本当に削除しますか？\n指定期間のデータが全て消えます。');">
+                
+                <div class="search-condition-area">
+                    <div class="condition-row">
+                        <label>期間目安セット</label>
+                        <div style="display: flex; gap: 10px;">
+                            <select class="date-form" id="yearSelect" th:field="*{year}" onchange="setAutoDates()">
+                                <option value="2025">2025年度</option>
+                                <option value="2026">2026年度</option>
+                            </select>
+                            <select class="date-form" id="termSelect" th:field="*{term}" onchange="setAutoDates()">
+                                <option value="1">前期</option>
+                                <option value="2">後期</option>
+                            </select>
+                            <button type="button" class="btn-secondary" onclick="setAutoDates()">日付を自動入力</button>
+                        </div>
+                    </div>
+
+                    <div class="condition-row">
+                        <label>対象クラス <span class="badge-required" style="color:red; font-size:0.8em;">(必須)</span></label>
+                        <select id="departmentId" th:field="*{departmentId}" class="searchable-select" required>
+                            <option value="">クラスを選択してください</option>
+                            <option th:each="dept : ${departmentOptions}" 
+                                    th:value="${dept.key}" 
+                                    th:text="${dept.value}"></option>
+                        </select>
+
+                        <select id="targetGrade" th:field="*{targetGrade}" 
+                                th:data-selected="${mdTimetableDto.targetGrade}"
+                                class="date-form">
+                            <option value="" th:if="${mdTimetableDto.targetGrade == null}">-</option>
+                            <option th:if="${mdTimetableDto.targetGrade != null}" 
+                                    th:value="${mdTimetableDto.targetGrade}" 
+                                    th:text="${mdTimetableDto.targetGrade} + '年'" selected></option>
+                        </select>
+                    </div>
+
+                    <div class="condition-row">
+                        <label>削除対象期間 <span class="badge-required">(必須)</span></label>
+                        <div class="date-range-box">
+                            <input type="text" id="startDate" class="date-form" th:field="*{startDate}" placeholder="開始日" required>
+                            <span>～</span>
+                            <input type="text" id="endDate" class="date-form" th:field="*{endDate}" placeholder="終了日" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
+                <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
+
+                <div class="delete-btn-area">
+                    <button type="submit" class="btn-danger-large">
+                        時間割を削除する
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+    
+    <script th:src="@{/js/admin/mdTimetable.js}"></script>
+
+</body>
+</html>

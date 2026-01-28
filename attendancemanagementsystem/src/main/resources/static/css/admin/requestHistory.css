@@ -1,0 +1,192 @@
+/* テーブル全体のスタイル */
+
+.main-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.page-title{
+    text-align: center;
+    border-bottom: 2px solid #00bdca;
+    padding-bottom: 10px;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+    letter-spacing: 2px;
+    margin-top: 80px;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.history-table th, .history-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.history-table th {
+    background-color: #00bdca;
+    color: #fff;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.history-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* ステータスバッジ */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: normal;
+    color: #fff;
+    min-width: 80px;
+    text-align: center;
+}
+
+/* ステータス別の色 */
+.status-pending { background-color: #e7a234; } /* 承認待ち: オレンジ */
+.status-approved { background-color: #27ae60; } /* 承認: 緑 */
+.status-rejected { background-color: #e74c3c; } /* 拒否: 赤 */
+
+/* 詳細ボタン */
+.detail-btn {
+    display: inline-block;
+    padding: 6px 15px;
+    background-color: #00bdca;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    transition: opacity 0.2s;
+}
+
+.detail-btn:hover {
+    opacity: 0.8;
+}
+
+/* --- 詳細画面用 --- */
+
+.main-container{
+    margin-top: 80px;
+}
+
+.detail-box {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 800px;
+    margin: 0 auto;
+    /* margin-top は backbutton-container で余白を取ったので不要、または微調整 */
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.detail-row {
+    margin-bottom: 20px;
+    display: flex;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 15px;
+}
+
+.detail-label {
+    width: 150px;
+    font-weight: bold;
+    color: #555;
+    flex-shrink: 0;
+}
+
+.detail-value {
+    color: #333;
+    flex-grow: 1;
+}
+
+.student-list-box {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    margin-top: 5px;
+}
+
+.student-list-item {
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+.student-list-item:last-child {
+    border-bottom: none;
+}
+
+.student-list-box {
+    max-height: 300px; /* 300pxはお好みで調整してください */
+    overflow-y: auto; 
+    width: 100%;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+/* --- ページネーション --- */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 35px;
+    height: 35px;
+    padding: 0 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.page-link:hover {
+    background-color: #f0f8ff;
+    border-color: #00bdca;
+    color: #00bdca;
+}
+
+.page-link.active {
+    background-color: #00bdca;
+    color: #fff;
+    border-color: #00bdca;
+    pointer-events: none;
+}
+
+.page-link.disabled {
+    color: #ccc;
+    pointer-events: none;
+    background-color: #f9f9f9;
+    border-color: #eee;
+}

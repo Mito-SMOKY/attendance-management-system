@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -18,6 +19,19 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
 
     // 学科と日付範囲で時間割を取得
     List<TimetableEntity> findByDepartmentAndDateBetween(DepartmentEntity department, LocalDate startDate, LocalDate endDate);
+
+    // 指定された期間内に、授業が1コマでも登録されている学科を、重複なくリストアップする
+    @Query("SELECT DISTINCT t.department FROM TimetableEntity t WHERE t.date BETWEEN :startDate AND :endDate")
+    List<DepartmentEntity> findDistinctDepartmentByDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    // 指定した学科・学年・日付のデータを全て削除する（更新時のクリア用）
+    void deleteByDepartment_DepartmentIdAndGradeAndDate(Integer departmentId, Integer grade, LocalDate date);
+    
+    // 指定した学科・学年・日付のデータを取得する（読み込み用）
+    List<TimetableEntity> findByDepartment_DepartmentIdAndGradeAndDateOrderBySlotIdAsc(Integer departmentId, Integer grade, LocalDate date);
+
+    // 1件ピンポイントで探すメソッド
+    Optional<TimetableEntity> findByDepartment_DepartmentIdAndGradeAndDateAndSlotId(Integer departmentId, Integer grade, LocalDate date, Integer slotId);
 
     // メソッド名の "_DepartmentID" は、TimetableEntity内の departmentフィールドの中にある DepartmentID を指します
     List<TimetableEntity> findByDateAndDepartment_DepartmentIdOrderBySlotId(LocalDate date, Integer departmentId);
@@ -33,82 +47,75 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
         "AND t.date <= CURRENT_DATE")
     int countTotalClassesBySubject(@Param("deptId") Integer deptId, @Param("subjectId") Integer subjectId);
 
-    //指定した教科・期間の時間割を日付順・時限順で取得
+    // 指定した教科・期間の時間割を日付順・時限順で取得
     List<TimetableEntity> findBySubjectIdAndDateBetweenOrderByDateAscSlotIdAsc(Integer subjectId, LocalDate startDate, LocalDate endDate);
 
-    //学科IDと日付範囲を指定して時間割を取得
+    // 学科IDと日付範囲を指定して時間割を取得
     List<TimetableEntity> findByDepartment_DepartmentIdAndDateBetweenOrderByDateAscSlotIdAsc(
             Integer departmentId, LocalDate startDate, LocalDate endDate);
     
-    //指定した教科の最新の時間割エンティティを取得
+    // 指定した教科の最新の時間割エンティティを取得
     TimetableEntity findTopBySubjectIdOrderByDateDesc(Integer subjectId);
 
-    //指定したユーザーIDの時間割エンティティを全て取得
+    // 指定したユーザーIDの時間割エンティティを全て取得
     List<TimetableEntity> findByUserId(Integer userId);
     
-    //指定したユーザIDの時間割エンティティの特定のコマを取得
+    // 指定したユーザIDの時間割エンティティの特定のコマを取得
     List<TimetableEntity> findByUserIdAndDate(Integer userId, LocalDate date);
     
-    //指定したユーザIDの時間割エンティティの特定の日付・時限のエンティティを取得
+    // 指定したユーザIDの時間割エンティティの特定の日付・時限のエンティティを取得
     Optional<TimetableEntity> findByUserIdAndDateAndSlotId(Integer userId, LocalDate date, Integer slotId);
+
+    // 指定期間・指定学科・指定学年のデータを一括削除
+    @Modifying
+    @Query("DELETE FROM TimetableEntity t WHERE t.department.departmentId = :deptId AND t.grade = :grade AND t.date BETWEEN :startDate AND :endDate")
+    void deleteByDepartmentAndGradeAndDateRange(
+        @Param("deptId") Integer deptId, 
+        @Param("grade") Integer grade, 
+        @Param("startDate") LocalDate startDate, 
+        @Param("endDate") LocalDate endDate);
+
+    // 参照画面
+    @Query("SELECT t FROM TimetableEntity t " +
+        "LEFT JOIN FETCH t.subject " +
+        "LEFT JOIN FETCH t.classroom " +
+        "LEFT JOIN FETCH t.user " +
+        "WHERE t.department.departmentId = :deptId " +
+        "AND t.grade = :grade " +
+        "AND t.date BETWEEN :startDate AND :endDate " +
+        "ORDER BY t.date ASC, t.slotId ASC")
+    List<TimetableEntity> findForWeeklyView(
+            @Param("deptId") Integer deptId, 
+            @Param("grade") Integer grade, 
+            @Param("startDate") LocalDate startDate, 
+            @Param("endDate") LocalDate endDate);
 
     // 指定した教員・日付・時間帯の簡易時間割情報を取得
     @Query("SELECT new map(" +
-        "  sub.subjectId as subjectId, " +
-        "  room.classroomId as classroomId, " +
-        "  dept.departmentId as departmentId, " +
-        "  ds.grade as targetGrade, " +       
-        "  m.majorId as majorId, " +
-        "  c.courseId as courseId " +
-        ") " +
-        "FROM TimetableEntity t " +
-        "JOIN t.subject sub " +               
-        "JOIN t.classroom room " +            
-        "JOIN t.department dept " +           
-        "JOIN dept.major m " +
-        "LEFT JOIN m.course c " +
-        "JOIN DepartmentSubject ds ON ds.department = dept AND ds.subject = sub " +
-        "WHERE t.userId = :userId " +         
-        "AND t.date = :date " +               
-        "AND t.slotId = :slotId")            
+            "  sub.subjectId as subjectId, " +
+            "  room.classroomId as classroomId, " +
+            "  dept.departmentId as departmentId, " +
+            "  t.grade as targetGrade, " +  
+            "  m.majorId as majorId, " +
+            "  c.courseId as courseId " +
+            ") " +
+            "FROM TimetableEntity t " +
+            "JOIN t.subject sub " +
+            "JOIN t.classroom room " +
+            "JOIN t.department dept " +
+            "JOIN dept.major m " +
+            "LEFT JOIN m.course c " +
+            "WHERE t.userId = :userId " +
+            "AND t.date = :date " +
+            "AND t.slotId = :slotId")
     Map<String, Object> findSimpleTimetableData(
             @Param("userId") Integer userId, 
             @Param("date") LocalDate date, 
             @Param("slotId") Integer slotId
     );
-
-    //教師IDに紐づく担当授業の情報を取得
-    @Query("""
-        SELECT DISTINCT 
-            s.subjectId, 
-            s.subjectName, 
-            c.courseName, 
-            ds.grade, 
-            d.className
-        FROM TimetableEntity t
-        JOIN t.subject s
-        JOIN t.department d
-        JOIN d.major m
-        JOIN m.course c
-        JOIN DepartmentSubject ds ON ds.department = d AND ds.subject = s
-        WHERE t.userId = :userId
-        ORDER BY c.courseName, ds.grade, d.className
-    """)
-    List<Object[]> findTeacherSubjectsRaw(@Param("userId") Integer userId);
-
-    //担当教員名を取得
-    @Query(value = """
-        SELECT u.Name 
-        FROM timetable t
-        JOIN users u ON t.UserID = u.UserID
-        WHERE t.SubjectID = :subjectId 
-        AND t.DepartmentID = :departmentId 
-        LIMIT 1
-        """, nativeQuery = true)
-    List<String> findTeacherNameBySubjectAndClass(
-        @Param("subjectId") Integer subjectId, 
-        @Param("departmentId") Integer departmentId
-    );
+    
+    //指定した科目IDの時間割エンティティ数をカウント
+    int countBySubjectId(Integer subjectId);
 
     //曜日と教室を取得
     @Query(value = """
@@ -122,4 +129,20 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
         @Param("subjectId") Integer subjectId, 
         @Param("departmentId") Integer departmentId
     );
+
+    // 登録されている時間割データの検索（学年条件を追加）
+    @Query("SELECT MIN(t.date), MAX(t.date), COUNT(t) " +
+        "FROM TimetableEntity t " +
+        "WHERE t.department.departmentId = :departmentId " +
+        "AND t.grade = :grade " + 
+        "AND t.date BETWEEN :startDate AND :endDate")
+    List<Object[]> findOverlapSummary(
+        @Param("departmentId") Integer departmentId, 
+        @Param("grade") Integer grade, 
+        @Param("startDate") LocalDate startDate, 
+        @Param("endDate") LocalDate endDate);
+
+    // 指定した学科IDで、データが存在する「学年」のリストを取得 (昇順)
+    @Query("SELECT DISTINCT t.grade FROM TimetableEntity t WHERE t.department.departmentId = :departmentId ORDER BY t.grade")
+    List<Integer> findGradesByDepartmentId(@Param("departmentId") Integer departmentId);
 }

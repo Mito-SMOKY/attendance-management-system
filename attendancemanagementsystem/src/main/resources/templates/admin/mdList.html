@@ -1,48 +1,46 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>マスタ情報の編集</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/MdList.css}">
+    
+    <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
+</head>
+<body>
 
-    <link rel="stylesheet" th:href="@{/css/parts.css}" />
-    <link rel="stylesheet" th:href="@{/css/admin/adminMdList.css}" />
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
-  </head>
-  <body>
     <div class="header-container">
-      <div
-        th:replace="~{fragments/_parts :: admin-header}"
-      ></div>
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+    
+    <div class="page-header-area">
+        
+        <h2 class="page-title">マスタ情報の編集</h2>
     </div>
 
-    <div class="backbutton-container">
-      <div
-        th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"
-      ></div>
-    </div>
+    <div class="content-wrapper">
+        
+        <div class="menu-group fade-in">
+            <div class="action-buttons">
+                
+                <a th:href="@{/admin/master/classroom}" class="ghost-button">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <span>教室マスタ</span>
+                </a>
 
-    <div class="md-list-container">
-      <div class="page-title-wrapper">
-        <h1 class="page-title">マスタ情報の編集</h1>
-      </div>
+                <a th:href="@{/admin/master/SubjectInformation}" class="ghost-button">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>教科情報マスタ</span>
+                </a>
 
-        <div class="menu-buttons-area">
-            <a th:href="@{/admin/master/classroom}" class="menu-btn">
-                教室マスタ
-            </a>
-
-            <a th:href="@{/admin/master/SubjectInformation}" class="menu-btn">
-                教科情報マスタ
-            </a>
+                <a th:href="@{/admin/master}" class="ghost-button">
+                    <i class="fa-solid fa-people-group"></i>
+                    <span>所属マスタ</span>
+                </a>
+            </div>
         </div>
-
-        <!-- <a th:href="@{/admin/master/subject}" class="menu-btn"> 教科マスタ </a> -->
-      </div>
-    </div>
-  </body>
+    </body>
 </html>

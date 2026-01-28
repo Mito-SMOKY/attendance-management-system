@@ -1,0 +1,64 @@
+@charset "UTF-8";
+
+/* requestMain.css */
+
+body {
+    margin: 0;
+    padding-top: 80px; 
+}
+
+/* メインコンテンツのコンテナ */
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 150px); 
+}
+
+/* ボタンを並べるエリア */
+.action-buttons {
+    display: flex;
+    gap: 40px; 
+    padding: 20px;
+    justify-content: center;
+    flex-wrap: wrap; 
+}
+
+/* ボタンのスタイル */
+.ghost-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 250px;
+    height: 180px;
+    background-color: white;
+    color: #00bdca;
+    border: 3px solid #00bdca;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 20px; 
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+}
+
+/* アイコンのスタイル */
+.ghost-button i {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+/* テキストのスタイル */
+.ghost-button span {
+    text-align: center;
+    padding: 0 10px; 
+}
+
+/* ホバー時の挙動 */
+.ghost-button:hover {
+    background-color: #00bdca;
+    color: white;
+    transform: translateY(-3px); 
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
