@@ -28,7 +28,6 @@ public class StudentEntity {
     @Column(name = "StudentStatusID")
     private Integer studentStatusId;
 
-    // ★修正: 重複エラー回避のため、こちらは読み取り専用にする
     @Column(name = "DataListID", insertable = false, updatable = false)
     private Integer dataListId;
 
@@ -92,6 +91,10 @@ public class StudentEntity {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public UsersEntity getUser() {
+        return user;
     }
 
     public void setUser(UsersEntity user) {
