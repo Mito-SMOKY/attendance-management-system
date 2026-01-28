@@ -1,26 +1,21 @@
-@charset "UTF-8";
-
-body {
-    background-color: #f9f9f9;
-}
 
 .confirm-container {
     width: 90%;
     max-width: 1000px;
     margin: 0 auto;
-    
-    /* レイアウト修正: ヘッダー(60px) + 戻るボタン(top:100px付近) との被りを避ける */
-    margin-top: 180px; 
-    
+    margin-top: 80px; 
     padding-bottom: 50px;
 }
 
 .main-title {
     text-align: center;
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #333;
+    border-bottom: 2px solid #00bdca;
+    padding-bottom: 10px;
+    font-size: 2rem;
     font-weight: bold;
+    margin-bottom: 50px;
+    color: #333;
+    letter-spacing: 2px;
 }
 
 .content-box {
@@ -32,7 +27,7 @@ body {
 
 .sub-title {
     font-size: 18px;
-    border-bottom: 2px solid #5BBEB9; /* テーマカラー */
+    border-bottom: 2px solid #00bdca;
     padding-bottom: 10px;
     margin-bottom: 20px;
     color: #555;
@@ -55,10 +50,10 @@ body {
 
 .confirm-table {
     width: 100%;
-    border-collapse: separate; /* stickyヘッダーのためにseparateを使用 */
+    border-collapse: separate; 
     border-spacing: 0;
     min-width: 800px;
-    table-layout: fixed;       /* 列幅ズレ修正の要 */
+    table-layout: fixed;
 }
 
 /* 列幅の指定 */
@@ -87,7 +82,7 @@ body {
 .confirm-table thead th {
     position: sticky;
     top: 0;
-    background-color: #539DA4;
+    background-color: #00bdca;
     color: white;
     z-index: 1;
     border-bottom: 2px solid #ddd;
@@ -129,7 +124,7 @@ body {
     width: 100%;
     height: 80px;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1.5px solid #00bdca !important;
     border-radius: 4px;
     font-size: 14px;
     resize: none;
@@ -142,8 +137,8 @@ body {
 
 .confirm-btn {
     background-color: white;
-    color: #539DA4;
-    border: 2px solid #539DA4;
+    color: #00bdca;
+    border: 2px solid #00bdca;
     padding: 10px 40px;
     font-size: 16px;
     border-radius: 5px;
@@ -153,6 +148,6 @@ body {
 }
 
 .confirm-btn:hover {
-    background-color: #539DA4;
+    background-color: #00bdca;
     color: white;
 }

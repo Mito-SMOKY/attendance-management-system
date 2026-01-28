@@ -178,16 +178,21 @@ document.addEventListener('DOMContentLoaded', function() {
             const rowClass = isPending ? 'style="background-color: #f9f9f9; color: #999;"' : '';
 
             // 状態欄の表示作成
-            let statusDisplay = status;
+            let checkboxCellContent;
+
             if (isPending) {
-                statusDisplay += ' <p style="color:red; font-weight:bold; font-size:0.8em; margin-left:5px;">(申請中)</p>';
+                // 申請中の場合は「申請中」という文字を表示（チェックボックスなし）
+                checkboxCellContent = '<span style="color: #ff4d4f; font-weight: bold; font-size: 0.85rem;">申請中</span>';
+            } else {
+                // 通常の場合はチェックボックスを表示
+                checkboxCellContent = `<input type="checkbox" class="student-checkbox" value="${userId}" ${isChecked}>`;
             }
 
             row.innerHTML = `
                 <td ${rowClass}>
-                    <input type="checkbox" class="student-checkbox" value="${userId}" ${isChecked} ${isDisabled}>
+                    ${checkboxCellContent}
                 </td>
-                <td ${rowClass}>${statusDisplay}</td>
+                <td ${rowClass}>${status}</td>
                 <td ${rowClass}>${loginId}</td>
                 <td ${rowClass}>${dept}</td>
                 <td ${rowClass}>${grade}</td>

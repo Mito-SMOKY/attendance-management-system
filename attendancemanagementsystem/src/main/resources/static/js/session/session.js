@@ -1,7 +1,17 @@
 // 定数定義
 const API_BASE = '/session';
 
-// 共通関数: プルダウンの初期化
+function showModal(modalId) {
+    const el = document.getElementById(modalId);
+    if(el) el.classList.add('show');
+}
+
+function hideModal(modalId) {
+    const el = document.getElementById(modalId);
+    if(el) el.classList.remove('show');
+}
+
+// 共通関数
 function resetSelect(el, defaultText) {
     el.innerHTML = '';
     const def = document.createElement('option');
@@ -261,8 +271,7 @@ window.startSession = async function() {
             document.getElementById('conflictSessionId').value = conflictId || ''; 
             
             const modalEl = document.getElementById('conflictModal');
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
+            showModal('conflictModal');
             
         } else {
             // その他のエラー
@@ -284,8 +293,7 @@ window.openConflictSession = function() {
     
     // モーダルを閉じる
     const modalEl = document.getElementById('conflictModal');
-    const modal = bootstrap.Modal.getInstance(modalEl);
-    modal.hide();
+    hideModal('conflictModal');
 
     // ウィンドウを開く
     const uniqueWindowName = 'SessionWindow_' + sessionId;
@@ -333,8 +341,7 @@ window.forceEndSession = async function() {
             alert("強制終了しました。自動的に再試行します。");
             
             const modalEl = document.getElementById('conflictModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            modal.hide();
+            hideModal('conflictModal');
             document.getElementById('conflictSessionId').value = '';
             
             // 再試行
