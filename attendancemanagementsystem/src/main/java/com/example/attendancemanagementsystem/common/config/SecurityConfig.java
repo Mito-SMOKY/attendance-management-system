@@ -23,10 +23,6 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 静的リソース
                 .requestMatchers("/css/**", "/js/**", "/image/**", "/error").permitAll()
-
-                // 管理者申請画面:一般管理者のみがアクセス可能
-                .requestMatchers("/admin/request/**")
-                    .access(new WebExpressionAuthorizationManager("hasRole('ADMIN') and !hasRole('SUPER_ADMIN')"))
                 
                 // "/api/issue/**" (PC登録用) と "/api/attendance/**" (ラズパイ出席用)
                 // これらはプログラムからのアクセスなので、ログインなしで許可する

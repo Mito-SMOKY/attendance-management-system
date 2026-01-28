@@ -35,9 +35,6 @@ public class Student {
     @JsonIgnore
     private Datalist datalist;
 
-    @Column(name = "DeleteFlag")
-    private boolean deleteFlag;
-
     //Usersテーブルと紐づける（IDを共有するため OneToOne @MapsId が理想ですが、簡易的にマッピング）
     @OneToOne(cascade = CascadeType.ALL)
     @MapsId // StudentのIDはUsersのIDと同じものを使う設定
@@ -58,13 +55,9 @@ public class Student {
     public Datalist getDatalist() { return datalist; }
     public void setDatalist(Datalist datalist) { this.datalist = datalist; }
 
-    public boolean isDeleteFlag() { return deleteFlag; }
-    public void setDeleteFlag(boolean deleteFlag) { this.deleteFlag = deleteFlag; }
-
     public UsersEntity getUser() { return user; }
     public void setUser(UsersEntity user) { this.user = user; }
 
-    // ★追加分のGetter/Setter
     public List<EnrollmentsEntity> getEnrollments() {
         return enrollments;
     }

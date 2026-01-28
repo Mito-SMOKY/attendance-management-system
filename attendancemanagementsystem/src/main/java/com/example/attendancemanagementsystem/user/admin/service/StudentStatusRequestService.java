@@ -10,13 +10,17 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.attendancemanagementsystem.common.entity.RequestEntity;
+import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.RequestRepository;
+import com.example.attendancemanagementsystem.common.repository.StudentRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
+import com.example.attendancemanagementsystem.user.admin.dto.StatusRequestDto;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
 @Service
@@ -27,14 +31,22 @@ public class StudentStatusRequestService {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private StudentRepository studentRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     
     @PersistenceContext
     private EntityManager entityManager;
 
-    // 申請種別: ステータス変更 
+    // 申請種別: ステータス変更 (ID: 3)
     private static final int TYPE_CHANGE_STATUS = 3;
 
-    // 生徒表示用データの取得
+    /**
+     * 確認画面用の生徒データ取得
+     */
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getStudentDisplayData(List<Integer> ids) {
         if (ids == null || ids.isEmpty()) {
@@ -56,7 +68,7 @@ public class StudentStatusRequestService {
                         SELECT 1 FROM request r
                         JOIN requesttargetuser rt ON r.RequestID = rt.RequestID
                         WHERE rt.UserID = s.UserID 
-                            AND r.RequestTypeID = 3  -- ★ここが削除申請(2)と違う点
+                            AND r.RequestTypeID = 3
                             AND r.Status = 1
                     ) THEN 1 
                     ELSE 0 
@@ -108,10 +120,11 @@ public class StudentStatusRequestService {
         return displayList;
     }
 
-    // ステータスリストの取得
+    /**
+     * ステータス一覧の取得 (ドロップダウン用)
+     */
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getStatusList() {
-        // studentstatusテーブルから全ステータスを取得
         String sql = "SELECT StudentStatusID, StudentStatusName FROM studentstatus ORDER BY StudentStatusID";
         Query query = entityManager.createNativeQuery(sql);
         
@@ -127,7 +140,9 @@ public class StudentStatusRequestService {
         return list;
     }
 
-    // 承認者リストの取得
+    /**
+     * 承認者(上位管理者)リストの取得
+     */
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getApproverList() {
         String sql = """
@@ -148,21 +163,64 @@ public class StudentStatusRequestService {
         return list;
     }
 
-    // ステータス変更申請の作成
+    /**
+     * ステータス変更申請の作成処理 (一般管理者用)
+     */
     @Transactional
-    public void createStatusRequests(List<Integer> targetIds, Integer targetStatusId, String remarks, Integer approverId, CustomUserDetails applicant) {
-        List<UsersEntity> targetUsers = usersRepository.findAllById(targetIds);
+    public void createStatusRequests(StatusRequestDto dto, CustomUserDetails applicant) {
+        List<UsersEntity> targetUsers = usersRepository.findAllById(dto.getTargetIds());
         if (targetUsers.isEmpty()) return;
 
         RequestEntity request = new RequestEntity();
-        request.setRequestTypeId(TYPE_CHANGE_STATUS); // 3
+        request.setRequestTypeId(TYPE_CHANGE_STATUS); 
         request.setRequesterUserId(applicant.getUserId());
-        request.setApproverId(approverId);
-        request.setTargetStatusId(targetStatusId); // ★変更後ステータスIDをセット
-        request.setRequestMessage(remarks);
-        request.setStatus(1); // 承認待ち
+        request.setApproverId(dto.getApproverId());
+        request.setTargetStatusId(dto.getTargetStatusId());
+        request.setRequestMessage(dto.getRemarks());
+        request.setStatus(1); // 申請中
         request.setTargetUsers(targetUsers);
         
         requestRepository.save(request);
+    }
+
+    /**
+     * ステータス変更の即時実行処理 (上位管理者用)
+     * パスワード認証を行い、成功したらDBを直接更新する
+     */
+    @Transactional
+    public void executeStatusUpdate(Map<String, Object> requestData, CustomUserDetails user) {
+        // ★修正点: セッションからではなく、DBから最新のユーザー情報を取得してパスワードを確認する
+        // (Spring Securityが認証後にセッション内のパスワードを消去する場合があるため)
+        UsersEntity adminUser = usersRepository.findById(user.getUserId())
+            .orElseThrow(() -> new SecurityException("管理者ユーザーが見つかりません。"));
+
+        // 1. パスワード確認
+        String rawPassword = (String) requestData.get("password");
+        if (rawPassword == null || !passwordEncoder.matches(rawPassword, adminUser.getPassword())) {
+            throw new SecurityException("パスワードが間違っています。");
+        }
+
+        // 2. データ抽出
+        @SuppressWarnings("unchecked")
+        List<Integer> targetIds = (List<Integer>) requestData.get("targetIds");
+        
+        Object statusIdObj = requestData.get("targetStatusId");
+        Integer targetStatusId = null;
+        if (statusIdObj instanceof String) {
+            targetStatusId = Integer.parseInt((String) statusIdObj);
+        } else if (statusIdObj instanceof Integer) {
+            targetStatusId = (Integer) statusIdObj;
+        }
+
+        if (targetIds == null || targetIds.isEmpty() || targetStatusId == null) {
+            throw new IllegalArgumentException("必要なデータが不足しています。");
+        }
+
+        // 3. 更新実行
+        List<StudentEntity> students = studentRepository.findAllById(targetIds);
+        for (StudentEntity student : students) {
+            student.setStudentStatusId(targetStatusId);
+        }
+        studentRepository.saveAll(students);
     }
 }

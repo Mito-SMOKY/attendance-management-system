@@ -2,14 +2,12 @@ package com.example.attendancemanagementsystem.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
 
 @Entity
 @Table(name = "enrollments")
@@ -37,57 +35,42 @@ public class EnrollmentsEntity {
     @Column(name = "IsActive")
     private Boolean isActive;
 
-
-    // --- constructor ---
     public EnrollmentsEntity() {
     }
 
-    // --- Getter/Setter ---
-    public Integer getEnrollmentsId() {
-        return enrollmentsId;
-    }
+    // --- Getters / Setters ---
+    public Integer getEnrollmentsId() { return enrollmentsId; }
+    public void setEnrollmentsId(Integer enrollmentsId) { this.enrollmentsId = enrollmentsId; }
 
-    public void setEnrollmentsId(Integer enrollmentsId) {
-        this.enrollmentsId = enrollmentsId;
-    }
+    public StudentEntity getStudent() { return student; }
+    public void setStudent(StudentEntity student) { this.student = student; }
 
-        public StudentEntity getStudent() {
-            return student;
+    public DepartmentEntity getDepartment() { return department; }
+    public void setDepartment(DepartmentEntity department) { this.department = department; }
+
+    // ★追加: Serviceでのエラー回避用 (Department経由でIDをセット)
+    public void setDepartmentId(Integer departmentId) {
+        if (departmentId == null) {
+            this.department = null;
+            return;
         }
-
-        public void setStudent(StudentEntity student) {
-            this.student = student;
+        if (this.department == null) {
+            this.department = new DepartmentEntity();
         }
-
-    public DepartmentEntity getDepartment() {
-        return department;
+        this.department.setDepartmentId(departmentId);
+    }
+    
+    // ★追加: Serviceでのエラー回避用
+    public Integer getDepartmentId() {
+        return (this.department != null) ? this.department.getDepartmentId() : null;
     }
 
-    public void setDepartment(DepartmentEntity department) {
-        this.department = department;
-    }
+    public Integer getAcademicYear() { return academicYear; }
+    public void setAcademicYear(Integer academicYear) { this.academicYear = academicYear; }
 
-    public Integer getAcademicYear() {
-        return academicYear;
-    }
+    public Integer getGrade() { return grade; }
+    public void setGrade(Integer grade) { this.grade = grade; }
 
-    public void setAcademicYear(Integer academicYear) {
-        this.academicYear = academicYear;
-    }
-
-    public Integer getGrade() {
-        return grade;
-    }
-
-    public void setGrade(Integer grade) {
-        this.grade = grade;
-    }
-
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 }

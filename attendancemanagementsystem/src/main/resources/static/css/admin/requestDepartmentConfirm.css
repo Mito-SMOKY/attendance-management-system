@@ -8,10 +8,7 @@ body {
     width: 90%;
     max-width: 1000px;
     margin: 0 auto;
-    
-    /* レイアウト修正: ヘッダー(60px) + 戻るボタン(top:100px付近) との被りを避ける */
     margin-top: 180px; 
-    
     padding-bottom: 50px;
 }
 
@@ -44,7 +41,7 @@ body {
     font-weight: bold;
 }
 
-/* スクロールテーブルの設定 */
+/* スクロールテーブル */
 .table-scroll-wrapper {
     max-height: 400px;
     overflow-y: auto;
@@ -55,20 +52,19 @@ body {
 
 .confirm-table {
     width: 100%;
-    border-collapse: separate; /* stickyヘッダーのためにseparateを使用 */
+    border-collapse: separate; 
     border-spacing: 0;
     min-width: 800px;
-    table-layout: fixed;       /* 列幅ズレ修正の要 */
+    table-layout: fixed;       
 }
 
-/* 列幅の指定 */
-.confirm-table th:nth-child(1) { width: 60px; }  /* 選択 */
-.confirm-table th:nth-child(2) { width: 100px; } /* 状態 */
-.confirm-table th:nth-child(3) { width: 140px; } /* ログインID */
-.confirm-table th:nth-child(4) { width: 240px; } /* 学科・コース */
-.confirm-table th:nth-child(5) { width: 60px; }  /* 学年 */
-.confirm-table th:nth-child(6) { width: 80px; }  /* クラス */
-.confirm-table th:nth-child(7) { width: auto; }  /* 氏名 (残り全て) */
+.confirm-table th:nth-child(1) { width: 60px; }
+.confirm-table th:nth-child(2) { width: 100px; }
+.confirm-table th:nth-child(3) { width: 140px; }
+.confirm-table th:nth-child(4) { width: 240px; }
+.confirm-table th:nth-child(5) { width: 60px; }
+.confirm-table th:nth-child(6) { width: 80px; }
+.confirm-table th:nth-child(7) { width: auto; }
 
 .confirm-table th, 
 .confirm-table td {
@@ -76,14 +72,11 @@ body {
     text-align: center;
     border-bottom: 1px solid #eee;
     font-size: 14px;
-    
-    /* 長い文字の省略設定 */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* ヘッダー固定 */
 .confirm-table thead th {
     position: sticky;
     top: 0;
@@ -108,13 +101,15 @@ body {
     padding-left: 15px !important;
 }
 
-/* チェックボックス */
 .confirm-checkbox {
     transform: scale(1.5);
     cursor: pointer;
 }
 
-/* 備考欄 */
+.input-area {
+    margin-bottom: 20px;
+}
+
 .remarks-area {
     margin-bottom: 30px;
 }
@@ -133,9 +128,9 @@ body {
     border-radius: 4px;
     font-size: 14px;
     resize: none;
+    font-family: inherit;
 }
 
-/* 確定ボタンエリア */
 .action-area {
     text-align: right;
 }
@@ -154,5 +149,78 @@ body {
 
 .confirm-btn:hover {
     background-color: #539DA4;
+    color: white;
+}
+
+/* ★追加: モーダル */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transform: translateY(-20px);
+    transition: all 0.3s;
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.password-input {
+    width: 100%;
+    padding: 10px;
+    margin: 15px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.modal-btn.cancel {
+    background: #eee;
+    color: #333;
+}
+
+.modal-btn.submit {
+    background: #539DA4;
     color: white;
 }

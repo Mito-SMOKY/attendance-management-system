@@ -19,20 +19,17 @@ import jakarta.persistence.Table;
 public class StudentEntity {
 
     @Id
-    @Column(name = "UserID") // PKでありFKでもある
+    @Column(name = "UserID")
     private Integer userId;
 
     @Column(name = "StudentStatusID")
-    private Integer studentStatusId; // ※本来は StudentStatusEntity への @ManyToOne
+    private Integer studentStatusId;
 
     @Column(name = "DataListID")
-    private Integer dataListId; // ※本来は DataListEntity への @ManyToOne
+    private Integer dataListId;
 
     @Column(name = "CreatedAt")
     private LocalDateTime createdAt;
-
-    @Column(name = "DeleteFlag")
-    private boolean deleteFlag;
 
     // --- 関連定義 ---
 
@@ -86,14 +83,6 @@ public class StudentEntity {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public boolean isDeleteFlag() {
-        return deleteFlag;
-    }
-
-    public void setDeleteFlag(boolean deleteFlag) {
-        this.deleteFlag = deleteFlag;
     }
 
     // 関連のゲッター・セッター
