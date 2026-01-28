@@ -15,7 +15,7 @@
 </head>
 
 <body>
-     <!-- ヘッダー -->
+    <!-- ヘッダー -->
     <div class="header-container">
         <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
             <div th:replace="~{fragments/_parts :: admin-header}"></div>
@@ -92,17 +92,21 @@
                     <label>表示基準日:</label>
                     <input type="text" name="date" id="dateInput" th:value="${mdTimetableDto.startDate}" class="date-form" required style="width: 150px; background-color: white;">
                 </div>
-                
+
+                <select name="departmentId" id="departmentId" class="searchable-select" style="width: 300px;">
+                    <option value="">クラスを選択してください</option>
+                    <option th:each="dept : ${departmentOptions}" 
+                            th:value="${dept.key}" 
+                            th:text="${dept.value}"
+                            th:selected="${dept.key == mdTimetableDto.departmentId}"></option>
+                </select>
+
                 <div class="form-group">
-                    <label>クラス:</label>
-                    <select name="departmentId" class="searchable-select" required style="min-width: 300px;">
-                        <option value="">選択してください</option>
-                        <option th:each="entry : ${departmentOptions}" 
-                                th:value="${entry.key}" 
-                                th:text="${entry.value}"
-                                th:selected="${entry.key == mdTimetableDto.departmentId}">
-                        </option>
-                    </select>
+                    <label>学年:</label>
+                    <select name="targetGrade" id="targetGrade" class="date-form"
+                            th:data-selected="${mdTimetableDto.targetGrade}">
+                        <option value="">-</option>
+                        </select>
                 </div>
                 
                 <button type="submit" class="btn-primary">表示</button>

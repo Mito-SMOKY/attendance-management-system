@@ -19,12 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.attendancemanagementsystem.classroom.timetable.dto.MdTimetableDto;
 import com.example.attendancemanagementsystem.classroom.timetable.dto.MdTimetableDto.Cell;
 import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
-import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
 import com.example.attendancemanagementsystem.common.entity.TimeSlotEntity;
 import com.example.attendancemanagementsystem.common.entity.TimetableEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
-import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository;
 import com.example.attendancemanagementsystem.common.repository.TimeSlotRepository;
 import com.example.attendancemanagementsystem.common.repository.TimetableRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
@@ -35,32 +33,42 @@ public class MdTimetableService {
     // 必要なリポジトリの注入
     @Autowired private TimetableRepository timetableRepository;
     @Autowired private DepartmentRepository departmentRepository;
-    @Autowired private EnrollmentsRepository enrollmentsRepository;
     @Autowired private UsersRepository usersRepository;
     @Autowired private TimeSlotRepository timeSlotRepository;
 
     // 学科の選択肢リスト作成
     public Map<Integer, String> getDepartmentOptions() {
-        List<DepartmentEntity> allDepts = departmentRepository.findAll();
+        // 全クラスデータを取得
+        List<DepartmentEntity> deptList = departmentRepository.findAll();
+        
+        // 順序を保持するためのLinkedHashMap
         Map<Integer, String> options = new LinkedHashMap<>();
-        for (DepartmentEntity dept : allDepts) {
-            List<EnrollmentsEntity> enList = enrollmentsRepository.findByDepartment_DepartmentId(dept.getDepartmentId());
-            String gradeStr = (!enList.isEmpty()) ? enList.get(0).getGrade() + "年" : "(学年不明)";
-            
-            String courseName = "コース不明";
-            String majorName = "学科不明";
+        
+        for (DepartmentEntity dept : deptList) {
+            StringBuilder label = new StringBuilder();
+
+            // 学科名を取得
             if (dept.getMajor() != null) {
-                majorName = dept.getMajor().getMajorName();
+                label.append(dept.getMajor().getMajorName());
+                
+                // コース名を取得
                 if (dept.getMajor().getCourse() != null) {
-                    courseName = dept.getMajor().getCourse().getCourseName();
+                    label.append(dept.getMajor().getCourse().getCourseName());
                 }
+            } else {
+                label.append("学科不明");
             }
-            String label = String.format("【%s】%s / %s / %s", courseName, majorName, gradeStr, dept.getClassName());
-            options.put(dept.getDepartmentId(), label);
+
+            // クラス名の取得
+            if (dept.getClassName() != null && !dept.getClassName().isEmpty()) {
+                label.append(" ").append(dept.getClassName());
+            }
+
+            // Mapに格納
+            options.put(dept.getDepartmentId(), label.toString());
         }
         return options;
     }
-
     // 教員のリストを取得
     public List<UsersEntity> getTeacherList() {
         return usersRepository.findByUserTypeId(2);
@@ -70,12 +78,16 @@ public class MdTimetableService {
     @Transactional
     public void registerWeeklySchedule(MdTimetableDto dto) {
         Integer deptId = dto.getDepartmentId();
+        Integer targetGrade = dto.getTargetGrade(); 
         
         // 学科エンティティの取得
         DepartmentEntity department = departmentRepository.findById(deptId)
                 .orElseThrow(() -> new RuntimeException("Department not found ID:" + deptId));
+        
+        // 学年が指定されていない場合のデフォルト処理 
+        if (targetGrade == null) targetGrade = 1; 
 
-        // 除外日リストの作成 (★強化版)
+        // 除外日リストの作成 
         Set<LocalDate> skipDates = new HashSet<>();
         String excludedStr = dto.getExcludedDates();
 
@@ -90,7 +102,7 @@ public class MdTimetableService {
             // カンマ(半角・全角)、読点、改行、スペースなどで分割
             String[] dates = cleanStr.split("[,、\n\r\\s]+");
             
-            // 対応するフォーマット定義 (ハイフン、スラッシュ、ゼロ埋め有無に対応)
+            // 対応するフォーマット定義 
             DateTimeFormatter[] formatters = {
                 DateTimeFormatter.ISO_LOCAL_DATE,       // 2025-04-29
                 DateTimeFormatter.ofPattern("yyyy/MM/dd"), // 2025/04/29
@@ -106,9 +118,8 @@ public class MdTimetableService {
                     try {
                         skipDates.add(LocalDate.parse(cleanDate, fmt));
                         parsed = true;
-                        break; // 成功したらループを抜ける
+                        break; 
                     } catch (Exception e) {
-                        // 次のフォーマットを試行
                     }
                 }
                 
@@ -157,9 +168,9 @@ public class MdTimetableService {
                         // 入力があるコマのみ処理
                         if (cell != null && cell.getSubjectId() != null) {
                             
-                            // 既存データの検索
+                            // 既存データの検索 
                             Optional<TimetableEntity> existingOpt = timetableRepository
-                                .findByDepartment_DepartmentIdAndDateAndSlotId(deptId, current, slot);
+                                .findByDepartment_DepartmentIdAndGradeAndDateAndSlotId(deptId, targetGrade, current, slot);
 
                             TimetableEntity entity;
 
@@ -176,6 +187,7 @@ public class MdTimetableService {
                                 entity.setDate(current);
                                 entity.setSlotId(slot);
                                 entity.setDepartment(department);
+                                entity.setGrade(targetGrade); 
                             }
 
                             // 共通項目のセット
@@ -207,13 +219,18 @@ public class MdTimetableService {
         }
     }
 
-    // 指定した日付のスケジュールを取得し、整形
-    public MdTimetableDto getDailySchedule(Integer deptId, LocalDate date) {
+    // 指定した日付のスケジュールを取得し、整形 
+    public MdTimetableDto getDailySchedule(Integer deptId, Integer targetGrade, LocalDate date) {
         MdTimetableDto dto = new MdTimetableDto();
         dto.setDepartmentId(deptId);
+        dto.setTargetGrade(targetGrade);
         dto.setStartDate(date);
         
-        List<TimetableEntity> entities = timetableRepository.findByDepartment_DepartmentIdAndDateOrderBySlotIdAsc(deptId, date);
+        if (targetGrade == null) targetGrade = 1;
+
+        // 検索時に学年を指定
+        List<TimetableEntity> entities = timetableRepository.findByDepartment_DepartmentIdAndGradeAndDateOrderBySlotIdAsc(deptId, targetGrade, date);
+        
         String dayOfWeek = date.getDayOfWeek().name();
         
         for (TimetableEntity entity : entities) {
@@ -238,10 +255,13 @@ public class MdTimetableService {
     public void updateDailySchedule(MdTimetableDto dto) {
         Integer deptId = dto.getDepartmentId();
         LocalDate date = dto.getStartDate();
+        Integer targetGrade = dto.getTargetGrade(); 
+        
         DepartmentEntity department = departmentRepository.findById(deptId).orElseThrow();
+        if (targetGrade == null) targetGrade = 1;
 
-        // 既存データを削除
-        timetableRepository.deleteByDepartment_DepartmentIdAndDate(deptId, date);
+        // 既存データを削除 
+        timetableRepository.deleteByDepartment_DepartmentIdAndGradeAndDate(deptId, targetGrade, date);
         
         // 削除を即時反映
         timetableRepository.flush();
@@ -260,6 +280,7 @@ public class MdTimetableService {
                     entity.setDate(date);
                     entity.setSlotId(slot);
                     entity.setDepartment(department);
+                    entity.setGrade(targetGrade); 
                     entity.setAcademicYear(date.getYear());
                     entity.setSubjectId(cell.getSubjectId());
                     entity.setClassroomId(cell.getClassroomId());
@@ -268,16 +289,18 @@ public class MdTimetableService {
                 }
             }
         }
+        
         // 一括保存
         if (!entitiesToSave.isEmpty()) {
             timetableRepository.saveAll(entitiesToSave);
         }
     }
 
-    // 週間スケジュールを参照用に取得
-    public MdTimetableDto getWeeklyScheduleView(Integer deptId, LocalDate date) {
+    // 週間スケジュールを参照用に取得 
+    public MdTimetableDto getWeeklyScheduleView(Integer deptId, Integer targetGrade, LocalDate date) {
         MdTimetableDto dto = new MdTimetableDto();
         dto.setDepartmentId(deptId);
+        dto.setTargetGrade(targetGrade);
 
         // 週の開始日と終了日を計算
         LocalDate monday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
@@ -285,9 +308,11 @@ public class MdTimetableService {
 
         dto.setStartDate(monday);
         dto.setEndDate(friday);
+        
+        if (targetGrade == null) targetGrade = 1;
 
-        // データ取得
-        List<TimetableEntity> entities = timetableRepository.findForWeeklyView(deptId, monday, friday);
+        // データ取得 
+        List<TimetableEntity> entities = timetableRepository.findForWeeklyView(deptId, targetGrade, monday, friday);
 
         // 取得データを画面表示用DTOにマッピング
         for (TimetableEntity entity : entities) {
@@ -318,14 +343,16 @@ public class MdTimetableService {
     @Transactional
     public void deleteRangeSchedule(MdTimetableDto dto) {
         Integer deptId = dto.getDepartmentId();
+        Integer targetGrade = dto.getTargetGrade();
         LocalDate start = dto.getStartDate();
         LocalDate end = dto.getEndDate();
 
         if (deptId == null || start == null || end == null) {
             throw new RuntimeException("削除に必要な情報が不足しています");
         }
+        if (targetGrade == null) targetGrade = 1;
 
         // リポジトリの削除メソッドを呼ぶ
-        timetableRepository.deleteByDepartmentAndDateRange(deptId, start, end);
+        timetableRepository.deleteByDepartmentAndGradeAndDateRange(deptId, targetGrade, start, end);
     }
 }

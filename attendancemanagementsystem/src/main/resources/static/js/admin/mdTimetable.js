@@ -5,6 +5,82 @@
 
 $(document).ready(function() {
 
+    // --- 1. Select2と連動した学年リストの動的読み込み (参照・削除画面用) ---
+    // ★修正: URL判定(isViewOrDeletePage)を削除し、要素の有無だけで判断するように変更
+    const $deptSelect = $('#departmentId'); // 学科セレクトボックス
+    const $gradeSelect = $('#targetGrade'); // 学年セレクトボックス
+
+    // 画面上に「学科」と「学年」のセレクトボックスが両方ある場合のみ実行
+    if ($deptSelect.length && $gradeSelect.length) {
+        
+        // ① 学科が変更された時の処理 (Select2対応のためjQueryを使用)
+        $deptSelect.on('change', function() {
+            updateGradeOptions();
+        });
+
+        // ② 画面読み込み時にも実行 (戻るボタンや再表示時、初期値がある場合用)
+        if ($deptSelect.val()) {
+            updateGradeOptions();
+        }
+    }
+
+    function updateGradeOptions() {
+        const deptId = $deptSelect.val();
+        // 現在選択されている学年（あればHTMLのdata属性やvalueから取得）
+        const currentGrade = $gradeSelect.data('selected') || $gradeSelect.val();
+
+        // 学科が空ならリセットして終了
+        if (!deptId) {
+            $gradeSelect.empty().append('<option value="">-</option>');
+            return;
+        }
+
+        // サーバーからデータ取得
+        $.ajax({
+            url: '/admin/mdTimetable/api/getRegisteredGrades',
+            type: 'GET',
+            data: { departmentId: deptId },
+            dataType: 'json',
+            success: function(grades) {
+                // セレクトボックスをクリア
+                $gradeSelect.empty();
+
+                if (grades.length === 0) {
+                    $gradeSelect.append('<option value="">データなし</option>');
+                } else {
+                    // データあり：optionを追加
+                    
+                    // 必要であれば「-」や「選択」を追加
+                    // $gradeSelect.append('<option value="">-</option>');
+
+                    $.each(grades, function(index, grade) {
+                        const option = $('<option>', {
+                            value: grade,
+                            text: grade + '年'
+                        });
+
+                        // 保持していた値と同じなら選択状態にする
+                        if (String(grade) === String(currentGrade)) {
+                            option.prop('selected', true);
+                        }
+                        $gradeSelect.append(option);
+                    });
+
+                    // もし何も選択されておらず、かつデータがある場合は先頭を自動選択する
+                    // (データロード後に即座に表示可能にするため)
+                    if (!$gradeSelect.val() && grades.length > 0 && !currentGrade) {
+                        $gradeSelect.val(grades[0]).trigger('change');
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("学年データの取得に失敗:", error);
+                $gradeSelect.empty().append('<option value="">取得エラー</option>');
+            }
+        });
+    }
+
+
     // --- 2. Flatpickr (一括登録用・期間選択) ---
     // startとendを別々に初期化して連動させる方式
     const startDateInput = document.getElementById("startDate");
@@ -40,6 +116,7 @@ $(document).ready(function() {
         });
     }
 });
+
 
 /* =========================================
  * 一括登録画面 (mdTimetable.html) 用
@@ -125,43 +202,34 @@ async function uploadImage() {
     }
 }
 
-/* 期間の自動セット ＆ 休日の抽出*/
+/**
+ * 行事予定表PDF解析
+ * (期間の自動セット ＆ 休日の抽出)
+ */
 async function uploadSchedulePdf() {
     const fileInput = document.getElementById('schedulePdf');
     const loadingMsg = document.getElementById('pdfLoadingMsg');
     const analyzeBtn = document.getElementById('analyzePdfBtn');
     
     const yearSelect = document.getElementById('yearSelect');
-    const termSelect = document.getElementById('termSelect'); // 学期も送信
+    const termSelect = document.getElementById('termSelect'); 
     const outputArea = document.getElementById('excludedDates');
     
-    // 日付入力欄の取得
     const startDateInput = document.getElementById('startDate');
     const endDateInput = document.getElementById('endDate');
 
-    // 1. クラスプルダウンから表示テキスト（例: "情報システム科 1年"）を取得
-    const selectedText = $("#departmentId option:selected").text(); 
-    
-    // 2. "1年" や "2年" という数字を抜き出す
-    const gradeMatch = selectedText.match(/([0-9]+)年/);
-    let targetGrade = 1; // デフォルト
-    
-    if (gradeMatch) {
-        targetGrade = gradeMatch[1];
-    } else {
-        if ($("#departmentId").val() !== "" && !confirm("クラス名から学年が読み取れませんでした。\n1年生として処理して良いですか？")) {
-            return;
-        }
-    }
+    // 学年は「クラス」から推測せず、画面の「学年プルダウン」から直接取得する
+    const targetGradeSelect = document.getElementById('targetGrade');
+    const targetGrade = targetGradeSelect ? targetGradeSelect.value : "";
 
     if (fileInput.files.length === 0) {
         alert("PDFファイルを選択してください");
         return;
     }
 
-    // クラス未選択チェック
-    if ($("#departmentId").val() === "") {
-        alert("先に対象クラス（学科）を選択してください。\n※学年を特定するために必要です。");
+    // 学年未選択のチェック
+    if (!targetGrade) {
+        alert("学年を選択してください。");
         return;
     }
 
@@ -171,7 +239,9 @@ async function uploadSchedulePdf() {
     const formData = new FormData();
     formData.append("file", fileInput.files[0]);
     formData.append("year", yearSelect.value); 
-    formData.append("term", termSelect.value); // ★学期を追加
+    formData.append("term", termSelect.value); 
+    
+    // ここで選択した学年をパラメータとして渡す
     formData.append("targetGrade", targetGrade);
 
     try {
@@ -185,9 +255,7 @@ async function uploadSchedulePdf() {
         const result = await response.json(); 
         console.log("解析結果:", result);
 
-        // --- 1. 期間の自動セット ---
         if (result.startDate && result.endDate) {
-            // Flatpickr経由で値をセット
             if (startDateInput && startDateInput._flatpickr) startDateInput._flatpickr.setDate(result.startDate);
             else if (startDateInput) startDateInput.value = result.startDate;
 
@@ -195,19 +263,16 @@ async function uploadSchedulePdf() {
             else if (endDateInput) endDateInput.value = result.endDate;
         }
 
-        // --- 2. 休日リストのセット ---
         const dateList = result.holidays || [];
 
         if (dateList.length === 0 && (!result.startDate || !result.endDate)) {
-            // 期間も休日も取れなかった場合
             alert("PDFから有効な情報を読み取れませんでした。");
         } else {
-            // 休日があればセット
             if (dateList.length > 0) {
                 outputArea.value = dateList.join(', ');
             }
-
-            // メッセージ作成
+            
+            // メッセージも選択した学年を表示
             let msg = `【${targetGrade}年生】のスケジュール解析完了\n`;
             if (result.startDate && result.endDate) {
                 msg += `■ 期間: ${result.startDate} ～ ${result.endDate}\n`;
@@ -277,7 +342,7 @@ async function checkAndSubmit() {
 
         if (data.exists) {
             const msg = "【⚠️ データ重複警告】\n\n" + 
-                        "指定期間内に既にデータがあります。\n" +
+                        "指定期間内に既にデータがあります。\n" + 
                         "上書き（更新）してもよろしいですか？";
             
             if (confirm(msg)) {

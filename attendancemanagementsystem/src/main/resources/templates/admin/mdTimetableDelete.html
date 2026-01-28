@@ -15,7 +15,7 @@
 </head>
     
 <body>
-     <!-- ヘッダー -->
+    <!-- ヘッダー -->
     <div class="header-container">
         <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
             <div th:replace="~{fragments/_parts :: admin-header}"></div>
@@ -96,6 +96,15 @@
                             <option th:each="dept : ${departmentOptions}" 
                                     th:value="${dept.key}" 
                                     th:text="${dept.value}"></option>
+                        </select>
+
+                        <select id="targetGrade" th:field="*{targetGrade}" 
+                                th:data-selected="${mdTimetableDto.targetGrade}"
+                                class="date-form">
+                            <option value="" th:if="${mdTimetableDto.targetGrade == null}">-</option>
+                            <option th:if="${mdTimetableDto.targetGrade != null}" 
+                                    th:value="${mdTimetableDto.targetGrade}" 
+                                    th:text="${mdTimetableDto.targetGrade} + '年'" selected></option>
                         </select>
                     </div>
 
