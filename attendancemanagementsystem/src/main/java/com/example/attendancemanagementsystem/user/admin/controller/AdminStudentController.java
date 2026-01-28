@@ -1,22 +1,29 @@
+
 package com.example.attendancemanagementsystem.user.admin.controller;
 
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.attendancemanagementsystem.user.admin.service.AdminStudentListService;
-import com.example.attendancemanagementsystem.user.admin.service.RequestService;
 
-@RestController
-@RequestMapping("/admin/api")
-public class AdminStudentApiController {
+@Controller
+@RequestMapping("/admin")
+public class AdminStudentController {
 
     @Autowired
     private AdminStudentListService adminStudentService;
+
+    //生徒一覧画面の表示
+    @GetMapping("/studentList")
+    public String showStudentList() {
+        return "admin/studentList";
+    }
 
     // 生徒一覧取得API
     @GetMapping("/api/students")
