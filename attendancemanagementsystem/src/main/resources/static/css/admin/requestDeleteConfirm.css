@@ -1,21 +1,23 @@
+@charset "UTF-8";
+
+body {
+    background-color: #f9f9f9;
+}
 
 .confirm-container {
     width: 90%;
     max-width: 1000px;
     margin: 0 auto;
-    margin-top: 80px; 
+    margin-top: 180px; 
     padding-bottom: 50px;
 }
 
 .main-title {
     text-align: center;
-    border-bottom: 2px solid #00bdca;
-    padding-bottom: 10px;
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 50px;
+    font-size: 24px;
+    margin-bottom: 20px;
     color: #333;
-    letter-spacing: 2px;
+    font-weight: bold;
 }
 
 .content-box {
@@ -27,7 +29,7 @@
 
 .sub-title {
     font-size: 18px;
-    border-bottom: 2px solid #00bdca;
+    border-bottom: 2px solid #5BBEB9;
     padding-bottom: 10px;
     margin-bottom: 20px;
     color: #555;
@@ -78,7 +80,7 @@
 .confirm-table thead th {
     position: sticky;
     top: 0;
-    background-color: #00bdca;
+    background-color: #539DA4;
     color: white;
     z-index: 1;
     border-bottom: 2px solid #ddd;
@@ -116,7 +118,7 @@
     width: 100%;
     height: 80px;
     padding: 10px;
-    border: 1.5px solid #00bdca !important;
+    border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 14px;
     resize: none;
@@ -129,8 +131,8 @@
 
 .confirm-btn {
     background-color: white;
-    color: #539DA4;
-    border: 2px solid #00bdca;
+    color: #e74c3c; /* 削除なので赤系 */
+    border: 2px solid #e74c3c;
     padding: 10px 40px;
     font-size: 16px;
     border-radius: 5px;
@@ -140,6 +142,79 @@
 }
 
 .confirm-btn:hover {
-    background-color: #00bdca;
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* ★追加: モーダル */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transform: translateY(-20px);
+    transition: all 0.3s;
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.password-input {
+    width: 100%;
+    padding: 10px;
+    margin: 15px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.modal-btn.cancel {
+    background: #eee;
+    color: #333;
+}
+
+.modal-btn.submit {
+    background: #e74c3c; /* 削除実行ボタンは赤 */
     color: white;
 }

@@ -1,6 +1,5 @@
 package com.example.attendancemanagementsystem.user.admin.controller;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -32,12 +31,11 @@ public class RequestListController {
     @GetMapping("/list")
     public String list(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam(name = "page", defaultValue = "0") int page, //ページ番号を受け取る
             Model model) {
         
         List<Map<String, Object>> requestList = requestListService.getApprovalList(userDetails.getUserId());
         model.addAttribute("pageTitle", "申請承認・履歴");
-        model.addAttribute("requestPage", requestPage);
+        model.addAttribute("requestList", requestList);
         
         return "admin/superAdmin/RequestList"; // ファイル名が RequestList.html ならこのままでOK
     }

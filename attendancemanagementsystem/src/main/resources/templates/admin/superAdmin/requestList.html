@@ -20,7 +20,7 @@
     <main class="main-container">
         <h2 class="main-title">申請承認・履歴一覧</h2>
         
-        <div th:if="${requestPage.totalElements == 0}" style="text-align: center; padding: 40px; color: #666;">
+        <div th:if="${#lists.isEmpty(requestList)}" style="text-align: center; padding: 40px; color: #666;">
             <i class="fa-regular fa-folder-open" style="font-size: 3em; margin-bottom: 15px;"></i>
             <p>現在、あなた宛ての申請はありません。</p>
         </div>
