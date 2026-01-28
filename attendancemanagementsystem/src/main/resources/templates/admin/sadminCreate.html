@@ -1,0 +1,174 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>管理者新規作成</title>
+
+    <link rel="stylesheet" th:href="@{/css/parts.css}" />
+    <link rel="stylesheet" th:href="@{/css/sadmin/sadminCreate.css}" />
+    <link
+      href="https://use.fontawesome.com/releases/v6.2.0/css/all.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="header-container">
+      <div th:replace="~{fragments/_parts :: header}"></div>
+    </div>
+
+    <div class="main-wrapper">
+      <div class="top-section">
+        <div class="backbutton-container">
+          <div
+            th:replace="~{fragments/_parts :: backButton(url='/admin/sadminList')}"
+          ></div>
+        </div>
+
+        <h2 class="page-title">管理者新規作成</h2>
+      </div>
+
+      <div class="info-container">
+        <div class="info-header">
+          <h3>アカウント情報入力</h3>
+        </div>
+
+        <form
+          id="createForm"
+          th:action="@{/admin/sadmin/create}"
+          method="post"
+          th:object="${adminForm}"
+        >
+          <div
+            th:if="${errorMessage}"
+            style="color: red; margin-bottom: 15px; text-align: center"
+          >
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span th:text="${errorMessage}"></span>
+          </div>
+
+          <div class="detail-box">
+            <div class="detail-row">
+              <div class="detail-label">
+                ログインID <span class="badge-required">必須</span>
+              </div>
+              <div class="detail-value">
+                <input
+                  type="text"
+                  id="loginId"
+                  name="loginId"
+                  placeholder="例: admin001"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-label">
+                氏名 <span class="badge-required">必須</span>
+              </div>
+              <div class="detail-value">
+                <input
+                  type="text"
+                  id="userName"
+                  name="name"
+                  placeholder="例: 山田 太郎"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-label">
+                権限設定 <span class="badge-required">必須</span>
+              </div>
+              <div class="detail-value">
+                <select id="userAuth" name="adminLevelID" class="auth-select">
+                  <option value="2" selected>管理者 (一般)</option>
+                  <option value="1">上位管理者</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-box mt-20">
+            <div class="detail-row">
+              <div class="detail-label">
+                パスワード <span class="badge-required">必須</span>
+              </div>
+              <div class="detail-value password-container">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="8文字以上推奨"
+                  required
+                />
+                <i
+                  class="fa-solid fa-eye-slash toggle-eye"
+                  onclick="togglePassword('password', this)"
+                ></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button
+              class="btn-register"
+              type="button"
+              onclick="showConfirmModal()"
+            >
+              登録する
+            </button>
+          </div>
+
+          <div id="confirmModal" class="modal-overlay">
+            <div class="modal-box">
+              <div class="modal-icon">
+                <i class="fa-solid fa-user-lock"></i>
+              </div>
+              <h3 class="modal-title">登録確認</h3>
+              <p class="modal-desc">
+                セキュリティ保護のため、<br />あなたのパスワードを入力して登録を確定してください。
+              </p>
+
+              <div class="modal-input-area">
+                <label class="modal-label">操作者パスワード</label>
+                <div class="modal-input-wrapper">
+                  <input
+                    type="password"
+                    id="currentAdminPassword"
+                    name="currentAdminPassword"
+                    placeholder="パスワードを入力"
+                  />
+                  <i
+                    class="fa-solid fa-eye-slash toggle-eye"
+                    onclick="togglePassword('currentAdminPassword', this)"
+                  ></i>
+                </div>
+              </div>
+
+              <div class="modal-actions">
+                <button
+                  type="button"
+                  class="btn-cancel"
+                  onclick="closeConfirmModal()"
+                >
+                  キャンセル
+                </button>
+                <button
+                  type="button"
+                  class="btn-confirm"
+                  onclick="submitCreate()"
+                >
+                  確定
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script th:src="@{/js/admin/sadminCreate.js}"></script>
+  </body>
+</html>

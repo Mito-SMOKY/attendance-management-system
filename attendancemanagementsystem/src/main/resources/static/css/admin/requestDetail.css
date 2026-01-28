@@ -1,0 +1,142 @@
+@charset "UTF-8";
+
+body {
+    background-color: #f9f9f9;
+}
+
+.main-container {
+    padding: 20px;
+}
+
+/* 戻るボタン調整 */
+.backbutton-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 30px auto 20px auto;
+    padding: 0;
+    box-sizing: border-box;
+    position: relative !important;
+    display: block;
+    min-height: 40px;
+    z-index: 10;
+}
+.backbutton-container button {
+    background-color: #fff;
+    color: #539DA4;
+    border: 1px solid #539DA4;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.backbutton-container button:hover {
+    background-color: #f0f8ff;
+}
+
+/* 詳細ボックス */
+.detail-box {
+    background: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+.detail-row {
+    margin-bottom: 25px;
+    display: flex;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 15px;
+}
+
+.detail-label {
+    width: 160px;
+    font-weight: bold;
+    color: #555;
+    flex-shrink: 0;
+}
+
+.detail-value {
+    color: #333;
+    flex-grow: 1;
+    line-height: 1.6;
+}
+
+.student-list-box {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.student-list-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+.student-list-item:last-child {
+    border-bottom: none;
+}
+
+/* ステータスバッジ */
+.status-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    color: #fff;
+    font-weight: bold;
+}
+.status-pending { background-color: #f39c12; }
+.status-approved { background-color: #27ae60; }
+.status-rejected { background-color: #e74c3c; }
+
+/* ボタンエリア */
+.action-area {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+.btn-approve, .btn-reject {
+    padding: 12px 40px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    color: #fff;
+}
+
+.btn-approve {
+    background-color: #27ae60;
+}
+.btn-reject {
+    background-color: #e74c3c;
+}
+
+.btn-approve:hover, .btn-reject:hover {
+    opacity: 0.85;
+}
+
+.processed-msg {
+    margin-top: 30px;
+    text-align: center;
+    color: #888;
+    font-weight: bold;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+}

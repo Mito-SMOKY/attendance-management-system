@@ -32,8 +32,8 @@ public class UsersEntity {
     @Column(name = "Password", nullable = false)
     private String password;
 
-    @Column(name = "DeleteFlag", nullable = false)
-    private boolean deleteFlag;
+    @Column(name = "DeleteFlag")
+    private Boolean deleteFlag = false;
 
     // --- Getter/Setter ---
     public Integer getUserId() {
@@ -84,13 +84,11 @@ public class UsersEntity {
         this.password = password;
     }
 
-    public boolean getDeleteFlag() {
+    public Boolean getDeleteFlag() {
         return deleteFlag;
     }
 
-    public void setDeleteFlag(boolean deleteFlag) {
+    public void setDeleteFlag(Boolean deleteFlag) {
         this.deleteFlag = deleteFlag;
     }
-
-
 }

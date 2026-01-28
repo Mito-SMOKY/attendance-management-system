@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <th:block th:if="${_csrf}">
+        <meta name="_csrf" th:content="${_csrf.token}"/>
+        <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    </th:block>
+
+    <title th:text="${pageTitle}">申請詳細</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/requestDetail.css}">
+    <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+</head>
+<body>
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+    </div>
+    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/requestList/list')}"></div>
+    </div>
+
+    <main class="main-container">
+        <div class="detail-box">
+            <div class="detail-header">
+                <h2>申請詳細</h2>
+                <span class="status-badge"
+                    th:classappend="${
+                        detail.statusCode == 1 ? 'status-pending' : 
+                        detail.statusCode == 2 ? 'status-approved' : 
+                        detail.statusCode == 3 ? 'status-rejected' : ''
+                    }"
+                    th:text="${detail.status}">
+                </span>
+            </div>
+
+            <div class="detail-content">
+                <div class="info-group">
+                    <label>申請日時</label>
+                    <p th:text="${detail.createdAt}"></p>
+                </div>
+
+                <div class="info-group">
+                    <label>申請者 (管理者)</label>
+                    <p th:text="${detail.requesterName}"></p>
+                </div>
+
+                <div class="info-group">
+                    <label>申請種別</label>
+                    <p th:text="${detail.type}"></p>
+                </div>
+                
+                <div class="info-group" th:if="${detail.message != null and detail.message != ''}">
+                    <label>申請メッセージ</label>
+                    <p th:text="${detail.message}"></p>
+                </div>
+
+                <div class="info-group" th:if="${not #lists.isEmpty(detail.students)}">
+                    <label>対象生徒</label>
+                    <div class="student-list">
+                        <ul>
+                            <li th:each="st : ${detail.students}">
+                                <span th:text="${st.name}"></span>
+                                (<span th:text="${st.loginId}"></span>)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-group" th:if="${detail.targetDetail != null}">
+                    <label>変更内容</label>
+                    <p th:text="${detail.targetDetail}"></p>
+                </div>
+            </div>
+
+            <div class="action-buttons" th:if="${detail.statusCode == 1}">
+                <input type="hidden" id="requestId" th:value="${detail.requestId}">
+                
+                <button type="button" class="btn-approve" onclick="confirmProcess('approve')">
+                    <i class="fa-solid fa-check"></i> 承認
+                </button>
+                <button type="button" class="btn-reject" onclick="confirmProcess('reject')">
+                    <i class="fa-solid fa-xmark"></i> 却下
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script th:inline="javascript">
+        function confirmProcess(action) {
+            const actionText = (action === 'approve') ? '承認' : '却下';
+            const confirmColor = (action === 'approve') ? '#27ae60' : '#e74c3c';
+
+            Swal.fire({
+                title: actionText + 'しますか？',
+                text: "この操作は元に戻せません。",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: confirmColor,
+                cancelButtonColor: '#aaa',
+                confirmButtonText: 'はい、' + actionText + 'します',
+                cancelButtonText: 'キャンセル'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitProcess(action);
+                }
+            });
+        }
+
+        function submitProcess(action) {
+            const requestId = document.getElementById('requestId').value;
+            
+            // CSRF対策: metaタグが存在する場合のみ取得
+            const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+            const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+            
+            const formData = new URLSearchParams();
+            formData.append('requestId', requestId);
+            formData.append('action', action);
+
+            const headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            };
+
+            // CSRFトークンがあればヘッダーに追加
+            if (csrfTokenMeta && csrfHeaderMeta) {
+                headers[csrfHeaderMeta.content] = csrfTokenMeta.content;
+            }
+
+            fetch('/admin/requestList/process', {
+                method: 'POST',
+                headers: headers,
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) return response.text();
+                throw new Error('Server error');
+            })
+            .then(msg => {
+                Swal.fire({
+                    icon: 'success',
+                    title: '完了',
+                    text: msg,
+                    confirmButtonColor: '#539DA4'
+                }).then(() => {
+                    // 一覧画面へ戻る、またはリロード
+                    location.href = '/admin/requestList/list';
+                });
+            })
+            .catch(err => {
+                Swal.fire('エラー', '処理に失敗しました。', 'error');
+            });
+        }
+    </script>
+</body>
+</html>

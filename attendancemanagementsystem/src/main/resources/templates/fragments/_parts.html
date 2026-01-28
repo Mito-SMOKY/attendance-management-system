@@ -20,17 +20,15 @@
 
 <!-- 共通画面などロールごとにヘッダーを変えたいときに使ってね -->
 <div th:fragment="Role-header" class="header-container">
-
-        <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
-            <div th:replace="~{fragments/_parts :: student-header}"></div>
-        </div>
-        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
-            <div th:replace="~{fragments/_parts :: admin-header}"></div>
-        </div>
-        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
-            <div th:replace="~{fragments/_parts :: admin-header}"></div>
-        </div>
-
+  <div th:if="${#authorization.expr('hasRole(''STUDENT'')')}">
+    <div th:replace="~{fragments/_parts :: student-header}"></div>
+  </div>
+  <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+    <div th:replace="~{fragments/_parts :: admin-header}"></div>
+  </div>
+  <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+    <div th:replace="~{fragments/_parts :: admin-header}"></div>
+  </div>
 </div>
 
 <!-- 無印ヘッダー -->
@@ -41,39 +39,48 @@
 <!-- パスワードの表示切替ボタン -->
 <!-- 以下コピペ用 -->
 <!-- <div th:replace="~{fragments/_parts :: passwordToggle('ここにパスワード入力欄のidを記入')}"></div> -->
-  
+
 <th:block th:fragment="passwordToggle(inputId)">
-    <i class="fa-solid fa-eye-slash toggle-password" 
-      th:id="${'toggle-' + inputId}" 
-      style="cursor: pointer;"></i>
+  <i
+    class="fa-solid fa-eye-slash toggle-password"
+    th:id="${'toggle-' + inputId}"
+    style="cursor: pointer"
+  ></i>
 
-    <script th:inline="javascript">
-        (function() {
-            // Thymeleafから渡されたinputIdを取得
-            const inputId = /*[[${inputId}]]*/ '';
-            const toggleIcon = document.getElementById('toggle-' + inputId);
-            const passwordInput = document.getElementById(inputId);
+  <script th:inline="javascript">
+    (function () {
+      // Thymeleafから渡されたinputIdを取得
+      const inputId = /*[[${inputId}]]*/ "";
+      const toggleIcon = document.getElementById("toggle-" + inputId);
+      const passwordInput = document.getElementById(inputId);
 
-            if (toggleIcon && passwordInput) {
-                toggleIcon.addEventListener("click", function () {
-                    // type属性を切り替える
-                    const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-                    passwordInput.setAttribute("type", type);
+      if (toggleIcon && passwordInput) {
+        toggleIcon.addEventListener("click", function () {
+          // type属性を切り替える
+          const type =
+            passwordInput.getAttribute("type") === "password"
+              ? "text"
+              : "password";
+          passwordInput.setAttribute("type", type);
 
-                    // アイコンを切り替える
-                    this.classList.toggle("fa-eye");
-                    this.classList.toggle("fa-eye-slash");
-                });
-            }
-        })();
-    </script>
+          // アイコンを切り替える
+          this.classList.toggle("fa-eye");
+          this.classList.toggle("fa-eye-slash");
+        });
+      }
+    })();
+  </script>
 </th:block>
 
 <!-- 生徒用ヘッダー -->
 <div th:fragment="student-header">
   <header class="main-header-student">
     <div class="header-left">
-      <span id="header-user-name" sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
+      <span
+        id="header-user-name"
+        sec:authentication="principal.usersEntity.name"
+        >ユーザー名</span
+      >さん
     </div>
     <nav class="header-nav">
       <ul>
@@ -98,7 +105,11 @@
 <div th:fragment="admin-header">
   <header class="main-header-admin">
     <div class="header-left">
-      <span id="header-user-name" sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
+      <span
+        id="header-user-name"
+        sec:authentication="principal.usersEntity.name"
+        >ユーザー名</span
+      >さん
     </div>
     <nav class="header-nav">
       <ul>
@@ -134,7 +145,11 @@
 <div th:fragment="superadmin-header">
   <header class="main-header-admin">
     <div class="header-left">
-      <span id="header-user-name" sec:authentication="principal.usersEntity.name">ユーザー名</span>さん
+      <span
+        id="header-user-name"
+        sec:authentication="principal.usersEntity.name"
+        >ユーザー名</span
+      >さん
     </div>
     <nav class="header-nav">
       <ul>

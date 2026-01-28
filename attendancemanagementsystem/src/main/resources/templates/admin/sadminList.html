@@ -1,0 +1,124 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>管理者一覧</title>
+
+    <link rel="stylesheet" th:href="@{/css/parts.css}" />
+    <link rel="stylesheet" th:href="@{/css/sadmin/sadminList.css}" />
+    <link
+      href="https://use.fontawesome.com/releases/v6.2.0/css/all.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="header-container">
+      <div th:replace="~{fragments/_parts :: header}"></div>
+    </div>
+
+    <div class="main-wrapper">
+      <div class="top-section">
+        <div class="backbutton-container">
+          <div
+            th:replace="~{fragments/_parts :: backButton(url='/admin/sadminUserManagement')}"
+          ></div>
+        </div>
+
+        <h2 class="page-title">管理者一覧</h2>
+
+        <a th:href="@{/admin/sadminCreate}" class="btn-create-new">
+          <i class="fa-solid fa-plus"></i> 新規登録
+        </a>
+      </div>
+
+      <div class="search-area">
+        <div class="search-box">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="キーワードを入力"
+            th:value="${keyword}"
+          />
+          <button type="button" id="searchBtn">
+            検索
+            <i
+              class="fa-solid fa-magnifying-glass"
+              style="margin-left: 5px"
+            ></i>
+          </button>
+        </div>
+
+        <button
+          type="button"
+          id="filterBtn"
+          th:class="${authFilter == '1' ? 'filter-btn active' : 'filter-btn'}"
+          title="表示オプション"
+        >
+          <i class="fa-solid fa-filter"></i>
+        </button>
+      </div>
+
+      <div class="table-area">
+        <table class="admin-table" id="adminTable">
+          <thead>
+            <tr>
+              <th class="col-id">ログインID</th>
+              <th class="col-name">氏名</th>
+              <th class="col-auth">上位権限</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="user : ${sadminList}">
+              <td th:text="${user.LoginID}"></td>
+
+              <td>
+                <a
+                  th:href="@{/admin/sadminInfo/{id}(id=${user.UserID})}"
+                  class="clickable-name"
+                  th:text="${user.Name}"
+                >
+                </a>
+              </td>
+
+              <td
+                th:class="${user.authority == '1' ? 'status-circle' : 'status-cross'}"
+                th:text="${user.authority == '1' ? '〇' : '×'}"
+              ></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="filterModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3 class="modal-title">表示オプション</h3>
+
+        <div class="filter-options">
+          <label class="radio-label">
+            <input type="radio" name="authOption" value="" checked />
+            <span>全て表示</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="authOption" value="1" />
+            <span>上位権限のみ</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="authOption" value="2" />
+            <span>管理者のみ</span>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="modalCancelBtn" class="btn-cancel">
+            キャンセル
+          </button>
+          <button type="button" id="modalApplyBtn" class="btn-apply">
+            適用する
+          </button>
+        </div>
+      </div>
+    </div>
+    <script th:src="@{/js/admin/sadminList.js}"></script>
+  </body>
+</html>

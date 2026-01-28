@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
+import com.example.attendancemanagementsystem.common.entity.UsersEntity; // ★追加
 import com.example.attendancemanagementsystem.common.repository.CourseRepository;
 import com.example.attendancemanagementsystem.common.repository.MajorRepository;
 import com.example.attendancemanagementsystem.common.repository.StudentRepository;
@@ -43,6 +44,19 @@ public class AdminStudentListService {
     @Autowired
     private CourseRepository courseRepository;
 
+    
+    // 2. 検索条件の作成--------------------------------------------------------
+        // Specification<StudentEntity> spec = null;
+        // if (keyword != null && !keyword.trim().isEmpty()) {
+        //     List<String> targetColumns = Arrays.asList(
+        //         "user.loginId", // 学籍番号
+        //         "user.name"     // 氏名
+        //     );
+        //     // 共通検索スペック作成サービスを利用
+        //     spec = searchService.createKeywordSpec(keyword, targetColumns);
+        //----------------------------------------------------------------------
+
+            
     // フィルター選択肢取得
     public Map<String, Object> getFilterOptions() {
         Map<String, Object> options = new HashMap<>();
@@ -128,8 +142,11 @@ public class AdminStudentListService {
             Map<String, Object> map = new HashMap<>();
             
             map.put("userId", student.getUserId());
-            map.put("name", (student.getUser() != null) ? student.getUser().getName() : "");
-            map.put("loginId", (student.getUser() != null) ? student.getUser().getLoginId() : "");
+            
+            // ★修正: UsersEntityを取得してから名前などを取得
+            UsersEntity user = student.getUser();
+            map.put("name", (user != null) ? user.getName() : "");
+            map.put("loginId", (user != null) ? user.getLoginId() : "");
 
             // 学科・コース・学年・クラス情報の取得
             String gradeStr = "-";

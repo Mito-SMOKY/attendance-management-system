@@ -19,9 +19,9 @@
         <div th:replace="~{fragments/_parts :: backButton(url='/admin/request/menu')}"></div>
     </div>
 
-    <main class="main-container">
+    <main class="main-container" style="max-width: 1000px; margin: 30px auto; padding: 0 20px;">
         
-        <div class="page-title">申請履歴</div>
+        <h2 class="main-title">申請履歴一覧</h2>
         
         <div th:if="${#lists.isEmpty(historyList)}" style="text-align: center; padding: 40px; color: #666;">
             <i class="fa-regular fa-folder-open" style="font-size: 3em; margin-bottom: 15px;"></i>
@@ -40,9 +40,9 @@
             </thead>
             <tbody>
                 <tr th:each="req : ${historyList}">
-                    <td th:text="${req.createdAt}"></td>
-                    <td th:text="${req.type}"></td>
-                    <td th:text="${req.approverName}"></td>
+                    <td th:text="${req.createdAt}">2026/01/23 10:00</td>
+                    <td th:text="${req.type}">生徒削除</td>
+                    <td th:text="${req.approverName}">管理者 太郎</td>
                     <td>
                         <span class="status-badge"
                             th:classappend="${
@@ -51,6 +51,7 @@
                                 req.statusCode == 3 ? 'status-rejected' : ''
                             }"
                             th:text="${req.status}">
+                            承認待ち
                         </span>
                     </td>
                     <td>
@@ -61,34 +62,6 @@
                 </tr>
             </tbody>
         </table>
-
-        <div class="pagination" th:if="${totalPages > 1}">
-    
-            <a th:href="@{/admin/request/history(page=${currentPage - 1})}"
-            class="page-link"
-            th:classappend="${currentPage == 0} ? 'disabled'">＜</a>
-
-            <th:block th:with="start=${currentPage - 2 < 0 ? 0 : currentPage - 2},
-                            end=${currentPage + 2 > totalPages - 1 ? totalPages - 1 : currentPage + 2}">
-                
-                <th:block th:with="finalStart=${end - start < 4 and end == totalPages - 1 ? (end - 4 < 0 ? 0 : end - 4) : start},
-                                finalEnd=${end - start < 4 and start == 0 ? (start + 4 > totalPages - 1 ? totalPages - 1 : start + 4) : end}">
-
-                    <th:block th:each="i : ${#numbers.sequence(finalStart, finalEnd)}">
-                        <a th:href="@{/admin/request/history(page=${i})}"
-                        class="page-link"
-                        th:classappend="${i == currentPage} ? 'active'"
-                        th:text="${i + 1}">1</a>
-                    </th:block>
-
-                </th:block>
-            </th:block>
-
-            <a th:href="@{/admin/request/history(page=${currentPage + 1})}"
-            class="page-link"
-            th:classappend="${currentPage == totalPages - 1} ? 'disabled'">＞</a>
-            
-        </div>
 
     </main>
 
