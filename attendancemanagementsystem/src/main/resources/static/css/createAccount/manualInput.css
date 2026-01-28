@@ -1,0 +1,135 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    background-color: #fff;
+    color: #333;
+    padding-top: 120px; 
+    padding-bottom: 50px;
+    text-align: center;
+}
+
+.main-container {
+    width: 95%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+    display: inline-block;        
+    border-bottom: 3px solid #00bdca;
+    padding-bottom: 5px;  
+}
+
+p { margin-bottom: 20px; color: #666; }
+
+.warning-msg {
+    background-color: #fff8e1;
+    color: #d35400;
+    border: 1px solid #ffe0b2;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+/* =========================================
+   基本設定エリア
+   ========================================= */
+.batch-setting {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-top: 5px solid #00bdca;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    text-align: left;
+}
+
+.batch-setting h3 {
+    margin: 0 0 15px 0;
+    font-size: 1.1rem;
+    color: #00bdca;
+}
+
+.setting-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.input-item { display: flex; flex-direction: column; }
+.input-item label { font-size: 0.9rem; font-weight: bold; margin-bottom: 5px; }
+.input-item input, .input-item select {
+    height: 40px; padding: 0 10px; border: 1px solid #ccc;
+    border-radius: 5px; font-size: 1rem; min-width: 150px;
+}
+
+/* =========================================
+   スクロールテーブルエリア
+   ========================================= */
+.table-scroll-wrapper {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid #ddd;
+    max-height: 50vh; 
+    overflow-y: auto; 
+    margin-bottom: 20px;
+}
+
+.input-table { width: 100%; border-collapse: collapse; }
+
+.input-table thead th {
+    position: sticky; top: 0; background-color: #00bdca;
+    color: #fff; z-index: 10; padding: 12px; font-weight: normal; white-space: nowrap;
+}
+
+.input-table td {
+    padding: 8px; border-bottom: 1px solid #eee;
+    background-color: #fff; vertical-align: middle;
+}
+
+.input-table tr:nth-child(even) td { background-color: #f9fcfd; }
+.row-num { text-align: center; font-weight: bold; color: #00bdca; }
+
+/* 入力欄 */
+.input-table input {
+    width: 100%; padding: 8px; border: 1px solid #ccc;
+    border-radius: 4px; outline: none;
+}
+.input-table input:focus {
+    border-color: #00bdca; box-shadow: 0 0 0 2px rgba(0, 189, 202, 0.1);
+}
+
+/* 削除アイコン */
+.action-cell { text-align: center; }
+.btn-icon-delete {
+    background: transparent; border: none; color: #ccc;
+    cursor: pointer; font-size: 1.1rem; padding: 5px; transition: color 0.2s;
+}
+.btn-icon-delete:hover { color: #e74c3c; }
+
+/* =========================================
+   フッター
+   ========================================= */
+.action-footer { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
+.btn { border: none; border-radius: 5px; padding: 10px 20px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+.btn-add { background-color: #fff; color: #00bdca; border: 2px solid #00bdca; }
+.btn-add:hover { background-color: #f0fcfd; }
+.btn-save { background-color: #00bdca; color: #fff; padding: 12px 40px; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0, 189, 202, 0.3); }
+.btn-save:hover { background-color: #009ba6; transform: translateY(-2px); }

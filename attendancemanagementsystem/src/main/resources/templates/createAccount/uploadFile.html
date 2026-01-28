@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>ファイルアップロード</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}" />
+    <link rel="stylesheet" th:href="@{/css/createAccount/uploadFile.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+</head>
+<body>
+    <div class="header-container">
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
+    </div>
+
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/upload')}"></div>
+    </div>
+
+    <div class="upload-container">
+        
+        <h1 class="page-title">リスト情報の入力</h1>
+
+        <div class="description-area">
+            <p>登録する生徒リストの基本情報を入力してください。</p>
+        </div>
+
+        <form
+            method="post"
+            th:action="@{/admin/accountList}"
+            th:object="${datalistForm}"
+            class="upload-form"
+        >
+            <div class="form-group">
+                <label class="input-label">年度 <span class="required-badge">必須</span></label>
+                
+                <input
+                    type="number"
+                    id="academicYear"
+                    th:field="*{academicYear}"
+                    class="styled-input"
+                    placeholder="例: 2025"
+                    required
+                    min="2000"
+                    max="9999"
+                />
+            </div>
+
+            <div class="form-group">
+                <label class="input-label">学年 <span class="required-badge">必須</span></label>
+                <div class="select-wrapper">
+                    <select th:field="*{grade}" class="styled-input">
+                        <option value="1">1年</option>
+                        <option value="2">2年</option>
+                        <option value="3">3年</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="input-label">学科・クラス <span class="required-badge">必須</span></label>
+                <div class="select-wrapper">
+                    <select th:field="*{departmentId}" class="styled-input">
+                        <option
+                            th:each="dept : ${departmentList}"
+                            th:value="${dept.departmentId}"
+                            th:text="${(dept.major != null ? dept.major.majorName : '学科不明') + ' : ' + dept.className}"
+                        ></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="input-label">データリスト名 <span class="required-badge">必須</span></label>
+                <input
+                    type="text"
+                    th:field="*{datalistName}"
+                    class="styled-input"
+                    placeholder="リスト名を入力"
+                    required
+                    oninput="sanitizeListName(this)"
+                />
+            </div>
+
+            <th:block th:each="acc, stat : *{tempAccounts}">
+                <input
+                    type="hidden"
+                    th:field="*{tempAccounts[__${stat.index}__].loginId}"
+                />
+                <input
+                    type="hidden"
+                    th:field="*{tempAccounts[__${stat.index}__].name}"
+                />
+                <input
+                    type="hidden"
+                    th:field="*{tempAccounts[__${stat.index}__].password}"
+                />
+            </th:block>
+
+            <div class="action-area">
+                <button type="submit" class="submit-btn">確認画面へ</button>
+            </div>
+        </form>
+    </div>
+
+    <script th:src="@{/js/createAccount/uploadFile.js}"></script>
+</body>
+</html>

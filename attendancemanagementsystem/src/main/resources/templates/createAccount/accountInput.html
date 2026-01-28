@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手動入力</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminAccountInput.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
+    </div>
+
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/accountHome')}"></div>
+    </div>
+
+    <div class="manual-container">
+        
+        <h1 class="page-title">手動入力</h1>
+
+        <div class="top-input-area">
+            <div class="input-wrapper">
+                <input type="text" id="dataListName" class="list-name-input" placeholder="データリスト名"
+                    oninput="this.classList.remove('input-error')">
+                <span id="errorMessage" class="error-text">※入力内容に不備があります（赤枠の箇所）</span>
+            </div>
+        </div>
+
+        <form id="accountInputForm" method="post" th:action="@{/admin/save-manual-accounts}">
+            
+            <input type="hidden" name="dataListName" id="hiddenDataListName">
+
+            <div class="table-wrapper">
+                <table class="manual-table">
+                    <thead>
+                        <tr>
+                            <th class="col-no">No.</th>
+                            <th class="col-name">名前</th>
+                            <th class="col-student-id">学籍番号</th>
+                            <th class="col-affiliation">所属ID</th>
+                            <th class="col-password">パスワード</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+                
+                <div class="add-btn-wrapper">
+                    <button type="button" class="add-row-btn" onclick="addRow()">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="submit-area">
+                <button type="button" class="create-btn" onclick="validateAndSubmit()">作成</button>
+            </div>
+        </form>
+
+    </div>
+    <script th:src="@{/js/createAccount/accountInput.js}"></script>
+
+</body>
+</html>

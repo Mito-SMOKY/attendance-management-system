@@ -1,16 +1,33 @@
 package com.example.attendancemanagementsystem.user.admin.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DatalistForm {
     private String datalistName;
-    private List<TempAccountData> tempAccounts;
+    private List<TempAccountData> tempAccounts = new ArrayList<>();
 
     // ★以下を追加してください
     private Integer departmentId; // 学科ID
     private Integer grade;        // 学年
     private Integer academicYear; // 年度
 
+    //accountListからtempAccountListに遷移するためにミユが追加した
+    private Integer dataListId;
+
+    public DatalistForm() {
+    }
+
+    public Integer getDataListId() {
+        return dataListId;
+    }
+
+    public void setDataListId(Integer dataListId) {
+        this.dataListId = dataListId;
+    }
+
+    ////////////////////////////////////////////////////////////
+    
     public String getDatalistName() { return datalistName; }
     public void setDatalistName(String datalistName) { this.datalistName = datalistName; }
 

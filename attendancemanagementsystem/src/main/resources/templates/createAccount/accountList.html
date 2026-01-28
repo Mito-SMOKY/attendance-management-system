@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>登録内容確認</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}" />
+    <link rel="stylesheet" th:href="@{/css/createAccount/accountList.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      
+    </style>
+  </head>
+  <body>
+    <div class="header-container">
+      <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+    <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+        <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+    </div>
+    </div>
+
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/upload')}"></div>
+    </div>
+
+    <div class="list-container">
+      <h1 class="page-title">登録内容の確認</h1>
+      <p>以下の内容で仮アカウントを一括登録しますか？</p>
+
+      <div class="warning-box">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <strong>重要なお知らせ</strong><br />
+        登録が完了すると、パスワードは暗号化されます。<br />
+        <span class="warning-highlight"
+          >平文のパスワードを確認できるのは、元のCSVファイルのみとなります。</span
+        >
+      </div>
+        <form method="post" th:action="@{/admin/saveTempAccounts}" th:object="${datalistForm}">
+        <input type="hidden" th:field="*{datalistName}" />
+        <input type="hidden" th:field="*{academicYear}" />
+        <input type="hidden" th:field="*{grade}" />
+        <input type="hidden" th:field="*{departmentId}" />
+
+        <div class="info-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>リスト名</th>
+                <th>年度</th>
+                <th>学年</th>
+                <th>学科・クラス</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td th:text="*{datalistName}"></td>
+                <td th:text="*{academicYear}"></td>
+                <td th:text="*{grade}"></td>
+                <td th:text="${departmentName}"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="account-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>ID</th>
+                <th>氏名</th>
+                <th>パスワード</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="acc, stat : *{tempAccounts}">
+                <td th:text="${stat.count}"></td>
+                <td th:text="${acc.loginId}"></td>
+                <td th:text="${acc.name}"></td>
+                <td>
+                  <span th:text="${acc.password}"></span>
+                  
+                  <input type="hidden" th:field="*{tempAccounts[__${stat.index}__].loginId}" />
+                  <input type="hidden" th:field="*{tempAccounts[__${stat.index}__].name}" />
+                  <input type="hidden" th:field="*{tempAccounts[__${stat.index}__].password}" />
+                  </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="button-area">
+          <button type="submit" class="action-btn">登録実行</button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

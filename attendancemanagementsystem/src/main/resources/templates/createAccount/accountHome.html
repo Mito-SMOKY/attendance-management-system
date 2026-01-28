@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アカウント管理</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/createAccount/accountHome.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
+    </div>
+    
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='#')}"></div>
+    </div>
+    
+    <div class="account-manage-container">
+        
+        <h1 class="page-title">アカウント管理</h1>
+
+        <div class="menu-buttons-area">
+            
+            <a th:href="@{/admin/upload}" class="menu-btn">
+                <i class="fa-solid fa-file-arrow-up" style="margin-right: 10px;"></i>
+                ファイルアップロード
+            </a>
+            <a th:href="@{/admin/manualInput}" class="menu-btn">
+                <i class="fa-solid fa-keyboard" style="margin-right: 10px;"></i>
+                手動入力
+            </a>
+            <a th:href="@{/admin/accountHistory}" class="menu-btn">
+                <i class="fa-solid fa-clock-rotate-left" style="margin-right: 10px;"></i>
+                作成履歴
+            </a>
+        </div>
+    </div>
+</body>
+</html>
