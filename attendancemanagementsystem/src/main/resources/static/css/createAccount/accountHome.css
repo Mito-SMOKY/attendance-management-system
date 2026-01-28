@@ -1,0 +1,90 @@
+@charset "UTF-8";
+
+/* =========================================
+   requestMain.css のサイズ・配置を完全移植
+   ========================================= */
+
+body {
+    margin: 0;
+    padding-top: 30px; /* ヘッダーの高さ分確保 */
+    background-color: #fff;
+}
+
+/* メインコンテンツのコンテナ（画面中央寄せ） */
+/* requestMainの .content-wrapper と同じ設定 */
+.account-manage-container {
+    display: flex;
+    flex-direction: column; /* タイトルがあるため縦並び指定を追加 */
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 150px); /* 画面中央に配置 */
+    width: 100%;
+}
+
+/* ページタイトル（requestMainにはないが、配置バランスを崩さないように設定） */
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    margin-bottom: 40px; /* ボタンとの間隔 */
+    
+    display: inline-block;
+    border-bottom: 3px solid #00bdca;
+    padding-bottom: 5px;
+}
+
+/* ボタンを並べるエリア */
+/* requestMainの .action-buttons と同じ設定 */
+.menu-buttons-area {
+    display: flex;
+    gap: 40px; /* ボタン同士の間隔 (40px) */
+    padding: 20px;
+    justify-content: center;
+    flex-wrap: wrap; /* レスポンシブ対応 */
+}
+
+/* ボタンのスタイル */
+/* requestMainの .ghost-button と同じ設定 */
+.menu-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    /* ▼▼▼ サイズを完全に一致させる ▼▼▼ */
+    width: 250px;
+    height: 180px;
+    
+    background-color: white;
+    color: #00bdca; /* テーマカラー */
+    
+    border: 3px solid #00bdca; /* 枠線の太さも3pxで統一 */
+    border-radius: 12px;
+    
+    font-size: 1.2rem; /* 文字サイズ統一 */
+    font-weight: bold;
+    text-decoration: none;
+    
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* 影のサイズ統一 */
+}
+
+/* アイコンの設定 */
+/* requestMainの i タグ設定と同じ */
+.menu-btn i {
+    font-size: 3rem; /* アイコンサイズ (3rem) */
+    margin-bottom: 15px; /* 文字との間隔 */
+    color: inherit;
+}
+
+/* ホバー時の挙動 */
+/* requestMainと同じ動き */
+.menu-btn:hover {
+    background-color: #00bdca;
+    color: white;
+    transform: translateY(-5px); /* 浮き上がる距離 (-5px) */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15); /* 影を濃く */
+    opacity: 1;
+}

@@ -1,52 +1,47 @@
 document.addEventListener('DOMContentLoaded', function() {
     
-    // テンプレートで window にセットされている想定（timeTable.html の <script th:inline="javascript">）
+    // ▼▼▼ 設定：年の範囲 ▼▼▼
+    const MIN_YEAR = 2025;
+    const MAX_YEAR = 2028;
+
+    // テンプレート変数の取得
     const initialWeekStartStr = (typeof window.initialWeekStartStr !== 'undefined') ? window.initialWeekStartStr : '';
     const initialDateStr = (typeof window.initialDateStr !== 'undefined') ? window.initialDateStr : '';
     const initialData = (typeof window.initialData !== 'undefined') ? window.initialData : null;
     
-    console.log('window.initialWeekStartStr', initialWeekStartStr, 'initialDateStr', initialDateStr, 'initialData?', !!initialData);
-
     let currentUserId; 
     
     const userSelect = document.getElementById('adminUserSelect');
     if (userSelect) {
-        // プルダウンがあれば初期値を設定し、イベントリスナーを追加
         currentUserId = userSelect.value;
-        window.currentUserId = currentUserId; // 他の関数からも参照できるように設定
+        window.currentUserId = currentUserId; 
         
         userSelect.addEventListener('change', (event) => {
-            // ユーザーが選択した新しいIDを取得
             window.currentUserId = event.target.value;
-            
-            // 選択されたユーザーの時間割を再取得・再描画する
             fetchTimetableData(currentWeekStart); 
         });
     } else {
-        // プルダウンがなければデフォルト値を設定
         currentUserId = document.querySelector('body').dataset.initialUserId || 'admin001';
         window.currentUserId = currentUserId;
     }
 
-
+    // 日付パース用
     function parseISODateLocal(s) {
         if (!s) return new Date(NaN);
         if (s instanceof Date) return s;
-        // 期待フォーマット: "YYYY-MM-DD"（サーバー側でこの形式を渡す想定）
         if (typeof s === 'string') {
             const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
             if (m) {
                 const y = parseInt(m[1], 10);
                 const mo = parseInt(m[2], 10) - 1;
                 const d = parseInt(m[3], 10);
-                // Date(year, monthIndex, day) の形式でローカル日付を強制的に作成
                 return new Date(y, mo, d);
             }
         }
-        // fallback
         return new Date(s);
     }
 
+    // YYYY-MM-DD 文字列生成
     function formatDateYMD(date) {
         const d = (date instanceof Date) ? date : new Date(date);
         const y = d.getFullYear();
@@ -55,12 +50,11 @@ document.addEventListener('DOMContentLoaded', function() {
         return `${y}-${m}-${day}`;
     }
 
-    // 与えた日付を「その週の月曜日」に揃えるヘルパー
-    function toWeekStartMonday(d) {
-        const date = (typeof d === 'string') ? parseISODateLocal(d) : parseISODateLocal(d);
-        if (isNaN(date.getTime())) return new Date(NaN);
-        const day = date.getDay(); // 0=Sun ... 6=Sat
-        const diff = (day + 6) % 7; // Mon->0, Sun->6
+    // 日付を「その週の月曜日」に戻す関数
+    function getMondayOfWeek(d) {
+        const date = new Date(d);
+        const day = date.getDay(); 
+        const diff = (day + 6) % 7;
         date.setDate(date.getDate() - diff);
         date.setHours(0,0,0,0);
         return date;
@@ -68,52 +62,73 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let currentWeekStart;
     
-    // 1. HTMLから渡された日付文字列をパース
+    // 初期表示の日付設定
     const parsedStart = parseISODateLocal(initialWeekStartStr || initialDateStr);
-
     if (isNaN(parsedStart.getTime())) {
-        // 2. パース失敗 (NaN) の場合、現在日にフォールバック
-        console.error("初期日付文字列が無効です。現在日を基準に設定します。");
-        currentWeekStart = toWeekStartMonday(new Date());
+        currentWeekStart = getMondayOfWeek(new Date()); 
     } else {
-        // 3. パース成功の場合、その週の月曜日に正規化
-        currentWeekStart = toWeekStartMonday(parsedStart);
+        currentWeekStart = getMondayOfWeek(parsedStart);
     }
-    // --------------------------------------------------------------------------
-
+    
+    // 初期日付が範囲外なら補正
+    if (currentWeekStart.getFullYear() < MIN_YEAR) {
+        currentWeekStart = new Date(MIN_YEAR, 0, 1);
+        currentWeekStart = getMondayOfWeek(currentWeekStart);
+    } else if (currentWeekStart.getFullYear() > MAX_YEAR) {
+        currentWeekStart = new Date(MAX_YEAR, 11, 25); 
+        currentWeekStart = getMondayOfWeek(currentWeekStart);
+    }
 
     // DOM 要素
     const yearSelector = document.getElementById('yearSelector');
     const monthSelector = document.getElementById('monthSelector');
     const prevWeekBtn = document.getElementById('prevWeekBtn');
     const nextWeekBtn = document.getElementById('nextWeekBtn');
+    const displayEl = document.getElementById('currentWeekDisplay');
+
+    // ▼▼▼ 修正：ボタン位置固定のための強力なスタイル適用 ▼▼▼
+    // 幅を min/max ともに固定し、inline-blockとして確実に領域を確保する
+    if (displayEl) {
+        displayEl.style.display = 'inline-block';
+        
+        // 日付文字列が長くても短くても、常にこのピクセル幅を確保します
+        // 「12月31日 〜 12月31日」でも余裕があるサイズ(260px)に設定
+        const FIXED_WIDTH = '260px'; 
+        
+        displayEl.style.width = FIXED_WIDTH;
+        displayEl.style.minWidth = FIXED_WIDTH;
+        displayEl.style.maxWidth = FIXED_WIDTH;
+        
+        displayEl.style.textAlign = 'center';
+        displayEl.style.whiteSpace = 'nowrap';
+        displayEl.style.verticalAlign = 'middle';
+    }
 
     function safeAddListener(el, ev, fn) { if (el) el.addEventListener(ev, fn); }
 
-    safeAddListener(prevWeekBtn, 'click', () => changeWeek(-7));
+    safeAddListener(prevWeekBtn, 'click', () => changeWeek(-7)); 
     safeAddListener(nextWeekBtn, 'click', () => changeWeek(7));
     safeAddListener(yearSelector, 'change', handleMonthYearChange);
     safeAddListener(monthSelector, 'change', handleMonthYearChange);
 
-    // 年月プルダウン初期化
     function initializeSelectors() {
-        // 基準日は currentWeekStart（既に月曜）
-        let baseDate = !isNaN(currentWeekStart.getTime()) ? currentWeekStart : new Date();
-
-        // initialDateStr が有効なら参照（ただし currentWeekStart を壊さない）
-        const initDate = parseISODateLocal(initialDateStr);
-        if (!isNaN(initDate.getTime())) baseDate = initDate;
-
-        const yearToSelect = !isNaN(baseDate.getFullYear()) ? baseDate.getFullYear() : new Date().getFullYear();
-        const monthToSelect = !isNaN(baseDate.getMonth()) ? baseDate.getMonth() : new Date().getMonth();
+        let baseDate = new Date(currentWeekStart);
+        baseDate.setDate(baseDate.getDate() + 4); 
+        
+        const yearToSelect = baseDate.getFullYear();
+        const monthToSelect = baseDate.getMonth();
 
         if (yearSelector) {
             yearSelector.innerHTML = '';
-            for (let y = yearToSelect - 1; y <= yearToSelect + 2; y++) {
+            for (let y = MIN_YEAR; y <= MAX_YEAR; y++) {
                 const option = new Option(y + '年', y);
                 yearSelector.add(option);
             }
-            yearSelector.value = yearToSelect;
+            if (yearToSelect >= MIN_YEAR && yearToSelect <= MAX_YEAR) {
+                yearSelector.value = yearToSelect;
+            } else {
+                yearSelector.value = (yearToSelect < MIN_YEAR) ? MIN_YEAR : MAX_YEAR;
+            }
         }
 
         if (monthSelector) {
@@ -127,16 +142,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         updateNavigationButtons();
-        
     }
 
     function changeWeek(days) {
         if (isNaN(currentWeekStart.getTime())) return;
-        const nextWeekStart = new Date(currentWeekStart);
-        nextWeekStart.setDate(nextWeekStart.getDate() + days);
-        // 整合性確保：必ず月曜に揃える
-        const normalized = toWeekStartMonday(nextWeekStart);
-        currentWeekStart = normalized;
+        
+        const nextDate = new Date(currentWeekStart);
+        nextDate.setDate(nextDate.getDate() + days);
+        
+        const checkFriday = new Date(nextDate);
+        checkFriday.setDate(checkFriday.getDate() + 4); 
+        const checkYear = checkFriday.getFullYear();
+
+        if (checkYear < MIN_YEAR || checkYear > MAX_YEAR) {
+            console.log("移動先が年範囲外のためキャンセルしました");
+            return;
+        }
+
+        currentWeekStart = nextDate;
         fetchTimetableData(currentWeekStart);
     }
 
@@ -144,19 +167,29 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!yearSelector || !monthSelector) return;
         const targetYear = parseInt(yearSelector.value);
         const targetMonth = parseInt(monthSelector.value);
-        const tempDate = new Date(targetYear, targetMonth, 1);
-        currentWeekStart = toWeekStartMonday(tempDate);
-        console.log('handleMonthYearChange -> currentWeekStart:', currentWeekStart.toISOString().split('T')[0]);
+        
+        let targetDate = new Date(targetYear, targetMonth, 1);
+        const dayOfWeek = targetDate.getDay();
+
+        if (dayOfWeek === 6) { 
+            targetDate.setDate(targetDate.getDate() + 2);
+        } else if (dayOfWeek === 0) {
+            targetDate.setDate(targetDate.getDate() + 1);
+        } else {
+            targetDate = getMondayOfWeek(targetDate);
+        }
+        
+        if (targetDate.getFullYear() < MIN_YEAR) {
+            targetDate = new Date(MIN_YEAR, 0, 1);
+            targetDate = getMondayOfWeek(targetDate);
+        }
+
+        currentWeekStart = targetDate;
         fetchTimetableData(currentWeekStart);
     }
 
-    // API 呼び出し：必ず startDate を月曜に正規化して送る。レスポンスの dates は使わず自前生成する。
     function fetchTimetableData(startDate) {
-        startDate = toWeekStartMonday(startDate);
-        if (isNaN(startDate.getTime())) {
-            console.error("日付データが無効です。API呼び出しをスキップします。");
-            return;
-        }
+        if (isNaN(startDate.getTime())) return;
 
         const dateStr = formatDateYMD(startDate);
         const userId = window.currentUserId || 
@@ -164,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         'admin001';
         const apiEndpoint = `/api/timetabledata?date=${dateStr}&userId=${userId}`;
 
-        console.log('fetching timetable for weekStart (mon):', dateStr);
+        console.log('fetching timetable starting from:', dateStr);
         
         fetch(apiEndpoint)
             .then(response => {
@@ -172,31 +205,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(raw => {
-                console.log("API raw response:", raw);
-                // 強制的に月曜基準の weekStart にする（サーバーが違っていてもこちらで統一）
-                const normalized = toWeekStartMonday(raw && raw.weekStart ? raw.weekStart : startDate);
-                const weekStartStr = isNaN(normalized.getTime()) ? formatDateYMD(startDate) : formatDateYMD(normalized);
-    
-                // 常に月曜〜金曜の日付配列を自前生成（表示の整合性を保つ）
+                const startString = dateStr; 
+                const startObj = parseISODateLocal(startString);
+                
                 const dates = [];
                 for (let i = 0; i < 5; i++) {
-                    const d = new Date(normalized);
+                    const d = new Date(startObj);
                     d.setDate(d.getDate() + i);
                     dates.push(formatDateYMD(d));
                 }
 
                 const data = raw || {};
-                data.weekStart = weekStartStr;
+                data.weekStart = startString;
                 data.dates = dates;
 
-                // timeSlots / schedule が無ければ空で埋める（安全）
-                data.timeSlots = Array.isArray(data.timeSlots) ? data.timeSlots : (data.timeSlots ? data.timeSlots : ["9:30-11:00","11:10-12:30","13:30-14:50","15:00-16:20"]);
+                data.timeSlots = Array.isArray(data.timeSlots) ? data.timeSlots : ["9:30-11:00","11:10-12:30","13:30-14:50","15:00-16:20"];
                 data.schedule = data.schedule || {};
 
-                // currentWeekStart を更新
-                currentWeekStart = parseISODateLocal(weekStartStr);
+                currentWeekStart = startObj;
 
-                console.log("normalized/enforced weekStart:", data.weekStart, "dates:", data.dates);
                 renderTimetable(data);
             })
             .catch(err => {
@@ -204,26 +231,27 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    function isWeekInSelectedMonth(weekStartDate) {
-        if (isNaN(weekStartDate.getTime())) return false;
-        const currentSelectedYear = yearSelector ? parseInt(yearSelector.value) : (new Date()).getFullYear();
-        const currentSelectedMonth = monthSelector ? parseInt(monthSelector.value) : (new Date()).getMonth();
-        const middleDay = new Date(weekStartDate);
-        middleDay.setDate(middleDay.getDate() + 3);
-        return middleDay.getFullYear() === currentSelectedYear && middleDay.getMonth() === currentSelectedMonth;
-    }
-
     function updateNavigationButtons() {
         if (!prevWeekBtn || !nextWeekBtn) return;
-        if (isNaN(currentWeekStart.getTime())) {
-            prevWeekBtn.disabled = true; nextWeekBtn.disabled = true; return;
-        }
-        const prevWeekStart = new Date(currentWeekStart); prevWeekStart.setDate(prevWeekStart.getDate() - 7);
-        const nextWeekStart = new Date(currentWeekStart); nextWeekStart.setDate(nextWeekStart.getDate() + 7);
-        prevWeekBtn.disabled = !isWeekInSelectedMonth(prevWeekStart);
-        nextWeekBtn.disabled = !isWeekInSelectedMonth(nextWeekStart);
-        prevWeekBtn.classList.toggle('disabled-arrow', prevWeekBtn.disabled);
-        nextWeekBtn.classList.toggle('disabled-arrow', nextWeekBtn.disabled);
+        
+        const prevCheck = new Date(currentWeekStart);
+        prevCheck.setDate(prevCheck.getDate() - 7);
+        const prevCheckFri = new Date(prevCheck); 
+        prevCheckFri.setDate(prevCheckFri.getDate() + 4);
+
+        const nextCheck = new Date(currentWeekStart);
+        nextCheck.setDate(nextCheck.getDate() + 7);
+        const nextCheckFri = new Date(nextCheck);
+        nextCheckFri.setDate(nextCheckFri.getDate() + 4);
+
+        const canGoPrev = (prevCheckFri.getFullYear() >= MIN_YEAR);
+        const canGoNext = (nextCheckFri.getFullYear() <= MAX_YEAR);
+
+        prevWeekBtn.disabled = !canGoPrev;
+        nextWeekBtn.disabled = !canGoNext;
+
+        prevWeekBtn.classList.toggle('disabled-arrow', !canGoPrev);
+        nextWeekBtn.classList.toggle('disabled-arrow', !canGoNext);
     }
 
     function renderTimetable(data) {
@@ -234,64 +262,53 @@ document.addEventListener('DOMContentLoaded', function() {
         const theadRow = timetable.querySelector('thead tr');
         tbody.innerHTML = '';
 
-        // header: 月曜〜金曜を ISO 日付で表示（必要ならフォーマット変更）
-        if (data.dates && data.dates.length === 5) {
-            theadRow.innerHTML = '<th class="time-slot-header">時間</th>';
-            data.dates.forEach(dateStr => {
-                const d = parseISODateLocal(dateStr);
-                const label = (d.getMonth() + 1) + '/' + d.getDate() + ' (' + ['日','月','火','水','木','金','土'][d.getDay()] + ')';
-                theadRow.innerHTML += `<th>${label}</th>`;
-            });
-        }
+        theadRow.innerHTML = '<th class="time-slot-header">時間</th>';
+        const validDates = data.dates || [];
         
-        // --------------------------------------------------------------------------
-        // ★★★ 修正箇所: ナビゲーションバーの日付表示ロジック ★★★
-        // --------------------------------------------------------------------------
-        let monthToShow;
-        if (monthSelector && !isNaN(parseInt(monthSelector.value))) {
-            // 月セレクタが有効ならその値を使う
-            monthToShow = parseInt(monthSelector.value);
-        } else if (!isNaN(currentWeekStart.getTime())) {
-            // セレクタが無効だが currentWeekStart が有効なら、その日付の中央値の月を使う
-            const middleDay = new Date(currentWeekStart);
-            middleDay.setDate(middleDay.getDate() + 3); // 週の中央の日付を取得
-            monthToShow = middleDay.getMonth();
-        } else {
-            // どちらも無効な場合は現在月を使う (フォールバック)
-            monthToShow = new Date().getMonth();
-        }
+        validDates.forEach(dateStr => {
+            const d = parseISODateLocal(dateStr);
+            const label = (d.getMonth() + 1) + '/' + d.getDate() + ' (' + ['日','月','火','水','木','金','土'][d.getDay()] + ')';
+            theadRow.innerHTML += `<th>${label}</th>`;
+        });
         
-        const displayMonth = monthToShow + 1; // 0-indexed から 1-indexed に変換
+        if (displayEl && validDates.length > 0) {
+            const wStart = parseISODateLocal(validDates[0]); 
+            const wEnd = parseISODateLocal(validDates[validDates.length - 1]);
+            
+            const fmt = (d) => `${d.getMonth() + 1}月${d.getDate()}日`;
+            displayEl.textContent = `${fmt(wStart)} 〜 ${fmt(wEnd)}`;
 
-        const weekNumber = data.weekNumber || '';
-        const displayEl = document.getElementById('currentWeekDisplay');
-        
-        // displayMonth が有効な数値であることを最終確認
-        if (displayEl && !isNaN(displayMonth)) { 
-            displayEl.textContent = `${displayMonth}月 第${weekNumber}週`;
-        } else if (displayEl) {
-            // 万が一まだNaNが残る場合はエラー表示
-            displayEl.textContent = `日付エラー 第${weekNumber}週`;
-        }
-        // --------------------------------------------------------------------------
+            const checkDateForDropdown = new Date(wEnd); 
 
-        // body
+            if (yearSelector) {
+                if (checkDateForDropdown.getFullYear() >= MIN_YEAR && checkDateForDropdown.getFullYear() <= MAX_YEAR) {
+                    yearSelector.value = checkDateForDropdown.getFullYear();
+                }
+            }
+            if (monthSelector) {
+                monthSelector.value = checkDateForDropdown.getMonth();
+            }
+        }
+
         const slots = Array.isArray(data.timeSlots) ? data.timeSlots : [];
         slots.forEach((slotTime, slotIndex) => {
             const row = tbody.insertRow();
             row.insertCell().textContent = slotTime;
+            
             for (let i = 0; i < 5; i++) {
-                const weekStartDate = parseISODateLocal(data.weekStart);
-                const date = new Date(weekStartDate);
-                date.setDate(date.getDate() + i);
-                const dateKey = formatDateYMD(date);
-                const daySchedule = data.schedule ? data.schedule[dateKey] : null;
-                const cell = row.insertCell();
-                if (daySchedule && daySchedule[slotIndex]) {
-                    const entry = daySchedule[slotIndex];
-                    if (entry && entry.subject) {
-                        cell.innerHTML = `<div class="subject">${entry.subject}</div><div class="classroom">${entry.classroom || ''}</div>`;
+                if (i < validDates.length) {
+                    const dateKey = validDates[i];
+                    const daySchedule = data.schedule ? data.schedule[dateKey] : null;
+                    const cell = row.insertCell();
+                    
+                    if (daySchedule && daySchedule[slotIndex]) {
+                        const entry = daySchedule[slotIndex];
+                        if (entry && entry.subject) {
+                            cell.innerHTML = `<div class="subject">${entry.subject}</div><div class="classroom">${entry.classroom || ''}</div>`;
+                        }
                     }
+                } else {
+                    row.insertCell();
                 }
             }
         });
@@ -299,33 +316,25 @@ document.addEventListener('DOMContentLoaded', function() {
         updateNavigationButtons();
     }
 
-    
-    console.log('初期 currentWeekStart:', isNaN(currentWeekStart.getTime()) ? 'invalid' : currentWeekStart.toISOString().split('T')[0]);
-
     if (initialData && initialData.schedule) {
-        console.log("初期データをレンダリング（正規化）");
-        // normalize initialData
-        const normStart = toWeekStartMonday(initialData.weekStart || currentWeekStart);
-        initialData.weekStart = isNaN(normStart.getTime()) ? formatDateYMD(currentWeekStart) : formatDateYMD(normStart);
-        // generate dates mon-fri
-        initialData.dates = [];
+        const startRaw = formatDateYMD(currentWeekStart);
+        currentWeekStart = getMondayOfWeek(new Date(startRaw));
+        const correctedStartStr = formatDateYMD(currentWeekStart);
+
+        initialData.weekStart = correctedStartStr;
+        
+        const dates = [];
         for (let i = 0; i < 5; i++) {
-            const d = new Date(normStart);
+            const d = new Date(currentWeekStart);
             d.setDate(d.getDate() + i);
-            initialData.dates.push(formatDateYMD(d));
+            dates.push(formatDateYMD(d));
         }
-        // ensure timeslots/schedule
-        initialData.timeSlots = Array.isArray(initialData.timeSlots) ? initialData.timeSlots : ["9:30-11:00","11:10-12:30","13:30-14:50","15:00-16:20"];
-        initialData.schedule = initialData.schedule || {};
-        currentWeekStart = parseISODateLocal(initialData.weekStart);
+        initialData.dates = dates;
+        
         renderTimetable(initialData);
     } else {
-        // API呼び出しで初期データを取得
-        const dateToFetch = currentWeekStart;
-        console.log('fetching for weekStart:', dateToFetch.toISOString().split('T')[0]);
-        fetchTimetableData(dateToFetch);
+        fetchTimetableData(currentWeekStart);
     }
 
-    // --- 初期化 ---
     initializeSelectors();
 });

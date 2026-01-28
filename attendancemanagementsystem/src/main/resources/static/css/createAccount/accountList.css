@@ -1,0 +1,154 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    
+    font-size: 16px;
+    background-color: #fff;
+    color: #333;
+}
+
+/* =========================================
+   コンテナ設定
+   ========================================= */
+.list-container {
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+    
+    /* ヘッダー・戻るボタンとの間隔（統一） */
+    padding-top: 120px; 
+    padding-bottom: 50px;
+    
+    text-align: center;
+}
+
+/* =========================================
+   ページタイトル
+   ========================================= */
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    
+    display: inline-block;        
+    border-bottom: 3px solid #00bdca; /* テーマカラー */
+    padding-bottom: 5px;          
+    margin-bottom: 20px;
+}
+
+p {
+    margin-bottom: 30px;
+    color: #666;
+}
+
+/* =========================================
+   警告ボックス
+   ========================================= */
+.warning-box {
+    background-color: #fff8e1; /* 薄い黄色 */
+    color: #d35400; /* オレンジ系の文字 */
+    border: 1px solid #ffe0b2;
+    padding: 15px;
+    margin-bottom: 40px;
+    border-radius: 8px;
+    text-align: center; /* 中身も中央揃え */
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.warning-highlight {
+    font-weight: bold;
+    color: #e74c3c; /* 赤字で強調 */
+}
+
+/* =========================================
+   テーブル共通設定
+   ========================================= */
+.info-table-wrapper,
+.account-table-wrapper {
+    width: 100%;
+    margin-bottom: 40px;
+    overflow-x: auto; /* 横スクロール対応 */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    background-color: #fff;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center; /* 中央揃えに統一 */
+    border: 1px solid #ddd;
+}
+
+/* ヘッダーデザイン */
+th {
+    background-color: #00bdca; /* テーマカラー */
+    color: #fff;
+    font-weight: normal;
+    white-space: nowrap;
+}
+
+/* セルデザイン */
+td {
+    color: #333;
+    font-size: 0.95rem;
+}
+
+/* ストライプ（偶数行に色付け） */
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* =========================================
+   ボタンエリア
+   ========================================= */
+.button-area {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.action-btn {
+    width: 200px;
+    height: 50px;
+    
+    background-color: #00bdca; /* テーマカラー */
+    color: #fff;
+    
+    border: none;
+    border-radius: 8px;
+    
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    
+    box-shadow: 0 4px 6px rgba(0, 189, 202, 0.2);
+}
+
+.action-btn:hover {
+    background-color: #009ba6;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 189, 202, 0.3);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}

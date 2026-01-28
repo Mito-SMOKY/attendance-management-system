@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     // --- 設定 ---
-    const API_ENDPOINT = '/admin/api/students/students';
+    const API_ENDPOINT = '/admin/api/students';
     const OPTION_API_ENDPOINT = '/admin/api/search-options';
     const PAGE_SIZE = 10;
     const PAGINATION_SIDE_PAGES = 1; // 現在のページの左右に何ページ表示するか（1なら前後1つずつ）

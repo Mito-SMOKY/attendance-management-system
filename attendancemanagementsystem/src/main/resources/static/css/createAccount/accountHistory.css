@@ -1,0 +1,172 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    
+    /* 全体の背景を薄いグレーに設定 */
+    background-color: #fff;
+    color: #333;
+    
+    /* ヘッダー固定分の余白 */
+    padding-top: 120px;
+    padding-bottom: 50px;
+    text-align: center;
+}
+
+/* =========================================
+   レイアウトコンテナ
+   ========================================= */
+.history-container {
+    width: 95%;
+    max-width: 1000px;
+    margin: 0 auto;
+    
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    padding: 40px;
+    
+    text-align: left;
+}
+
+/* =========================================
+   ページタイトル
+   ========================================= */
+.page-title-wrapper {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+    display: inline-block;        
+    border-bottom: 3px solid #00bdca;
+    padding-bottom: 5px;   
+}
+
+.page-title-wrapper p {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* =========================================
+   メッセージエリア
+   ========================================= */
+.message-area {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+/* =========================================
+   テーブル設定
+   ========================================= */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+/* ヘッダー */
+.history-table th {
+    background-color: #00bdca;
+    color: #fff;
+    font-weight: normal;
+    padding: 15px 10px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+/* データセル */
+.history-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    vertical-align: middle;
+}
+
+/* ゼブラストライプ */
+.history-table tr:nth-child(even) td {
+    background-color: #f9fcfd;
+}
+
+.history-table tr:hover td {
+    background-color: #f0fcfd;
+}
+
+/* ----------------------------------------------------
+   【修正箇所】リンクのスタイル (強制適用)
+   ---------------------------------------------------- */
+.history-table td a {
+    /* !important を付けて強制的にこの色にします */
+    color: #00bdca !important;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.history-table td a:hover {
+    /* ホバー時は少し濃い色へ */
+    color: #008c96 !important;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.history-table td a:visited {
+    /* 訪問済みでも同じ色を維持したい場合 */
+    color: #00bdca !important;
+}
+
+/* 小さな文字 */
+.history-table small {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+/* データなし */
+.history-table td[colspan="4"] {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+    background-color: #fff;
+}

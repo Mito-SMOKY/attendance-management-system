@@ -1,0 +1,125 @@
+function addRow() {
+            const tbody = document.getElementById('tableBody');
+            const rowCount = tbody.rows.length + 1;
+            
+            // エラー解除用のスクリプト
+            const removeError = "this.classList.remove('input-error')";
+
+            const newRow = `
+                <tr>
+                    <td class="row-num">${rowCount}</td>
+                    <td>
+                        <input type="text" name="name[]" class="cell-input" placeholder="名前" 
+                            oninput="${removeError}">
+                    </td>
+                    <td>
+                        <input type="text" name="studentId[]" class="cell-input" maxlength="7" 
+                            inputmode="numeric" placeholder="1234567"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, ''); ${removeError}">
+                    </td>
+                    <td>
+                        <select name="affiliationId[]" class="cell-select" onchange="${removeError}">
+                            <option value="" selected disabled></option>
+                            <option value="SE_M_2_AA">SE_M_2_AA</option>
+                            <option value="SE_M_2_BB">SE_M_2_BB</option>
+                            <option value="IT_M_1_AA">IT_M_1_AA</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="password-action-wrapper">
+                            <input type="text" name="password[]" class="cell-input" placeholder="パスワード"
+                                oninput="${removeError}">
+                            
+                            <button type="button" class="delete-row-btn" onclick="deleteRow(this)" title="行を削除">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            
+            tbody.insertAdjacentHTML('beforeend', newRow);
+        }
+
+        // 行削除処理
+        function deleteRow(btn) {
+            if (confirm("本当に削除しますか？")) {
+                const row = btn.closest('tr');
+                row.remove();
+                renumberRows();
+            }
+        }
+
+        // 行番号の振り直し
+        function renumberRows() {
+            const tbody = document.getElementById('tableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].querySelector('.row-num').textContent = i + 1;
+            }
+        }
+
+        // バリデーションと送信
+        function validateAndSubmit() {
+            const listNameInput = document.getElementById('dataListName');
+            const errorMsgSpan = document.getElementById('errorMessage');
+            const tbody = document.getElementById('tableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            // 初期化
+            errorMsgSpan.style.visibility = 'hidden';
+            errorMsgSpan.textContent = "※入力内容に不備があります（赤枠の箇所）";
+            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+
+            let hasError = false;
+
+            // リスト名チェック
+            if (!listNameInput.value.trim()) {
+                listNameInput.classList.add('input-error');
+                hasError = true;
+            }
+
+            // データ有無チェック
+            if (rows.length === 0) {
+                errorMsgSpan.textContent = "※データを1件以上追加してください";
+                errorMsgSpan.style.visibility = 'visible';
+                return;
+            }
+
+            // 各行チェック
+            for (let i = 0; i < rows.length; i++) {
+                const nameInput = rows[i].querySelector('input[name="name[]"]');
+                const idInput = rows[i].querySelector('input[name="studentId[]"]');
+                const affSelect = rows[i].querySelector('select[name="affiliationId[]"]');
+                const passInput = rows[i].querySelector('input[name="password[]"]');
+                
+                if (!nameInput.value.trim()) {
+                    nameInput.classList.add('input-error');
+                    hasError = true;
+                }
+                
+                const idVal = idInput.value;
+                if (!idVal || idVal.length !== 7) {
+                    idInput.classList.add('input-error');
+                    hasError = true;
+                }
+                
+                if (!affSelect.value) {
+                    affSelect.classList.add('input-error');
+                    hasError = true;
+                }
+
+                if (!passInput.value.trim()) {
+                    passInput.classList.add('input-error');
+                    hasError = true;
+                }
+            }
+
+            if (hasError) {
+                errorMsgSpan.style.visibility = 'visible';
+                return;
+            }
+
+            document.getElementById('hiddenDataListName').value = listNameInput.value.trim();
+            document.getElementById('accountInputForm').submit();
+        }

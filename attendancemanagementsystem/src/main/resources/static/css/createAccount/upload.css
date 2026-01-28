@@ -1,0 +1,162 @@
+@charset "UTF-8";
+
+/* =========================================
+   基本設定
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    
+    font-size: 16px; 
+    background-color: #fff;
+    color: #333;
+}
+
+/* =========================================
+   コンテナ設定
+   ========================================= */
+.upload-container {
+    width: 90%;
+    max-width: 700px;
+    margin: 0 auto;
+    
+    /* ヘッダー・戻るボタンとの間隔（統一） */
+    padding-top: 120px; 
+    padding-bottom: 50px;
+    
+    text-align: center;
+}
+
+/* =========================================
+   ページタイトル
+   （統一デザイン）
+   ========================================= */
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    
+    /* 下線と余白の設定 */
+    display: inline-block;        
+    border-bottom: 3px solid #00bdca; /* テーマカラー */
+    padding-bottom: 5px;          
+    margin-bottom: 60px;          /* 説明文との間隔 */
+}
+
+/* =========================================
+   説明文エリア
+   ========================================= */
+.description-area {
+    margin-bottom: 40px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* =========================================
+   フォームエリア
+   ========================================= */
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+/* --- ファイル選択ボタン周り --- */
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px; /* ボタンと「選択されていません」の間隔 */
+    margin-bottom: 10px;
+}
+
+/* 実際のinputタグは隠す */
+.file-input-hidden {
+    display: none;
+}
+
+/* 「ファイルを選択」ボタンのスタイル */
+.file-label-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #fff;
+    color: #00bdca; /* 文字色をテーマカラーに */
+    border: 1px solid #333; /* 黒枠 */
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.file-label-btn:hover {
+    background-color: #f0fcfd;
+}
+
+/* ファイル名表示テキスト */
+.file-name-text {
+    font-size: 1rem;
+    color: #333;
+}
+
+/* --- テンプレート情報エリア --- */
+.template-info-area {
+    text-align: left; 
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.template-link {
+    color: #00bdca; /* リンク色 */
+    text-decoration: underline;
+    font-size: 0.95rem;
+}
+
+.template-desc {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+/* --- アップロードボタン（修正箇所） --- */
+.submit-btn {
+    margin-top: 20px;
+    width: 200px;
+    height: 50px;
+    
+    /* ▼▼▼ 色の変更 ▼▼▼ */
+    background-color: #00bdca; /* 背景を水色に */
+    color: #fff;               /* 文字を白に */
+    border: none;              /* 枠線なし（または border: 1px solid #00bdca;） */
+    /* ▲▲▲ 色の変更 ▲▲▲ */
+
+    border-radius: 8px;
+    
+    font-size: 1.2rem;
+    font-weight: bold; 
+    cursor: pointer;
+    transition: all 0.3s;
+    
+    /* 影をつけて少し浮かせる（お好みで削除可） */
+    box-shadow: 0 4px 6px rgba(0, 189, 202, 0.2);
+}
+
+.submit-btn:hover {
+    background-color: #009ba6; /* ホバー時は少し濃く */
+    transform: translateY(-2px); /* 少し上に動く */
+    box-shadow: 0 6px 8px rgba(0, 189, 202, 0.3);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
