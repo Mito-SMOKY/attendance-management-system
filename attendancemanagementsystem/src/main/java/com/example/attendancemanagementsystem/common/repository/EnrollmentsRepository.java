@@ -34,6 +34,10 @@ public interface EnrollmentsRepository extends JpaRepository<EnrollmentsEntity, 
     @Query("SELECT e FROM EnrollmentsEntity e JOIN FETCH e.student WHERE e.department.departmentId = :deptId AND e.grade = :grade")
     List<EnrollmentsEntity> findByDepartmentIdAndGrade(@Param("deptId") Integer deptId, @Param("grade") Integer grade);
 
+    // ユーザーIDとアクティブ状態で検索
+    @Query("SELECT e FROM EnrollmentsEntity e WHERE e.student.userId = :userId AND e.isActive = true")
+    EnrollmentsEntity findByUserIdAndIsActiveTrue(@Param("userId") Integer userId);
+
     // コースIDと学年で検索 
     @Query(value = "SELECT e.* FROM enrollments e " +
         "INNER JOIN department d ON e.DepartmentID = d.DepartmentID " +

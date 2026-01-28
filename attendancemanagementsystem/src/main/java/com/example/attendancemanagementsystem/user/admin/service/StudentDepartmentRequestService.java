@@ -4,19 +4,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
+import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
 import com.example.attendancemanagementsystem.common.entity.RequestEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
+import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
+import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository;
 import com.example.attendancemanagementsystem.common.repository.RequestRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
+import com.example.attendancemanagementsystem.user.admin.dto.DepartmentRequestDto;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
 @Service
@@ -28,13 +35,24 @@ public class StudentDepartmentRequestService {
     @Autowired
     private UsersRepository usersRepository;
     
+    @Autowired
+    private EnrollmentsRepository enrollmentsRepository;
+    
+    @Autowired
+    private DepartmentRepository departmentRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
     @PersistenceContext
     private EntityManager entityManager;
 
-    // 申請種別: 学科・コース変更 (4)
+    // 申請種別: 学科・コース変更 (ID: 4)
     private static final int TYPE_CHANGE_DEPARTMENT = 4;
 
-    // 生徒表示用データの取得
+    /**
+     * 確認画面用の生徒データ取得
+     */
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getStudentDisplayData(List<Integer> ids) {
         if (ids == null || ids.isEmpty()) return new ArrayList<>();
@@ -59,7 +77,8 @@ public class StudentDepartmentRequestService {
                         AND r.Status = 1
                     ) THEN 1 
                     ELSE 0 
-                END AS IsPending
+                END AS IsPending,
+                e.DepartmentID
             FROM student s
             LEFT JOIN users u ON s.UserID = u.UserID
             LEFT JOIN studentstatus ss ON s.StudentStatusID = ss.StudentStatusID 
@@ -93,6 +112,7 @@ public class StudentDepartmentRequestService {
             if (deptAndCourse.isEmpty()) deptAndCourse = "-";
             
             boolean isPending = ((Number) row[8]).intValue() == 1;
+            Integer currentDeptId = (row[9] != null) ? (Integer) row[9] : 0;
 
             map.put("userId", userId);
             map.put("loginId", loginId);
@@ -102,13 +122,16 @@ public class StudentDepartmentRequestService {
             map.put("classroom", className);
             map.put("department", deptAndCourse);
             map.put("isPending", isPending);
+            map.put("currentDeptId", currentDeptId);
 
             displayList.add(map);
         }
         return displayList;
     }
 
-    // 学科・コースリストの取得
+    /**
+     * 学科・コースリストの取得
+     */
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getDepartmentList() {
@@ -137,9 +160,6 @@ public class StudentDepartmentRequestService {
             
             String displayName = major;
             if (!course.isEmpty()) displayName += "・" + course;
-            
-            // ★修正: ハードコードしていた "クラス" を削除しました
-            // DBに「Aクラス」と入っていれば「(Aクラス)」と表示され、「A」なら「(A)」となります。
             if (!className.isEmpty()) displayName += " (" + className + ")";
             
             map.put("id", id);
@@ -149,7 +169,9 @@ public class StudentDepartmentRequestService {
         return list;
     }
 
-    // 承認者リストの取得
+    /**
+     * 承認者リストの取得
+     */
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getApproverList() {
@@ -171,23 +193,80 @@ public class StudentDepartmentRequestService {
         return list;
     }
 
-    // 学科・コース変更申請の作成
+    /**
+     * 学科・コース変更申請の作成 (一般管理者用)
+     */
     @Transactional
-    public void createDepartmentRequests(List<Integer> targetIds, Integer targetDepartmentId, String remarks, Integer approverId, CustomUserDetails applicant) {
-        List<UsersEntity> targetUsers = usersRepository.findAllById(targetIds);
+    public void createDepartmentRequests(DepartmentRequestDto dto, CustomUserDetails applicant) {
+        List<UsersEntity> targetUsers = usersRepository.findAllById(dto.getTargetIds());
         if (targetUsers.isEmpty()) return;
 
         RequestEntity request = new RequestEntity();
         request.setRequestTypeId(TYPE_CHANGE_DEPARTMENT);
         request.setRequesterUserId(applicant.getUserId());
-        request.setApproverId(approverId);
-        
-        request.setTargetDepartmentId(targetDepartmentId); 
-        
-        request.setRequestMessage(remarks);
+        request.setApproverId(dto.getApproverId());
+        request.setTargetDepartmentId(dto.getTargetDepartmentId()); 
+        request.setRequestMessage(dto.getRemarks());
         request.setStatus(1); 
         request.setTargetUsers(targetUsers);
         
         requestRepository.save(request);
+    }
+
+    /**
+     * 学科・コース変更の即時実行 (上位管理者用)
+     */
+    @Transactional
+    public void executeDepartmentUpdate(Map<String, Object> requestData, CustomUserDetails user) {
+        // 1. 管理者ユーザーの確認とパスワード検証
+        UsersEntity adminUser = usersRepository.findById(user.getUserId())
+            .orElseThrow(() -> new SecurityException("管理者ユーザーが見つかりません。"));
+
+        String rawPassword = (String) requestData.get("password");
+        if (rawPassword == null || !passwordEncoder.matches(rawPassword, adminUser.getPassword())) {
+            throw new SecurityException("パスワードが間違っています。");
+        }
+
+        // 2. データ抽出と型変換
+        List<?> rawIds = (List<?>) requestData.get("targetIds");
+        if (rawIds == null || rawIds.isEmpty()) {
+            throw new IllegalArgumentException("対象者が選択されていません。");
+        }
+        
+        List<Integer> targetIds = rawIds.stream()
+            .map(obj -> Integer.parseInt(obj.toString()))
+            .collect(Collectors.toList());
+        
+        Object deptIdObj = requestData.get("targetDepartmentId");
+        
+        // ★修正点: 一時変数で処理してから、final変数に確定させる
+        Integer tempId = null;
+        if (deptIdObj instanceof String) {
+            tempId = Integer.parseInt((String) deptIdObj);
+        } else if (deptIdObj instanceof Integer) {
+            tempId = (Integer) deptIdObj;
+        }
+        
+        // エラーチェック
+        if (tempId == null) {
+            throw new IllegalArgumentException("移動先の学科・コースが正しくありません。");
+        }
+        
+        // ラムダ式(orElseThrow)で使うための final変数を用意
+        final Integer finalDeptId = tempId;
+
+        // 3. 移動先学科エンティティの取得
+        DepartmentEntity newDepartment = departmentRepository.findById(finalDeptId)
+            .orElseThrow(() -> new IllegalArgumentException("指定された学科が見つかりません: ID=" + finalDeptId));
+
+        // 4. 更新実行
+        for (Integer userId : targetIds) {
+            EnrollmentsEntity enrollment = enrollmentsRepository.findByUserIdAndIsActiveTrue(userId);
+            if (enrollment != null) {
+                // エンティティごとセット
+                enrollment.setDepartment(newDepartment);
+                enrollmentsRepository.save(enrollment);
+            }
+        }
     }
 }

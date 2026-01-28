@@ -18,7 +18,6 @@ import com.example.attendancemanagementsystem.common.entity.Datalist;
 import com.example.attendancemanagementsystem.common.entity.DatalistDetailEntity;
 import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
-import com.example.attendancemanagementsystem.common.entity.Student;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.DatalistDetailRepository;
@@ -52,9 +51,9 @@ public class AdminCreateStudentService {
     @Autowired
     private DatalistDetailRepository datalistDetailRepository;
 
-    // 1. 全履歴取得
+    // 1. 履歴取得
     public List<Datalist> getAllDatalists() {
-        return datalistRepository.findAllWithCreator();
+        return datalistRepository.findByRoleWithCreator(1);
     }
     
     // 2. 自分の履歴のみ取得
@@ -98,8 +97,9 @@ public class AdminCreateStudentService {
         Datalist datalist = new Datalist();
         datalist.setDataListName(form.getDatalistName());
         datalist.setCreatorId(creatorId);
+        datalist.setRole(1);
 
-        List<Student> students = new ArrayList<>();
+        List<StudentEntity> students = new ArrayList<>();
 
         if (form.getTempAccounts() != null) {
             for (TempAccountData acc : form.getTempAccounts()) {
@@ -113,7 +113,7 @@ public class AdminCreateStudentService {
                 user.setPassword(passwordEncoder.encode(rawPassword));
                 user.setUserTypeId(1);
 
-                Student student = new Student();
+                StudentEntity student = new StudentEntity();
                 student.setStudentStatusId(1);
                 student.setDatalist(datalist);
                 student.setUser(user);
@@ -145,13 +145,14 @@ public class AdminCreateStudentService {
         Datalist datalist = new Datalist();
         datalist.setDataListName(form.getDataListName());
         datalist.setCreatorId(creatorId);
+        datalist.setRole(1);
 
         DepartmentEntity department = null;
         if (form.getDepartmentId() != null) {
             department = departmentRepository.findById(form.getDepartmentId()).orElse(null);
         }
 
-        List<Student> students = new ArrayList<>();
+        List<StudentEntity> students = new ArrayList<>();
         Set<String> seenIds = new HashSet<>();
         List<ManualAccountData> accounts = form.getAccounts();
 
@@ -175,7 +176,7 @@ public class AdminCreateStudentService {
                 user.setPassword(passwordEncoder.encode(rawPass));
                 user.setUserTypeId(1);
 
-                Student student = new Student();
+                StudentEntity student = new StudentEntity();
                 student.setStudentStatusId(1);
                 student.setDatalist(datalist);
                 student.setUser(user);
@@ -198,26 +199,23 @@ public class AdminCreateStudentService {
         return savedDatalist;
     }
 
-    // --- 共通処理: Enrollments保存 ---
     private void saveEnrollments(Datalist savedDatalist, Integer year, Integer grade, DepartmentEntity department) {
-        if (department != null && grade != null && year != null) {
-            List<EnrollmentsEntity> enrollmentsList = new ArrayList<>();
-            for (Student savedStudent : savedDatalist.getStudents()) {
-                StudentEntity studentEntity = new StudentEntity();
-                studentEntity.setUserId(savedStudent.getUser().getUserId());
-                
-                EnrollmentsEntity enroll = new EnrollmentsEntity();
-                enroll.setStudent(studentEntity);
-                enroll.setDepartment(department);
-                enroll.setGrade(grade);
-                enroll.setAcademicYear(year);
-                enroll.setIsActive(true);
-                
-                enrollmentsList.add(enroll);
-            }
-            enrollmentsRepository.saveAll(enrollmentsList);
+    if (department != null && grade != null && year != null) {
+        List<EnrollmentsEntity> enrollmentsList = new ArrayList<>();
+        for (StudentEntity savedStudent : savedDatalist.getStudents()) {
+            // savedStudent は既に保存済みの実体なので、これを使う
+            EnrollmentsEntity enroll = new EnrollmentsEntity();
+            enroll.setStudent(savedStudent); // new せず、保存されたインスタンスを直接セット
+            enroll.setDepartment(department);
+            enroll.setGrade(grade);
+            enroll.setAcademicYear(year);
+            enroll.setIsActive(true);
+            
+            enrollmentsList.add(enroll);
         }
+        enrollmentsRepository.saveAll(enrollmentsList);
     }
+}
 
     // --- 共通処理: スナップショット保存 (LoginID対応版) ---
     private void saveSnapshotDetails(Datalist savedDatalist, Integer year, Integer grade, DepartmentEntity dept) {
@@ -226,7 +224,7 @@ public class AdminCreateStudentService {
         String majorName = (dept != null && dept.getMajor() != null) ? dept.getMajor().getMajorName() : "未設定";
         String className = (dept != null) ? dept.getClassName() : "";
 
-        for (Student savedStudent : savedDatalist.getStudents()) {
+        for (StudentEntity savedStudent : savedDatalist.getStudents()) {
             DatalistDetailEntity detail = new DatalistDetailEntity();
             detail.setDatalistId(savedDatalist.getDataListId());
             
@@ -279,7 +277,7 @@ public class AdminCreateStudentService {
         Datalist datalist = getDatalistById(datalistId);
         StringBuilder sb = new StringBuilder();
         sb.append("\uFEFF");
-        for (Student student : datalist.getStudents()) {
+        for (StudentEntity student : datalist.getStudents()) {
             if (student.getUser() == null) continue;
             sb.append(student.getUser().getLoginId()).append(",");
             sb.append(student.getUser().getName()).append(",");

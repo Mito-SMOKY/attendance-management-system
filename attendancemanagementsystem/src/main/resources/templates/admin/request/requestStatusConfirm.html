@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <meta name="_csrf" th:content="${_csrf != null} ? ${_csrf.token} : ''"/>
     <meta name="_csrf_header" th:content="${_csrf != null} ? ${_csrf.headerName} : ''"/>
+    
     <meta name="submit-url" th:content="${submitUrl}"/>
+    
+    <meta name="is-super-admin" th:content="${#authorization.expression('hasRole(''SUPER_ADMIN'')')}"/>
 
     <title th:text="${pageTitle}">確認画面</title>
     
@@ -20,7 +24,12 @@
 <body>
 
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        <div th:if="${#authorization.expression('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
+        <div th:unless="${#authorization.expression('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
     </div>
     
     <div class="backbutton-container">
@@ -95,7 +104,8 @@
                 </select>
             </div>
 
-            <div class="input-area" style="margin-bottom: 20px;">
+            <div class="input-area" style="margin-bottom: 20px;" 
+                 th:unless="${#authorization.expression('hasRole(''SUPER_ADMIN'')')}">
                 <label for="approver" style="font-weight: bold; display: block; margin-bottom: 5px;">
                     申請先（承認者）<span style="color: red; font-size: 12px; margin-left: 5px;">必須</span>
                 </label>
@@ -124,6 +134,18 @@
             
         </div>
     </main>
+
+    <div id="passwordModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>管理者認証</h3>
+            <p>操作を実行するためにパスワードを入力してください。</p>
+            <input type="password" id="actionPassword" placeholder="パスワード" class="password-input">
+            <div class="modal-actions">
+                <button type="button" id="cancelModalBtn" class="modal-btn cancel">キャンセル</button>
+                <button type="button" id="submitModalBtn" class="modal-btn submit">実 行</button>
+            </div>
+        </div>
+    </div>
 
     <script th:src="@{/js/admin/requestStatusConfirm.js}"></script>
 

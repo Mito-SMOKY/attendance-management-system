@@ -10,6 +10,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import com.example.attendancemanagementsystem.common.entity.RequestEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.RequestRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
+import com.example.attendancemanagementsystem.user.admin.dto.DeleteRequestDto;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
 @Service
@@ -28,20 +30,24 @@ public class StudentDeleteRequestService {
     @Autowired
     private UsersRepository usersRepository;
     
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
     @PersistenceContext
     private EntityManager entityManager;
 
-    // 申請種別: アカウント削除
+    // 申請種別: アカウント削除 (ID: 2)
     private static final int TYPE_DELETE_ACCOUNT = 2;
 
-    // 生徒表示用データの取得
+    /**
+     * 確認画面用の生徒データ取得
+     */
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getStudentDisplayData(List<Integer> ids) {
         if (ids == null || ids.isEmpty()) {
             return new ArrayList<>();
         }
 
-        // JPAを使わずネイティブクエリで取得（User情報欠損等の不整合があっても落とさないため）
         String sql = """
             SELECT 
                 s.UserID,
@@ -97,11 +103,12 @@ public class StudentDeleteRequestService {
         return displayList;
     }
 
-    // 承認者リストの取得
+    /**
+     * 承認者リストの取得
+     */
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getApproverList() {
-        // administratorテーブルとusersテーブルを結合して名前を取得
         String sql = """
             SELECT u.UserID, u.Name 
             FROM administrator a
@@ -122,21 +129,54 @@ public class StudentDeleteRequestService {
         return list;
     }
 
-    // 生徒アカウント削除申請の作成
+    /**
+     * 生徒アカウント削除申請の作成 (一般管理者用)
+     */
     @Transactional
-    public void createDeleteRequests(List<Integer> targetIds, String remarks, Integer approverId, CustomUserDetails applicant) {
-        List<UsersEntity> targetUsers = usersRepository.findAllById(targetIds);
-        if (targetUsers.isEmpty()) {
-            return;
-        }
+    public void createDeleteRequests(DeleteRequestDto dto, CustomUserDetails applicant) {
+        List<UsersEntity> targetUsers = usersRepository.findAllById(dto.getTargetIds());
+        if (targetUsers.isEmpty()) return;
 
         RequestEntity request = new RequestEntity();
         request.setRequestTypeId(TYPE_DELETE_ACCOUNT);
         request.setRequesterUserId(applicant.getUserId());
-        request.setApproverId(approverId); 
-        request.setRequestMessage(remarks);
-        request.setStatus(1);
+        request.setApproverId(dto.getApproverId()); 
+        request.setRequestMessage(dto.getRemarks());
+        request.setStatus(1); // 申請中
         request.setTargetUsers(targetUsers);
+        
         requestRepository.save(request);
+    }
+
+    /**
+     * 削除の即時実行 (上位管理者用)
+     * パスワード認証を行い、論理削除フラグを立てる
+     */
+    @Transactional
+    public void executeDelete(Map<String, Object> requestData, CustomUserDetails user) {
+        // ★修正点: DBから最新のユーザー情報を取得してパスワードを確認する
+        UsersEntity adminUser = usersRepository.findById(user.getUserId())
+            .orElseThrow(() -> new SecurityException("管理者ユーザーが見つかりません。"));
+
+        // 1. パスワード確認
+        String rawPassword = (String) requestData.get("password");
+        if (rawPassword == null || !passwordEncoder.matches(rawPassword, adminUser.getPassword())) {
+            throw new SecurityException("パスワードが間違っています。");
+        }
+
+        // 2. データ抽出
+        @SuppressWarnings("unchecked")
+        List<Integer> targetIds = (List<Integer>) requestData.get("targetIds");
+        
+        if (targetIds == null || targetIds.isEmpty()) {
+            throw new IllegalArgumentException("削除対象が選択されていません。");
+        }
+
+        // 3. 削除処理 (論理削除)
+        List<UsersEntity> users = usersRepository.findAllById(targetIds);
+        for (UsersEntity u : users) {
+            u.setDeleteFlag(true); // DeleteFlagをtrueに設定
+        }
+        usersRepository.saveAll(users);
     }
 }

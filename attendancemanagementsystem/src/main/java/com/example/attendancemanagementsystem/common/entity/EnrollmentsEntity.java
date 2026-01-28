@@ -36,56 +36,42 @@ public class EnrollmentsEntity {
     @Column(name = "IsActive")
     private Boolean isActive;
 
-    // --- constructor ---
     public EnrollmentsEntity() {
     }
 
-    // --- Getter/Setter ---
-    public Integer getEnrollmentsId() {
-        return enrollmentsId;
+    // --- Getters / Setters ---
+    public Integer getEnrollmentsId() { return enrollmentsId; }
+    public void setEnrollmentsId(Integer enrollmentsId) { this.enrollmentsId = enrollmentsId; }
+
+    public StudentEntity getStudent() { return student; }
+    public void setStudent(StudentEntity student) { this.student = student; }
+
+    public DepartmentEntity getDepartment() { return department; }
+    public void setDepartment(DepartmentEntity department) { this.department = department; }
+
+    // ★追加: Serviceでのエラー回避用 (Department経由でIDをセット)
+    public void setDepartmentId(Integer departmentId) {
+        if (departmentId == null) {
+            this.department = null;
+            return;
+        }
+        if (this.department == null) {
+            this.department = new DepartmentEntity();
+        }
+        this.department.setDepartmentId(departmentId);
+    }
+    
+    // ★追加: Serviceでのエラー回避用
+    public Integer getDepartmentId() {
+        return (this.department != null) ? this.department.getDepartmentId() : null;
     }
 
-    public void setEnrollmentsId(Integer enrollmentsId) {
-        this.enrollmentsId = enrollmentsId;
-    }
+    public Integer getAcademicYear() { return academicYear; }
+    public void setAcademicYear(Integer academicYear) { this.academicYear = academicYear; }
 
-    public StudentEntity getStudent() {
-        return student;
-    }
+    public Integer getGrade() { return grade; }
+    public void setGrade(Integer grade) { this.grade = grade; }
 
-    public void setStudent(StudentEntity student) {
-        this.student = student;
-    }
-
-    public DepartmentEntity getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(DepartmentEntity department) {
-        this.department = department;
-    }
-
-    public Integer getAcademicYear() {
-        return academicYear;
-    }
-
-    public void setAcademicYear(Integer academicYear) {
-        this.academicYear = academicYear;
-    }
-
-    public Integer getGrade() {
-        return grade;
-    }
-
-    public void setGrade(Integer grade) {
-        this.grade = grade;
-    }
-
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 }

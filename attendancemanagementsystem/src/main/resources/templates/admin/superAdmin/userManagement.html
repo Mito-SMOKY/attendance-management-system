@@ -81,10 +81,10 @@
                         <span>管理者作成履歴</span>
                     </a>
 
-                    <a th:href="@{/admin/approval/list}" class="ghost-button">
-                        <i class="fa-solid fa-list-check"></i>
-                        <span>申請履歴</span>
-                    </a>
+                <a th:href="@{/admin/requestList/list}" class="ghost-button">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>申請履歴</span>
+                </a>
 
                 </div>
 
@@ -107,7 +107,7 @@
             document.getElementById('history-menu-group').classList.add('hidden');
         }
 
-        // データ変更履歴メニューを表示 (今回追加)
+        // データ変更履歴メニューを表示
         function showHistoryMenu() {
             document.getElementById('main-menu-group').classList.add('hidden');
             document.getElementById('student-menu-group').classList.add('hidden');

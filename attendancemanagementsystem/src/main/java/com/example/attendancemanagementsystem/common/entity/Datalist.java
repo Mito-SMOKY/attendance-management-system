@@ -35,11 +35,14 @@ public class Datalist {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "datalist", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Student> students;
+    private List<StudentEntity> students;
 
     @ManyToOne
     @JoinColumn(name = "Creator", insertable = false, updatable = false)
     private UsersEntity creatorUser;
+
+    @Column(name = "Role")
+    private Integer role;
 
     // --- Getter / Setter ---
     public Integer getDataListId() {
@@ -74,11 +77,11 @@ public class Datalist {
         this.createdAt = createdAt;
     }
 
-    public List<Student> getStudents() {
+    public List<StudentEntity> getStudents() {
         return students;
     }
 
-    public void setStudents(List<Student> students) {
+    public void setStudents(List<StudentEntity> students) {
         this.students = students;
     }
 
@@ -88,6 +91,14 @@ public class Datalist {
 
     public void setCreatorUser(UsersEntity creatorUser) {
         this.creatorUser = creatorUser;
+    }
+
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
     }
 
     // 必要に応じて toString() なども追加

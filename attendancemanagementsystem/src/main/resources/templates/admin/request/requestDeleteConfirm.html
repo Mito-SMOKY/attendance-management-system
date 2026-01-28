@@ -1,25 +1,35 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <meta name="_csrf" th:content="${_csrf != null} ? ${_csrf.token} : ''"/>
     <meta name="_csrf_header" th:content="${_csrf != null} ? ${_csrf.headerName} : ''"/>
+    
     <meta name="submit-url" th:content="${submitUrl}"/>
+    
+    <meta name="is-super-admin" th:content="${#authorization.expression('hasRole(''SUPER_ADMIN'')')}"/>
 
     <title th:text="${pageTitle}">確認画面</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/admin/requestDeleteConfirm.css}">
     <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
+    
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
     
 </head>
 <body>
 
     <div class="header-container">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        <div th:if="${#authorization.expression('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+        </div>
+        <div th:unless="${#authorization.expression('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
     </div>
     
     <div class="backbutton-container">
@@ -73,11 +83,12 @@
                 </table>
             </div>
 
-            <div class="input-area" style="margin-bottom: 20px;">
+            <div class="input-area" style="margin-bottom: 20px;" 
+                 th:unless="${#authorization.expression('hasRole(''SUPER_ADMIN'')')}">
                 <label for="approver" style="font-weight: bold; display: block; margin-bottom: 5px;">
                     申請先（承認者）<span style="color: red; font-size: 12px; margin-left: 5px;">必須</span>
                 </label>
-                <select id="approver" name="approverId" class="remarks-input" style="height: 40px; border: 2px solid #539DA4;">
+                <select id="approver" class="remarks-input" style="height: 40px; border: 2px solid #539DA4;">
                     <option value="" disabled selected>承認者を選択してください</option>
                     <option th:each="admin : ${approverList}" 
                             th:value="${admin.userId}" 
@@ -103,8 +114,19 @@
         </div>
     </main>
 
+    <div id="passwordModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>管理者認証</h3>
+            <p>削除処理を実行するためにパスワードを入力してください。<br><span style="color:red; font-size:0.9em;">※この操作は取り消せません</span></p>
+            <input type="password" id="actionPassword" placeholder="パスワード" class="password-input">
+            <div class="modal-actions">
+                <button type="button" id="cancelModalBtn" class="modal-btn cancel">キャンセル</button>
+                <button type="button" id="submitModalBtn" class="modal-btn submit">実行（削除）</button>
+            </div>
+        </div>
+    </div>
+
     <script th:src="@{/js/admin/requestDeleteConfirm.js}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
 
 </body>
 </html>

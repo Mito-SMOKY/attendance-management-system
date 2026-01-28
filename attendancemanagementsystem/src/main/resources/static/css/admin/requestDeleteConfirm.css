@@ -39,7 +39,7 @@
     font-weight: bold;
 }
 
-/* スクロールテーブルの設定 */
+/* スクロールテーブル */
 .table-scroll-wrapper {
     max-height: 400px;
     overflow-y: auto;
@@ -50,20 +50,19 @@
 
 .confirm-table {
     width: 100%;
-    border-collapse: separate; /* stickyヘッダーのためにseparateを使用 */
+    border-collapse: separate; 
     border-spacing: 0;
     min-width: 800px;
-    table-layout: fixed;       /* 列幅ズレ修正の要 */
+    table-layout: fixed;       
 }
 
-/* 列幅の指定 */
-.confirm-table th:nth-child(1) { width: 60px; }  /* 選択 */
-.confirm-table th:nth-child(2) { width: 100px; } /* 状態 */
-.confirm-table th:nth-child(3) { width: 140px; } /* ログインID */
-.confirm-table th:nth-child(4) { width: 240px; } /* 学科・コース */
-.confirm-table th:nth-child(5) { width: 60px; }  /* 学年 */
-.confirm-table th:nth-child(6) { width: 80px; }  /* クラス */
-.confirm-table th:nth-child(7) { width: auto; }  /* 氏名 (残り全て) */
+.confirm-table th:nth-child(1) { width: 60px; }
+.confirm-table th:nth-child(2) { width: 100px; }
+.confirm-table th:nth-child(3) { width: 140px; }
+.confirm-table th:nth-child(4) { width: 240px; }
+.confirm-table th:nth-child(5) { width: 60px; }
+.confirm-table th:nth-child(6) { width: 80px; }
+.confirm-table th:nth-child(7) { width: auto; }
 
 .confirm-table th, 
 .confirm-table td {
@@ -71,14 +70,11 @@
     text-align: center;
     border-bottom: 1px solid #eee;
     font-size: 14px;
-    
-    /* 長い文字の省略設定 */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* ヘッダー固定 */
 .confirm-table thead th {
     position: sticky;
     top: 0;
@@ -92,24 +88,20 @@
     background-color: #f0f8ff;
 }
 
-.confirm-table tbody tr.disabled {
-    background-color: #f0f0f0;
-    color: #aaa;
-    text-decoration: line-through;
-}
-
 .align-left {
     text-align: left !important;
     padding-left: 15px !important;
 }
 
-/* チェックボックス */
 .confirm-checkbox {
     transform: scale(1.5);
     cursor: pointer;
 }
 
-/* 備考欄 */
+.input-area {
+    margin-bottom: 20px;
+}
+
 .remarks-area {
     margin-bottom: 30px;
 }
@@ -128,9 +120,9 @@
     border-radius: 4px;
     font-size: 14px;
     resize: none;
+    font-family: inherit;
 }
 
-/* 確定ボタンエリア */
 .action-area {
     text-align: right;
 }

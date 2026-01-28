@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${pageTitle}">申請一覧</title>
-    
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/admin/requestList.css}">
     <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
 </head>
 <body>
-
     <div class="header-container">
         <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
     </div>
@@ -18,17 +16,16 @@
     <div class="backbutton-container" style="max-width: 1000px; margin: 20px auto;">
         <div th:replace="~{fragments/_parts :: backButton(url='/admin/userManagement')}"></div>
     </div>
-
+    
     <main class="main-container">
-        
-        <h2 class="page-title">申請承認・履歴一覧</h2>
+        <h2 class="main-title">申請承認・履歴一覧</h2>
         
         <div th:if="${requestPage.totalElements == 0}" style="text-align: center; padding: 40px; color: #666;">
             <i class="fa-regular fa-folder-open" style="font-size: 3em; margin-bottom: 15px;"></i>
             <p>現在、あなた宛ての申請はありません。</p>
         </div>
-
-        <table class="approval-table" th:if="${requestPage.totalElements > 0}">
+        
+        <table class="approval-table" th:unless="${#lists.isEmpty(requestList)}">
             <thead>
                 <tr>
                     <th>申請日時</th>
@@ -39,10 +36,10 @@
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="req : ${requestPage.content}">
-                    <td th:text="${req.createdAt}">2026/01/26 10:00</td>
-                    <td th:text="${req.requesterName}">管理者 太郎</td>
-                    <td th:text="${req.type}">アカウント削除</td>
+                <tr th:each="req : ${requestList}">
+                    <td th:text="${req.createdAt}"></td>
+                    <td th:text="${req.requesterName}"></td>
+                    <td th:text="${req.type}"></td>
                     <td>
                         <span class="status-badge"
                             th:classappend="${
@@ -51,57 +48,16 @@
                                 req.statusCode == 3 ? 'status-rejected' : ''
                             }"
                             th:text="${req.status}">
-                            承認待ち
                         </span>
                     </td>
                     <td>
-                        <a th:href="@{/admin/approval/detail/{id}(id=${req.requestId})}" class="action-btn">
+                        <a th:href="@{/admin/requestList/detail/{id}(id=${req.requestId})}" class="action-btn">
                             確認
                         </a>
                     </td>
                 </tr>
             </tbody>
         </table>
-
-        <div class="pagination-area" th:if="${requestPage.totalPages > 1}">
-            <ul class="pagination">
-                
-                <li th:classappend="${requestPage.first} ? 'disabled'">
-                    <a th:href="@{/admin/approval/list(page=${requestPage.number - 1})}">
-                        <i class="fa-solid fa-angle-left"></i>
-                    </a>
-                </li>
-
-                <li th:classappend="${requestPage.number == 0} ? 'active'">
-                    <a th:href="@{/admin/approval/list(page=0)}">1</a>
-                </li>
-
-                <li class="dots" th:if="${requestPage.number > 2}">...</li>
-
-                <th:block th:each="i : ${#numbers.sequence(requestPage.number - 1, requestPage.number + 1)}">
-                    <li th:if="${i > 0 and i < requestPage.totalPages - 1}" 
-                        th:classappend="${requestPage.number == i} ? 'active'">
-                        <a th:href="@{/admin/approval/list(page=${i})}" th:text="${i + 1}"></a>
-                    </li>
-                </th:block>
-
-                <li class="dots" th:if="${requestPage.number < requestPage.totalPages - 3}">...</li>
-
-                <li th:if="${requestPage.totalPages > 1}" 
-                    th:classappend="${requestPage.number == requestPage.totalPages - 1} ? 'active'">
-                    <a th:href="@{/admin/approval/list(page=${requestPage.totalPages - 1})}" 
-                    th:text="${requestPage.totalPages}"></a>
-                </li>
-
-                <li th:classappend="${requestPage.last} ? 'disabled'">
-                    <a th:href="@{/admin/approval/list(page=${requestPage.number + 1})}">
-                        <i class="fa-solid fa-angle-right"></i>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
     </main>
-
 </body>
 </html>

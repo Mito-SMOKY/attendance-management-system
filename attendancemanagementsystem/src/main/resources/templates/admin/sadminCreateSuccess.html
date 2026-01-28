@@ -1,0 +1,62 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>登録完了</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}" />
+    <link rel="stylesheet" th:href="@{/css/sadmin/sadminCreate.css}" />
+    <link
+      href="https://use.fontawesome.com/releases/v6.2.0/css/all.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="header-container">
+      <div th:replace="~{fragments/_parts :: header}"></div>
+    </div>
+
+    <div class="main-wrapper">
+      <div class="info-container" style="text-align: center; padding: 50px">
+        <div style="font-size: 60px; color: #00bdca; margin-bottom: 20px">
+          <i class="fa-regular fa-circle-check"></i>
+        </div>
+
+        <h2 style="margin-bottom: 10px">登録が完了しました</h2>
+        <p>
+          管理者アカウントの発行が完了しました。<br />登録票（PDF）が自動的にダウンロードされます。
+        </p>
+
+        <div style="margin: 40px 0">
+          <a
+            th:href="@{/admin/sadmin/download-pdf/{id}(id=${logId})}"
+            class="btn-register"
+            style="text-decoration: none"
+          >
+            <i class="fa-solid fa-file-pdf"></i> PDFを再ダウンロード
+          </a>
+        </div>
+
+        <div style="margin-top: 20px">
+          <a
+            th:href="@{/admin/sadminList}"
+            style="color: #666; text-decoration: underline"
+          >
+            管理者一覧へ戻る
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script th:inline="javascript">
+      document.addEventListener("DOMContentLoaded", function () {
+        const logId = /*[[${logId}]]*/ 0;
+        if (logId) {
+          // 少しだけ待ってからダウンロード開始（画面描画を優先させるため）
+          setTimeout(function () {
+            window.location.href = "/admin/sadmin/download-pdf/" + logId;
+          }, 1000);
+        }
+      });
+    </script>
+  </body>
+</html>
