@@ -296,12 +296,23 @@ async function uploadSchedulePdf() {
 function applyTimetableData(data) {
     let count = 0;
     data.forEach(item => {
-        const nameBase = `scheduleMap[${item.slot}]['${item.day}']`;
-        const subjectEl = $(`select[name="${nameBase}.subjectId"]`);
-        const roomEl    = $(`select[name="${nameBase}.classroomId"]`);
-        const teacherEl = $(`select[name="${nameBase}.userId"]`);
+        // ★修正点: dayを強制的に大文字に変換する (Monday -> MONDAY)
+        // HTML側の name 属性が scheduleMap[1]['MONDAY']... と大文字になっているため
+        const dayKey = item.day ? item.day.toUpperCase() : "";
 
-        if (subjectEl.length === 0) return; 
+        // エスケープ処理（念のため）
+        const nameBase = `scheduleMap[${item.slot}]['${dayKey}']`;
+
+        // jQueryのセレクタ作成（属性セレクタ内のクォートに注意）
+        const subjectEl = $(`select[name="scheduleMap[${item.slot}]['${dayKey}'].subjectId"]`);
+        const roomEl    = $(`select[name="scheduleMap[${item.slot}]['${dayKey}'].classroomId"]`);
+        const teacherEl = $(`select[name="scheduleMap[${item.slot}]['${dayKey}'].userId"]`);
+
+        // 要素が見つからない場合はスキップ（ログに出すと原因がわかりやすい）
+        if (subjectEl.length === 0) {
+            console.warn(`Element not found for: Slot=${item.slot}, Day=${dayKey}`);
+            return; 
+        }
 
         if (item.subjectId) {
             subjectEl.val(item.subjectId).trigger('change');
