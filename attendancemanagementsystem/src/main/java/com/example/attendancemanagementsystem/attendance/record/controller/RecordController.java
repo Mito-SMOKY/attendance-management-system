@@ -1,11 +1,15 @@
 package com.example.attendancemanagementsystem.attendance.record.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.attendancemanagementsystem.attendance.record.dto.RecordDTO;
 import com.example.attendancemanagementsystem.attendance.record.dto.VerifiedRecordDto;
 import com.example.attendancemanagementsystem.attendance.record.service.RecordService;
 import com.example.attendancemanagementsystem.common.component.NfcDataHolder;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/attendance/record")
@@ -24,6 +28,7 @@ public class RecordController {
     @PostMapping("/nfc")
     public ResponseEntity<String> recordFromNFC(@RequestBody RecordDTO recordDTO) {
         try {
+
             //検証実行
             VerifiedRecordDto verifiedData = recordService.processAttendanceScan(recordDTO);
 
@@ -39,7 +44,8 @@ public class RecordController {
             //検証エラー (未登録など) 画面通知
             String cardId = recordDTO.getCardId();
             if (cardId != null && !cardId.isEmpty()) {
-                // 新規カードとして書き込み画面へ (UserIDは空)
+
+                // 新規カードとして書き込み画面へ 
                 nfcDataHolder.setScannedData(cardId, null);
                 return ResponseEntity.ok("Detected (New Card)");
             }

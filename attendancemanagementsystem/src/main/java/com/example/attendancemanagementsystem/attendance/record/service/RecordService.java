@@ -54,7 +54,7 @@ public class RecordService {
             throw new IllegalArgumentException("Card ID is empty");
         }
         
-        //　新規カード登録へ
+        //  新規カード登録へ
         Optional<CardsEntity> cardOpt = cardsRepository.findByCardId(cardId);
         if (cardOpt.isEmpty()) {
             throw new IllegalArgumentException("未登録のカードです: " + cardId);

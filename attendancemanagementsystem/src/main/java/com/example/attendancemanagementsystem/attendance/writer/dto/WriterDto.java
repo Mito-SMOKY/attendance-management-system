@@ -4,19 +4,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class WriterDto {
 
-    @JsonProperty("user_id")
-    private Integer userId;
+    @JsonProperty("login_id")
+    private String loginId;
 
     @JsonProperty("card_id")
     private String cardId;
 
     // --- Getter / Setter ---
-    public Integer getUserId() {
-        return userId;
+    public String getLoginId() {
+        return loginId;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setLoginId(String loginId) {
+        this.loginId = loginId;
     }
 
     public String getCardId() {

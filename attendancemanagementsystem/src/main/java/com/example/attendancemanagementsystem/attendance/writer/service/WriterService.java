@@ -1,17 +1,19 @@
 package com.example.attendancemanagementsystem.attendance.writer.service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.attendancemanagementsystem.common.entity.CardsEntity;
 import com.example.attendancemanagementsystem.common.repository.CardsRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class WriterService {
@@ -30,14 +32,16 @@ public class WriterService {
      */
     @Transactional
     public String issueCard(Integer targetUserId, String targetCardId) {
-        
+
+        //パス指定
         String projectDir = System.getProperty("user.dir");
-        String scriptPath = java.nio.file.Paths.get(projectDir, "python_scripts", "nfc_writer_json.py").toString();
+        String scriptPath = Paths.get(projectDir, "attendancemanagementsystem", "python_scripts", "nfc_writer_json.py").toString();
+        String pythonExe = "C:/Users/Student/AppData/Local/Programs/Python/Python313/python.exe";
 
         try {
             // Pythonスクリプトを実行
             ProcessBuilder pb = new ProcessBuilder(
-                "python", 
+                pythonExe, 
                 scriptPath, 
                 String.valueOf(targetUserId), 
                 targetCardId 

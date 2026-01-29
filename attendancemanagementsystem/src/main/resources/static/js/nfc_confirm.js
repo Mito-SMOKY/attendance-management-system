@@ -1,4 +1,4 @@
-// confirm.js: 書き込み画面用スクリプト
+// nfc_confirm.js: 書き込み画面用スクリプト
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -6,23 +6,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const userIdInput = document.getElementById('input-user-id');
     const userNameInput = document.getElementById('input-user-name');
 
-   // 名前を取得して表示する関数（共通化）
+    // 名前を取得して表示する関数
     const updateUserName = async () => {
-        const userId = userIdInput.value;
+        const loginId = userIdInput.value; // 変数名をわかりやすく loginId とみなす
         
-        // 入力が空なら名前欄もクリア
-        if (!userId) {
+        if (!loginId) {
             userNameInput.value = "";
             return;
         }
 
         try {
-            // APIを呼んで名前を取得
-            const res = await fetch(`/api/issue/user-info?userId=${userId}`);
+            // 修正: パラメータ名を userId から loginId に変更（バックエンド側も合わせる必要あり）
+            // または、バックエンドが userId というパラメータ名で LoginId を受け取るならそのままでも可
+            // ここでは明示的に loginId として送る形を推奨します
+            const res = await fetch(`/api/issue/user-info?loginId=${encodeURIComponent(loginId)}`);
             const data = await res.json();
 
             if (data.status === 'success') {
-                userNameInput.value = data.name; // 名前を表示
+                userNameInput.value = data.name;
                 userNameInput.style.color = "black";
             } else {
                 userNameInput.value = "未登録のユーザーです";
@@ -34,50 +35,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // 学籍番号を手入力して変更したとき
     userIdInput.addEventListener('change', updateUserName);
 
-    // 画面を開いた瞬間（すでにIDが入っている場合）
     if (userIdInput.value) {
         updateUserName();
     }
     
-    // ボタンクリック時の処理
     authBtn.addEventListener('click', async () => {
-        const userIdInput = document.getElementById('input-user-id');
-        const userId = userIdInput.value;
-        const cardIdInput = document.getElementById('input-card-id');
-        const cardId = cardIdInput.value;
+        const loginId = userIdInput.value;
+        const cardId = document.getElementById('input-card-id').value;
 
-        if (!userId) {
-            alert("ユーザーIDを入力してください");
+        if (!loginId) {
+            alert("学籍番号(ログインID)を入力してください");
             return;
         }
 
-        // 画面切り替え (入力フォームを隠して、ローディングを表示)
         document.getElementById('view-input').classList.add('hidden');
         document.getElementById('view-loading').classList.remove('hidden');
 
         try {
-            // 書き込みAPI実行
             const res = await fetch('/api/issue/write', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    user_id: parseInt(userId),
+                    login_id: loginId, // 修正: user_id(数値) ではなく login_id(文字列) を送る
                     card_id: cardId
                 })
             });
 
             if (res.ok) {
-                // 成功 -> 結果画面(success)へ
                 window.location.href = '/admin/nfc/result?status=success';
             } else {
-                // 失敗 -> 結果画面(error)へ
                 const txt = await res.text();
                 window.location.href = `/admin/nfc/result?status=error&msg=${encodeURIComponent(txt)}`;
             }
         } catch (e) {
+            console.error(e);
             window.location.href = '/admin/nfc/result?status=error&msg=通信エラー';
         }
     });
