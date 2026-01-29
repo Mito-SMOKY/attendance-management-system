@@ -1,0 +1,223 @@
+@charset "UTF-8";
+
+:root {
+  --primary-color: #00bdca; /* 指定カラー（下線用） */
+  --primary-hover: #0096a1;
+  --bg-color: #f4f7f6;
+  --card-bg: #ffffff;
+  --text-color: #333;       /* 黒（タイトル用） */
+  --border-color: #e0e0e0;
+  --danger-color: #dc3545;
+  --success-color: #28a745;
+}
+
+body {
+  background-color: #fff;
+  color: var(--text-color);
+  font-family: "Noto Sans JP", sans-serif;
+  margin: 0;
+}
+
+/* レイアウト調整 */
+.layout-wrapper {
+    max-width: 1200px;
+    width: 95%;
+    margin: 0 auto;
+    margin-top: 90px; /* ヘッダーから少し離す */
+}
+
+/* ★修正: タイトルを外に出してデザイン変更 */
+.page-header-outer {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--text-color); /* 黒 */
+    margin: 0;
+    display: inline-block;
+    border-bottom: 4px solid var(--primary-color); /* 指定カラーの下線 */
+    padding-bottom: 5px;
+}
+
+/* カードデザイン */
+.subject-info-container {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  padding: 30px 40px;
+  margin-bottom: 50px;
+  border-top: 5px solid var(--primary-color);
+}
+
+/* ボタンエリア */
+.action-area {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+}
+
+.edit-btn {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 189, 202, 0.3);
+}
+
+.edit-btn:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+/* メッセージ・エラー */
+.alert-success {
+  color: var(--success-color);
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.alert-error {
+  color: var(--danger-color);
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.error-message-area {
+  text-align: center;
+  margin-bottom: 10px;
+  min-height: 20px;
+}
+.error-text {
+  color: var(--danger-color);
+  font-weight: bold;
+  display: none;
+  display: block; /* JSで制御するが初期状態では隠すためCSSとしてはblockにしてJSでnoneにするか、あるいはdisplay:noneにしておく */
+}
+/* JSで表示制御するので初期はnone */
+.error-message-area .error-text {
+    display: none;
+}
+
+.input-error {
+  border: 1px solid var(--danger-color) !important;
+  background-color: #fff8f8;
+}
+
+/* テーブル */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.subject-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.subject-info-table th {
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.th-major { width: 20%; }
+.th-class { width: 10%; }
+.th-grade { width: 8%; }
+
+.subject-info-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.subject-info-table tr:nth-child(even) {
+  background-color: #f9fbfb;
+}
+
+/* フォーム部品 */
+select,
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+select:focus,
+input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 189, 202, 0.2);
+}
+
+/* 削除ボタン */
+.delete-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 5px;
+}
+.delete-btn:hover {
+  color: var(--danger-color);
+}
+
+.edit-mode-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* 追加ボタン */
+.add-btn-wrapper {
+  margin-top: 20px;
+  text-align: center;
+  border: 2px dashed #bcebf0;
+  border-radius: 6px;
+  padding: 12px;
+  background-color: #f0fdfe;
+  display: none;
+}
+
+.add-row-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+}
+.add-row-btn:hover {
+  text-decoration: underline;
+}
+
+.hidden-template {
+    display: none;
+}
+
+/* 編集モード切り替え */
+.edit-mode { display: none; }
+.view-mode { display: block; }
+
+.editing-mode .edit-mode { display: block; }
+.editing-mode .view-mode { display: none; }
+.editing-mode .add-btn-wrapper { display: block; }
+
+.editing-mode .edit-mode-wrapper .edit-mode {
+    display: block; 
+}
