@@ -51,4 +51,21 @@ public interface DepartmentSubjectRepository extends JpaRepository<DepartmentSub
         WHERE d.DepartmentID = :departmentId
         """, nativeQuery = true)
     List<Object[]> findCourseAndClass(@Param("departmentId") Integer departmentId);
+
+    //指定されたコースIDに紐づく学年（Grade）の一覧を取得する
+    @Query("SELECT DISTINCT ds.grade FROM DepartmentSubject ds " +
+        "WHERE ds.department.major.course.courseId = :courseId " +
+        "ORDER BY ds.grade ASC")
+    List<Integer> findGradesByCourseId(@Param("courseId") Integer courseId);
+
+    //コースIDと学年から、該当するクラスを取得する
+    @Query("SELECT DISTINCT ds.department.departmentId, ds.department.className " +
+        "FROM DepartmentSubject ds " +
+        "WHERE ds.department.major.course.courseId = :courseId " +
+        "AND ds.grade = :grade " +
+        "ORDER BY ds.department.className ASC")
+    List<Object[]> findClassesByCourseIdAndGrade(
+            @Param("courseId") Integer courseId, 
+            @Param("grade") Integer grade
+    );
 }

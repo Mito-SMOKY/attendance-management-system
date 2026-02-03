@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter; 
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -260,39 +261,96 @@ public class MdTimetableService {
         DepartmentEntity department = departmentRepository.findById(deptId).orElseThrow();
         if (targetGrade == null) targetGrade = 1;
 
-        // 既存データを削除 
-        timetableRepository.deleteByDepartment_DepartmentIdAndGradeAndDate(deptId, targetGrade, date);
+        // 既存データを取得してMapにする
+        List<TimetableEntity> existingList = timetableRepository.findByDepartment_DepartmentIdAndGradeAndDateOrderBySlotIdAsc(deptId, targetGrade, date);
+        Map<Integer, TimetableEntity> existingMap = new HashMap<>();
+        for (TimetableEntity t : existingList) {
+            existingMap.put(t.getSlotId(), t);
+        }
         
-        // 削除を即時反映
-        timetableRepository.flush();
-        
-        // 新しいデータを登録リストに追加
+        // 保存用・削除用リスト
         List<TimetableEntity> entitiesToSave = new ArrayList<>();
+        List<TimetableEntity> entitiesToDelete = new ArrayList<>();
         String dayOfWeekKey = date.getDayOfWeek().name();
         Map<Integer, Map<String, Cell>> scheduleMap = dto.getScheduleMap();
         
+        // 全時限ループ
         for (Integer slot : scheduleMap.keySet()) {
+            
+            // 入力データの取得
+            Cell cell = null;
             Map<String, Cell> dayMap = scheduleMap.get(slot);
-            if (dayMap != null && dayMap.containsKey(dayOfWeekKey)) {
-                Cell cell = dayMap.get(dayOfWeekKey);
-                if (cell != null && cell.getSubjectId() != null) {
-                    TimetableEntity entity = new TimetableEntity();
-                    entity.setDate(date);
-                    entity.setSlotId(slot);
-                    entity.setDepartment(department);
-                    entity.setGrade(targetGrade); 
-                    entity.setAcademicYear(date.getYear());
-                    entity.setSubjectId(cell.getSubjectId());
-                    entity.setClassroomId(cell.getClassroomId());
-                    entity.setUserId(cell.getUserId());
-                    entitiesToSave.add(entity);
+            if (dayMap != null) {
+                if (dayMap.containsKey(dayOfWeekKey)) {
+                    cell = dayMap.get(dayOfWeekKey);
+                } else if (dayMap.containsKey(dayOfWeekKey.toLowerCase())) {
+                    cell = dayMap.get(dayOfWeekKey.toLowerCase());
+                }
+            }
+
+            //同じ時限・教員の重複を解消
+            if (cell != null && cell.getUserId() != null) {
+
+                // その先生の、その日の授業を全取得
+                List<TimetableEntity> teacherDailySchedule = timetableRepository.findByUserIdAndDate(cell.getUserId(), date);
+                
+                for (TimetableEntity conflict : teacherDailySchedule) {
+
+                    // 「同じ時限」かつ「違う学科」のデータがあれば削除対象にする
+                    if (conflict.getSlotId().equals(slot) && !conflict.getDepartment().getDepartmentId().equals(deptId)) {
+                        entitiesToDelete.add(conflict);
+                    }
+                }
+            }
+
+            // DB上の既存データ
+            TimetableEntity currentEntity = existingMap.get(slot);
+
+            // 入力あり
+            if (cell != null && cell.getSubjectId() != null) {
+
+                if (currentEntity != null) {
+
+                    //上書き処理
+                    currentEntity.setSubjectId(cell.getSubjectId());
+                    currentEntity.setClassroomId(cell.getClassroomId());
+                    currentEntity.setUserId(cell.getUserId());
+                    entitiesToSave.add(currentEntity);
+                    
+                    existingMap.remove(slot);
+                } else {
+
+                    // 新規登録
+                    TimetableEntity newEntity = new TimetableEntity();
+                    newEntity.setDate(date);
+                    newEntity.setSlotId(slot);
+                    newEntity.setDepartment(department);
+                    newEntity.setGrade(targetGrade);
+                    newEntity.setAcademicYear(date.getYear());
+                    newEntity.setSubjectId(cell.getSubjectId());
+                    newEntity.setClassroomId(cell.getClassroomId());
+                    newEntity.setUserId(cell.getUserId());
+                    entitiesToSave.add(newEntity);
+                }
+            } 
+
+            // 入力なし
+            else {
+                if (currentEntity != null) {
+                    entitiesToDelete.add(currentEntity);
+                    existingMap.remove(slot);
                 }
             }
         }
-        
-        // 一括保存
+
+        // 保存実行
         if (!entitiesToSave.isEmpty()) {
             timetableRepository.saveAll(entitiesToSave);
+        }
+        
+        // 削除実行
+        if (!entitiesToDelete.isEmpty()) {
+            timetableRepository.deleteAll(entitiesToDelete);
         }
     }
 

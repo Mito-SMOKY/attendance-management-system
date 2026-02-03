@@ -145,4 +145,17 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Inte
     // 指定した学科IDで、データが存在する「学年」のリストを取得 (昇順)
     @Query("SELECT DISTINCT t.grade FROM TimetableEntity t WHERE t.department.departmentId = :departmentId ORDER BY t.grade")
     List<Integer> findGradesByDepartmentId(@Param("departmentId") Integer departmentId);
+
+    // 教員の重複チェック
+    @Query("SELECT COUNT(t) > 0 FROM TimetableEntity t " +
+        "WHERE t.date = :date " +
+        "AND t.slotId = :slotId " +
+        "AND t.userId = :userId " +
+        "AND t.department.departmentId <> :excludeDeptId")
+    boolean existsByTeacherOverlap(
+        @Param("date") LocalDate date, 
+        @Param("slotId") Integer slotId, 
+        @Param("userId") Integer userId, 
+        @Param("excludeDeptId") Integer excludeDeptId
+    );
 }

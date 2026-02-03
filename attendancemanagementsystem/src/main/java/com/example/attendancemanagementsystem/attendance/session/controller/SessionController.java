@@ -33,6 +33,7 @@ import com.example.attendancemanagementsystem.common.repository.AttendanceStatus
 import com.example.attendancemanagementsystem.common.repository.ClassroomRepository;
 import com.example.attendancemanagementsystem.common.repository.CourseRepository;
 import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
+import com.example.attendancemanagementsystem.common.repository.DepartmentSubjectRepository;
 import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository;
 import com.example.attendancemanagementsystem.common.repository.MajorRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
@@ -54,6 +55,7 @@ public class SessionController {
     private final EnrollmentsRepository enrollmentsRepository;
     private final TimetableRepository timetableRepository;
     private final DepartmentRepository departmentRepository;
+    private final DepartmentSubjectRepository departmentSubjectRepository;
     private final CourseRepository courseRepository;
     private final MajorRepository majorRepository;
 
@@ -67,6 +69,7 @@ public class SessionController {
                             EnrollmentsRepository enrollmentsRepository,
                             TimetableRepository timetableRepository,
                             DepartmentRepository departmentRepository,
+                            DepartmentSubjectRepository departmentSubjectRepository,
                             CourseRepository courseRepository,
                             MajorRepository majorRepository) {
         this.sessionService = sessionService;
@@ -79,6 +82,7 @@ public class SessionController {
         this.enrollmentsRepository = enrollmentsRepository;
         this.timetableRepository = timetableRepository;
         this.departmentRepository = departmentRepository;
+        this.departmentSubjectRepository = departmentSubjectRepository;
         this.courseRepository = courseRepository;
         this.majorRepository = majorRepository;
     }
@@ -284,7 +288,7 @@ public class SessionController {
     public List<Integer> getGrades(@RequestParam("courseId") Integer courseId) {
 
         // 指定されたコースIDから学年一覧を取得して返す
-        return enrollmentsRepository.findDistinctGradesByCourseId(courseId);
+        return departmentSubjectRepository.findGradesByCourseId(courseId);
     }
 
     // コース + 学年 -> クラス
@@ -295,7 +299,7 @@ public class SessionController {
             @RequestParam("grade") Integer grade) {
         
         // 指定されたコースIDと学年から学科IDとクラス名の組み合わせを取得
-        List<Object[]> results = enrollmentsRepository.findDistinctDepartmentIdAndClass(courseId, grade);
+        List<Object[]> results = departmentSubjectRepository.findClassesByCourseIdAndGrade(courseId, grade);
         List<Map<String, Object>> responseList = new ArrayList<>();
         
         // 結果をマップ形式に変換してリストに追加
