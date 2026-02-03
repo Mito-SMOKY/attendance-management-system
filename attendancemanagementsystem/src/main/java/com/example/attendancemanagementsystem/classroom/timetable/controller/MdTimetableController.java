@@ -173,12 +173,22 @@ public class MdTimetableController {
     // 日別スケジュールの更新実行処理
     @PostMapping("/daily/update")
     public String updateDaily(@ModelAttribute MdTimetableDto mdTimetableDto, RedirectAttributes redirectAttributes) {
-        mdTimetableService.updateDailySchedule(mdTimetableDto);
-        redirectAttributes.addFlashAttribute("successMessage", "保存しました！");
+        
+        try {
+            // 更新処理を実行
+            mdTimetableService.updateDailySchedule(mdTimetableDto);
+            
+            // 成功メッセージ
+            redirectAttributes.addFlashAttribute("successMessage", "保存しました！");
+            
+        } catch (Exception e) {
+            e.printStackTrace(); 
+            redirectAttributes.addFlashAttribute("errorMessage", "エラーが発生しました: " + e.getMessage());
+        }
+
+        // リダイレクト設定
         redirectAttributes.addAttribute("date", mdTimetableDto.getStartDate());
         redirectAttributes.addAttribute("departmentId", mdTimetableDto.getDepartmentId());
-        
-        // 学年が null でない場合のみパラメータに追加する
         if (mdTimetableDto.getTargetGrade() != null) {
             redirectAttributes.addAttribute("targetGrade", mdTimetableDto.getTargetGrade());
         }
