@@ -121,6 +121,8 @@ body {
 .toggle-eye {
   position: absolute;
   right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
   cursor: pointer;
   color: #aaa;
   font-size: 18px;

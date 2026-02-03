@@ -35,11 +35,6 @@ body {
   margin-bottom: 30px;
 }
 
-.backbutton-container {
-  position: absolute;
-  left: 0;
-}
-
 .page-title {
   font-size: 28px;
   font-weight: bold;
