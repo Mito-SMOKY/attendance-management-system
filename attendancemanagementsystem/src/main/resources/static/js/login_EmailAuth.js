@@ -85,22 +85,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const pass = passwordInput ? passwordInput.value : '';
 
             // 文字数チェック (8文字以上 24文字以下)
-            if (pass.length < 8 || pass.length > 24) {
+            if (pass.length < 1 || pass.length > 255) {
                 e.preventDefault();
-                showError('パスワードは8文字以上、24文字以下で入力してください。');
                 return;
             }
-
-            // 大文字・小文字の混合チェック
-            const hasLowerCase = /[a-z]/.test(pass);
-            const hasUpperCase = /[A-Z]/.test(pass);
-
-            if (!hasLowerCase || !hasUpperCase) {
-                e.preventDefault();
-                showError('パスワードには大文字と小文字をそれぞれ1文字以上含めてください。');
-                return;
-            }
-
             // OKならボタンを無効化
             if (submitBtn) {
                 submitBtn.disabled = true;
