@@ -19,10 +19,19 @@
             <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
         </div>
     </div>
-    
+
     <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/admin/request/menu')}"></div>
+
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: backButton(url='/admin/request/menu')}"></div>
+        </div>
+        
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: backButton(url='/admin/userManagement')}"></div>
+        </div>
+
     </div>
+    
 
     <div class="student-list-container">
         

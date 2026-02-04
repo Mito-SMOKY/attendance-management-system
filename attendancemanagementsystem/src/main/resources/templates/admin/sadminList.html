@@ -13,14 +13,14 @@
   </head>
   <body>
     <div class="header-container">
-      <div th:replace="~{fragments/_parts :: header}"></div>
+        <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
     </div>
 
     <div class="main-wrapper">
       <div class="top-section">
         <div class="backbutton-container">
           <div
-            th:replace="~{fragments/_parts :: backButton(url='/admin/sadminUserManagement')}"
+            th:replace="~{fragments/_parts :: backButton(url='/admin/userManagement')}"
           ></div>
         </div>
 
