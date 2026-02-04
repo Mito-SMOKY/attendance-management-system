@@ -22,15 +22,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.attendancemanagementsystem.common.entity.Datalist;
-import com.example.attendancemanagementsystem.common.entity.DatalistDetailEntity; // ★追加
-import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
+import com.example.attendancemanagementsystem.common.entity.Datalist; // ★追加: セッション管理用
+import com.example.attendancemanagementsystem.common.entity.DatalistDetailEntity;
+import com.example.attendancemanagementsystem.common.entity.DepartmentEntity; // ★追加
 import com.example.attendancemanagementsystem.common.repository.DatalistDetailRepository;
 import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
 import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
 import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm;
 import com.example.attendancemanagementsystem.user.admin.service.AdminCreateStudentService;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/admin")
@@ -188,55 +190,126 @@ public class AdminCreateStudentController {
 
 
     // 手動入力データの保存 
-    @PostMapping("/saveManualAccounts")
-    public String saveManualAccounts(@ModelAttribute ManualAccountForm form, RedirectAttributes redirectAttributes) {
+    // @PostMapping("/saveManualAccounts")
+    // public String saveManualAccounts(@ModelAttribute ManualAccountForm form, RedirectAttributes redirectAttributes) {
         
+    //     Datalist savedDatalist = adminService.saveDatalistFromForm(form, getCurrentUserId());
+        
+    //     if (savedDatalist == null) {
+
+    //         // 保存されたデータが無い場合（全員重複などで保存されなかった場合）
+    //         redirectAttributes.addFlashAttribute("warningMessage", "登録できるデータがありませんでした（すべて重複またはエラー）。");
+
+    //         return "redirect:/admin/manualInput"; 
+    //     }
+
+    //     // IDを取得
+    //     Integer newId = savedDatalist.getDataListId();
+    //     redirectAttributes.addFlashAttribute("successMessage", "登録が完了しました。");
+
+    //     // デフォルトでcsvのダウンロード
+    //     String redirectUrl = "redirect:/admin/tempAccountList/" + newId + "?origin=send&download=true";
+
+    //     return redirectUrl;
+    // }
+    
+    // // CSVをダウンロードする処理
+    // @GetMapping("/downloadCsv/{id}")
+    // public ResponseEntity<byte[]> downloadCsvById(@PathVariable Integer id) {
+        
+    //     // CSVの中身の作成
+    //     byte[] csvData = adminService.createCsvFile(id);
+        
+    //     // リストの情報を取得する
+    //     Datalist datalist = adminService.getDatalistById(id);
+    //     String fileName = datalist.getDataListName() + ".csv";
+        
+    //     // 日本語のファイル名が文字化けしないように変換する
+    //     String encodedFileName;
+    //     try {
+    //         encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replace("+", "%20");
+    //     } catch (Exception e) {
+    //         encodedFileName = "download.csv";
+    //     }
+
+    //     // ヘッダーの作成
+    //     HttpHeaders headers = new HttpHeaders();
+        
+    //     // 保存処理
+    //     headers.setContentType(MediaType.parseMediaType("text/csv; charset=UTF-8"));
+    //     headers.setContentDispositionFormData("attachment", encodedFileName);
+    //     headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+    //     return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
+    // }
+
+    // 手動入力データの保存 
+    @PostMapping("/saveManualAccounts")
+    public String saveManualAccounts(@ModelAttribute ManualAccountForm form, 
+                                     RedirectAttributes redirectAttributes,
+                                     HttpSession session) { // ★追加: セッション利用
+        
+        // 1. DBへの保存（パスワードはここで暗号化される）
         Datalist savedDatalist = adminService.saveDatalistFromForm(form, getCurrentUserId());
         
         if (savedDatalist == null) {
-
-            // 保存されたデータが無い場合（全員重複などで保存されなかった場合）
             redirectAttributes.addFlashAttribute("warningMessage", "登録できるデータがありませんでした（すべて重複またはエラー）。");
-
             return "redirect:/admin/manualInput"; 
         }
 
-        // IDを取得
         Integer newId = savedDatalist.getDataListId();
+
+        // ★追加: DB保存に使ったフォーム情報（平文パスワード含む）からPDFを即座に作成
+        byte[] pdfData = adminService.createPdfFromForm(form);
+        
+        // ★追加: セッションにPDFデータを一時保存（キーにIDを含める）
+        session.setAttribute("TEMP_PDF_" + newId, pdfData);
+
         redirectAttributes.addFlashAttribute("successMessage", "登録が完了しました。");
 
-        // デフォルトでcsvのダウンロード
-        String redirectUrl = "redirect:/admin/tempAccountList/" + newId + "?origin=send&download=true";
-
-        return redirectUrl;
+        // ダウンロードフラグ付きでリダイレクト
+        return "redirect:/admin/tempAccountList/" + newId + "?origin=send&download=true";
     }
     
-    // CSVをダウンロードする処理
-    @GetMapping("/downloadCsv/{id}")
-    public ResponseEntity<byte[]> downloadCsvById(@PathVariable Integer id) {
+    // ★変更: PDFをダウンロードする処理
+    @GetMapping("/downloadPdf/{id}")
+    public ResponseEntity<byte[]> downloadPdfById(@PathVariable Integer id, HttpSession session) {
         
-        // CSVの中身の作成
-        byte[] csvData = adminService.createCsvFile(id);
+        byte[] pdfData;
+        String fileName;
+
+        // 1. セッションから平文入りPDFを探す
+        String sessionKey = "TEMP_PDF_" + id;
+        if (session.getAttribute(sessionKey) != null) {
+            pdfData = (byte[]) session.getAttribute(sessionKey);
+            // ダウンロードしたらセッションから消す（メモリ節約）
+            session.removeAttribute(sessionKey);
+            
+            // ファイル名の決定（DBから名前だけ取得）
+            Datalist datalist = adminService.getDatalistById(id);
+            fileName = datalist.getDataListName() + ".pdf";
+
+        } else {
+            // 2. セッションにない場合（後から履歴画面でDLする場合など）
+            // 平文パスワードは復元できないため、暗号化済みデータのPDFか、エラーを返す等の対応が必要。
+            // ここでは簡易的に「有効期限切れ」の空PDFなどを返すか、例外を出します。
+            // ※必要であればServiceに「DBからPDF作成（パスワードはハッシュ値）」メソッドも追加してください。
+             return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
+        }
         
-        // リストの情報を取得する
-        Datalist datalist = adminService.getDatalistById(id);
-        String fileName = datalist.getDataListName() + ".csv";
-        
-        // 日本語のファイル名が文字化けしないように変換する
+        // 日本語ファイル名のエンコード
         String encodedFileName;
         try {
             encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replace("+", "%20");
         } catch (Exception e) {
-            encodedFileName = "download.csv";
+            encodedFileName = "account_list.pdf";
         }
 
-        // ヘッダーの作成
+        // ヘッダー作成
         HttpHeaders headers = new HttpHeaders();
-        
-        // 保存処理
-        headers.setContentType(MediaType.parseMediaType("text/csv; charset=UTF-8"));
+        headers.setContentType(MediaType.APPLICATION_PDF); // ★変更: PDF用のMIMEタイプ
         headers.setContentDispositionFormData("attachment", encodedFileName);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-        return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
+        
+        return new ResponseEntity<>(pdfData, headers, HttpStatus.OK);
     }
 }
