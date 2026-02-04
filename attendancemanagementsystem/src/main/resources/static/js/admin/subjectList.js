@@ -81,7 +81,6 @@ function renderTable(subjects) {
                 <div class="subject-content">
                     <span class="subject-icon"><i class="fa-solid fa-chalkboard-user"></i></span>
                     <div class="subject-text">
-                        <span class="class-name">${item.classInfoStr}</span>
                         <span class="subject-name">${item.subjectName}</span>
                     </div>
                     <i class="fa-solid fa-chevron-right arrow-icon"></i>
