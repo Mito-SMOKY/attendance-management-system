@@ -30,7 +30,7 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
        // 出席情報の存在確認
        boolean existsBySessionIdAndStudent_UserId(Integer sessionId, Integer userId);
 
-       // ★追加: StudentEntity と SessionEntity オブジェクトによる検索
+       // StudentEntity と SessionEntity オブジェクトによる検索
        Optional<AttendanceEntity> findByStudentAndSession(StudentEntity student, SessionEntity session);
 
        @Transactional 
@@ -117,4 +117,10 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
               @Param("studentId") Integer studentId, 
               @Param("startDate") LocalDate startDate, 
               @Param("endDate") LocalDate endDate);
+
+       @Query("SELECT a FROM AttendanceEntity a WHERE a.sessionId = :sessionId AND a.student.userId = :userId")
+       Optional<AttendanceEntity> findBySessionIdAndUserId(
+              @Param("sessionId") Integer sessionId, 
+              @Param("userId") Integer userId
+       );
 }

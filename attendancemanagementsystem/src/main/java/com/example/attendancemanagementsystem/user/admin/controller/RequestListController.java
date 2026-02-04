@@ -10,7 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +20,7 @@ import com.example.attendancemanagementsystem.user.loginandprofile.service.Custo
 
 @Controller
 @RequestMapping("/admin/requestList")
-@PreAuthorize("hasRole('SUPER_ADMIN')")
+@PreAuthorize("hasRole('SUPER_ADMIN')") // スーパー管理者専用
 public class RequestListController {
 
     @Autowired
@@ -33,19 +32,21 @@ public class RequestListController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             Model model) {
         
-        List<Map<String, Object>> requestList = requestListService.getApprovalList(userDetails.getUserId());
-        model.addAttribute("pageTitle", "申請承認・履歴");
+        // 未承認(1)などのリストを取得
+        List<Map<String, Object>> requestList = requestListService.getApprovalList(userDetails.getUsersEntity().getUserId());
         model.addAttribute("requestList", requestList);
+        model.addAttribute("pageTitle", "申請一覧");
         
-        return "admin/superAdmin/RequestList"; // ファイル名が RequestList.html ならこのままでOK
+        return "admin/superAdmin/requestList"; // スーパー管理者用の一覧へ
     }
 
-    // 詳細画面 (GET /admin/requestList/detail/{id})
-    @GetMapping("/detail/{id}")
+    // 詳細画面 (GET /admin/requestList/detail?id=...)
+    @GetMapping("/detail")
     public String detail(
-            @PathVariable("id") Integer requestId,
+            @RequestParam("id") Integer requestId,
             Model model) {
         
+        // Serviceから詳細情報をMap形式で取得
         Map<String, Object> detail = requestListService.getRequestDetail(requestId);
         
         if (detail == null) {
@@ -53,29 +54,34 @@ public class RequestListController {
         }
 
         model.addAttribute("pageTitle", "申請詳細");
-        model.addAttribute("detail", detail);
+        // HTML側では ${request} でデータにアクセスします
+        model.addAttribute("request", detail);
         
-        // ★修正箇所: ファイル名(requestDetail.html)に合わせて先頭を小文字にする
-        return "admin/superAdmin/requestDetail";
+        // ★修正箇所: 正しいスーパー管理者用テンプレートを指定
+        return "admin/superAdmin/requestDetail"; 
     }
 
     // 承認・却下実行 (POST /admin/requestList/process)
     @PostMapping("/process")
-    @ResponseBody
+    @ResponseBody // Ajaxで呼ばれることを想定
     public ResponseEntity<String> process(
             @RequestParam("requestId") Integer requestId,
-            @RequestParam("action") String action) { 
+            @RequestParam("action") String action,
+            @AuthenticationPrincipal CustomUserDetails userDetails) { 
         
         try {
             boolean isApproved = "approve".equals(action);
-            requestListService.processRequest(requestId, isApproved);
+            Integer approverId = userDetails.getUsersEntity().getUserId();
+            
+            // 承認処理を実行
+            requestListService.processRequest(requestId, isApproved, approverId);
             
             String msg = isApproved ? "承認しました。" : "却下しました。";
             return ResponseEntity.ok(msg);
             
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("エラーが発生しました: " + e.getMessage());
+            return ResponseEntity.badRequest().body("処理に失敗しました: " + e.getMessage());
         }
     }
 }
