@@ -1,33 +1,46 @@
 package com.example.attendancemanagementsystem.classroom.timetable.controller;
 
 import java.time.LocalDate;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
 import com.example.attendancemanagementsystem.classroom.timetable.dto.StudentTimetableDto;
 import com.example.attendancemanagementsystem.classroom.timetable.service.StudentTimetableService;
+import com.example.attendancemanagementsystem.common.entity.UsersEntity; 
+import com.example.attendancemanagementsystem.common.repository.UsersRepository; 
 
 @Controller
 @RequestMapping("/student")
 public class StudentTimetableController {
 
     private final StudentTimetableService timetableService;
+    private final UsersRepository usersRepository; 
 
-    public StudentTimetableController(StudentTimetableService timetableService) {
+    // コンストラクタでRepositoryも注入
+    public StudentTimetableController(StudentTimetableService timetableService, UsersRepository usersRepository) {
         this.timetableService = timetableService;
+        this.usersRepository = usersRepository;
     }
 
     //時間割画面を表示
-    //URL: /student/timetable
     @GetMapping("/timetable")
     public String showTimetable(
             @AuthenticationPrincipal UserDetails userDetails,
             Model model) {
         
         String loginId = userDetails.getUsername();
+
+        // メールアドレス未登録チェック
+        UsersEntity user = usersRepository.findByLoginId(loginId).orElse(null);
+        if (user != null && user.getEmail() == null) {
+            return "redirect:/email/auth";
+        }
+
         LocalDate today = LocalDate.now();
 
         // 初期表示用のデータを取得

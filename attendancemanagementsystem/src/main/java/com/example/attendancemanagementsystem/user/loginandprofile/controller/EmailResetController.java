@@ -1,5 +1,8 @@
 package com.example.attendancemanagementsystem.user.loginandprofile.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -8,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody; 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
@@ -24,21 +28,21 @@ import jakarta.servlet.http.HttpSession;
 public class EmailResetController {
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private OtpService otpService;
     
     @Autowired
     private UsersRepository usersRepository;
     
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private NotificationEmailService notificationEmailService;
-
+    
     @Autowired
     private NotificationMessageService notificationMessageService;
 
-    // 本人確認画面
+    // メールアドレス入力画面
     @GetMapping("/auth")
     public String showAuthForm() {
         return "login/email_auth";
@@ -73,52 +77,33 @@ public class EmailResetController {
         return "login/reset_email";
     }
 
-    // OTP送信処理（初回送信 ＆ 再送信ボタンもここ宛て）
+    // OTP送信処理
     @PostMapping("/send-otp")
     public String sendOtp(
-            @RequestParam("newEmail") String newEmail,
-            @RequestParam(name = "isResend", required = false, defaultValue = "false") boolean isResend,
+            @RequestParam("newEmail") String newEmail, 
             HttpSession session,
             RedirectAttributes redirectAttributes) {
-        
+
         Integer userId = (Integer) session.getAttribute("resetEmail_UserId");
         if (userId == null) return "redirect:/email/auth";
-
-        // 初回送信時のみ重複チェックを行う
-        if (!isResend && usersRepository.findByEmail(newEmail).isPresent()) {
-            redirectAttributes.addFlashAttribute("error", "このメールアドレスは既に使用されています");
-            return "redirect:/email/reset-email";
-        }
 
         try {
             UsersEntity user = usersRepository.findById(userId).orElseThrow();
             
-            // ★ OtpServiceに委譲 (DB保存, メール送信, クールタイムチェック)
+            // メール重複チェック
+            if (usersRepository.findByEmail(newEmail).isPresent()) {
+                redirectAttributes.addFlashAttribute("error", "このメールアドレスは既に使用されています");
+                return "redirect:/email/reset-email";
+            }
+
+            // OTP生成・送信
             otpService.sendOtp(user, newEmail, OtpPurpose.EMAIL_CHANGE);
-
-            // セッションに保存
+            
             session.setAttribute("resetEmail_NewEmail", newEmail);
-
-            // 再送ボタンから来た場合のみメッセージを表示
-            if (isResend) {
-                redirectAttributes.addFlashAttribute("message", "sent");
-            }
-
             return "redirect:/email/verify-otp";
-            
-        } catch (RuntimeException e) {
-            
-            // クールタイムエラーの場合
-            if (e.getMessage() != null && e.getMessage().contains("時間を空けて")) {
-                
-                // セッション復元
-                session.setAttribute("resetEmail_NewEmail", newEmail);
-                session.setAttribute("resetEmail_UserId", userId);
 
-                redirectAttributes.addAttribute("error", "too_soon");
-                return "redirect:/email/verify-otp";
-            }
-
+        } catch (Exception e) {
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "エラーが発生しました");
             return "redirect:/email/reset-email";
         }
@@ -128,53 +113,77 @@ public class EmailResetController {
     @GetMapping("/verify-otp")
     public String showVerifyOtpForm(HttpSession session) {
         if (session.getAttribute("resetEmail_NewEmail") == null) {
-            return "redirect:/email/auth";
+            return "redirect:/email/reset-email";
         }
-        return "login/email_verify_otp"; 
+        return "login/email_verify_otp";
+    }
+
+    // 完了画面表示用メソッド
+    @GetMapping("/complete")
+    public String showCompletePage() {
+        return "login/email_complete";
     }
 
     // OTP検証と更新
     @PostMapping("/verify-otp")
-    public String verifyOtp(
+    @ResponseBody 
+    public Map<String, Object> verifyOtp(
             @RequestParam("otp") String otp,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+            HttpSession session) {
+        
+        Map<String, Object> response = new HashMap<>();
         
         String newEmail = (String) session.getAttribute("resetEmail_NewEmail");
         Integer userId = (Integer) session.getAttribute("resetEmail_UserId");
 
-        if (newEmail == null || userId == null) return "redirect:/email/auth";
+        // セッション切れの場合
+        if (newEmail == null || userId == null) {
+            response.put("success", true); 
+            response.put("redirectUrl", "/email/auth");
+            return response;
+        }
 
-        boolean isValid;
         try {
             UsersEntity user = usersRepository.findById(userId).orElseThrow();
-            // OtpServiceで検証
-            isValid = otpService.verifyOtp(user, otp, OtpPurpose.EMAIL_CHANGE); 
+            
+            // 検証実行
+            boolean isValid = otpService.verifyOtp(user, otp, OtpPurpose.EMAIL_CHANGE); 
             
             if (isValid) {
-                // 検証成功 -> メールアドレス更新実行
+
+                // 検証成功 -> 更新
                 user.setEmail(newEmail);
                 usersRepository.save(user);
-                notificationMessageService.createEmailChangeCompletion(user);
+
+                // 通知処理 
+                try {
+                    notificationMessageService.createEmailChangeCompletion(user);
+                    notificationEmailService.sendEmailChangeCompletion(user);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
                 
-                // トークン掃除
                 otpService.clearOtp(user);
                 
-                // 完了通知
-                notificationEmailService.sendEmailChangeCompletion(user);
-
-                // セッション掃除
                 session.removeAttribute("resetEmail_NewEmail");
                 session.removeAttribute("resetEmail_UserId");
 
-                return "login/email_complete";
+                // 成功時のレスポンス 
+                response.put("success", true);
+                response.put("redirectUrl", "/email/complete"); 
+
+            } else {
+                // 失敗時のレスポンス 
+                response.put("success", false);
+                response.put("message", "invalid");
             }
+
         } catch (Exception e) {
-            isValid = false;
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "error");
         }
 
-        // 検証失敗時
-        redirectAttributes.addAttribute("error", "invalid");
-        return "redirect:/email/verify-otp";
+        return response;
     }
 }
