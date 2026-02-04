@@ -1,5 +1,6 @@
 package com.example.attendancemanagementsystem.user.loginandprofile.controller;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +45,13 @@ public class EmailResetController {
 
     // メールアドレス入力画面
     @GetMapping("/auth")
-    public String showAuthForm() {
+    public String showAuthForm(Principal principal, Model model) {
+
+        //urlの設定
+        String backUrl = (principal != null) ? "/logout" : "/login";
+        
+        model.addAttribute("backUrl", backUrl);
+        
         return "login/email_auth";
     }
 
