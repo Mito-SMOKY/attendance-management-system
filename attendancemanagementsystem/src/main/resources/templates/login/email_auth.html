@@ -19,7 +19,7 @@
     <div class="container">
         
         <div class="backbutton-container">
-            <div th:replace="~{fragments/_parts :: backButton(url='/login')}"></div>
+            <div th:replace="~{fragments/_parts :: backButton(url=${backUrl})}"></div>
         </div>
         <h2 class="main-title">本人確認</h2>
         

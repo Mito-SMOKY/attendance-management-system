@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.attendancemanagementsystem.classroom.timetable.service.AdminTimetableService;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
+import com.example.attendancemanagementsystem.common.repository.UsersRepository; 
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
 
 @Controller
@@ -22,6 +23,9 @@ public class AdminTimetableController {
 
     @Autowired
     private AdminTimetableService adminTimetableService;
+
+    @Autowired 
+    private UsersRepository usersRepository;
 
     // ログイン中のユーザーIDを取得
     private String getCurrentUserLoginId(CustomUserDetails userDetails) {
@@ -35,6 +39,16 @@ public class AdminTimetableController {
     @GetMapping("/timetable")
     public String showTimetablePage(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
         
+        // メールアドレス未登録チェック
+        if (userDetails != null) {
+            String loginId = userDetails.getUsername();
+            UsersEntity user = usersRepository.findByLoginId(loginId).orElse(null);
+            
+            if (user != null && user.getEmail() == null) {
+                return "redirect:/email/auth";
+            }
+        }
+        
         // 全ての管理者を取得してプルダウン用に渡す
         List<UsersEntity> adminList = adminTimetableService.getAllAdmins();
         model.addAttribute("adminUsers", adminList);
@@ -45,11 +59,12 @@ public class AdminTimetableController {
         return "admin/timetable";
     }
 
-    // 時間割データの取得
+    // 時間割データの取得 (API)
     @GetMapping("/api/timetabledata")
     @ResponseBody
     public Map<String, Object> getTimetableData(@RequestParam("date") String dateStr,
                                                 @RequestParam("userId") String targetLoginId) {
+        
         return adminTimetableService.getTimetableData(dateStr, targetLoginId);
     }
 }
