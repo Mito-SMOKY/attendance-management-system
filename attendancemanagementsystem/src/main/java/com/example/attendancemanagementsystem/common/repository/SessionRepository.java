@@ -2,6 +2,7 @@ package com.example.attendancemanagementsystem.common.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -60,4 +61,18 @@ public interface SessionRepository extends JpaRepository<SessionEntity, Integer>
     // 指定された学科と科目に対する実施済みセッションのカウント
     @Query("SELECT COUNT(s) FROM SessionEntity s WHERE s.department.departmentId = :departmentId AND s.subject.subjectId = :subjectId AND s.sessionFlag = true")
     int countImplementedSessions(@Param("departmentId") Integer departmentId, @Param("subjectId") Integer subjectId);
+
+    // 承認用: 既に保存されたセッションが存在するか確認するメソッド
+    @Query("SELECT s FROM SessionEntity s " +
+        "WHERE s.sessionDate = :date " +
+        "AND s.timeSlot.slotId = :slotId " +
+        "AND s.department.departmentId = :deptId " +
+        "AND s.targetGrade = :grade " +
+        "AND s.sessionFlag = true")
+    Optional<SessionEntity> findExistingSessionForApproval(
+        @Param("date") LocalDate date,
+        @Param("slotId") Integer slotId,
+        @Param("deptId") Integer deptId,
+        @Param("grade") Integer grade
+    );
 }

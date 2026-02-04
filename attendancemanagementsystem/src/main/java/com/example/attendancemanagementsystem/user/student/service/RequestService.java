@@ -1,12 +1,15 @@
 package com.example.attendancemanagementsystem.user.student.service;
 
+import java.time.DayOfWeek; // 追加
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.attendancemanagementsystem.common.entity.RequestDetailEntity;
 import com.example.attendancemanagementsystem.common.entity.RequestEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.RequestRepository;
@@ -33,31 +36,18 @@ public class RequestService {
 
     /**
      * 公欠申請を作成・保存する
-     * @param studentId 申請者(生徒)ID
-     * @param start     開始日
-     * @param end       終了日
-     * @param periods   時限リスト
-     * @param reason    理由
-     * @param approverId 承認者ID
      */
     @Transactional
-    public void createOfficialAbsenceRequest(Integer studentId, LocalDate start, LocalDate end, List<Integer> periods, String reason, Integer approverId) {
+    public void createOfficialAbsenceRequest(Integer approverId, UsersEntity studentUser, LocalDate start, LocalDate end, List<Integer> periods, String reason) {
         
-        UsersEntity student = usersRepository.findById(studentId)
-                .orElseThrow(() -> new IllegalArgumentException("生徒が見つかりません: " + studentId));
+        UsersEntity approver = usersRepository.findById(approverId)
+                .orElseThrow(() -> new IllegalArgumentException("承認者が見つかりません"));
 
         RequestEntity request = new RequestEntity();
         request.setRequestTypeId(1); // 1: 公欠申請
-        request.setRequesterUserId(studentId);
+        request.setRequesterUserId(studentUser.getUserId());
         request.setRequestMessage(reason);
-        request.setStatus(0); // 0: 申請中
-        
-        // 承認者のセット
-        if (approverId == null) {
-            throw new IllegalArgumentException("承認者が選択されていません");
-        }
-        UsersEntity approver = usersRepository.findById(approverId)
-                .orElseThrow(() -> new IllegalArgumentException("承認者が見つかりません: " + approverId));
+        request.setStatus(1); // 1: 承認待ち
         request.setApproverId(approverId);
         
         request.setStartDate(start);
@@ -70,9 +60,45 @@ public class RequestService {
         request.setPeriods(periodsStr);
 
         // 公欠申請の対象は自分自身
-        request.addTargetUser(student);
+        request.addTargetUser(studentUser);
+        
+        // ▼▼▼ RequestDetail (詳細データ) の作成処理 ▼▼▼
+        List<RequestDetailEntity> details = new ArrayList<>();
+        
+        // 開始日から終了日までの各日付についてループ
+        LocalDate currentDate = start;
+        while (!currentDate.isAfter(end)) {
+            
+            // ▼▼▼ 土日の場合はスキップ ▼▼▼
+            DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+            if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+                currentDate = currentDate.plusDays(1);
+                continue;
+            }
+            // ▲▲▲ スキップ処理ここまで ▲▲▲
+
+            // 選択された各時限についてデータを作成
+            for (Integer slotId : periods) {
+                RequestDetailEntity detail = new RequestDetailEntity();
+                detail.setRequest(request);      // 親となる申請をセット
+                detail.setTargetDate(currentDate); // 日付
+                detail.setSlotId(slotId);        // 時限
+                
+                details.add(detail);
+            }
+            
+            // 次の日に進める
+            currentDate = currentDate.plusDays(1);
+        }
+        
+        // 親Entityに子Entityのリストをセット
+        // (RequestEntityに CascadeType.ALL が設定されているため、親を保存すれば子も保存されます)
+        request.setRequestDetails(details);
+
         requestRepository.save(request);
-        notificationMessageService.createOfficialAbsenceRequestNotification(approver, student, reason);
+        
+        // 通知送信
+        notificationMessageService.createOfficialAbsenceRequestNotification(approver, studentUser, reason);
     }
 
     //申請を取り下げる (ソフトデリート)
@@ -86,9 +112,9 @@ public class RequestService {
             throw new SecurityException("他人の申請は操作できません");
         }
 
-        // ステータスが「0: 申請中」以外ならエラー
+        // ステータスが「1: 承認待ち」以外ならエラー
         Integer currentStatus = request.getStatus() != null ? request.getStatus() : 0;
-        if (currentStatus != 0) {
+        if (currentStatus != 1) { 
             throw new IllegalStateException("既に処理済みのため取り下げできません");
         }
 
@@ -96,7 +122,7 @@ public class RequestService {
         requestRepository.save(request);
     }
 
-    //自分の申請履歴を取得する
+    // 自分の申請履歴を取得
     public List<RequestEntity> getMyRequestHistory(Integer userId) {
         return requestRepository.findByRequesterUserIdOrderByCreatedAtDesc(userId);
     }
