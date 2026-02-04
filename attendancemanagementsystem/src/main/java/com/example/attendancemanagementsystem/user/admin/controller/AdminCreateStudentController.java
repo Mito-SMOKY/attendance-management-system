@@ -270,7 +270,7 @@ public class AdminCreateStudentController {
         return "redirect:/admin/tempAccountList/" + newId + "?origin=send&download=true";
     }
     
-    // ★変更: PDFをダウンロードする処理
+    // PDFをダウンロードする処理
     @GetMapping("/downloadPdf/{id}")
     public ResponseEntity<byte[]> downloadPdfById(@PathVariable Integer id, HttpSession session) {
         
@@ -281,19 +281,17 @@ public class AdminCreateStudentController {
         String sessionKey = "TEMP_PDF_" + id;
         if (session.getAttribute(sessionKey) != null) {
             pdfData = (byte[]) session.getAttribute(sessionKey);
-            // ダウンロードしたらセッションから消す（メモリ節約）
-            session.removeAttribute(sessionKey);
             
-            // ファイル名の決定（DBから名前だけ取得）
+            // ★修正: ここにあった session.removeAttribute(sessionKey); を削除しました。
+            // これで画面をリロードしたりボタンを押しても、セッションが切れるまではダウンロード可能です。
+            
+            // ファイル名の決定
             Datalist datalist = adminService.getDatalistById(id);
             fileName = datalist.getDataListName() + ".pdf";
 
         } else {
-            // 2. セッションにない場合（後から履歴画面でDLする場合など）
-            // 平文パスワードは復元できないため、暗号化済みデータのPDFか、エラーを返す等の対応が必要。
-            // ここでは簡易的に「有効期限切れ」の空PDFなどを返すか、例外を出します。
-            // ※必要であればServiceに「DBからPDF作成（パスワードはハッシュ値）」メソッドも追加してください。
-             return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
+            // 2. セッションにない場合
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
         }
         
         // 日本語ファイル名のエンコード
@@ -306,7 +304,7 @@ public class AdminCreateStudentController {
 
         // ヘッダー作成
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF); // ★変更: PDF用のMIMEタイプ
+        headers.setContentType(MediaType.APPLICATION_PDF); 
         headers.setContentDispositionFormData("attachment", encodedFileName);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
         
