@@ -1,14 +1,17 @@
 package com.example.attendancemanagementsystem.user.admin.service;
 
+import java.awt.Color;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
+import java.util.List; // フォント読み込み用
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +32,14 @@ import com.example.attendancemanagementsystem.user.admin.model.DatalistForm;
 import com.example.attendancemanagementsystem.user.admin.model.ManualAccountData;
 import com.example.attendancemanagementsystem.user.admin.model.ManualAccountForm;
 import com.example.attendancemanagementsystem.user.admin.model.TempAccountData;
+import com.lowagie.text.Document;
+import com.lowagie.text.Font;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.BaseFont;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 
 @Service
 public class AdminCreateStudentService {
@@ -304,5 +315,71 @@ public class AdminCreateStudentService {
             }
         }
         return sb.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    // ★追加: 手動登録フォームから平文パスワード入りのPDFを作成する
+    public byte[] createPdfFromForm(ManualAccountForm form) {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            
+            // 1. ドキュメントの作成 (A4)
+            Document document = new Document(PageSize.A4);
+            PdfWriter.getInstance(document, out);
+            document.open();
+
+            // 2. 日本語フォントの設定
+            // ※ resources/fonts/ipaexg.ttf などを配置してください。
+            // 配置がない場合はデフォルトフォントになり日本語が消えます。
+            BaseFont bf;
+            try {
+                // クラスパスから日本語フォントを読み込む例
+                ClassPathResource fontResource = new ClassPathResource("fonts/ipaexg.ttf");
+                bf = BaseFont.createFont(fontResource.getURL().toString(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            } catch (Exception e) {
+                // フォントがない場合のフォールバック（日本語は表示されません）
+                bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
+            }
+            Font font = new Font(bf, 11);
+            Font titleFont = new Font(bf, 16, Font.BOLD);
+
+            // 3. タイトル
+            Paragraph title = new Paragraph("アカウント登録リスト: " + form.getDataListName(), titleFont);
+            title.setAlignment(Paragraph.ALIGN_CENTER);
+            title.setSpacingAfter(20);
+            document.add(title);
+
+            // 4. テーブル作成 (3列: ID, 氏名, パスワード)
+            PdfPTable table = new PdfPTable(new float[] { 2, 4, 3 }); // 列幅の比率
+            table.setWidthPercentage(100);
+
+            // ヘッダー
+            String[] headers = { "ログインID", "氏名", "パスワード" };
+            for (String header : headers) {
+                PdfPCell cell = new PdfPCell(new Paragraph(header, font));
+                cell.setBackgroundColor(Color.LIGHT_GRAY);
+                cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                cell.setPadding(5);
+                table.addCell(cell);
+            }
+
+            // データ行 (平文パスワードを使用)
+            if (form.getAccounts() != null) {
+                for (ManualAccountData acc : form.getAccounts()) {
+                    // ID
+                    table.addCell(new PdfPCell(new Paragraph(acc.getStudentNumber(), font)));
+                    // 名前
+                    table.addCell(new PdfPCell(new Paragraph(acc.getName(), font)));
+                    // パスワード (平文)
+                    table.addCell(new PdfPCell(new Paragraph(acc.getPassword(), font)));
+                }
+            }
+
+            document.add(table);
+            document.close();
+
+            return out.toByteArray();
+
+        } catch (Exception e) {
+            throw new RuntimeException("PDF作成中にエラーが発生しました", e);
+        }
     }
 }
