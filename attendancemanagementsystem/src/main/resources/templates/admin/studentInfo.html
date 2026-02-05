@@ -32,10 +32,7 @@
     <input type="hidden" id="studentIdHidden" th:value="${student.studentId}">
     
     <div class="info-container">
-        
-        <div class="page-header-wrapper">
-            <h1 class="page-title">生徒情報</h1>
-        </div>
+        <div th:replace="~{fragments/_parts :: page-title-part('生徒情報')}"></div>
 
         <div class="main-content-area">
             

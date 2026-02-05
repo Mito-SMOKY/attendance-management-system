@@ -84,7 +84,6 @@ document.addEventListener('DOMContentLoaded', function() {
             clearError();
             const pass = passwordInput ? passwordInput.value : '';
 
-            // 文字数チェック (8文字以上 24文字以下)
             if (pass.length < 1 || pass.length > 255) {
                 e.preventDefault();
                 return;

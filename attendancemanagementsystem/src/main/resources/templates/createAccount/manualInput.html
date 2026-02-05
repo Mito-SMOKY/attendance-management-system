@@ -23,7 +23,7 @@
     </div>
 
     <div class="main-container">
-        <h1>手動でのアカウント登録</h1>
+        <div th:replace="~{fragments/_parts :: page-title-part('手動でのアカウント登録')}"></div>
         <p>登録したい学生の情報を入力してください。</p>
         
         <div th:if="${warningMessage}" class="warning-msg">

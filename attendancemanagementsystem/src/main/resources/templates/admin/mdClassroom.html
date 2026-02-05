@@ -11,20 +11,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
-    <div class="header-container">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
-    </div>
 
-    <div class="layout-wrapper">
-        
-        <div class="page-header-outer">
-            <h1 class="page-title">教室マスタ</h1>
+    <div th:replace="~{fragments/_parts :: admin-header}"></div>
+
+
+    <div class="main-container">
+
+        <div class="backbutton-container">
+            <div th:replace="~{fragments/_parts :: backButton(url='/admin/master-data')}"></div>
         </div>
 
-            <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/admin/master-data')}"></div>
-    </div>
-
+        <div th:replace="~{fragments/_parts :: page-title-part('教室マスタ')}"></div>
+        
         <form th:action="@{/admin/master/classroom/save}" method="post" id="masterForm">
             <div class="classroom-card">
                 
@@ -70,13 +68,13 @@
                                 <td>
                                     <span class="view-mode" th:text="${room.classroomName}"></span>
                                     <input type="text" class="form-input edit-mode" name="classroomName" 
-                                           th:value="${room.classroomName}" placeholder="教室名 (例: 201)" />
+                                        th:value="${room.classroomName}" placeholder="教室名 (例: 201)" />
                                 </td>
 
                                 <td>
                                     <span class="view-mode" th:text="${room.macAddress}"></span>
                                     <input type="text" class="form-input edit-mode" name="macAddress" 
-                                           th:value="${room.macAddress}" placeholder="AA:BB:CC:11:22:33" />
+                                        th:value="${room.macAddress}" placeholder="AA:BB:CC:11:22:33" />
                                 </td>
 
                                 <td class="action-col">
@@ -97,8 +95,7 @@
 
             </div>
         </form>
-    </div>
 
-    <script th:src="@{/js/admin/mdClassroom.js}"></script>
+    </div> <script th:src="@{/js/admin/mdClassroom.js}"></script>
 </body>
 </html>

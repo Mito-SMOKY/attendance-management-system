@@ -20,8 +20,7 @@
     <div class="backbutton-container">
       <div th:replace="~{fragments/_parts :: backButton(url=${backUrl})}"></div>
     </div>
-    
-    <h1>仮アカウント一覧</h1>
+        <div th:replace="~{fragments/_parts :: page-title-part('仮アカウント一覧')}"></div>
 
     <div th:if="${successMessage}" class="success-message">
         <i class="fas fa-check-circle"></i>

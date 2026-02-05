@@ -26,7 +26,7 @@
     </div>
 
     <div class="main-container">
-        <h1 class="page-title">受講情報</h1>
+        <div th:replace="~{fragments/_parts :: page-title-part('受講情報')}"></div>
 
         <div class="student-name-display">
             <span th:text="${detail.studentName} + さん" ></span>

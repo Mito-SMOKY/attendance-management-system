@@ -1,62 +1,41 @@
 @charset "UTF-8";
 
+/* --- 変数定義 --- */
 :root {
     --primary-color: #00bdca;
     --primary-hover: #0096a1;
-    --bg-color: #f4f7f6;
     --card-bg: #ffffff;
-    --text-color: #333;
     --border-color: #e0e0e0;
     --danger-color: #dc3545;
-    --gray-color: #6c757d; /* キャンセルボタン用 */
+    --gray-color: #6c757d;
 }
 
-body {
-    background-color: #fff;
-    color: var(--text-color);
-    font-family: "Noto Sans JP", sans-serif;
-    margin: 0;
-}
+/* bodyやレイアウト（layout-wrapper）の設定は削除しました。
+   すべて parts.css の .main-container が管理します。 */
 
-/* レイアウト */
-.layout-wrapper {
-    max-width: 1000px;
-    width: 95%;
-    margin: 0 auto;
-    margin-top: 80px; /* ヘッダーとの距離 */
-    margin-bottom: 50px;
-}
-
-/* ★修正: タイトルをカードの外へ、中央寄せ */
-.page-header-outer {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.page-title {
-    font-size: 28px;
-    font-weight: bold;
-    color: var(--text-color);
-    margin: 0;
-    display: inline-block; /* 下線を文字幅に合わせるため */
-    border-bottom: 4px solid var(--primary-color); /* 指定色で太めのあしらい */
-    padding-bottom: 5px;
-}
-
-/* カードデザイン */
+/* --- カードデザイン（白い箱） --- */
 .classroom-card {
     background-color: var(--card-bg);
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     padding: 30px 40px;
+    
+    /* 上の太い線はお好みですが、タイトルに下線があるので
+       うるさければ削除してもOKです。一旦残します。 */
     border-top: 5px solid var(--primary-color);
+    
+    /* マージンなどは親の main-container に任せるので削除 */
 }
 
-/* ボタンエリア */
+/* タイトル設定（.page-title, .page-header-outer）も削除しました。
+   parts.css が担当するため、ここで書くと崩れます。 */
+
+
+/* --- ボタンエリア --- */
 .action-bar {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px; /* ボタン間の隙間 */
+    justify-content: flex-end; /* 右寄せ */
+    gap: 10px;
     margin-bottom: 15px;
 }
 
@@ -75,10 +54,11 @@ body {
 .edit-btn { background-color: var(--primary-color); box-shadow: 0 2px 5px rgba(0, 189, 202, 0.3); }
 .edit-btn:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
 
+/* 保存ボタン（JSで切り替える際に使用） */
 .save-btn { background-color: #28a745; box-shadow: 0 2px 5px rgba(40, 167, 69, 0.3); }
 .save-btn:hover { background-color: #218838; transform: translateY(-1px); }
 
-/* ★追加: キャンセルボタン */
+/* キャンセルボタン */
 .cancel-btn {
     display: none; /* デフォルト非表示 */
     background-color: transparent;
@@ -95,42 +75,106 @@ body {
     color: #333;
 }
 
-/* メッセージ */
-.alert-message { padding: 10px; margin-bottom: 15px; text-align: center; border-radius: 4px; font-weight: bold; }
+
+/* --- メッセージ表示エリア --- */
+.alert-message { 
+    padding: 10px; 
+    margin-bottom: 15px; 
+    text-align: center; 
+    border-radius: 4px; 
+    font-weight: bold; 
+}
 .alert-message.success { background-color: #d4edda; color: #155724; }
 .alert-message.error { background-color: #f8d7da; color: #721c24; }
+
 .error-area { text-align: center; margin-bottom: 10px; }
 .error-text { color: var(--danger-color); font-weight: bold; display: block; }
 
-/* テーブル */
-.table-container { overflow-x: auto; }
-.classroom-table { width: 100%; border-collapse: collapse; }
-.classroom-table th { background-color: var(--primary-color); color: #fff; padding: 12px; text-align: left; white-space: nowrap; }
-.classroom-table td { padding: 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; height: 50px; }
+
+/* --- テーブル設定 --- */
+.table-container { 
+    overflow-x: auto; /* スマホなどで横スクロールするように */
+}
+.classroom-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+}
+.classroom-table th { 
+    background-color: var(--primary-color); 
+    color: #fff; 
+    padding: 12px; 
+    text-align: left; 
+    white-space: nowrap; 
+}
+.classroom-table td { 
+    padding: 12px; 
+    border-bottom: 1px solid var(--border-color); 
+    vertical-align: middle; 
+    height: 50px; 
+}
 .classroom-table tr:nth-child(even) { background-color: #f9fbfb; }
 
-/* フォーム部品 */
-.form-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-.form-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(0, 189, 202, 0.2); }
-.input-error { border-color: var(--danger-color); background-color: #fff8f8; }
 
-/* 削除ボタン */
-.delete-btn { background: none; border: none; color: #aaa; cursor: pointer; font-size: 18px; transition: color 0.3s; }
+/* --- フォーム入力部品 --- */
+.form-input { 
+    width: 100%; 
+    padding: 8px; 
+    border: 1px solid #ccc; 
+    border-radius: 4px; 
+    box-sizing: border-box; 
+}
+.form-input:focus { 
+    outline: none; 
+    border-color: var(--primary-color); 
+    box-shadow: 0 0 0 2px rgba(0, 189, 202, 0.2); 
+}
+.input-error { 
+    border-color: var(--danger-color); 
+    background-color: #fff8f8; 
+}
+
+
+/* --- 削除・追加ボタン --- */
+.delete-btn { 
+    background: none; 
+    border: none; 
+    color: #aaa; 
+    cursor: pointer; 
+    font-size: 18px; 
+    transition: color 0.3s; 
+}
 .delete-btn:hover { color: var(--danger-color); }
 
-/* 追加ボタン */
-.add-row-wrapper { margin-top: 20px; text-align: center; border: 2px dashed #bcebf0; border-radius: 6px; padding: 12px; background-color: #f0fdfe; }
-.add-row-btn { background: none; border: none; color: var(--primary-color); font-weight: bold; cursor: pointer; font-size: 16px; }
+.add-row-wrapper { 
+    margin-top: 20px; 
+    text-align: center; 
+    border: 2px dashed #bcebf0; 
+    border-radius: 6px; 
+    padding: 12px; 
+    background-color: #f0fdfe; 
+}
+.add-row-btn { 
+    background: none; 
+    border: none; 
+    color: var(--primary-color); 
+    font-weight: bold; 
+    cursor: pointer; 
+    font-size: 16px; 
+}
 .add-row-btn:hover { text-decoration: underline; }
 
+
 /* --- 編集モード切り替えロジック --- */
+/* 通常時は編集系を隠す */
 .edit-mode { display: none; }
 .view-mode { display: block; }
 
-/* 編集中（.is-editingがついた時） */
+/* 親要素に .is-editing クラスがついた時（編集中） */
 .is-editing .edit-mode { display: block; }
 .is-editing .view-mode { display: none; }
-.is-editing td { padding: 8px; }
+
+/* 編集中のみ適用されるスタイル調整 */
+.is-editing td { padding: 8px; } /* 入力欄が入るため少し狭く */
 .is-editing .add-row-wrapper { display: block; }
 .is-editing button.delete-btn { display: inline-block; }
-.is-editing .cancel-btn { display: inline-block; } /* キャンセルボタン表示 */
+.is-editing .cancel-btn { display: inline-block; }

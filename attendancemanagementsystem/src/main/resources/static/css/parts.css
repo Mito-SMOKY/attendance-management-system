@@ -233,3 +233,70 @@ a {
 .header-nav li.dropdown:hover .dropdown-menu {
   display: block;
 }
+
+/* --- タイトル（下線付き・中央寄せ） --- */
+/* --- タイトルエリア全体 --- */
+.page-title-wrap {
+    text-align: center;   /* 画面の真ん中に寄せる */
+    margin-bottom: 40px;
+}
+
+/* --- タイトルの外枠 (h2タグ) --- */
+.page-title {
+    /* ★重要: ここにあった border-bottom を消す */
+    border-bottom: none !important; 
+    
+    margin: 0;
+    padding: 0;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333333;
+}
+
+/* --- ★文字 (spanタグ) だけに線を引く --- */
+.page-title span {
+    display: inline-block;
+    
+    /* これが唯一の下線です */
+    border-bottom: 3px solid #00bdca;
+    
+    /* 線と文字の間隔 */
+    padding-bottom: 5px; 
+}
+
+/* --- ★ここが抜けていました：画面全体の枠組み --- */
+.main-container {
+    width: 95%;              /* 横幅（スマホでも端まで行かないように） */
+    max-width: 1000px;       /* PCで広がりすぎないように制限 */
+    margin: 0 auto;          /* 左右中央寄せ */
+    margin-top: 100px;       /* ヘッダーに隠れないように上に隙間を空ける */
+    padding-bottom: 50px;    /* 下の隙間 */
+}
+
+/* --- タイトルエリア全体 --- */
+.page-title-wrap {
+    text-align: center;   /* 画面の真ん中に寄せる */
+    margin-bottom: 40px;  /* タイトルと下のカードの間隔 */
+}
+
+/* --- タイトルの文字設定 --- */
+.page-title {
+    /* h2タグの余計な隙間や線を消す */
+    border-bottom: none !important; 
+    margin: 0;
+    padding: 0;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333333;
+}
+
+/* --- タイトルの下線（文字幅ピッタリにする設定） --- */
+.page-title span {
+    display: inline-block;
+    
+    /* 下線の設定 */
+    border-bottom: 3px solid #00bdca;
+    
+    /* 線と文字の間隔 */
+    padding-bottom: 5px; 
+}

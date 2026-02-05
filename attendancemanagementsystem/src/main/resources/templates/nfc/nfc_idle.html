@@ -3,23 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>待機中 - 出欠管理システム</title>
+    
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/nfc/nfc.css}">
+    
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
 </head>
 <body>
+
     <div class="header-container">
         <div th:replace="~{fragments/_parts :: header}"></div>
     </div>
 
-    <div class="writer-container">
+    <div class="main-container">
 
-        <div class="page-title">NFCカード読み取り</div>
+        <div th:replace="~{fragments/_parts :: page-title-part('NFCカード読み取り')}"></div>
 
         <div class="instruction-text">
             リーダーにカードをかざしてください
         </div>
+        
         <img th:src="@{/image/loading.gif}" alt="Scanning..." class="idle-image">
+        
     </div>
 
     <script th:src="@{/js/nfc_idle.js}"></script>
