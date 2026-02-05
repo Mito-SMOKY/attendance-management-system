@@ -1,52 +1,24 @@
 @charset "UTF-8";
 
-/* --- 基本設定 --- */
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #fff;
-}
+/* 注意: body, .main-wrapper, .top-section, .page-title の設定は削除しました。
+   parts.css の共通デザインにお任せします。
+*/
 
-/* ヘッダー位置の調整（必要に応じて） */
-.header-container {
-  width: 100%;
-  margin-bottom: 60px; /* ヘッダー下の余白 */
-  padding-top: 80px;
-}
-
-/* ▼▼▼ メインラップ：ここで横幅800px中央揃えを制御 ▼▼▼ */
-.main-wrapper {
-  width: 800px; /* 幅を固定 */
-  max-width: 95%; /* スマホ対策 */
-  margin: 0 auto; /* 左右自動で中央寄せ */
-  padding-bottom: 50px;
-}
-
-/* --- タイトルエリア（戻るボタン＋タイトル） --- */
-.top-section {
-  position: relative; /* 戻るボタンの基準点 */
+/* --- 検索・アクションエリア --- */
+.search-action-area {
   display: flex;
-  justify-content: center; /* タイトルを中央に */
+  justify-content: space-between; /* 左右に配置 */
   align-items: center;
-  height: 50px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* 画面が狭いときは折り返し */
+  gap: 15px;
 }
 
-/* タイトル文字 */
-.page-title {
-  font-size: 28px;
-  font-weight: bold;
-  color: #333;
-  margin: 0;
-}
-
-/* --- 検索エリア --- */
-.search-area {
+/* 左側の検索グループ */
+.search-group {
   display: flex;
-  justify-content: left; /* 左寄せ */
   align-items: center;
   gap: 10px;
-  margin-bottom: 20px;
 }
 
 .search-box {
@@ -99,10 +71,35 @@ body {
   background: #f0f0f0;
 }
 
+/* --- 新規登録ボタン --- */
+.btn-create-new {
+  /* position: absolute; は削除 */
+  background-color: #00bdca;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 15px;
+  box-shadow: 0 4px 6px rgba(0, 189, 202, 0.3);
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap; /* テキストの折り返し防止 */
+}
+
+.btn-create-new:hover {
+  background-color: #009bad;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 189, 202, 0.4);
+}
+
 /* --- テーブルエリア --- */
 .table-area {
-  width: 100%; /* 親のmain-wrapper(800px)に合わせる */
+  width: 100%;
   border: 1px solid #ccc;
+  background-color: #fff;
 }
 
 .admin-table {
@@ -121,6 +118,10 @@ body {
   white-space: nowrap;
 }
 
+.col-id { width: 30%; }
+.col-name { width: 40%; }
+.col-auth { width: 30%; }
+
 .admin-table td {
   padding: 12px;
   border: 1px solid #ccc;
@@ -128,7 +129,7 @@ body {
   vertical-align: middle;
 }
 
-/* ▼▼▼ 名前リンク（指定カラー #00bdca） ▼▼▼ */
+/* 名前リンク */
 .clickable-name {
   color: #00bdca !important;
   text-decoration: underline;
@@ -154,6 +155,7 @@ body {
   border-color: #00bdca;
 }
 
+/* --- モーダル設定 --- */
 .modal-overlay {
   display: none; /* 初期状態は非表示 */
   position: fixed;
@@ -161,13 +163,12 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* 半透明の黒背景 */
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
   justify-content: center;
   align-items: center;
 }
 
-/* JavaScriptで .active を付けたときに表示 */
 .modal-overlay.active {
   display: flex;
 }
@@ -195,7 +196,7 @@ body {
   gap: 15px;
   margin-bottom: 30px;
   text-align: left;
-  padding-left: 20%; /* 中央寄せっぽく調整 */
+  padding-left: 20%;
 }
 
 .radio-label {
@@ -206,7 +207,7 @@ body {
   gap: 10px;
 }
 .radio-label input[type="radio"] {
-  transform: scale(1.2); /* ラジオボタンを少し大きく */
+  transform: scale(1.2);
 }
 
 .modal-actions {
@@ -240,28 +241,4 @@ body {
 }
 .btn-apply:hover {
   background-color: #009bad;
-}
-
-/* --- 新規登録ボタン --- */
-.btn-create-new {
-  position: absolute;
-  right: 0; /* 右端に配置 */
-  background-color: #00bdca;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 30px;
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 15px;
-  box-shadow: 0 4px 6px rgba(0, 189, 202, 0.3);
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-create-new:hover {
-  background-color: #009bad;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 10px rgba(0, 189, 202, 0.4);
 }

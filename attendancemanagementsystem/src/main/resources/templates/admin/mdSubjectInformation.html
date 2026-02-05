@@ -20,14 +20,13 @@
       <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
 
-    <div class="layout-wrapper">
-      
-      <div class="main-container">
-        <div th:replace="~{fragments/_parts :: page-title-part('教科情報マスタ')}"></div>
+    <div class="backbutton-container">
+      <div th:replace="~{fragments/_parts :: backButton(url='/admin/master-data')}"></div>
+    </div>
 
-      <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/admin/master-data')}"></div>
-      </div>
+    <div class="main-container">
+      
+      <div th:replace="~{fragments/_parts :: page-title-part('教科情報マスタ')}"></div>
 
       <form
         th:action="@{/admin/master/SubjectInformation/save}"

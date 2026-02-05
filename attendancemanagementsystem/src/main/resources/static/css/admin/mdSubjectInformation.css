@@ -1,46 +1,19 @@
 @charset "UTF-8";
 
 :root {
-  --primary-color: #00bdca; /* 指定カラー（下線用） */
+  --primary-color: #00bdca; /* 指定カラー */
   --primary-hover: #0096a1;
   --bg-color: #f4f7f6;
   --card-bg: #ffffff;
-  --text-color: #333;       /* 黒（タイトル用） */
+  --text-color: #333;
   --border-color: #e0e0e0;
   --danger-color: #dc3545;
   --success-color: #28a745;
 }
 
-body {
-  background-color: #fff;
-  color: var(--text-color);
-  font-family: "Noto Sans JP", sans-serif;
-  margin: 0;
-}
-
-/* レイアウト調整 */
-.layout-wrapper {
-    max-width: 1200px;
-    width: 95%;
-    margin: 0 auto;
-    margin-top: 90px; /* ヘッダーから少し離す */
-}
-
-/* ★修正: タイトルを外に出してデザイン変更 */
-.page-header-outer {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.page-title {
-    font-size: 28px;
-    font-weight: bold;
-    color: var(--text-color); /* 黒 */
-    margin: 0;
-    display: inline-block;
-    border-bottom: 4px solid var(--primary-color); /* 指定カラーの下線 */
-    padding-bottom: 5px;
-}
+/* 注意: body, .layout-wrapper, .page-title などの共通設定は削除しました。
+   parts.css の共通デザインにお任せします。
+*/
 
 /* カードデザイン */
 .subject-info-container {
@@ -100,9 +73,7 @@ body {
   color: var(--danger-color);
   font-weight: bold;
   display: none;
-  display: block; /* JSで制御するが初期状態では隠すためCSSとしてはblockにしてJSでnoneにするか、あるいはdisplay:noneにしておく */
 }
-/* JSで表示制御するので初期はnone */
 .error-message-area .error-text {
     display: none;
 }

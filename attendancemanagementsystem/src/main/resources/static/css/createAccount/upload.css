@@ -1,54 +1,8 @@
 @charset "UTF-8";
 
-/* =========================================
-   基本設定
-   ========================================= */
-*, *::before, *::after {
-    box-sizing: border-box;
-}
-
-body {
-    overflow-x: hidden;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    
-    font-size: 16px; 
-    background-color: #fff;
-    color: #333;
-}
-
-/* =========================================
-   コンテナ設定
-   ========================================= */
-.upload-container {
-    width: 90%;
-    max-width: 700px;
-    margin: 0 auto;
-    
-    /* ヘッダー・戻るボタンとの間隔（統一） */
-    padding-top: 120px; 
-    padding-bottom: 50px;
-    
-    text-align: center;
-}
-
-/* =========================================
-   ページタイトル
-   （統一デザイン）
-   ========================================= */
-.page-title {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
-    
-    /* 下線と余白の設定 */
-    display: inline-block;        
-    border-bottom: 3px solid #00bdca; /* テーマカラー */
-    padding-bottom: 5px;          
-    margin-bottom: 60px;          /* 説明文との間隔 */
-}
+/* 注意: .upload-container や .page-title の設定は削除しました。
+   parts.css の共通デザイン（.main-container）にお任せします。
+*/
 
 /* =========================================
    説明文エリア
@@ -57,6 +11,7 @@ body {
     margin-bottom: 40px;
     font-size: 1.1rem;
     line-height: 1.6;
+    text-align: center; /* 中央揃えを明示 */
 }
 
 /* =========================================
@@ -67,6 +22,7 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 30px;
+    width: 100%; /* コンテナ幅に合わせる */
 }
 
 /* --- ファイル選択ボタン周り --- */
@@ -74,7 +30,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 15px; /* ボタンと「選択されていません」の間隔 */
+    gap: 15px; 
     margin-bottom: 10px;
 }
 
@@ -127,18 +83,16 @@ body {
     color: #333;
 }
 
-/* --- アップロードボタン（修正箇所） --- */
+/* --- アップロードボタン --- */
 .submit-btn {
     margin-top: 20px;
     width: 200px;
     height: 50px;
     
-    /* ▼▼▼ 色の変更 ▼▼▼ */
-    background-color: #00bdca; /* 背景を水色に */
-    color: #fff;               /* 文字を白に */
-    border: none;              /* 枠線なし（または border: 1px solid #00bdca;） */
-    /* ▲▲▲ 色の変更 ▲▲▲ */
-
+    background-color: #00bdca;
+    color: #fff;
+    border: none;
+    
     border-radius: 8px;
     
     font-size: 1.2rem;
@@ -146,13 +100,12 @@ body {
     cursor: pointer;
     transition: all 0.3s;
     
-    /* 影をつけて少し浮かせる（お好みで削除可） */
     box-shadow: 0 4px 6px rgba(0, 189, 202, 0.2);
 }
 
 .submit-btn:hover {
-    background-color: #009ba6; /* ホバー時は少し濃く */
-    transform: translateY(-2px); /* 少し上に動く */
+    background-color: #009ba6;
+    transform: translateY(-2px);
     box-shadow: 0 6px 8px rgba(0, 189, 202, 0.3);
 }
 

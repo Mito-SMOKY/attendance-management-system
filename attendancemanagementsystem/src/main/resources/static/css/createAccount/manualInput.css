@@ -5,36 +5,15 @@
    ========================================= */
 *, *::before, *::after { box-sizing: border-box; }
 
-body {
-    overflow-x: hidden;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    font-size: 16px;
-    background-color: #fff;
-    color: #333;
-    padding-top: 120px; 
-    padding-bottom: 50px;
+/* 注意: body, .main-container, h1 の設定は削除しました。
+   parts.css の共通デザインにお任せします。
+*/
+
+.description-text {
     text-align: center;
+    margin-bottom: 20px;
+    color: #666;
 }
-
-.main-container {
-    width: 95%;
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 10px;
-    display: inline-block;        
-    border-bottom: 3px solid #00bdca;
-    padding-bottom: 5px;  
-}
-
-p { margin-bottom: 20px; color: #666; }
 
 .warning-msg {
     background-color: #fff8e1;
@@ -43,7 +22,10 @@ p { margin-bottom: 20px; color: #666; }
     padding: 10px;
     margin-bottom: 20px;
     border-radius: 5px;
-    display: inline-block;
+    display: block; /* 中央寄せのためにblock化 */
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* =========================================
