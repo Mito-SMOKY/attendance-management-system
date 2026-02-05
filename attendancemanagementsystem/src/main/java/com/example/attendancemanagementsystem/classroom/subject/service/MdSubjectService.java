@@ -91,60 +91,59 @@ public class MdSubjectService {
             List<Integer> departmentIds,
             List<Integer> grades) {
     
+        System.out.println("=== saveSubjectList 開始 ===");
         List<String> skippedSubjects = new ArrayList<>();
 
         if (subjectNames == null) return skippedSubjects;
 
-        // --- ★追加: 重複チェック処理 ---
-        // 画面内での重複、およびDBとの重複をチェックして、問題があれば例外を投げます。
-        
-        // キー: "DeptId-Grade-SubjectName", 値: SubjectId
+        // --- ★強化版: 重複チェック処理 ---
         Map<String, Integer> processingKeys = new HashMap<>();
-        List<DepartmentSubject> existingDBRelations = departmentSubjectRepository.findAll();
 
         for (int i = 0; i < subjectNames.size(); i++) {
             Integer deptId = departmentIds.get(i);
             Integer grade = grades.get(i);
             String name = subjectNames.get(i);
-            Integer inputSubId = subjectIds.get(i); // 新規の場合はnull
+            Integer inputSubId = (subjectIds != null && subjectIds.size() > i) ? subjectIds.get(i) : null;
 
-            // 入力不備のスキップ（空行など）
+            // 空行はスキップ
             if (deptId == null || grade == null || name == null || name.trim().isEmpty()) {
                 continue;
             }
 
             String key = deptId + "-" + grade + "-" + name.trim();
+            System.out.println("Check: " + key + " (ID: " + inputSubId + ")");
 
-            // 1. 画面内で同じ設定の行が複数あるかチェック
+            // 1. 画面内での重複チェック
             if (processingKeys.containsKey(key)) {
-                Integer existingIdInBatch = processingKeys.get(key);
-                // 既に処理リストにあるIDと異なる（あるいは片方がnull）場合、別行での重複登録とみなす
-                // ※同じSubjectIDであれば、それは「同じ教科に複数の教員」のデータなのでOK
-                if (!Objects.equals(inputSubId, existingIdInBatch)) {
-                    throw new IllegalArgumentException("入力データに重複があります: " + name + " (同じクラス・学年に同名の教科を複数作成しようとしています)");
-                }
+                // 同じキー（クラス・学年・教科名）が既に出てきている場合、即エラー
+                // (新規同士の重複も、既存と新規の重複もすべてNG)
+                throw new IllegalArgumentException("入力エラー: 教科「" + name + "」が重複して入力されています。");
             } else {
                 processingKeys.put(key, inputSubId);
             }
 
-            // 2. データベースに既に存在するかチェック
-            DepartmentSubject duplicateTarget = existingDBRelations.stream()
-                .filter(ds -> ds.getDepartment().getDepartmentId().equals(deptId) &&
-                              ds.getGrade().equals(grade) &&
-                              ds.getSubject().getSubjectName().equals(name.trim()))
-                .findFirst()
-                .orElse(null);
+            // 2. データベースとの重複チェック
+            // SQLで「同じクラス・学年・名前」を持つ教科IDを検索
+            List<Integer> existingIdsInDb = subjectFacultyRepository.findSubjectIdsByClassAndSubjectName(deptId, grade, name.trim());
+            
+            System.out.println(" -> DB検索結果: " + existingIdsInDb);
 
-            if (duplicateTarget != null) {
-                Integer dbSubjectId = duplicateTarget.getSubject().getSubjectId();
-                // DBにあるのに、入力データのIDが null (新規作成) または 違うID (別教科をリネームして衝突) の場合
-                if (inputSubId == null || !inputSubId.equals(dbSubjectId)) {
-                    throw new IllegalArgumentException("既に登録済みの教科です: " + name + " (このクラス・学年には既に存在します)");
+            for (Integer existId : existingIdsInDb) {
+                // DBに同名教科が存在する場合
+                
+                // Case A: 新規登録しようとしている (inputSubId == null) -> エラー
+                if (inputSubId == null) {
+                    throw new IllegalArgumentException("登録エラー: 「" + name + "」は既にこのクラス・学年に登録されています。");
+                }
+                
+                // Case B: 既存更新だが、IDが違う教科と名前が被った (リネームなど) -> エラー
+                // (自分自身の更新なら inputSubId == existId なのでOK)
+                if (!inputSubId.equals(existId)) {
+                    throw new IllegalArgumentException("エラー: 「" + name + "」は既に存在するため、その名前に変更できません。");
                 }
             }
         }
         // ---------------------------------
-
 
         // 1. 削除処理
         List<Integer> activeSubjectIds = new ArrayList<>();
@@ -160,20 +159,18 @@ public class MdSubjectService {
         for (SubjectEntity sub : allSubjects) {
             if (!activeSubjectIds.contains(sub.getSubjectId())) {
                 
-                // 時間割で使用されているかチェック
                 int usageCount = subjectFacultyRepository.countTimeTableUsage(sub.getSubjectId());
                 if (usageCount > 0) {
+                    System.out.println("削除スキップ(使用中): " + sub.getSubjectName());
                     skippedSubjects.add(sub.getSubjectName());
                     continue; 
                 }
 
-                // 削除実行
+                System.out.println("削除実行: " + sub.getSubjectName());
                 subjectFacultyRepository.deleteBySubjectId(sub.getSubjectId());
-                
                 allRelations.stream()
                     .filter(ds -> ds.getSubject().getSubjectId().equals(sub.getSubjectId()))
                     .forEach(ds -> departmentSubjectRepository.delete(ds));
-
                 subjectRepository.delete(sub);
             }
         }
@@ -208,6 +205,7 @@ public class MdSubjectService {
             }
         }
         
+        System.out.println("=== saveSubjectList 終了 ===");
         return skippedSubjects;
     }
 

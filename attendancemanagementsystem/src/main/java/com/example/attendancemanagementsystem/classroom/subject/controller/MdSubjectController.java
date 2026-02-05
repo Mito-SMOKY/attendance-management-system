@@ -59,7 +59,7 @@ public class MdSubjectController {
             }
 
         } catch (IllegalArgumentException e) {
-            // ★重複チェックなどでServiceが投げた意図的なエラーをここでキャッチして表示
+            // 重複エラーキャッチ
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
