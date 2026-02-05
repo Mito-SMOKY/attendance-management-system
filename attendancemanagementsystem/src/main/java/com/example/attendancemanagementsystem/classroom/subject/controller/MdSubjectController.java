@@ -41,7 +41,6 @@ public class MdSubjectController {
             RedirectAttributes redirectAttributes) {
         
         try {
-            // Serviceから削除スキップリストを受け取る
             List<String> skipped = mdSubjectService.saveSubjectList(
                 subjectIds,
                 subjectNames,
@@ -51,9 +50,6 @@ public class MdSubjectController {
                 grades
             );
             
-            // デバッグログ
-            System.out.println("Controller受信 - skippedリスト: " + skipped);
-
             if (skipped.isEmpty()) {
                 redirectAttributes.addFlashAttribute("successMessage", "変更を保存しました。");
             } else {
@@ -62,9 +58,12 @@ public class MdSubjectController {
                 redirectAttributes.addFlashAttribute("errorMessage", msg);
             }
 
+        } catch (IllegalArgumentException e) {
+            // ★重複チェックなどでServiceが投げた意図的なエラーをここでキャッチして表示
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", "保存中にエラーが発生しました。");
+            redirectAttributes.addFlashAttribute("errorMessage", "保存中に予期せぬエラーが発生しました。");
         }
 
         return "redirect:/admin/master/SubjectInformation";
