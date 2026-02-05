@@ -107,7 +107,8 @@ public class SubjectAttendanceService {
         String teacherNames = "未定";
         if (!facultyList.isEmpty()) {
             teacherNames = facultyList.stream()
-                .map(sf -> usersRepository.findById(sf.getUserId()).map(UsersEntity::getName).orElse(null))
+                // 修正箇所: sf.getUserId() -> sf.getId().getUserId()
+                .map(sf -> usersRepository.findById(sf.getId().getUserId()).map(UsersEntity::getName).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(", "));
             if (teacherNames.isEmpty()) {
