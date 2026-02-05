@@ -1,6 +1,7 @@
 package com.example.attendancemanagementsystem.common.repository;
 
-import java.util.List; // ★これを追加してください
+import java.util.List;
+import java.util.Optional; // ★追加
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -12,6 +13,9 @@ import com.example.attendancemanagementsystem.common.entity.SubjectEntity;
 
 @Repository
 public interface SubjectRepository extends JpaRepository<SubjectEntity, Integer>, JpaSpecificationExecutor<SubjectEntity> {
+
+    // ★追加: 名前で教科マスタを検索するメソッド
+    Optional<SubjectEntity> findBySubjectName(String subjectName);
 
     // 教員のユーザIDにもとづく科目の取得
     @Query(value = "SELECT s.* FROM subject s " +
