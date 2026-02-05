@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody; // 追加
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
@@ -23,6 +24,9 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/password")
 public class PasswordResetController {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private OtpService otpService;
@@ -108,11 +112,13 @@ public class PasswordResetController {
         }
 
         if (isValid) {
+
             // 成功時
             session.setAttribute("isVerified", true);
             response.put("success", true);
             response.put("redirectUrl", "/password/new-password"); 
         } else {
+
             // 失敗時
             response.put("success", false);
             response.put("message", "invalid");
@@ -121,7 +127,7 @@ public class PasswordResetController {
         return response;
     }
 
-    // 新パスワード入力画面 (GET)
+    // 新パスワード入力画面
     @GetMapping("/new-password")
     public String showNewPasswordForm(HttpSession session) {
         Boolean isVerified = (Boolean) session.getAttribute("isVerified");
@@ -165,5 +171,71 @@ public class PasswordResetController {
         }
         
         return "redirect:/login";
+    }
+
+    // パスワード入力画面 (初回セットアップ用)
+    @GetMapping("/initial")
+    public String showInitialPasswordForm(HttpSession session, Model model) {
+        
+        Integer userId = (Integer) session.getAttribute("resetEmail_UserId");
+        Boolean isFirstSetup = (Boolean) session.getAttribute("isFirstSetup");
+
+        // セッションがない、または初回セットアップでない場合はログイン画面へ
+        if (userId == null || isFirstSetup == null || !isFirstSetup) {
+            return "redirect:/login";
+        }
+
+        // フォームのアクションURL設定
+        model.addAttribute("formAction", "/password/initial");
+        model.addAttribute("backUrl", "/email/reset-email");
+        
+        return "login/reset_password";
+    }
+
+    // パスワード更新実行 (初回セットアップ用)
+    @PostMapping("/initial")
+    public String updateInitialPassword(
+            @RequestParam("password") String password,
+            @RequestParam("confirmPassword") String confirmPassword,
+            HttpSession session, 
+            Model model) {
+        
+        Integer userId = (Integer) session.getAttribute("resetEmail_UserId");
+        
+        // セッションがない場合はログイン画面へ
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        // パスワードと確認用パスワードの一致チェック
+        if (!password.equals(confirmPassword)) {
+            model.addAttribute("error", "パスワードが一致しません");
+            model.addAttribute("formAction", "/password/initial"); 
+            model.addAttribute("backUrl", "/email/reset-email");
+            return "login/reset_password";
+        }
+
+        // パスワード更新処理
+        try {
+            UsersEntity user = usersRepository.findById(userId).orElseThrow();
+            
+            // パスワード更新
+            user.setPassword(passwordEncoder.encode(password));
+            usersRepository.save(user);
+            otpService.updatePassword(user.getEmail(), password);
+            
+            // セッション全クリア
+            session.invalidate();
+            
+            // 完了画面へ
+            return "login/update"; 
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "更新に失敗しました");
+            model.addAttribute("formAction", "/password/initial");
+            model.addAttribute("backUrl", "/email/reset-email");
+            return "login/reset_password";
+        }
     }
 }

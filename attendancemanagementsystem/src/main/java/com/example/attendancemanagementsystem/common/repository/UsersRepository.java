@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 
@@ -27,4 +29,10 @@ public interface UsersRepository extends JpaRepository<UsersEntity, Integer> {
     //ユーザーIDから氏名を取得するメソッド
     @Query("SELECT u.name FROM UsersEntity u WHERE u.userId = :userId")
     String findNameByUserId(@Param("userId") Integer userId);
+
+    //メアドがNULLのユーザを取得する
+    @Modifying
+    @Transactional
+    @Query("UPDATE UsersEntity u SET u.email = :email WHERE u.userId = :userId AND u.email IS NULL")
+    int updateEmailIfNull(@Param("userId") Integer userId, @Param("email") String email);
 }
