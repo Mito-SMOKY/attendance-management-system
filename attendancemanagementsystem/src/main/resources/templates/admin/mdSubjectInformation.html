@@ -342,6 +342,12 @@
         if (container.classList.contains("is-editing")) {
           btn.textContent = "編集終了(データは保存されません)";
           btn.classList.add("active");
+
+          // ★追加: 編集モードに入ったらメッセージ（成功・エラー）を非表示にする
+          const successMsg = document.querySelector(".alert-success");
+          const errorMsg = document.querySelector(".alert-error");
+          if (successMsg) successMsg.style.display = "none";
+          if (errorMsg) errorMsg.style.display = "none";
         } else {
           btn.textContent = "編集";
           btn.classList.remove("active");
