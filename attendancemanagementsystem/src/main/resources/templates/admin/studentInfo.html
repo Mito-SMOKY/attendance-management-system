@@ -15,7 +15,6 @@
 
 <body>
 
-    <!-- ヘッダー -->
     <div class="header-container">
         <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
             <div th:replace="~{fragments/_parts :: admin-header}"></div>
@@ -24,7 +23,6 @@
             <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
         </div>
     </div>
-    <!-- 戻るボタン -->
     <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url='/admin/studentList')}"></div>
     </div> 
@@ -36,7 +34,6 @@
 
         <div class="main-content-area">
             
-            <!-- 詳細コンテナ -->
             <div class="left-sidebar-area">
                 
                 <div class="student-name-display">
@@ -63,7 +60,7 @@
                                     教科名
                             </a>
                         </li>
-                        <li th:if="${#lists.isEmpty(student.subjectList)}" class="subject-item" style="color: #999; padding: 5px;">
+                        <li th:if="${#lists.isEmpty(student.subjectList)}" class="subject-item" style="color: #999; padding: 15px; text-align: center;">
                             該当なし
                         </li>
                     </ul>
@@ -72,10 +69,8 @@
 
             <div class="attendance-detail-main">
                 
-                <!-- コントロール -->
-                <div class="attendance-controls" style="display: flex; align-items: center; gap: 10px;">
-                    <!-- 年月変更 -->
-                     <div>
+                <div class="attendance-controls">
+                    <div>
                         <form id="monthForm">
                             <select id="monthPicker" name="month" class="month-select" onchange="changeMonth()">
                                 <option th:each="m : ${student.selectableMonths}"
@@ -87,12 +82,10 @@
                         </form>
                     </div>
                     
-                    <!-- 編集保存ボタン -->
-                     <div>
-                        <button id="saveBtn" class="edit-btn" type="button" onclick="saveChanges()" 
-                                style="display:none; background-color: #00bdca; color: white; border: none;">保存</button>
+                    <div>
+                        <button id="saveBtn" class="edit-btn save-btn-style" type="button" onclick="saveChanges()" 
+                                style="display:none;">保存</button>
                         <button id="editBtn" class="edit-btn" type="button" onclick="toggleEditMode()">編集</button>
-                        
                     </div>
 
                 </div>
@@ -129,7 +122,7 @@
                         </colgroup>
                         <thead>
                             <tr>
-                                <th>日付</th>
+                                <th class="date-col">日付</th>
                                 <th th:each="header : ${student.periodHeaders}" th:text="${header}">1限目</th>
                             </tr>
                         </thead>
@@ -151,8 +144,7 @@
                                             <div class="subject-name" th:text="${period.subjectName}">教科名</div>
                                             <select class="status-select" 
                                                     th:data-date="${day.dateStr}" 
-                                                    th:data-period="${period.period}"
-                                                    style="width: 100%; font-size: 0.9rem; padding: 2px;">
+                                                    th:data-period="${period.period}">
                                                 <option value="出席" th:selected="${period.statusIcon == '〇'}">出席</option>
                                                 <option value="欠席" th:selected="${period.statusIcon == '✕'}">欠席</option>
                                                 <option value="遅刻" th:selected="${period.statusIcon == '△'}">遅刻</option>

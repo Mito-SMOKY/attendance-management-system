@@ -19,57 +19,60 @@
         <div th:replace="~{fragments/_parts :: backButton(url='/admin/request/menu')}"></div>
     </div>
 
-    <div class="student-list-container">
-        
-        <input type="hidden" id="pageMode" th:value="${mode}">
+    <div class="main-container">
 
-        <h1 class="page-title" th:text="${pageTitle}">生徒選択</h1>
+        <div th:replace="~{fragments/_parts :: page-title-part(${pageTitle})}"></div>
 
-        <div class="search-filter-area">
-            <form class="search-form" onsubmit="return false;">
-                <input type="text" id="searchInput" class="search-input" placeholder="検索キーワードを入力">
-            </form>
-            <button type="button" id="searchBtn" class="tool-btn search-btn">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-        </div>
+        <div class="student-list-container">
+            
+            <input type="hidden" id="pageMode" th:value="${mode}">
 
-        <div class="selection-status-bar">
-            <span id="selectionCount">0件選択中</span>
-            <button type="button" id="submitSelectionBtn" class="submit-btn" disabled>
-                申請画面へ進む
-            </button>
-        </div>
+            <div class="search-filter-area">
+                <form class="search-form" onsubmit="return false;">
+                    <input type="text" id="searchInput" class="search-input" placeholder="検索キーワードを入力">
+                </form>
+                <button type="button" id="searchBtn" class="tool-btn search-btn">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
 
-        <div class="table-wrapper">
-            <table class="student-table">
-                <colgroup>
-                    <col style="width: 10%;"> 
-                    <col style="width: 7%;">  
-                    <col style="width: 15%;"> 
-                    <col style="width: 30%;"> 
-                    <col style="width: 5%;"> 
-                    <col style="width: 10%;"> 
-                    <col style="width: 25%;"> 
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th><input type="checkbox" id="selectAllCheckbox"></th>
-                        <th>状態</th>
-                        <th>学籍番号</th>
-                        <th>学科・コース</th>
-                        <th>学年</th>
-                        <th>クラス</th>
-                        <th>氏名</th>
-                    </tr>
-                </thead>
-                <tbody id="studentTableBody">
+            <div class="selection-status-bar">
+                <span id="selectionCount">0件選択中</span>
+                <button type="button" id="submitSelectionBtn" class="submit-btn" disabled>
+                    申請画面へ進む
+                </button>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="student-table">
+                    <colgroup>
+                        <col style="width: 10%;"> 
+                        <col style="width: 7%;">  
+                        <col style="width: 15%;"> 
+                        <col style="width: 30%;"> 
+                        <col style="width: 5%;"> 
+                        <col style="width: 10%;"> 
+                        <col style="width: 25%;"> 
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAllCheckbox"></th>
+                            <th>状態</th>
+                            <th>学籍番号</th>
+                            <th>学科・コース</th>
+                            <th>学年</th>
+                            <th>クラス</th>
+                            <th>氏名</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody">
                     </tbody>
-            </table>
+                </table>
+            </div>
+
+            <div id="pagination" class="pagination"></div>
+
         </div>
-
-        <div id="pagination" class="pagination"></div>
-
     </div>
 
     <script th:src="@{/js/admin/studentSelect.js}"></script>

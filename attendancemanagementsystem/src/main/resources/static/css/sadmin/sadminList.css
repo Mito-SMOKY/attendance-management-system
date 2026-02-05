@@ -1,16 +1,20 @@
 @charset "UTF-8";
 
-/* 注意: body, .main-wrapper, .top-section, .page-title の設定は削除しました。
-   parts.css の共通デザインにお任せします。
-*/
+/* =========================================
+   基本設定
+   ========================================= */
+/* parts.css の .main-container を使用するため、
+   レイアウト関連の独自設定は削除しています */
 
-/* --- 検索・アクションエリア --- */
+/* =========================================
+   検索・アクションエリア
+   ========================================= */
 .search-action-area {
   display: flex;
   justify-content: space-between; /* 左右に配置 */
   align-items: center;
   margin-bottom: 20px;
-  flex-wrap: wrap; /* 画面が狭いときは折り返し */
+  flex-wrap: wrap;
   gap: 15px;
 }
 
@@ -24,7 +28,7 @@
 .search-box {
   display: flex;
   align-items: center;
-  border: 1px solid #999;
+  border: 1px solid #ccc; /* 色を少し薄く */
   border-radius: 4px;
   background: #fff;
   width: 320px;
@@ -57,7 +61,7 @@
 .filter-btn {
   width: 40px;
   height: 38px;
-  border: 1px solid #999;
+  border: 1px solid #ccc;
   border-radius: 4px;
   background: #fff;
   cursor: pointer;
@@ -71,9 +75,10 @@
   background: #f0f0f0;
 }
 
-/* --- 新規登録ボタン --- */
+/* =========================================
+   新規登録ボタン
+   ========================================= */
 .btn-create-new {
-  /* position: absolute; は削除 */
   background-color: #00bdca;
   color: #fff;
   padding: 10px 20px;
@@ -86,7 +91,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  white-space: nowrap; /* テキストの折り返し防止 */
+  white-space: nowrap;
 }
 
 .btn-create-new:hover {
@@ -95,11 +100,19 @@
   box-shadow: 0 6px 10px rgba(0, 189, 202, 0.4);
 }
 
-/* --- テーブルエリア --- */
+/* =========================================
+   テーブルエリア (修正箇所)
+   ========================================= */
 .table-area {
   width: 100%;
-  border: 1px solid #ccc;
+  margin-bottom: 30px;
   background-color: #fff;
+  
+  /* 角丸・影の設定 (枠線削除) */
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden; /* 角丸適用のため */
 }
 
 .admin-table {
@@ -109,12 +122,13 @@
   font-size: 16px;
 }
 
+/* ヘッダー */
 .admin-table th {
-  background-color: #00bdca; /* ヘッダー色 */
+  background-color: #00bdca;
   color: #fff;
-  padding: 12px;
-  font-weight: bold;
-  border: 1px solid #ccc;
+  padding: 15px 12px;
+  font-weight: normal; /* 他の画面に合わせてnormalに */
+  border: none; /* 枠線を消す */
   white-space: nowrap;
 }
 
@@ -122,22 +136,37 @@
 .col-name { width: 40%; }
 .col-auth { width: 30%; }
 
+/* データ行 */
 .admin-table td {
-  padding: 12px;
-  border: 1px solid #ccc;
+  padding: 15px 12px;
+  border: none;
+  border-bottom: 1px solid #eee; /* 薄い下線のみ */
   color: #333;
   vertical-align: middle;
+}
+
+/* 最後の行の下線は消す */
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 行ホバー */
+.admin-table tbody tr:hover {
+    background-color: #f9fbfd;
 }
 
 /* 名前リンク */
 .clickable-name {
   color: #00bdca !important;
-  text-decoration: underline;
-  cursor: pointer;
+  text-decoration: none; /* 下線を通常は消す(他の画面と統一する場合) */
   font-weight: bold;
+  cursor: pointer;
+  display: block;
+  width: 100%;
 }
 .clickable-name:hover {
-  color: #009bad !important;
+  color: #00bdca !important;
+  text-decoration: underline;
 }
 
 /* 〇と× */
@@ -148,16 +177,20 @@
   font-size: 1.2em;
 }
 
-/* フィルターボタンがONの状態 */
+/* =========================================
+   フィルターボタンがONの状態
+   ========================================= */
 .filter-btn.active {
   background-color: #00bdca;
   color: #fff;
   border-color: #00bdca;
 }
 
-/* --- モーダル設定 --- */
+/* =========================================
+   モーダル設定
+   ========================================= */
 .modal-overlay {
-  display: none; /* 初期状態は非表示 */
+  display: none;
   position: fixed;
   top: 0;
   left: 0;

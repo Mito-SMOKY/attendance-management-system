@@ -23,76 +23,15 @@ body {
     width: 100%;
     max-width: 1300px;
     margin: 0 auto;
-    /* ヘッダー(約80px) + 余白 */
     padding-bottom: 50px;
+    
+    /* ★修正: ヘッダーや戻るボタンと重ならないよう上部に余白を確保 */
+    /* 以前のmargin-top: 120px相当のスペースを作ります */
+    padding-top: 110px; 
 }
 
 /* =========================================
-   ページヘッダーエリア (戻るボタンとタイトルを格納)
-   ========================================= */
-/* .page-header-wrapper {
-    position: relative; /* 子要素配置の基準 */
-    /* display: flex; */
-    /* justify-content: center; タイトルを中央に */
-    /* align-items: center;     垂直中央 */
-    /* height: 50px; */
-    /* margin-bottom: 30px;     下のコンテンツとの間隔 */
-    /* width: 100%; */
-/* } */ 
-
-/* --- タイトル --- */
-.page-title {
-    color: #333;
-    font-size: 1.8rem;
-    border-bottom: 2px solid #00bdca;
-    padding-bottom: 10px;
-    margin-top: 120px;
-    margin-bottom: 20px;
-    padding-left: 20px;
-    text-align: center;
-}
-
-/* --- 戻るボタン (parts.cssの影響を完全に打ち消して配置) --- */
-a.backbutton {
-    /* 配置：ヘッダーエリアの左端に絶対配置 */
-    position: absolute !important;
-    left: 0 !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important; /* 垂直中央補正 */
-    margin: 0 !important;
-    
-    /* 見た目：ボタン形状に整える */
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    height: 40px !important;
-    width: auto !important;
-    min-width: 90px;
-    padding: 0 20px !important;
-    
-    border: 1px solid #00bdca !important;
-    border-radius: 5px !important;
-    background-color: #fff !important;
-    color: #00bdca !important;
-    font-size: 1rem !important;
-    text-decoration: none !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    box-shadow: none !important;
-    z-index: 10; /* 他の要素より手前に */
-}
-a.backbutton::before {
-    content: '＜';
-    margin-right: 5px;
-    display: inline-block;
-}
-a.backbutton:hover {
-    background-color: #f0f0f0 !important;
-}
-
-
-/* =========================================
-   メインコンテンツエリア (左：サイドバー / 右：詳細)
+   メインコンテンツエリア
    ========================================= */
 .main-content-area {
     display: flex;
@@ -102,7 +41,7 @@ a.backbutton:hover {
     flex-wrap: wrap;
 }
 
-/* --- 左側エリア (生徒名・検索・教科リスト) --- */
+/* --- 左側エリア (サイドバー) --- */
 .left-sidebar-area {
     display: flex;
     flex: 0 0 280px; /* 固定幅 */
@@ -110,16 +49,18 @@ a.backbutton:hover {
     gap: 20px;
 }
 
-/* 生徒名表示 */
+/* 生徒名表示 (カード化) */
 .student-name-display {
     font-size: 1.5rem;
     font-weight: bold;
     color: #333;
-    padding: 15px;
-    border-left: 6px solid #00bdca;
+    padding: 20px;
     background-color: #fff;
-    border-radius: 0 4px 4px 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    
+    /* デザイン変更: カード化 */
+    border-left: 6px solid #00bdca;
+    border-radius: 8px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
 }
 
 /* サイドバー検索フォーム */
@@ -132,7 +73,7 @@ a.backbutton:hover {
     flex: 1;
     height: 40px;
     padding: 5px 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #ccc; 
     border-radius: 4px;
     font-size: 0.9rem;
 }
@@ -154,12 +95,14 @@ a.backbutton:hover {
     opacity: 0.9;
 }
 
-/* 受講教科リストボックス */
+/* 受講教科リストボックス (カード化) */
 .subject-list-box {
     background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    
+    /* デザイン変更: カード化 */
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     overflow: hidden;
 }
 
@@ -167,10 +110,9 @@ a.backbutton:hover {
     background-color: #00bdca;
     color: white;
     font-size: 1.1rem;
-    padding: 12px 15px;
+    padding: 15px;
     font-weight: bold;
     text-align: center;
-    border-bottom: 1px solid #00bdca;
 }
 
 .subject-list {
@@ -180,47 +122,49 @@ a.backbutton:hover {
 }
 
 .subject-list li {
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #f0f0f0; /* 非常に薄い線 */
+}
+.subject-list li:last-child {
+    border-bottom: none;
 }
 
 .subject-list a {
     display: block;
     padding: 12px 15px;
-    color: #00bdca;
+    color: #333;
     text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.3s;
+    font-weight: normal;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 .subject-list a:hover {
-    /* background-color: #f0f8f9; */
+    background-color: #f9fbfd;
     color: #00bdca;
-    text-decoration: underline;
 }
 
 
-/* --- 右側エリア (出欠情報・テーブル) --- */
+/* --- 右側エリア (詳細・テーブル) --- */
 .attendance-detail-main {
     flex: 1;
     min-width: 600px;
 }
 
-/* コントロール (月選択・編集) */
+/* コントロール */
 .attendance-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .month-select {
     height: 40px;
     padding: 5px 10px;
-    border: 1px solid #707070;
+    border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1rem;
     background-color: #fff;
-    min-width: 120px;
+    min-width: 140px;
 }
 
 .edit-btn {
@@ -237,91 +181,133 @@ a.backbutton:hover {
 }
 
 .edit-btn:hover {
-    background-color: #dfdfdf;
+    background-color: #eafcfd;
 }
 
-/* 出欠状況サマリーテーブル */
+.save-btn-style {
+    background-color: #00bdca !important; 
+    color: white !important; 
+    border: none !important;
+}
+.save-btn-style:hover {
+    background-color: #009bad !important;
+}
+
+/* =========================================
+   出欠状況サマリーテーブル (カード化・枠なし)
+   ========================================= */
 .status-summary-table {
     width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     text-align: center;
     background-color: white;
+    
+    /* カード化 */
+    border-collapse: separate; 
+    border-spacing: 0;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
 }
 
-.status-summary-table th,
-.status-summary-table td {
-    border: 1px solid #999;
-    padding: 12px 5px;
-    vertical-align: middle;
-}
-
-.status-summary-table thead th {
+.status-summary-table th {
     background-color: #00bdca;
     color: white;
     font-weight: normal;
     font-size: 0.95rem;
+    padding: 15px 10px;
+    border: none; /* 枠線を消す */
 }
 
-.status-summary-table tbody td {
+.status-summary-table td {
+    padding: 15px 10px;
+    border: none; /* 枠線を消す */
+    border-bottom: 1px solid #f0f0f0; /* 薄い下線 */
     font-weight: bold;
     font-size: 1.1rem;
     color: #333;
+    vertical-align: middle;
+}
+/* 最終行の下線削除 */
+.status-summary-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
-/* 時間割テーブル */
+
+/* =========================================
+   時間割テーブル (カード化・枠なし)
+   ========================================= */
 .table-wrapper {
     width: 100%;
-    max-height: 500px; 
+    max-height: 600px; 
     overflow-y: auto;
     overflow-x: auto;   
-    border: 1px solid #999;
     background-color: white;
-    position: relative;
+    
+    /* カード化 */
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .schedule-table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse;
+    table-layout: fixed; 
     text-align: center;
     min-width: 700px;
 }
 
-.schedule-table thead th{
+/* ヘッダー (固定) */
+.schedule-table thead th {
     position: sticky;   
     top: 0;   
     z-index: 10;
     background-color: #00bdca; 
     color: white;
     font-weight: normal;
-    padding: 12px 0;
+    padding: 15px 5px;
     font-size: 1rem;
+    border: none; /* 枠線を消す */
 }
 
-.schedule-table th,
+/* セル共通 */
 .schedule-table td {
-    border-right: 1px solid #999;
-    border-bottom: 1px solid #999;
-    padding: 0;
+    border: none; /* 枠線を消す */
+    border-bottom: 1px solid #eee; /* 薄い下線 */
+    padding: 5px;
     vertical-align: middle;
-}
-
-.schedule-table thead th {
-    background-color: #00bdca;
-    color: white;
-    font-weight: normal;
-    padding: 12px 0;
-    font-size: 1rem;
-}
-
-.schedule-table tbody td {
-    font-size: 1rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    height: 80px; 
     color: #333;
-    height: 70px;
 }
 
-/* セル内のコンテンツラッパー */
+/* 1列目（日付） */
+.schedule-table th.date-col,
+.schedule-table td:first-child {
+    width: 120px;
+    border-right: 1px solid #eee; /* 日付と中身の境界だけ薄く残す */
+}
+
+/* 行ホバー */
+.schedule-table tbody tr:hover {
+    background-color: #f9fbfd;
+}
+
+/* 欠席日の行強調 */
+.absent-row {
+    background-color: #fff5f5;
+}
+.absent-row:hover {
+    background-color: #ffecec;
+}
+
+
+/* =========================================
+   セル内コンテンツ
+   ========================================= */
 .cell-content {
     display: flex;
     flex-direction: column;
@@ -330,83 +316,35 @@ a.backbutton:hover {
     gap: 5px;
     width: 100%;
     height: 100%;
-    padding: 5px;
-    box-sizing: border-box;
+    padding: 2px;
 }
 
 .subject-name {
+    font-size: 0.95rem;
     font-weight: bold;
-    font-size: 1rem;
+    line-height: 1.3;
 }
 
-/* ステータスタグ (○×などの文字) */
-/* 以前の丸い背景スタイルを解除し、シンプルな文字表示にします */
+/* ステータスアイコン */
 .status-tag {
     display: inline-block;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: bold;
     color: inherit;
     background-color: transparent; 
-    padding: 0;
-    border-radius: 0;
-    min-width: auto;
+    margin-top: 2px;
 }
 
-/* --- studentInfo.css に以下を追加・修正 --- */
+/* ステータスごとの色 */
+.bg-present .status-icon { color: #28a745; } /* 出席 */
+.bg-sick    .status-icon { color: #dc3545; } /* 欠席 */
+.bg-late    .status-icon { color: #ffc107; } /* 遅刻 */
+.bg-early   .status-icon { color: #555; }    /* 早退 */
+.bg-suspend .status-icon { color: #555; }    /* 出停 */
+.bg-public  .status-icon { color: #555; }    /* 公欠 */
+.bg-other   .status-icon { color: #555; }    /* その他 */
 
-/* テーブル自体への設定 */
-.student-table { /* ← HTML側のtableタグについているクラス名に合わせてください */
-    width: 100%;
-    table-layout: fixed; /* ★重要：これを指定するとセルの幅が均等に固定されます */
-    border-collapse: collapse;
-}
-
-/* 1列目（日付・曜日）の設定 */
-.student-table th:first-child,
-.student-table td:first-child {
-    width: 20%;       /* 日付列の幅を固定（お好みで調整してください） */
-    /* white-space: nowrap; */
-    text-align: center;
-}
-
-/* 2列目以降（1限～4限...）の設定 */
-.student-table th:not(:first-child),
-.student-table td:not(:first-child) {
-    width: auto; 
-    padding: 8px;
-}
-
-/* テーブルの列幅計算を「固定」モードにする */
-.schedule-table {
-    width: 100%;
-    table-layout: fixed; 
-    border-collapse: collapse;
-}
-
-/* 1列目（日付列）の幅を固定する */
-/* th.date-col がHTMLにあるためそれを利用 */
-.schedule-table th.date-col {
-    width: 100px; 
-}
-
-/* 全てのセル（th, td）に対する設定 */
-.schedule-table th,
-.schedule-table td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-
-/* ステータスごとの背景色・文字色設定*/
-.bg-present .status-icon { color: #28a745; font-weight: bold; font-size: 1.2em;} /* 出席*/
-.bg-sick  .status-icon { color: #dc3545; font-weight: bold; font-size: 1.2em;} /* 欠席*/
-.bg-late .status-icon { color: #ffc107; font-weight: bold; font-size: 1.2em;} /* 遅刻 */
-.bg-early .status-icon { color: #333;font-weight: bold; font-size: 1.2em; } /* 早退*/
-.bg-suspend .status-icon { color: #333; font-weight: bold; font-size: 1.2em; } /* 出停*/
-.bg-public .status-icon { color: #333; font-weight: bold; font-size: 1.2em;} /* 公欠 */
-.bg-other .status-icon { color: #333; font-weight: bold; font-size: 1.2em;} /* その他 */
-
+/* 編集モード */
 .view-mode, .edit-mode {
     display: flex !important;
     flex-direction: column;
@@ -422,18 +360,10 @@ a.backbutton:hover {
     display: none !important;
 }
 
-.subject-name {
-    font-size: 1rem;
-    font-weight: bold;
-    line-height: 1.2;
-}
-
-.edit-mode .subject-name {
-    font-size: 1rem;
-    font-weight: bold;
-}
-
 .status-select {
-    box-sizing: border-box;
-    height: 28px; /* 高さを明示的に固定 */
+    width: 90%;
+    height: 30px;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }

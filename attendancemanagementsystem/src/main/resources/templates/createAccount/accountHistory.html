@@ -24,14 +24,12 @@
         <div th:replace="~{fragments/_parts :: backButton(url='/admin/accountHome')}"></div>
     </div>
 
-    <div th:replace="~{fragments/_parts :: page-title-part('作成履歴一覧')}"></div>
+    <div class="main-container">
 
-    <div class="history-container">
-        
-        <div class="page-title-wrapper">
-            <p style="text-align: center; color: #666; margin-bottom: 20px;">
-                システムに登録された仮アカウントリストの一覧です。
-            </p>
+        <div th:replace="~{fragments/_parts :: page-title-part('作成履歴一覧')}"></div>
+
+        <div class="page-description">
+            <p>システムに登録された仮アカウントリストの一覧です。</p>
         </div>
 
         <div class="message-area">
@@ -46,7 +44,10 @@
         <div class="table-wrapper">
             <table class="history-table">
                 <colgroup>
-                    <col style="width: 35%;"> <col style="width: 35%;"> <col style="width: 30%;"></colgroup>
+                    <col style="width: 35%;"> 
+                    <col style="width: 35%;"> 
+                    <col style="width: 30%;">
+                </colgroup>
                 <thead>
                     <tr>
                         <th>リスト名</th>
@@ -58,9 +59,9 @@
                     <tr th:each="item : ${datalists}">
                         <td>
                             <a th:href="@{/admin/tempAccountList/{id}(id=${item.dataListId}, origin='history')}"
-                                th:text="${item.dataListName}"
-                                style="color: #007bff; text-decoration: underline; cursor: pointer;">
-                                リスト名
+                               th:text="${item.dataListName}"
+                               class="list-link">
+                               リスト名
                             </a>
                         </td>
                         
@@ -74,7 +75,7 @@
                     </tr>
                     
                     <tr th:if="${#lists.isEmpty(datalists)}">
-                        <td colspan="4" style="text-align: center; padding: 20px; color: #666;">
+                        <td colspan="3" style="text-align: center; padding: 20px; color: #666;">
                             履歴はありません。
                         </td>
                     </tr>
@@ -82,7 +83,5 @@
             </table>
         </div>
 
-    </div>
-
-</body>
+    </div> </body>
 </html>

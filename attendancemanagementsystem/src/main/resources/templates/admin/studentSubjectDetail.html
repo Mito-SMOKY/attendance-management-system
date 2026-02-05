@@ -10,7 +10,6 @@
 <body>
     <input type="hidden" id="studentIdHidden" th:value="${detail.studentId}">
 
-    <!-- ヘッダー -->
     <div class="header-container">
         <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
             <div th:replace="~{fragments/_parts :: admin-header}"></div>
@@ -20,42 +19,39 @@
         </div>
     </div>
     
-    <!-- 戻るボタン -->
     <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url=${backUrl})}"></div>
     </div>
 
     <div class="main-container">
+        
         <div th:replace="~{fragments/_parts :: page-title-part('受講情報')}"></div>
 
         <div class="student-name-display">
-            <span th:text="${detail.studentName} + さん" ></span>
+            <span th:text="${detail.studentName} + ' さん'"></span>
         </div>
 
         <div class="content-wrapper">
+            
             <div class="left-panel">
                 <table class="info-table">
                     <tr>
                         <th>教科名</th>
                         <td class="subject-name">
                             <a th:href="@{/admin/subjectInfo(departmentId=${detail.departmentId}, subjectId=${detail.subjectId}, grade=${detail.grade}, from='student', fromStudentId=${detail.studentId})}"
-                                th:text="${detail.subjectName}"
-                                style="text-decoration: none; color: #00acbd; font-weight: bold; border-bottom: 1px solid transparent; transition: border-bottom 0.3s;">
-                                教科名
-                            </a>
-                            <a th:href="@{/admin/subjectInfo(departmentId=${detail.departmentId}, subjectId=${detail.subjectId}, grade=${detail.grade}, from='student', fromStudentId=${detail.studentId})}"
-                                style="font-size: 0.9em; color: #00acbd; margin-left: 5px;">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                               style="text-decoration: none; border-bottom: 1px solid transparent; transition: border-bottom 0.3s;">
+                               <span th:text="${detail.subjectName}"></span>
+                               <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.9em; margin-left: 5px;"></i>
                             </a>
                         </td>
                     </tr>
                     <tr>
                         <th>教室</th>
-                        <td th:text="${detail.classroomName}">-</td>
+                        <td th:text="${detail.classroomName}"></td>
                     </tr>
                     <tr>
                         <th>担当教員</th>
-                        <td th:text="${detail.teacherName}">-</td>
+                        <td th:text="${detail.teacherName}"></td>
                     </tr>
                     <tr>
                         <th>実施コマ数</th>
@@ -75,9 +71,9 @@
             <div class="right-panel">
                 
                 <div class="button-group">
-                        <button type="button" class="edit-btn" id="editBtn" onclick="toggleEditMode()">編集</button>
-                        <button type="button" class="save-btn" id="saveBtn" onclick="saveChanges()" style="display:none;">保存</button>
-                        <button type="button" class="cancel-btn" id="cancelBtn" onclick="cancelEdit()" style="display:none;">キャンセル</button>
+                    <button type="button" class="edit-btn" id="editBtn" onclick="toggleEditMode()">編集</button>
+                    <button type="button" class="save-btn" id="saveBtn" onclick="saveChanges()" style="display:none;">保存</button>
+                    <button type="button" class="cancel-btn" id="cancelBtn" onclick="cancelEdit()" style="display:none;">キャンセル</button>
                 </div>
 
                 <div class="summary-area">
@@ -123,7 +119,6 @@
                             
                             <tr th:each="row : ${detail.dailyRecords}">
                                 <td th:text="${row.dateStr}"></td>
-                                
                                 <td th:each="periodIdx : ${#numbers.sequence(1, 4)}"
                                     class="editable-cell"
                                     th:with="statusMark=${periodIdx == 1 ? row.period1 : (periodIdx == 2 ? row.period2 : (periodIdx == 3 ? row.period3 : row.period4))}"
@@ -147,6 +142,7 @@
             </div>
         </div>
     </div>
+    
     <script th:src="@{/js/admin/studentSubjectDetail.js}"></script>
 </body>
 </html>
