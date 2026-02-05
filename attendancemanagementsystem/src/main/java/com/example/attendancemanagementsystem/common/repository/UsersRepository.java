@@ -15,22 +15,26 @@ import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 @Repository
 public interface UsersRepository extends JpaRepository<UsersEntity, Integer> {
 
-    // emailをキーにしてusersテーブルから1件検索するメソッド
-    Optional<UsersEntity> findByEmail(String email);
+    // メールアドレスでのユーザー取得メソッド
+    @Query("SELECT u FROM UsersEntity u WHERE u.email = :email AND u.deleteFlag = false")
+    Optional<UsersEntity> findByEmail(@Param("email") String email);
 
-    // LoginIDをキーにしてusersテーブルから1件検索するメソッド
-    Optional<UsersEntity> findByLoginId(String loginId);
+    // ログインIDでのユーザー取得メソッド
+    @Query("SELECT u FROM UsersEntity u WHERE u.loginId = :loginId AND u.deleteFlag = false")
+    Optional<UsersEntity> findByLoginId(@Param("loginId") String loginId);
 
+    // ログインIDの存在確認メソッド
     boolean existsByLoginId(String loginId);
 
-    // RoleIDをキーにしてusersテーブルから複数件検索するメソッド
-    List<UsersEntity> findByUserTypeId(Integer userTypeId);
+    // ユーザー種別IDでのユーザー一覧取得メソッド
+    @Query("SELECT u FROM UsersEntity u WHERE u.userTypeId = :userTypeId AND u.deleteFlag = false")
+    List<UsersEntity> findByUserTypeId(@Param("userTypeId") Integer userTypeId);
 
-    //ユーザーIDから氏名を取得するメソッド
+    // ユーザー名取得用メソッド
     @Query("SELECT u.name FROM UsersEntity u WHERE u.userId = :userId")
     String findNameByUserId(@Param("userId") Integer userId);
 
-    //メアドがNULLのユーザを取得する
+    // メールアドレスがNULLの場合にのみ更新するメソッド
     @Modifying
     @Transactional
     @Query("UPDATE UsersEntity u SET u.email = :email WHERE u.userId = :userId AND u.email IS NULL")

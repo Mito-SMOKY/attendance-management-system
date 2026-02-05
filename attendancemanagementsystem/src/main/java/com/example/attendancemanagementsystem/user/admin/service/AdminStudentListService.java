@@ -87,7 +87,9 @@ public class AdminStudentListService {
                                             Integer departmentId, Integer grade, Integer courseId) {
 
         // 検索条件の構築 ---
-        Specification<StudentEntity> spec = Specification.where(null);
+        Specification<StudentEntity> spec = (root, query, cb) -> {
+            return cb.equal(root.get("user").get("deleteFlag"), false);
+        };
 
         // キーワード検索
         if (keyword != null && !keyword.isEmpty()) {
