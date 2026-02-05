@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +97,7 @@ public class MdSubjectService {
 
         if (subjectNames == null) return skippedSubjects;
 
-        // --- ★強化版: 重複チェック処理 ---
+        // --- 1. 重複＆必須チェック ---
         Map<String, Integer> processingKeys = new HashMap<>();
 
         for (int i = 0; i < subjectNames.size(); i++) {
@@ -105,47 +106,44 @@ public class MdSubjectService {
             String name = subjectNames.get(i);
             Integer inputSubId = (subjectIds != null && subjectIds.size() > i) ? subjectIds.get(i) : null;
 
-            // 空行はスキップ
+            // ★必須チェック: 項目が空ならエラーにする
             if (deptId == null || grade == null || name == null || name.trim().isEmpty()) {
-                continue;
+                throw new IllegalArgumentException("入力エラー: 必須項目（コース、クラス、学年、教科名）が入力されていない行があります。");
             }
 
             String key = deptId + "-" + grade + "-" + name.trim();
-            System.out.println("Check: " + key + " (ID: " + inputSubId + ")");
+            System.out.printf("[Check] Dept:%d Grade:%d Name:%s (InputID:%s)%n", deptId, grade, name, inputSubId);
 
-            // 1. 画面内での重複チェック
+            // A. 画面内での重複チェック
             if (processingKeys.containsKey(key)) {
-                // 同じキー（クラス・学年・教科名）が既に出てきている場合、即エラー
-                // (新規同士の重複も、既存と新規の重複もすべてNG)
-                throw new IllegalArgumentException("入力エラー: 教科「" + name + "」が重複して入力されています。");
+                Integer existingId = processingKeys.get(key);
+                // IDが異なる(または片方が新規)なら、別行として重複している
+                if (!Objects.equals(inputSubId, existingId)) {
+                    throw new IllegalArgumentException("入力エラー: 教科「" + name + "」が重複して入力されています。");
+                }
             } else {
                 processingKeys.put(key, inputSubId);
             }
 
-            // 2. データベースとの重複チェック
-            // SQLで「同じクラス・学年・名前」を持つ教科IDを検索
-            List<Integer> existingIdsInDb = subjectFacultyRepository.findSubjectIdsByClassAndSubjectName(deptId, grade, name.trim());
+            // B. 教科マスタ全体での重複チェック (Subjectテーブル全体をチェック)
+            Optional<SubjectEntity> existingSubject = subjectRepository.findBySubjectName(name.trim());
             
-            System.out.println(" -> DB検索結果: " + existingIdsInDb);
-
-            for (Integer existId : existingIdsInDb) {
-                // DBに同名教科が存在する場合
+            if (existingSubject.isPresent()) {
+                Integer existingId = existingSubject.get().getSubjectId();
                 
-                // Case A: 新規登録しようとしている (inputSubId == null) -> エラー
+                // 新規登録(null)しようとしたが、マスタに既に同じ名前がある -> エラー
                 if (inputSubId == null) {
-                    throw new IllegalArgumentException("登録エラー: 「" + name + "」は既にこのクラス・学年に登録されています。");
+                    throw new IllegalArgumentException("登録エラー: 「" + name + "」は既に教科マスタに存在します。(ID: " + existingId + ")");
                 }
                 
-                // Case B: 既存更新だが、IDが違う教科と名前が被った (リネームなど) -> エラー
-                // (自分自身の更新なら inputSubId == existId なのでOK)
-                if (!inputSubId.equals(existId)) {
-                    throw new IllegalArgumentException("エラー: 「" + name + "」は既に存在するため、その名前に変更できません。");
+                // 編集しようとしたが、別の教科IDと名前が被った -> エラー
+                if (!inputSubId.equals(existingId)) {
+                    throw new IllegalArgumentException("エラー: 「" + name + "」は既に教科マスタに存在するため、その名前に変更できません。");
                 }
             }
         }
-        // ---------------------------------
 
-        // 1. 削除処理
+        // --- 2. 削除処理 ---
         List<Integer> activeSubjectIds = new ArrayList<>();
         if (subjectIds != null) {
             activeSubjectIds = subjectIds.stream()
@@ -158,15 +156,12 @@ public class MdSubjectService {
 
         for (SubjectEntity sub : allSubjects) {
             if (!activeSubjectIds.contains(sub.getSubjectId())) {
-                
                 int usageCount = subjectFacultyRepository.countTimeTableUsage(sub.getSubjectId());
                 if (usageCount > 0) {
                     System.out.println("削除スキップ(使用中): " + sub.getSubjectName());
                     skippedSubjects.add(sub.getSubjectName());
                     continue; 
                 }
-
-                System.out.println("削除実行: " + sub.getSubjectName());
                 subjectFacultyRepository.deleteBySubjectId(sub.getSubjectId());
                 allRelations.stream()
                     .filter(ds -> ds.getSubject().getSubjectId().equals(sub.getSubjectId()))
@@ -175,25 +170,63 @@ public class MdSubjectService {
             }
         }
 
-        // 2. 保存・更新処理
+        // --- 3. 保存・更新処理 ---
         if (subjectNames != null && !subjectNames.isEmpty()) {
-            Map<String, List<Integer>> groupMap = new LinkedHashMap<>();
+            Map<String, List<Integer>> groupTeacherMap = new LinkedHashMap<>();
+            // Key: "Dept-Grade-Name", Value: SubjectID
+            Map<String, Integer> groupSubjectIdMap = new HashMap<>();
+
             for (int i = 0; i < subjectNames.size(); i++) {
-                String key = String.format("%s-%s-%s-%s", majorIds.get(i), departmentIds.get(i), grades.get(i), subjectNames.get(i));
-                groupMap.computeIfAbsent(key, k -> new ArrayList<>()).add(teacherIds.get(i));
+                Integer deptId = departmentIds.get(i);
+                Integer grade = grades.get(i);
+                String name = subjectNames.get(i);
+                Integer tId = teacherIds.get(i);
+                Integer sId = (subjectIds != null && subjectIds.size() > i) ? subjectIds.get(i) : null;
+
+                if (deptId == null || grade == null || name == null) continue;
+
+                String key = deptId + "-" + grade + "-" + name.trim();
+                groupTeacherMap.computeIfAbsent(key, k -> new ArrayList<>()).add(tId);
+                
+                if (sId != null) {
+                    groupSubjectIdMap.put(key, sId);
+                }
             }
 
-            for (Map.Entry<String, List<Integer>> entry : groupMap.entrySet()) {
-                String[] parts = entry.getKey().split("-");
-                Integer dId = Integer.parseInt(parts[1]);
-                Integer grade = Integer.parseInt(parts[2]);
-                String sName = parts[3];
-                List<Integer> tIds = entry.getValue();
-
-                SubjectEntity subject = findOrCreateSubject(dId, grade, sName);
+            for (Map.Entry<String, List<Integer>> entry : groupTeacherMap.entrySet()) {
+                String key = entry.getKey();
+                String[] parts = key.split("-");
+                Integer dId = Integer.parseInt(parts[0]);
+                Integer grade = Integer.parseInt(parts[1]);
+                String sName = parts[2];
                 
-                subjectFacultyRepository.deleteBySubjectId(subject.getSubjectId());
+                List<Integer> tIds = entry.getValue();
+                Integer currentSubjectId = groupSubjectIdMap.get(key);
 
+                SubjectEntity subject;
+
+                if (currentSubjectId != null) {
+                    // IDあり: 更新
+                    subject = subjectRepository.findById(currentSubjectId).orElse(new SubjectEntity());
+                    subject.setSubjectName(sName);
+                    subject = subjectRepository.save(subject);
+                    
+                    updateDepartmentSubject(dId, grade, subject);
+
+                } else {
+                    // IDなし: 新規作成
+                    // 重複チェックを通過しているので、ここでは純粋な新規作成を行う
+                    subject = new SubjectEntity();
+                    subject.setSubjectName(sName);
+                    subject.setRequiredCredits(1); 
+                    subject.setTotalCredits(1);
+                    subject = subjectRepository.save(subject);
+
+                    updateDepartmentSubject(dId, grade, subject);
+                }
+
+                // 教員紐づけ更新
+                subjectFacultyRepository.deleteBySubjectId(subject.getSubjectId());
                 List<Integer> uniqueTeacherIds = tIds.stream()
                     .filter(Objects::nonNull)
                     .distinct()
@@ -209,54 +242,22 @@ public class MdSubjectService {
         return skippedSubjects;
     }
 
-    public List<Map<String, Object>> getSimpleMajorList() {
-        return majorRepository.findAll().stream().map(m -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("majorId", m.getMajorId());
-            map.put("majorName", m.getMajorName());
-            return map;
-        }).collect(Collectors.toList());
+    private void updateDepartmentSubject(Integer deptId, Integer grade, SubjectEntity subject) {
+        // 既存の紐づけをクリーンアップして再登録
+        List<DepartmentSubject> existing = departmentSubjectRepository.findAll();
+        existing.stream()
+            .filter(ds -> ds.getSubject().getSubjectId().equals(subject.getSubjectId()))
+            .forEach(ds -> departmentSubjectRepository.delete(ds));
+        
+        DepartmentSubject ds = new DepartmentSubject();
+        ds.setId(new DepartmentSubjectKey(deptId, subject.getSubjectId()));
+        ds.setGrade(grade);
+        departmentRepository.findById(deptId).ifPresent(ds::setDepartment);
+        ds.setSubject(subject);
+        departmentSubjectRepository.save(ds);
     }
 
-    public List<Map<String, Object>> getSimpleDepartmentList() {
-        return departmentRepository.findAll().stream().map(d -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("departmentId", d.getDepartmentId());
-            map.put("className", d.getClassName());
-            return map;
-        }).collect(Collectors.toList());
-    }
-
-    public List<Map<String, Object>> getSimpleTeacherList() {
-        return usersRepository.findByUserTypeId(2).stream().map(u -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("teacherId", u.getUserId());
-            map.put("teacherName", u.getName());
-            return map;
-        }).collect(Collectors.toList());
-    }
-
-    private SubjectEntity findOrCreateSubject(Integer deptId, Integer grade, String name) {
-        return departmentSubjectRepository.findAll().stream()
-            .filter(ds -> ds.getGrade().equals(grade) && 
-                          ds.getDepartment().getDepartmentId().equals(deptId) && 
-                          ds.getSubject().getSubjectName().equals(name))
-            .map(DepartmentSubject::getSubject)
-            .findFirst()
-            .orElseGet(() -> {
-                SubjectEntity s = new SubjectEntity();
-                s.setSubjectName(name);
-                s.setRequiredCredits(1); 
-                s.setTotalCredits(1);
-                SubjectEntity saved = subjectRepository.save(s);
-
-                DepartmentSubject ds = new DepartmentSubject();
-                ds.setId(new DepartmentSubjectKey(deptId, saved.getSubjectId()));
-                ds.setGrade(grade);
-                departmentRepository.findById(deptId).ifPresent(ds::setDepartment);
-                ds.setSubject(saved);
-                departmentSubjectRepository.save(ds);
-                return saved;
-            });
-    }
+    public List<Map<String, Object>> getSimpleMajorList() { return majorRepository.findAll().stream().map(m -> { Map<String, Object> map = new HashMap<>(); map.put("majorId", m.getMajorId()); map.put("majorName", m.getMajorName()); return map; }).collect(Collectors.toList()); }
+    public List<Map<String, Object>> getSimpleDepartmentList() { return departmentRepository.findAll().stream().map(d -> { Map<String, Object> map = new HashMap<>(); map.put("departmentId", d.getDepartmentId()); map.put("className", d.getClassName()); return map; }).collect(Collectors.toList()); }
+    public List<Map<String, Object>> getSimpleTeacherList() { return usersRepository.findByUserTypeId(2).stream().map(u -> { Map<String, Object> map = new HashMap<>(); map.put("teacherId", u.getUserId()); map.put("teacherName", u.getName()); return map; }).collect(Collectors.toList()); }
 }

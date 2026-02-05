@@ -15,20 +15,21 @@ import com.example.attendancemanagementsystem.common.entity.SubjectFacultyId;
 @Repository
 public interface SubjectFacultyRepository extends JpaRepository<SubjectFaculty, SubjectFacultyId> {
 
-    // --- ★修正: 重複チェック用のSQLを追加 ---
-    // 指定された「クラス・学年・教科名」を持つ教科IDのリストを返します
-    @Query(value = "SELECT s.SubjectID FROM departmentsubject ds JOIN subject s ON ds.SubjectID = s.SubjectID WHERE ds.DepartmentID = :deptId AND ds.Grade = :grade AND s.SubjectName = :subjectName", nativeQuery = true)
+    // --- ★修正: JPQLに変更して検索精度を向上 ---
+    // DepartmentSubjectエンティティを経由して、条件に合う教科IDを取得
+    @Query("SELECT ds.subject.subjectId FROM DepartmentSubject ds WHERE ds.department.departmentId = :deptId AND ds.grade = :grade AND ds.subject.subjectName = :subjectName")
     List<Integer> findSubjectIdsByClassAndSubjectName(@Param("deptId") Integer deptId, @Param("grade") Integer grade, @Param("subjectName") String subjectName);
 
-    // --- 既存: アプリ起動エラー回避 ---
+    // --- 既存機能 ---
+    
+    // アプリ起動エラー回避用
     @Query(value = "SELECT * FROM subjectfaculty WHERE SubjectID = :subjectId", nativeQuery = true)
     List<SubjectFaculty> findBySubjectId(@Param("subjectId") Integer subjectId);
 
-    // --- 既存: 削除チェック ---
+    // 削除チェック用
     @Query(value = "SELECT COUNT(*) FROM timetable WHERE SubjectID = :subjectId", nativeQuery = true)
     int countTimeTableUsage(@Param("subjectId") Integer subjectId);
 
-    // --- 以下、既存機能 ---
     @Query(value = "SELECT UserID FROM subjectfaculty WHERE SubjectID = :subjectId LIMIT 1", nativeQuery = true)
     Integer findTeacherIdBySubjectId(@Param("subjectId") Integer subjectId);
 

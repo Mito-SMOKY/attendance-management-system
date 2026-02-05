@@ -196,6 +196,12 @@
                     </div>
 
                     <div class="edit-mode teacher-edit-area">
+                      <input
+                        type="hidden"
+                        name="row-base-subject-id"
+                        th:value="${info.subjectId}"
+                      />
+
                       <div
                         th:each="tId, stat : ${info.teacherIds}"
                         class="teacher-select-wrapper"
@@ -328,12 +334,11 @@
       const teacherOptions = /*[[${teacherList}]]*/ [];
       const majorOptions = /*[[${majorList}]]*/ [];
       const departmentOptions = /*[[${departmentList}]]*/ [];
-      const gradeOptions = /*[[${gradeList}]]*/ [1, 2, 3]; // デフォルト値のフォールバック
+      const gradeOptions = /*[[${gradeList}]]*/ [1, 2, 3];
       /*]]>*/
     </script>
 
     <script>
-      // 編集モード切替
       function toggleEditMode() {
         const container = document.querySelector(".subject-info-container");
         container.classList.toggle("is-editing");
@@ -343,7 +348,6 @@
           btn.textContent = "編集終了(データは保存されません)";
           btn.classList.add("active");
 
-          // ★追加: 編集モードに入ったらメッセージ（成功・エラー）を非表示にする
           const successMsg = document.querySelector(".alert-success");
           const errorMsg = document.querySelector(".alert-error");
           if (successMsg) successMsg.style.display = "none";
@@ -354,16 +358,13 @@
         }
       }
 
-      // 教員追加フィールドの生成
       function addTeacherField(btn) {
         const cell = btn.closest(".teacher-edit-area");
         const row = btn.closest("tr");
 
-        // 新しいラッパーを作成
         const wrapper = document.createElement("div");
         wrapper.className = "teacher-select-wrapper";
 
-        // セレクトボックス作成
         const select = document.createElement("select");
         select.name = "teacherId";
         const defaultOpt = document.createElement("option");
@@ -379,7 +380,6 @@
         });
         wrapper.appendChild(select);
 
-        // 削除ボタン
         const removeBtn = document.createElement("button");
         removeBtn.type = "button";
         removeBtn.className = "remove-teacher-btn";
@@ -389,10 +389,12 @@
         };
         wrapper.appendChild(removeBtn);
 
-        // Hidden値の取得（行の状態から取得）
-        let majorId, deptId, grade, subjectName;
+        let majorId,
+          deptId,
+          grade,
+          subjectName,
+          subjectId = "";
 
-        // 新規行(select)か既存行(hidden/span)かで取得元を変える、あるいは共通クラスから取る
         if (row.classList.contains("new-row")) {
           majorId = row.querySelector(".row-major-select").value;
           deptId = row.querySelector(".row-dept-select").value;
@@ -403,61 +405,55 @@
           deptId = row.querySelector(".row-dept-id").value;
           grade = row.querySelector(".row-grade").value;
           subjectName = row.querySelector(".row-subject-name").value;
+
+          const baseIdInput = cell.querySelector(
+            'input[name="row-base-subject-id"]',
+          );
+          if (baseIdInput) subjectId = baseIdInput.value;
         }
 
-        // Hidden Input 作成
         wrapper.appendChild(createHidden("majorId", majorId));
         wrapper.appendChild(createHidden("departmentId", deptId));
         wrapper.appendChild(createHidden("grade", grade));
         wrapper.appendChild(createHidden("subjectName", subjectName));
-        // 新規追加分の subjectId は空または既存行IDを入れる
-        // ここでは既存行の場合はIDを入れ、新規行の場合は空にする
-        const subjectIdInput = row.querySelector('input[name="subjectId"]'); // 既存行の隠しフィールドを探す
-        if (subjectIdInput) {
-          wrapper.appendChild(createHidden("subjectId", subjectIdInput.value));
-        } else {
-          wrapper.appendChild(createHidden("subjectId", "")); // 新規行
-        }
+        wrapper.appendChild(createHidden("subjectId", subjectId));
 
         cell.insertBefore(wrapper, btn);
       }
 
-      // 教員削除
       function removeTeacher(btn) {
         const wrapper = btn.closest(".teacher-select-wrapper");
         const area = wrapper.parentElement;
         if (area.querySelectorAll(".teacher-select-wrapper").length <= 1) {
-          wrapper.querySelector("select").value = ""; // 1つだけならリセット
+          wrapper.querySelector("select").value = "";
         } else {
           wrapper.remove();
         }
       }
 
-      // 行削除
       function deleteRow(btn) {
         if (confirm("この教科情報を削除しますか？")) {
           btn.closest("tr").remove();
         }
       }
 
-      // 行追加機能
       function addRow() {
         const tbody = document.querySelector("#infoTable tbody");
         const tr = document.createElement("tr");
-        tr.className = "new-row"; // 新規行用クラス（常に編集モード）
+        tr.className = "new-row";
 
-        // 1. コース (Major)
+        // 1. コース
         const tdMajor = document.createElement("td");
         const selMajor = createSelect(majorOptions, "majorId", "majorName");
         selMajor.className = "row-major-select";
-        selMajor.name = "dummy_major"; // 送信対象外（hiddenで送るため）
+        selMajor.name = "dummy_major";
         selMajor.onchange = function () {
           syncHiddenValues(tr, "majorId", this.value);
         };
         tdMajor.appendChild(selMajor);
         tr.appendChild(tdMajor);
 
-        // 2. クラス (Dept)
+        // 2. クラス
         const tdDept = document.createElement("td");
         const selDept = createSelect(
           departmentOptions,
@@ -472,13 +468,17 @@
         tdDept.appendChild(selDept);
         tr.appendChild(tdDept);
 
-        // 3. 学年 (Grade)
+        // 3. 学年 (修正箇所)
         const tdGrade = document.createElement("td");
         const selGrade = document.createElement("select");
         selGrade.className = "row-grade-select";
         selGrade.name = "dummy_grade";
         const defOpt = document.createElement("option");
+
+        // ★修正: value="" を明示的にセット
+        defOpt.value = "";
         defOpt.text = "選択";
+
         selGrade.appendChild(defOpt);
         gradeOptions.forEach((g) => {
           const opt = document.createElement("option");
@@ -504,12 +504,11 @@
         tdName.appendChild(inpName);
         tr.appendChild(tdName);
 
-        // 5. 担当教師エリア
+        // 5. 担当教師
         const tdTeacher = document.createElement("td");
         const editArea = document.createElement("div");
-        editArea.className = "teacher-edit-area edit-mode"; // 常時表示
+        editArea.className = "teacher-edit-area edit-mode";
 
-        // 教師追加ボタン
         const addBtn = document.createElement("button");
         addBtn.type = "button";
         addBtn.className = "add-teacher-inner-btn";
@@ -522,7 +521,6 @@
         tdTeacher.appendChild(editArea);
         tr.appendChild(tdTeacher);
 
-        // 初期教師フィールドを1つ追加
         addTeacherField(addBtn);
 
         // 6. 削除ボタン
@@ -539,8 +537,6 @@
 
         tbody.appendChild(tr);
       }
-
-      // --- Helper Functions ---
 
       function createHidden(name, val) {
         const input = document.createElement("input");
@@ -565,19 +561,16 @@
         return sel;
       }
 
-      // Visualな入力(select/text)が変わった時に、その行に含まれる全ての送信用のHidden値を同期する
       function syncHiddenValues(row, name, value) {
         const hiddens = row.querySelectorAll(`input[name="${name}"]`);
         hiddens.forEach((h) => (h.value = value));
       }
 
-      // 既存行の教科名変更イベントリスナー
       document.addEventListener("input", function (e) {
         if (
           e.target.classList.contains("row-subject-name") &&
           !e.target.closest("tr").classList.contains("new-row")
         ) {
-          // 既存行の場合のみここで処理（新規行はoninputで処理済み）
           const val = e.target.value;
           const row = e.target.closest("tr");
           row

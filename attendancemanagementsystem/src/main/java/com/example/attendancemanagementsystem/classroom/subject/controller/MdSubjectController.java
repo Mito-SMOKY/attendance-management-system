@@ -40,6 +40,11 @@ public class MdSubjectController {
             @RequestParam(name = "grade", required = false) List<Integer> grades,
             RedirectAttributes redirectAttributes) {
         
+        // ★デバッグ用ログ出力
+        System.out.println("Controller received:");
+        System.out.println("IDs: " + subjectIds);
+        System.out.println("Names: " + subjectNames);
+
         try {
             List<String> skipped = mdSubjectService.saveSubjectList(
                 subjectIds,
@@ -59,7 +64,6 @@ public class MdSubjectController {
             }
 
         } catch (IllegalArgumentException e) {
-            // 重複エラーキャッチ
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
