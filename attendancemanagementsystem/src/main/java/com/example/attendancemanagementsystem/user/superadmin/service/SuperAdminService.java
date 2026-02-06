@@ -16,9 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.attendancemanagementsystem.common.entity.AdministratorEntity;
 import com.example.attendancemanagementsystem.common.entity.CreationLogEntity;
+import com.example.attendancemanagementsystem.common.entity.DeleteLogEntity; // ★追加
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.AdministratorRepository;
 import com.example.attendancemanagementsystem.common.repository.CreationLogRepository;
+import com.example.attendancemanagementsystem.common.repository.DeleteLogRepository; // ★追加
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.common.service.SearchService;
 import com.example.attendancemanagementsystem.user.superadmin.dto.SuperAdminCreateDto;
@@ -45,6 +47,10 @@ public class SuperAdminService {
     @Autowired
     private CreationLogRepository creationLogRepository;
 
+    // ★追加: 削除ログ用リポジトリ
+    @Autowired
+    private DeleteLogRepository deleteLogRepository;
+
     @Autowired
     private SearchService searchService;
     
@@ -57,14 +63,14 @@ public class SuperAdminService {
     // --- 1. 一覧取得メソッド ---
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getAdminList(String keyword, String authFilter) {
+        // ... (省略: 変更なし) ...
+        // ファイルの内容と同じ実装のままでOKです
         Specification<AdministratorEntity> spec = Specification.where(null);
         
-        // 論理削除済み(DeleteFlag=true)を除外
         spec = spec.and((root, query, cb) -> {
             if (Long.class != query.getResultType()) {
                 root.fetch("user", JoinType.LEFT);
             }
-            // user.DeleteFlag is false OR null
             return cb.or(
                 cb.equal(root.get("user").get("deleteFlag"), false),
                 cb.isNull(root.get("user").get("deleteFlag"))
@@ -111,6 +117,7 @@ public class SuperAdminService {
     // --- 2. 詳細取得メソッド ---
     @Transactional(readOnly = true)
     public SuperAdminDetailDto getAdminDetail(Integer id) {
+        // ... (省略: 変更なし) ...
         AdministratorEntity admin = administratorRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("管理者が見つかりません ID: " + id));
         
@@ -123,11 +130,10 @@ public class SuperAdminService {
         return dto;
     }
 
-    // --- 3. 更新メソッド (修正済み) ---
+    // --- 3. 更新メソッド ---
     @Transactional
     public void updateAdmin(SuperAdminDetailDto dto, Integer operatorId) {
-        
-        // 1. 操作者のパスワード確認
+        // ... (省略: 変更なし) ...
         UsersEntity operator = usersRepository.findById(operatorId)
             .orElseThrow(() -> new RuntimeException("操作ユーザーが見つかりません"));
         
@@ -136,14 +142,12 @@ public class SuperAdminService {
             throw new RuntimeException("パスワードが正しくありません。");
         }
 
-        // 2. 更新処理
         AdministratorEntity admin = administratorRepository.findById(dto.getUserId())
             .orElseThrow(() -> new RuntimeException("管理者が見つかりません"));
         
         UsersEntity user = admin.getUser();
         user.setName(dto.getName());
         
-        // ★修正: Emailが空文字ならnullを入れる（Unique制約エラー回避）
         if (dto.getEmail() != null && dto.getEmail().trim().isEmpty()) {
             user.setEmail(null);
         } else {
@@ -157,7 +161,7 @@ public class SuperAdminService {
         administratorRepository.save(admin);
     }
 
-    // --- 4. 削除メソッド (論理削除) ---
+    // --- 4. 削除メソッド (論理削除 + ログ保存) ---
     @Transactional
     public boolean deleteAdmin(Integer targetId, String password, Integer operatorId) {
         
@@ -179,12 +183,24 @@ public class SuperAdminService {
         targetUser.setDeleteFlag(true);
         usersRepository.save(targetUser);
 
+        // ★4. 削除ログの保存 (ここを追加)
+        try {
+            DeleteLogEntity log = new DeleteLogEntity(targetId, operatorId);
+            deleteLogRepository.save(log);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // ログ保存失敗時に削除自体をロールバックするかは要件次第ですが、
+            // @Transactionalがあるので例外を投げればロールバックされます。
+            throw new RuntimeException("削除ログの保存に失敗しました", e);
+        }
+
         return true;
     }
 
     // --- 5. 新規管理者作成メソッド ---
     @Transactional
     public Integer createAdmin(SuperAdminCreateDto dto, Integer operatorId) {
+        // ... (省略: 変更なし) ...
         UsersEntity currentUser = usersRepository.findById(operatorId)
             .orElseThrow(() -> new RuntimeException("操作ユーザーが見つかりません"));
         if (dto.getCurrentAdminPassword() == null || 
@@ -199,8 +215,6 @@ public class SuperAdminService {
         newUser.setName(dto.getName());
         newUser.setPassword(passwordEncoder.encode(dto.getPassword()));
         newUser.setUserTypeId(2); 
-        
-        // Emailはセットしない（nullになる）
         
         usersRepository.save(newUser);
         usersRepository.flush(); 
@@ -226,6 +240,7 @@ public class SuperAdminService {
 
     // --- 6. PDF生成メソッド ---
     public byte[] generateRegistrationPdf(Integer logId) {
+        // ... (省略: 変更なし) ...
         CreationLogEntity log = creationLogRepository.findById(logId)
             .orElseThrow(() -> new RuntimeException("ログが見つかりません"));
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {

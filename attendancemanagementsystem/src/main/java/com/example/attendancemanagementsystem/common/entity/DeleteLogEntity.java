@@ -1,4 +1,4 @@
-package com.example.attendancemanagementsystem.common.entity;
+package com.example.attendancemanagementsystem.common.entity; // ←この行が重要
 
 import java.time.LocalDateTime;
 
@@ -28,13 +28,11 @@ public class DeleteLogEntity {
     @Column(name = "deleted_at", updatable = false)
     private LocalDateTime deletedAt;
 
-    // 保存前に現在時刻を自動セット
     @PrePersist
     public void onPrePersist() {
         this.deletedAt = LocalDateTime.now();
     }
 
-    // --- コンストラクタ ---
     public DeleteLogEntity() {}
 
     public DeleteLogEntity(Integer targetUserId, Integer deletedBy) {
@@ -42,7 +40,6 @@ public class DeleteLogEntity {
         this.deletedBy = deletedBy;
     }
 
-    // --- Getter / Setter ---
     public Integer getLogId() { return logId; }
     public void setLogId(Integer logId) { this.logId = logId; }
     
