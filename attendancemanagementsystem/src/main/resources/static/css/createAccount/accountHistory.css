@@ -7,60 +7,23 @@
     box-sizing: border-box;
 }
 
-body {
-    overflow-x: hidden;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    font-size: 16px;
-    
-    /* 全体の背景を薄いグレーに設定 */
-    background-color: #fff;
-    color: #333;
-    
-    /* ヘッダー固定分の余白 */
-    padding-top: 120px;
-    padding-bottom: 50px;
-    text-align: center;
-}
+/* body, .page-title などの設定は削除し、
+   parts.css の .main-container に任せます。 */
+
 
 /* =========================================
-   レイアウトコンテナ
+   ページ固有の説明エリア
    ========================================= */
-.history-container {
-    width: 95%;
-    max-width: 1000px;
-    margin: 0 auto;
-    
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    padding: 40px;
-    
-    text-align: left;
+.page-description {
+    text-align: left; /* タイトルのインデントに合わせるならleft、中央ならcenter */
+    margin-bottom: 20px;
+    padding-left: 5px;
 }
 
-/* =========================================
-   ページタイトル
-   ========================================= */
-.page-title-wrapper {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.page-title {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 10px;
-    display: inline-block;        
-    border-bottom: 3px solid #00bdca;
-    padding-bottom: 5px;   
-}
-
-.page-title-wrapper p {
+.page-description p {
     color: #666;
     font-size: 0.95rem;
+    margin: 0;
 }
 
 /* =========================================
@@ -92,13 +55,19 @@ body {
 }
 
 /* =========================================
-   テーブル設定
+   テーブル設定 (他の画面と統一)
    ========================================= */
 .table-wrapper {
     width: 100%;
+    margin-bottom: 30px;
     overflow-x: auto;
+    background-color: white;
+    
+    /* 角丸・影の設定 */
+    border: none;
     border-radius: 8px;
-    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden; /* 角丸適用のため */
 }
 
 .history-table {
@@ -120,41 +89,33 @@ body {
 /* データセル */
 .history-table td {
     padding: 15px 10px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #eee; /* 薄い下線のみ */
     color: #333;
     vertical-align: middle;
 }
 
-/* ゼブラストライプ */
-.history-table tr:nth-child(even) td {
-    background-color: #f9fcfd;
+/* 最後の行の下線を消す */
+.history-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
-.history-table tr:hover td {
-    background-color: #f0fcfd;
+/* 行ホバー */
+.history-table tbody tr:hover {
+    background-color: #f9fbfd;
 }
 
-/* ----------------------------------------------------
-   【修正箇所】リンクのスタイル (強制適用)
-   ---------------------------------------------------- */
-.history-table td a {
-    /* !important を付けて強制的にこの色にします */
+/* リンクスタイル */
+.list-link {
     color: #00bdca !important;
     text-decoration: none;
     font-weight: bold;
     transition: color 0.3s;
-}
-
-.history-table td a:hover {
-    /* ホバー時は少し濃い色へ */
-    color: #008c96 !important;
-    text-decoration: underline;
     cursor: pointer;
 }
 
-.history-table td a:visited {
-    /* 訪問済みでも同じ色を維持したい場合 */
-    color: #00bdca !important;
+.list-link:hover {
+    color: #008c96 !important;
+    text-decoration: underline;
 }
 
 /* 小さな文字 */
@@ -164,9 +125,8 @@ body {
 }
 
 /* データなし */
-.history-table td[colspan="4"] {
+.history-table td[colspan="3"] {
     text-align: center;
     padding: 30px;
     color: #999;
-    background-color: #fff;
 }

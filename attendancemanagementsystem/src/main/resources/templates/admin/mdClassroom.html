@@ -11,20 +11,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
-    <div class="header-container">
-        <div th:replace="~{fragments/_parts :: admin-header}"></div>
-    </div>
 
-    <div class="layout-wrapper">
-        
-        <div class="page-header-outer">
-            <h1 class="page-title">教室マスタ</h1>
+    <div th:replace="~{fragments/_parts :: admin-header}"></div>
+
+
+    <div class="main-container">
+
+        <div class="backbutton-container">
+            <div th:replace="~{fragments/_parts :: backButton(url='/admin/master-data')}"></div>
         </div>
 
-            <div class="backbutton-container">
-        <div th:replace="~{fragments/_parts :: backButton(url='/admin/master-data')}"></div>
-    </div>
-
+        <div th:replace="~{fragments/_parts :: page-title-part('教室マスタ')}"></div>
+        
         <form th:action="@{/admin/master/classroom/save}" method="post" id="masterForm">
             <div class="classroom-card">
                 
@@ -36,11 +34,8 @@
                 </div>
 
                 <div class="action-bar">
-                    <button type="button" class="cancel-btn" id="cancelButton" onclick="cancelEditMode()">
-                        キャンセル
-                    </button>
-                    <button type="button" class="action-btn edit-btn" id="toggleButton" onclick="toggleEditMode()">
-                        編集
+                    <button type="button" class="action-btn edit-btn view-mode" onclick="enableEditMode()">
+                        <i class="fa-solid fa-pen"></i> 編集
                     </button>
                 </div>
 
@@ -89,16 +84,24 @@
                     </table>
                 </div>
 
-                <div class="add-row-wrapper edit-mode">
-                    <button type="button" class="add-row-btn" onclick="addClassroomRow()">
-                        ＋ 行を追加
-                    </button>
+                <div class="action-footer edit-mode">
+                    <div class="edit-btns">
+                        <button type="button" class="btn btn-add" onclick="addClassroomRow()">
+                            <i class="fa-solid fa-plus"></i> 行を追加
+                        </button>
+                    </div>
+                    
+                    <div class="save-btns">
+                        <button type="button" class="btn btn-secondary" onclick="cancelEditMode()">キャンセル</button>
+                        <button type="button" class="btn btn-save" onclick="saveData()">保存実行</button>
+                    </div>
                 </div>
 
             </div>
         </form>
-    </div>
 
+    </div> 
+    
     <script th:src="@{/js/admin/mdClassroom.js}"></script>
 </body>
 </html>

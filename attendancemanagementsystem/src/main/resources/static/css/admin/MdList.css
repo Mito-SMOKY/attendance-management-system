@@ -1,75 +1,29 @@
 @charset "UTF-8";
 
-/* --- 基本設定（頂いたCSSそのまま） --- */
-body {
-    margin: 0;
-    padding-top: 80px;
-    background-color: #fff;
-}
-
-/* --- ヘッダーエリア --- */
-.page-header-area {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    position: relative; /* 子要素の絶対配置の基準 */
-    min-height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.page-title {
-    font-size: 28px;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
-}
-
-/* --- コンテンツエリア --- */
-.content-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: calc(100vh - 180px);
-    padding-bottom: 50px;
-    width: 100%;
-}
-
-/* --- メニューグループ --- */
+/* --- メニュー全体エリア（ここが修正ポイント） --- */
 .menu-group {
+    /* フレックスボックスにして中身を中央に寄せる */
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: column; /* 縦並びのルールで */
+    justify-content: center; /* 縦方向の中央寄せ */
+    align-items: center;     /* 横方向の中央寄せ */
+    
+    /* 画面の高さからヘッダーやタイトルの分（約250px）を引いた高さを確保 */
+    min-height: calc(100vh - 250px);
     width: 100%;
 }
 
-/* アニメーション */
-.fade-in {
-    animation: fadeIn 0.4s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- ボタン配置エリア --- */
+/* --- ボタンの並び --- */
 .action-buttons {
     display: flex;
-    gap: 40px;
-    padding: 0 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-    max-width: 1000px;
+    justify-content: center; /* 横並びの中央寄せ */
+    flex-wrap: wrap;         /* 画面が狭ければ折り返し */
+    gap: 40px;               /* ボタン間の隙間 */
     width: 100%;
-    box-sizing: border-box;
 }
 
-/* --- ゴーストボタン --- */
+/* --- ゴーストボタンのデザイン --- */
 .ghost-button {
-    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -78,7 +32,7 @@ body {
     width: 250px;
     height: 180px;
     
-    background-color: white;
+    background-color: #fff;
     color: #00bdca;
     border: 3px solid #00bdca;
     border-radius: 15px;
@@ -93,15 +47,17 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
+/* アイコン */
 .ghost-button i {
     font-size: 50px;
     margin-bottom: 20px;
     transition: transform 0.3s ease;
 }
 
+/* ホバー時の動き */
 .ghost-button:hover {
     background-color: #00bdca;
-    color: white;
+    color: #fff;
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0, 189, 202, 0.3);
 }
@@ -110,3 +66,19 @@ body {
     transform: scale(1.1);
 }
 
+/* アニメーション */
+.fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}

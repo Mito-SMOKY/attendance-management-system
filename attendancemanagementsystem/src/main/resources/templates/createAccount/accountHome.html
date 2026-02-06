@@ -7,38 +7,41 @@
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/createAccount/accountHome.css}">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <div class="header-container">
-        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
-            <div th:replace="~{fragments/_parts :: admin-header}"></div>
-        </div>
-        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
-            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
-        </div>
+    <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
+        <div th:replace="~{fragments/_parts :: admin-header}"></div>
+    </div>
+    <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+        <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
     </div>
     
-    <div class="account-manage-container">
-        
-        <h1 class="page-title">アカウント管理</h1>
+    <div class="main-container">
+
+        <div th:replace="~{fragments/_parts :: page-title-part('アカウント管理')}"></div>
 
         <div class="menu-buttons-area">
             
             <a th:href="@{/admin/upload}" class="menu-btn">
-                <i class="fa-solid fa-file-arrow-up" style="margin-right: 10px;"></i>
+                <i class="fa-solid fa-file-arrow-up"></i>
                 ファイルアップロード
             </a>
+            
             <a th:href="@{/admin/manualInput}" class="menu-btn">
-                <i class="fa-solid fa-keyboard" style="margin-right: 10px;"></i>
+                <i class="fa-solid fa-keyboard"></i>
                 手動入力
             </a>
+            
             <a th:href="@{/admin/accountHistory}" class="menu-btn">
-                <i class="fa-solid fa-clock-rotate-left" style="margin-right: 10px;"></i>
+                <i class="fa-solid fa-clock-rotate-left"></i>
                 作成履歴
             </a>
+            
         </div>
     </div>
+
 </body>
 </html>

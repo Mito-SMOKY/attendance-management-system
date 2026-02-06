@@ -1,16 +1,25 @@
 @charset "UTF-8";
 
-/* 全体レイアウト */
-.main-container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 20px;
+/* =========================================
+   基本設定
+   ========================================= */
+body {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+    background-color: #f9fbfd; /* 背景色（任意） */
 }
 
-/* 戻るボタン */
+/* =========================================
+   レイアウト調整（ヘッダー被り回避）
+   ========================================= */
+/* ★重要: 戻るボタンのエリアに上部余白を追加して、コンテンツ全体を押し下げます */
 .backbutton-container {
-    margin: 10px 20px;
+    margin-top: 110px; /* 固定ヘッダーの高さ分 */
+    margin-left: 20px;
+    margin-bottom: 10px;
 }
+
 .back-btn {
     text-decoration: none;
     color: #555;
@@ -18,236 +27,240 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
+    transition: color 0.3s;
 }
 .back-btn:hover {
-    color: #000;
+    color: #00bdca;
 }
 
-/* タイトルエリア */
-.page-title {
-    color: #333;
-    font-size: 1.8rem;
-    border-bottom: 2px solid #00bdca;
-    padding-bottom: 20px;
-    margin-top: 100px;
-    margin-bottom: 30px;
-    padding-left: 20px;
-    text-align: center;
+/* コンテナ全体 */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 50px 20px;
 }
 
+/* 生徒名表示 (カード化) */
 .student-name-display {
     text-align: left;
+    margin-bottom: 20px;
+    padding: 15px 20px;
+    background-color: white;
+    
+    /* デザイン: 左線・角丸・影 */
+    border-left: 6px solid #00bdca;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    
     font-size: 1.2rem;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
+    color: #333;
 }
 .student-name-display span {
     font-weight: bold;
     font-size: 1.4rem;
 }
 
-/* 左右カラムレイアウト */
+/* =========================================
+   左右カラムレイアウト
+   ========================================= */
 .content-wrapper {
     display: flex;
     gap: 30px;
     align-items: flex-start;
+    flex-wrap: wrap;
 }
 
 /* --- 左パネル（教科情報） --- */
 .left-panel {
-    flex: 0 0 320px; /* 固定幅 */
+    flex: 0 0 320px; /* 幅固定 */
 }
 
+/* 教科情報テーブル (カード化・枠なし) */
 .info-table {
     width: 100%;
-    border-collapse: collapse;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background-color: #fff;
+    
+    /* デザイン変更 */
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden; /* 角丸用 */
+    border-collapse: separate; 
+    border-spacing: 0;
 }
 
 .info-table th {
-    background-color: #00bdca; /* テーマカラー */
+    background-color: #00bdca;
     color: white;
-    padding: 15px 10px;
+    padding: 15px;
     text-align: left;
-    width: 40%;
-    border-bottom: 1px solid #fff;
+    width: 35%;
     font-weight: normal;
+    border: none;
 }
 
 .info-table td {
-    background-color: #fff;
-    padding: 15px 10px;
+    padding: 15px;
     text-align: left;
-    border-bottom: 1px solid #eee;
-    font-weight: bold;
     color: #444;
+    font-weight: bold;
+    border: none;
+    border-bottom: 1px solid #f0f0f0; /* 薄い下線のみ */
 }
-
+/* 最終行の下線を消す */
 .info-table tr:last-child td {
     border-bottom: none;
 }
 
-.info-table .subject-name {
-    color: #00bdca;
+.info-table .subject-name a {
+    color: #00bdca !important;
     font-weight: 900;
 }
 
 .rate-highlight {
-    color: #d9534f; /* 重要項目を目立たせる赤 */
+    color: #d9534f;
     font-size: 1.2rem;
 }
+
 
 /* --- 右パネル（集計・明細） --- */
 .right-panel {
     flex: 1;
+    min-width: 600px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
 }
 
-/* 集計テーブルエリア */
+/* ボタン群 */
+.button-group {
+    text-align: right;
+}
+
+.edit-btn, .save-btn, .cancel-btn {
+    height: 40px;
+    padding: 0 30px;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    border: none;
+}
+.edit-btn {
+    border: 1px solid #00bdca;
+    background-color: #fff;
+    color: #00bdca;
+}
+.edit-btn:hover { background-color: #eafcfd; }
+
+.save-btn { background-color: #00bdca; color: #fff; margin-right: 10px; }
+.save-btn:hover { background-color: #009bad; }
+
+.cancel-btn { background-color: #e15966; color: #fff; }
+.cancel-btn:hover { background-color: #c94450; }
+
+
+/* 集計テーブル (カード化・枠なし) */
 .summary-area {
-    display: flex;
     width: 100%;
-    /* justify-content: space-between; */
-    align-items: center;
 }
 
 .summary-table {
     width: 100%;
-    border-collapse: collapse;
+    background-color: white;
+    
+    /* デザイン変更 */
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 .summary-table th {
     background-color: #00bdca;
     color: white;
-    padding: 8px;
-    font-size: 0.9rem;
-    border: 1px solid #00bdca;
+    padding: 12px;
+    font-size: 0.95rem;
     text-align: center;
+    font-weight: normal;
+    border: none;
 }
 
 .summary-table td {
-    background-color: #fff;
+    padding: 15px;
     text-align: center;
-    padding: 10px;
-    border: 1px solid #ccc;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    color: #333;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+}
+.summary-table tr:last-child td {
+    border-bottom: none;
 }
 
-.edit-btn {
-    padding: 8px 20px;
-    background-color: #fff;
-    color: #3e9cb1;
-    border: 2px solid #3e9cb1;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s;
-}
 
-.edit-btn:hover {
-    background-color: #00bdca;
-    color: #fff;
-}
-
-/* 明細テーブル */
+/* 明細テーブルエリア (カード化) */
 .detail-table-wrapper {
     background-color: #fff;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    max-height: 500px;  
-    overflow-y: auto;  
-    position: relative; 
+    
+    /* デザイン変更 */
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden; /* 角丸用 */
+    
+    max-height: 600px;
+    overflow-y: auto;
 }
 
 .schedule-table {
     width: 100%;
     border-collapse: collapse;
+    border-spacing: 0;
 }
 
+/* ヘッダー固定 */
 .schedule-table thead th {
     position: sticky;
     top: 0;
-    z-index: 10;  
-    background-color: #00bdca;
-}
-
-
-.schedule-table th {
+    z-index: 10;
     background-color: #00bdca;
     color: white;
-    padding: 12px;
-    border-right: 1px solid #fff;
+    padding: 15px;
     text-align: center;
+    font-weight: normal;
+    border: none;
 }
 
 .schedule-table td {
     padding: 12px;
     text-align: center;
-    border-bottom: 1px solid #eee;
     color: #333;
     font-weight: 500;
-}
-
-.schedule-table tr:nth-child(even) {
-    background-color: #fcfcfc;
-}
-
-.schedule-table tr:hover {
-    background-color: #f0f8ff;
-}
-
-/* ステータスによる色分け (任意) */
-.status-bad {
-    color: #d9534f; /* 欠席などは赤字にする等 */
-    font-weight: bold;
-}
-
-.button-group {
-    text-align: right;
-}
-
-.edit-btn,.save-btn, .cancel-btn{
-    height: 40px;
-    padding: 0 30px;
     border: none;
+    border-bottom: 1px solid #f0f0f0;
+}
+.schedule-table tbody tr:hover {
+    background-color: #f9fbfd;
+}
+
+/* 編集用プルダウン */
+.status-select {
+    padding: 4px;
+    border: 1px solid #ccc;
     border-radius: 4px;
-    background-color: #fff;
-    font-size: 1rem;
+    font-size: 0.95rem;
     cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
 }
 
-.edit-btn{ border:1px solid #00bdca; color: #00bdca;}
-.edit-btn:hover { background-color: #cccccc; color: #009aa4;}
-
-.save-btn { background-color: #00bdca; margin-right: 5px;  color: #fff;}
-.save-btn:hover { background-color: #009aa4;  color: #fff;}
-
-.cancel-btn { background-color: rgb(225, 89, 102); color: #fff;}
-.cancel-btn:hover { background-color: rgb(225, 89, 102); color: #fff;}
-
-/* プルダウンのスタイル */
-.status-select {
-    padding: 2px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-}
-
-/* ステータス別の文字色 */
-.status-present { color: #28a745 !important; font-weight: bold; font-size: 1.2em; } /* 〇 出席：緑 */
-.status-absence { color: #dc3545 !important; font-weight: bold; font-size: 1.2em;} /* ✕ 欠席：赤 */
-.status-late    { color: #ffc107 !important; font-weight: bold; font-size: 1.2em;} /* △ 遅刻：黄 */
-
-.status-select {
-    padding: 2px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.9rem;
-}
+/* ステータス色 */
+.status-present { color: #28a745 !important; font-weight: bold; font-size: 1.2em; }
+.status-absence { color: #dc3545 !important; font-weight: bold; font-size: 1.2em; }
+.status-late    { color: #ffc107 !important; font-weight: bold; font-size: 1.2em; }
+.status-early   { color: #6c757d !important; font-weight: bold; font-size: 1.2em; }
+.status-suspend { color: #6c757d !important; font-weight: bold; font-size: 1.2em; }
+.status-public  { color: #6c757d !important; font-weight: bold; font-size: 1.2em; }
