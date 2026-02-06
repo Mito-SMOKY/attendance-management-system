@@ -24,11 +24,12 @@
 <body>
 
     <div class="header-container">
-        <div th:if="${#authorization.expression('hasRole(''SUPER_ADMIN'')')}">
-            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
-        </div>
-        <div th:unless="${#authorization.expression('hasRole(''ADMIN'')')}">
+        <div sec:authorize="hasRole('ADMIN')">
             <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+
+        <div sec:authorize="hasRole('SUPER_ADMIN')">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
         </div>
     </div>
     
@@ -37,8 +38,15 @@
     </div>
 
     <main class="confirm-container">
+
+        <div sec:authorize="hasRole('SUPER_ADMIN')">
+            <h2 class="main-title">ステータス変更</h2>
+        </div>
+
+        <div sec:authorize="hasRole('ADMIN')">
+            <h2 class="main-title">ステータス変更申請</h2>
+        </div>
         
-        <h2 class="main-title" th:text="${pageTitle}">ステータス変更申請</h2>
         
         <div class="content-box">
             <h3 class="sub-title">以下の生徒のステータスを変更しますか？</h3>

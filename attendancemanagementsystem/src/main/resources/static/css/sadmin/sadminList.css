@@ -4,7 +4,6 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #fff;
 }
 
 /* ヘッダー位置の調整（必要に応じて） */
@@ -32,12 +31,15 @@ body {
   margin-bottom: 30px;
 }
 
-/* タイトル文字 */
 .page-title {
-  font-size: 28px;
-  font-weight: bold;
-  color: #333;
-  margin: 0;
+    text-align: center;
+    border-bottom:2px solid #00bdca;
+    padding-bottom: 10px;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
+    letter-spacing: 2px;
 }
 
 /* --- 検索エリア --- */
@@ -103,6 +105,7 @@ body {
 .table-area {
   width: 100%; /* 親のmain-wrapper(800px)に合わせる */
   border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .admin-table {

@@ -24,11 +24,11 @@
 <body>
 
     <div class="header-container">
-        <div th:if="${#authorization.expression('hasRole(''SUPER_ADMIN'')')}">
-            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
-        </div>
-        <div th:unless="${#authorization.expression('hasRole(''ADMIN'')')}">
+        <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
             <div th:replace="~{fragments/_parts :: admin-header}"></div>
+        </div>
+        <div th:if="${#authorization.expr('hasRole(''SUPER_ADMIN'')')}">
+            <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
         </div>
     </div>
     
@@ -38,7 +38,7 @@
 
     <main class="confirm-container">
         
-        <h2 class="main-title" th:text="${pageTitle}">生徒削除</h2>
+        <h2 class="page-title" th:text="${pageTitle}">生徒削除</h2>
         
         <div class="content-box">
             <h3 class="sub-title">以下の生徒のアカウントを削除しますか？</h3>
