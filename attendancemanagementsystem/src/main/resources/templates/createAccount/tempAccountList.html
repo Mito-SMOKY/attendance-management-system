@@ -1,11 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
     <title>仮アカウント一覧</title>
-    <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" th:href="@{/css/createAccount/tempAccountList.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/parts.css}" />
+    <link
+      rel="stylesheet"
+      th:href="@{/css/createAccount/tempAccountList.css}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
   </head>
   <body>
     <div class="header-container">
@@ -16,42 +22,58 @@
         <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
       </div>
     </div>
-  
+
     <div class="backbutton-container">
       <div th:replace="~{fragments/_parts :: backButton(url=${backUrl})}"></div>
     </div>
-        <div th:replace="~{fragments/_parts :: page-title-part('仮アカウント一覧')}"></div>
+    
+    <h1>仮アカウント一覧</h1>
 
     <div th:if="${successMessage}" class="success-message">
-        <i class="fas fa-check-circle"></i>
-        <span th:text="${successMessage}"></span>
+      <i class="fas fa-check-circle"></i>
+      <span th:text="${successMessage}"></span>
     </div>
 
     <div class="info-box">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <p>
-                <strong>リストID:</strong>
-                <span th:text="${datalist.dataListId}"></span>
-            </p>
-            <p>
-                <strong>リスト名:</strong>
-                <span th:text="${datalist.dataListName}"></span>
-            </p>
-            <p>
-                <strong>作成者:</strong>
-                <span th:text="${datalist.creatorUser != null ? datalist.creatorUser.name : '不明'}"></span>
-                (<span th:text="${datalist.creatorUser != null ? datalist.creatorUser.loginId : '-'}"></span>)
-            </p>
-            <p>
-                <strong>作成日時:</strong> <span th:text="${datalist.createdAt}"></span>
-            </p>
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <div class="info-box">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div></div>
+
+            <div>
+              <a
+                th:href="@{/admin/downloadPdf/{id}(id=${datalist.dataListId})}"
+                class="btn btn-download"
+              >
+                <i class="fas fa-file-pdf"></i> PDFダウンロード
+              </a>
+              <br />
+              <span style="font-size: 0.8em; color: red"
+                >※登録直後のみ平文パスワードで出力されます</span
+              >
+            </div>
+          </div>
         </div>
 
-        <div>
-            <a th:href="@{/admin/downloadCsv/{id}(id=${datalist.dataListId})}" class="btn btn-download">
-                <i class="fas fa-file-csv"></i> CSVダウンロード
-            </a>
+        <!-- <div>
+          <a
+            th:href="@{/admin/downloadCsv/{id}(id=${datalist.dataListId})}"
+            class="btn btn-download"
+          >
+            <i class="fas fa-file-csv"></i> CSVダウンロード
+          </a> -->
         </div>
       </div>
     </div>
@@ -85,7 +107,11 @@
     <br /><br />
     <a th:href="@{/admin/accountHome}" class="btn">← topに戻る</a>
 
-    <input type="hidden" id="dataListIdValue" th:value="${datalist.dataListId}">
+    <input
+      type="hidden"
+      id="dataListIdValue"
+      th:value="${datalist.dataListId}"
+    />
 
     <script th:src="@{/js/createAccount/tempAccountList.js}"></script>
   </body>

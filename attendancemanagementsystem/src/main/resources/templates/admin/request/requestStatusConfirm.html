@@ -27,7 +27,7 @@
         <div th:if="${#authorization.expression('hasRole(''SUPER_ADMIN'')')}">
             <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
         </div>
-        <div th:unless="${#authorization.expression('hasRole(''SUPER_ADMIN'')')}">
+        <div th:unless="${#authorization.expression('hasRole(''ADMIN'')')}">
             <div th:replace="~{fragments/_parts :: admin-header}"></div>
         </div>
     </div>

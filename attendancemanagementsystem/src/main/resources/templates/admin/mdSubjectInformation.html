@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
@@ -6,17 +6,29 @@
     <title>教科情報マスタ</title>
 
     <link rel="stylesheet" th:href="@{/css/parts.css}" />
-    <link rel="stylesheet" th:href="@{/css/admin/mdSubjectInformation.css}" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      th:href="@{/css/admin/mdSubjectInformation.css}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
   </head>
   <body>
     <div class="header-container">
       <div th:replace="~{fragments/_parts :: admin-header}"></div>
     </div>
 
-    <div class="backbutton-container">
-      <div th:replace="~{fragments/_parts :: backButton(url='/admin/master-data')}"></div>
-    </div>
+    <div class="layout-wrapper">
+      
+      <div class="page-header-outer">
+        <h1 class="page-title">教科情報マスタ</h1>
+      </div>
+
+      <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/master-data')}"></div>
+      </div>
 
     <div class="main-container">
       
@@ -24,7 +36,6 @@
 
       <form th:action="@{/admin/master/SubjectInformation/save}" method="post" id="masterForm">
         <div class="subject-info-container">
-
           <div th:if="${successMessage}" class="alert-success">
             <span th:text="${successMessage}"></span>
           </div>
@@ -32,10 +43,10 @@
             <span th:text="${errorMessage}"></span>
           </div>
 
-          <div class="action-bar">
-             <button type="button" class="action-btn edit-btn view-mode" onclick="enableEditMode()">
-                <i class="fa-solid fa-pen"></i> 編集
-             </button>
+          <div class="action-area">
+            <button type="button" class="edit-btn" onclick="toggleEditMode()">
+              編集
+            </button>
           </div>
 
           <div class="error-message-area">
@@ -55,22 +66,28 @@
                   <th class="th-class">クラス</th>
                   <th class="th-grade">学年</th>
                   <th>受講教科 (結合名)</th>
-                  <th>教師</th>
-                  <th>コマ数</th>
+                  <th style="min-width: 250px">担当教師</th>
+                  <th class="edit-mode" style="width: 50px">削除</th>
                 </tr>
               </thead>
               <tbody>
                 <tr th:each="info : ${subjectInfoList}">
-                  <input type="hidden" name="subjectId" th:value="${info.subjectId}" />
+                  <input
+                    type="hidden"
+                    name="subjectId"
+                    th:value="${info.subjectId}"
+                  />
 
                   <td>
                     <span class="view-mode" th:text="${info.majorName}"></span>
                     <select class="edit-mode" name="majorId">
                       <option value="">選択</option>
-                      <option th:each="major : ${majorList}"
-                              th:value="${major.majorId}"
-                              th:text="${major.majorName}"
-                              th:selected="${major.majorName == info.majorName}"></option>
+                      <option
+                        th:each="major : ${majorList}"
+                        th:value="${major.majorId}"
+                        th:text="${major.majorName}"
+                        th:selected="${major.majorName == info.majorName}"
+                      ></option>
                     </select>
                   </td>
 
@@ -78,29 +95,45 @@
                     <span class="view-mode" th:text="${info.className}"></span>
                     <select class="edit-mode" name="departmentId">
                       <option value="">選択</option>
-                      <option th:each="dept : ${departmentList}"
-                              th:value="${dept.departmentId}"
-                              th:text="${dept.className}"
-                              th:selected="${dept.className == info.className}"></option>
+                      <option
+                        th:each="dept : ${departmentList}"
+                        th:value="${dept.departmentId}"
+                        th:text="${dept.className}"
+                        th:selected="${dept.className == info.className}"
+                      ></option>
                     </select>
                   </td>
 
                   <td>
-                    <span class="view-mode" th:text="${info.grade != null ? info.grade + '年' : '-'}"></span>
+                    <span
+                      class="view-mode"
+                      th:text="${info.grade != null ? info.grade + '年' : '-'}"
+                    ></span>
                     <select class="edit-mode" name="grade">
                       <option value="">選択</option>
-                      <option th:each="gr : ${gradeList}"
-                              th:value="${gr}"
-                              th:text="${gr + '年'}"
-                              th:selected="${gr == info.grade}"></option>
+                      <option
+                        th:each="gr : ${gradeList}"
+                        th:value="${gr}"
+                        th:text="${gr + '年'}"
+                        th:selected="${gr == info.grade}"
+                      ></option>
                     </select>
                   </td>
 
                   <td>
                     <span class="view-mode" th:text="${info.subjectName}"></span>
-                    <div class="edit-mode-wrapper edit-mode">
-                        <input type="text" name="subjectName" th:value="${info.subjectName}" />
-                        <button type="button" class="delete-btn" onclick="deleteRow(this)">
+                    <div class="edit-mode-wrapper">
+                        <input
+                          type="text"
+                          class="edit-mode"
+                          name="subjectName"
+                          th:value="${info.subjectName}"
+                        />
+                        <button
+                          type="button"
+                          class="delete-btn edit-mode"
+                          onclick="deleteRow(this)"
+                        >
                           <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
@@ -110,34 +143,35 @@
                     <span class="view-mode" th:text="${info.teacherName}"></span>
                     <select class="edit-mode" name="teacherId">
                       <option value="">教師を選択</option>
-                      <option th:each="teacher : ${teacherList}"
-                              th:value="${teacher.teacherId}"
-                              th:text="${teacher.teacherName}"
-                              th:selected="${teacher.teacherId == info.teacherId}"></option>
+                      <option
+                        th:each="teacher : ${teacherList}"
+                        th:value="${teacher.teacherId}"
+                        th:text="${teacher.teacherName}"
+                        th:selected="${teacher.teacherId == info.teacherId}"
+                      ></option>
                     </select>
                   </td>
 
                   <td>
                     <span class="view-mode" th:text="${info.courseCount}"></span>
-                    <input type="number" class="edit-mode" name="courseCount"
-                           th:value="${info.courseCount}" min="1" max="10" />
+                    <input
+                      type="number"
+                      class="edit-mode"
+                      name="courseCount"
+                      th:value="${info.courseCount}"
+                      min="1"
+                      max="10"
+                    />
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div class="action-footer edit-mode">
-            <div class="edit-btns">
-                <button type="button" class="btn btn-add" onclick="addRow()">
-                    <i class="fa-solid fa-plus"></i> 行を追加
-                </button>
-            </div>
-            
-            <div class="save-btns">
-                <button type="button" class="btn btn-secondary" onclick="cancelEditMode()">キャンセル</button>
-                <button type="button" class="btn btn-save" onclick="saveData()">保存実行</button>
-            </div>
+          <div class="add-btn-wrapper">
+            <button type="button" class="add-row-btn" onclick="addRow()">
+              ＋ 行を追加
+            </button>
           </div>
 
         </div>
@@ -163,6 +197,15 @@
         </select>
     </div>
 
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      const teacherOptions = /*[[${teacherList}]]*/ [];
+      const majorOptions = /*[[${majorList}]]*/ [];
+      const departmentOptions = /*[[${departmentList}]]*/ [];
+      const gradeOptions = /*[[${gradeList}]]*/ [];
+      /*]]>*/
+    </script>
     <script th:src="@{/js/admin/mdSubjectInformation.js}"></script>
+    
   </body>
 </html>

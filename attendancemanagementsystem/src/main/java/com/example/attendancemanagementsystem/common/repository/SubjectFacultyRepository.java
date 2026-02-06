@@ -15,30 +15,34 @@ import com.example.attendancemanagementsystem.common.entity.SubjectFacultyId;
 @Repository
 public interface SubjectFacultyRepository extends JpaRepository<SubjectFaculty, SubjectFacultyId> {
 
-    // --- ★今回追加した機能 ---
-    // 教科IDで検索し、担当教員情報を含むエンティティリストを返す (JPAメソッド)
-    List<SubjectFaculty> findBySubjectId(Integer subjectId);
+    // --- ★修正: JPQLに変更して検索精度を向上 ---
+    // DepartmentSubjectエンティティを経由して、条件に合う教科IDを取得
+    @Query("SELECT ds.subject.subjectId FROM DepartmentSubject ds WHERE ds.department.departmentId = :deptId AND ds.grade = :grade AND ds.subject.subjectName = :subjectName")
+    List<Integer> findSubjectIdsByClassAndSubjectName(@Param("deptId") Integer deptId, @Param("grade") Integer grade, @Param("subjectName") String subjectName);
 
+    // --- 既存機能 ---
+    
+    // アプリ起動エラー回避用
+    @Query(value = "SELECT * FROM subjectfaculty WHERE SubjectID = :subjectId", nativeQuery = true)
+    List<SubjectFaculty> findBySubjectId(@Param("subjectId") Integer subjectId);
 
-    // --- 既存の機能 (変更なし) ---
+    // 削除チェック用
+    @Query(value = "SELECT COUNT(*) FROM timetable WHERE SubjectID = :subjectId", nativeQuery = true)
+    int countTimeTableUsage(@Param("subjectId") Integer subjectId);
 
-    // 教科IDに紐づいている教師のIDを取得 (1件のみ取得)
     @Query(value = "SELECT UserID FROM subjectfaculty WHERE SubjectID = :subjectId LIMIT 1", nativeQuery = true)
     Integer findTeacherIdBySubjectId(@Param("subjectId") Integer subjectId);
 
-    // 教科と教師の紐づけを保存 (INSERT)
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO subjectfaculty (SubjectID, UserID) VALUES (:subjectId, :userId)", nativeQuery = true)
     void insertSubjectFaculty(@Param("subjectId") Integer subjectId, @Param("userId") Integer userId);
 
-    // 特定の教科IDの紐づけを全て削除 (DELETE)
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM subjectfaculty WHERE SubjectID = :subjectId", nativeQuery = true)
     void deleteBySubjectId(@Param("subjectId") Integer subjectId);
 
-    //教師に紐づいてる教科・学科学年・クラスを取得
     @Query(value = """
         SELECT DISTINCT
             s.SubjectID, 
@@ -54,4 +58,12 @@ public interface SubjectFacultyRepository extends JpaRepository<SubjectFaculty, 
         ORDER BY ds.DepartmentID, ds.Grade, d.Class, s.SubjectID
     """, nativeQuery = true)
     List<Object[]> findSubjectDetailsByTeacherId(@Param("userId") Integer userId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM subjectfaculty WHERE SubjectID = :subjectId AND UserID = :userId", nativeQuery = true)
+    void deleteBySubjectIdAndUserId(@Param("subjectId") Integer subjectId, @Param("userId") Integer userId);
+    
+    @Query(value = "SELECT UserID FROM subjectfaculty WHERE SubjectID = :subjectId", nativeQuery = true)
+    List<Integer> findTeacherIdsBySubjectId(@Param("subjectId") Integer subjectId);
 }
