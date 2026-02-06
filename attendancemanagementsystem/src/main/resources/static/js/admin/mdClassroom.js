@@ -1,51 +1,52 @@
 /**
- * 編集モード切り替え
+ * 編集モードを開始する
+ * (上部の「編集」ボタンから呼ばれる)
  */
-function toggleEditMode() {
+function enableEditMode() {
     const form = document.getElementById("masterForm");
-    const btn = document.getElementById("toggleButton");
+    const card = document.querySelector(".classroom-card"); // is-editingをつける対象
     
-    // 現在のクラスでモード判定
-    if (form.classList.contains("is-editing")) {
-        // --- 保存処理（編集モード -> 保存） ---
-        
-        // バリデーション実行
-        if (!validateData()) return;
+    // 編集モードクラスを付与 (CSSで表示切り替え)
+    card.classList.add("is-editing");
+    form.classList.add("is-editing"); // 念のためformにも
 
-        if (confirm("変更を保存しますか？")) {
-            form.submit();
-        }
-    } else {
-        // --- 編集開始（表示モード -> 編集モード） ---
-        form.classList.add("is-editing");
-        
-        // ボタンを「編集」から「保存」へ変更
-        btn.textContent = "保存";
-        btn.classList.remove("edit-btn");
-        btn.classList.add("save-btn");
-        
-        // エラーメッセージは一旦消す
-        resetErrors();
+    // エラーメッセージは一旦消す
+    resetErrors();
+}
+
+/**
+ * 保存処理を実行する
+ * (下部の「保存実行」ボタンから呼ばれる)
+ */
+function saveData() {
+    const form = document.getElementById("masterForm");
+
+    // バリデーション実行
+    if (!validateData()) return;
+
+    if (confirm("変更を保存しますか？")) {
+        form.submit();
     }
 }
 
 /**
- * ★追加: 編集キャンセル
+ * 編集キャンセル
+ * (下部の「キャンセル」ボタンから呼ばれる)
  */
 function cancelEditMode() {
-    // 変更を破棄して確実に戻すため、リロードが最も安全でシンプル
     if(confirm("編集を破棄して元に戻りますか？")) {
         window.location.reload();
     }
 }
 
 /**
- * 行追加
+ * 行追加 (先ほどの画面と同じロジック)
  */
 function addClassroomRow() {
     const tbody = document.querySelector("#classroomTable tbody");
     const newRow = document.createElement("tr");
     
+    // HTML構造は existing の tr と合わせる
     newRow.innerHTML = `
         <input type="hidden" name="classroomId" value="">
         <td>
@@ -64,14 +65,20 @@ function addClassroomRow() {
     `;
     
     tbody.appendChild(newRow);
+    
+    // 追加した行の最初の入力欄にフォーカス
     const input = newRow.querySelector('input[name="classroomName"]');
     if(input) input.focus();
+    
+    // スクロール (手動登録画面と同じ動き)
+    newRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 /**
  * 行削除
  */
 function deleteRow(btn) {
+    // 必須チェックなどは要件に合わせて調整してください。ここでは単純に削除。
     if (confirm("この行を削除しますか？")) {
         const row = btn.closest("tr");
         row.remove();
@@ -79,7 +86,7 @@ function deleteRow(btn) {
 }
 
 /**
- * エラーリセット
+ * エラーリセット (変更なし)
  */
 function resetErrors() {
     document.getElementById("errorMsgRequired").style.display = "none";
@@ -88,7 +95,7 @@ function resetErrors() {
 }
 
 /**
- * バリデーション
+ * バリデーション (変更なし)
  */
 function validateData() {
     const rows = document.querySelectorAll("#classroomTable tbody tr");

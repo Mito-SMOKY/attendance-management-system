@@ -1,68 +1,75 @@
 /**
- * 編集モード切り替え
+ * 編集モードを開始する
+ * (上部の「編集」ボタンから呼ばれる)
  */
-function toggleEditMode() {
-  const body = document.body;
-  const btn = document.querySelector(".edit-btn");
+function enableEditMode() {
+  document.body.classList.add("editing-mode");
+  
+  // エラー表示リセット
   const errorTextDup = document.getElementById("errorMsgDuplicate");
   const errorTextSec = document.getElementById("errorMsgSecurity");
-  const form = document.getElementById("masterForm");
+  
+  document.querySelectorAll(".input-error").forEach((el) => el.classList.remove("input-error"));
+  if (errorTextDup) errorTextDup.style.display = "none";
+  if (errorTextSec) errorTextSec.style.display = "none";
+}
 
-  if (body.classList.contains("editing-mode")) {
-    // --- 適用（保存）ボタン押下時 ---
-
-    // 1. エラー表示リセット
-    document
-      .querySelectorAll(".input-error")
-      .forEach((el) => el.classList.remove("input-error"));
-    if (errorTextDup) errorTextDup.style.display = "none";
-    if (errorTextSec) errorTextSec.style.display = "none";
-
-    // 2. 必須入力チェック
-    if (!validateRequired()) {
-      alert("未入力の項目があります。\nすべての項目を選択・入力してください。");
-      return;
-    }
-
-    // 3. ★追加: セキュリティチェック（インジェクション対策）
-    if (!validateSecurity()) {
-      if (errorTextSec) errorTextSec.style.display = "inline-block";
-      alert("入力内容に使用できない文字が含まれています。\n（< > & \" ' / \\ .. など）");
-      return;
-    }
-
-    // 4. 重複チェック
-    if (!validateDuplicates()) {
-      if (errorTextDup) errorTextDup.style.display = "inline-block";
-      alert("同じ教科と教師の組み合わせが既に存在します。");
-      return;
-    }
-
-    // 5. 送信確認
-    if (!confirm("変更を保存しますか？")) {
-      return;
-    }
-    form.submit();
-
-  } else {
-    // --- 編集ボタン押下時 ---
-    body.classList.add("editing-mode");
-    btn.textContent = "適用";
-    if (errorTextDup) errorTextDup.style.display = "none";
-    if (errorTextSec) errorTextSec.style.display = "none";
+/**
+ * 編集キャンセル
+ * (下部の「キャンセル」ボタンから呼ばれる)
+ */
+function cancelEditMode() {
+  if(confirm("編集を破棄して元に戻りますか？")) {
+    window.location.reload();
   }
 }
 
 /**
- * ★追加: セキュリティチェック
- * インジェクションやディレクトリトラバーサルに使われる記号を禁止する
+ * 保存処理を実行する
+ * (下部の「保存実行」ボタンから呼ばれる)
+ */
+function saveData() {
+  const form = document.getElementById("masterForm");
+  const errorTextDup = document.getElementById("errorMsgDuplicate");
+  const errorTextSec = document.getElementById("errorMsgSecurity");
+
+  // リセット
+  document.querySelectorAll(".input-error").forEach((el) => el.classList.remove("input-error"));
+  if (errorTextDup) errorTextDup.style.display = "none";
+  if (errorTextSec) errorTextSec.style.display = "none";
+
+  // 1. 必須入力チェック
+  if (!validateRequired()) {
+    alert("未入力の項目があります。\nすべての項目を選択・入力してください。");
+    return;
+  }
+
+  // 2. セキュリティチェック
+  if (!validateSecurity()) {
+    if (errorTextSec) errorTextSec.style.display = "inline-block";
+    alert("入力内容に使用できない文字が含まれています。\n（< > & \" ' / \\ .. など）");
+    return;
+  }
+
+  // 3. 重複チェック
+  if (!validateDuplicates()) {
+    if (errorTextDup) errorTextDup.style.display = "inline-block";
+    alert("同じ教科と教師の組み合わせが既に存在します。");
+    return;
+  }
+
+  // 4. 送信
+  if (confirm("変更を保存しますか？")) {
+    form.submit();
+  }
+}
+
+/**
+ * セキュリティチェック
  */
 function validateSecurity() {
   const rows = document.querySelectorAll("#infoTable tbody tr");
   let isValid = true;
-  
-  // 禁止文字の正規表現
-  // < > & " ' / \ ..
   const forbiddenPattern = /[<>&"'\/]|\\|\.\./;
 
   rows.forEach((row) => {
@@ -172,37 +179,40 @@ function addRow() {
   newRow.innerHTML = `
     <input type="hidden" name="subjectId" value="">
     <td>
-        <select class="edit-mode" name="majorId">${majorOpts}</select>
+        <span class="view-mode" style="display:none"></span>
+        <select class="edit-mode" name="majorId" style="display:block">${majorOpts}</select>
     </td>
     <td>
-        <select class="edit-mode" name="departmentId">${deptOpts}</select>
+        <span class="view-mode" style="display:none"></span>
+        <select class="edit-mode" name="departmentId" style="display:block">${deptOpts}</select>
     </td>
     <td>
-        <select class="edit-mode" name="grade">${gradeOpts}</select>
+        <span class="view-mode" style="display:none"></span>
+        <select class="edit-mode" name="grade" style="display:block">${gradeOpts}</select>
     </td>
     <td>
-        <div class="edit-mode-wrapper">
-            <input type="text" class="edit-mode" name="subjectName" placeholder="教科名">
-            <button type="button" class="delete-btn edit-mode" onclick="deleteRow(this)">
+        <span class="view-mode" style="display:none"></span>
+        <div class="edit-mode-wrapper edit-mode" style="display:flex">
+            <input type="text" name="subjectName" placeholder="教科名">
+            <button type="button" class="delete-btn" onclick="deleteRow(this)">
                 <i class="fa-solid fa-trash-can"></i>
             </button>
         </div>
     </td>
     <td>
-        <select class="edit-mode" name="teacherId">${teacherOpts}</select>
+        <span class="view-mode" style="display:none"></span>
+        <select class="edit-mode" name="teacherId" style="display:block">${teacherOpts}</select>
     </td>
     <td>
-        <input type="number" class="edit-mode" name="courseCount" value="1" min="1" max="10">
+        <span class="view-mode" style="display:none"></span>
+        <input type="number" class="edit-mode" name="courseCount" value="1" min="1" max="10" style="display:block">
     </td>
   `;
 
   tableBody.appendChild(newRow);
-
-  if (!document.body.classList.contains("editing-mode")) {
-     document.body.classList.add("editing-mode");
-     const btn = document.querySelector(".edit-btn");
-     if(btn) btn.textContent = "適用";
-  }
+  
+  // 追加した行までスクロール
+  newRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 /**

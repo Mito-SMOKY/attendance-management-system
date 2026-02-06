@@ -34,11 +34,8 @@
                 </div>
 
                 <div class="action-bar">
-                    <button type="button" class="cancel-btn" id="cancelButton" onclick="cancelEditMode()">
-                        キャンセル
-                    </button>
-                    <button type="button" class="action-btn edit-btn" id="toggleButton" onclick="toggleEditMode()">
-                        編集
+                    <button type="button" class="action-btn edit-btn view-mode" onclick="enableEditMode()">
+                        <i class="fa-solid fa-pen"></i> 編集
                     </button>
                 </div>
 
@@ -68,13 +65,13 @@
                                 <td>
                                     <span class="view-mode" th:text="${room.classroomName}"></span>
                                     <input type="text" class="form-input edit-mode" name="classroomName" 
-                                        th:value="${room.classroomName}" placeholder="教室名 (例: 201)" />
+                                           th:value="${room.classroomName}" placeholder="教室名 (例: 201)" />
                                 </td>
 
                                 <td>
                                     <span class="view-mode" th:text="${room.macAddress}"></span>
                                     <input type="text" class="form-input edit-mode" name="macAddress" 
-                                        th:value="${room.macAddress}" placeholder="AA:BB:CC:11:22:33" />
+                                           th:value="${room.macAddress}" placeholder="AA:BB:CC:11:22:33" />
                                 </td>
 
                                 <td class="action-col">
@@ -87,15 +84,24 @@
                     </table>
                 </div>
 
-                <div class="add-row-wrapper edit-mode">
-                    <button type="button" class="add-row-btn" onclick="addClassroomRow()">
-                        ＋ 行を追加
-                    </button>
+                <div class="action-footer edit-mode">
+                    <div class="edit-btns">
+                        <button type="button" class="btn btn-add" onclick="addClassroomRow()">
+                            <i class="fa-solid fa-plus"></i> 行を追加
+                        </button>
+                    </div>
+                    
+                    <div class="save-btns">
+                        <button type="button" class="btn btn-secondary" onclick="cancelEditMode()">キャンセル</button>
+                        <button type="button" class="btn btn-save" onclick="saveData()">保存実行</button>
+                    </div>
                 </div>
 
             </div>
         </form>
 
-    </div> <script th:src="@{/js/admin/mdClassroom.js}"></script>
+    </div> 
+    
+    <script th:src="@{/js/admin/mdClassroom.js}"></script>
 </body>
 </html>

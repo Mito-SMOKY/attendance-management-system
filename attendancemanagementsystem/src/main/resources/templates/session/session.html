@@ -2,11 +2,12 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>授業開始設定</title>
     
-    <link rel="stylesheet" th:href="@{/css/session/session.css}">
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
+    <link rel="stylesheet" th:href="@{/css/session/session.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
@@ -20,93 +21,97 @@
         </div>
     </div>
 
-    <div class="setting-container">
-        <div class="card shadow-sm">
-            <div class="card-header">
-                授業設定
-            </div>
-            <div class="card-body">
-                <form id="startSessionForm">
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="date" class="form-label">日付</label>
-                            <input type="date" id="date" class="form-control" th:value="${defaultDate}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="slotId" class="form-label">時限</label>
-                            <select id="slotId" class="form-select" required>
-                                <option value="" disabled selected>選択してください</option>
-                                <option th:each="slot : ${timeSlotList}" 
-                                        th:value="${slot.slotId}" 
-                                        th:text="${slot.slotId} + '限 (' + ${slot.startTime} + '-' + ${slot.endTime} + ')'"></option>
-                            </select>
-                        </div>
-                    </div>
+    <div class="main-container">
 
-                    <hr style="color: #00bdca;">
+        <div th:replace="~{fragments/_parts :: page-title-part('授業開始設定')}"></div>
 
-                    <h5 class="mb-3">対象クラス選択</h5>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="majorId" class="form-label">学科</label>
-                            <select id="majorId" class="form-select">
-                                <option value="" selected>選択してください</option>
-                                <option th:each="m : ${majorList}" th:value="${m.majorId}" th:text="${m.majorName}"></option>
-                            </select>
+        <div class="setting-container">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form id="startSessionForm">
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="date" class="form-label">日付</label>
+                                <input type="date" id="date" class="form-control" th:value="${defaultDate}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="slotId" class="form-label">時限</label>
+                                <select id="slotId" class="form-select" required>
+                                    <option value="" disabled selected>選択してください</option>
+                                    <option th:each="slot : ${timeSlotList}" 
+                                            th:value="${slot.slotId}" 
+                                            th:text="${slot.slotId} + '限 (' + ${slot.startTime} + '-' + ${slot.endTime} + ')'"></option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="courseId" class="form-label">コース</label>
-                            <select id="courseId" class="form-select" disabled>
-                                <option value="" selected>学科を選択してください</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="grade" class="form-label">学年</label>
-                            <select id="grade" class="form-select" disabled>
-                                <option value="" selected>コースを選択してください</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="departmentId" class="form-label">クラス</label>
-                            <select id="departmentId" class="form-select" disabled>
-                                <option value="" selected>学年を選択してください</option>
-                            </select>
-                        </div>
-                    </div>
+                        <hr style="color: #00bdca;">
 
-                    <hr style="color: #00bdca;">
+                        <h5 class="mb-3" style="font-weight:bold; color:#555;">対象クラス選択</h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="majorId" class="form-label">学科</label>
+                                <select id="majorId" class="form-select">
+                                    <option value="" selected>選択してください</option>
+                                    <option th:each="m : ${majorList}" th:value="${m.majorId}" th:text="${m.majorName}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="courseId" class="form-label">コース</label>
+                                <select id="courseId" class="form-select" disabled>
+                                    <option value="" selected>学科を選択してください</option>
+                                </select>
+                            </div>
+                        </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="subjectId" class="form-label">科目</label>
-                            <select id="subjectId" class="form-select" required>
-                                <option value="" disabled selected>選択してください</option>
-                                <option th:each="sub : ${subjectList}" th:value="${sub.subjectId}" th:text="${sub.subjectName}"></option>
-                            </select>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="grade" class="form-label">学年</label>
+                                <select id="grade" class="form-select" disabled>
+                                    <option value="" selected>コースを選択してください</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="departmentId" class="form-label">クラス</label>
+                                <select id="departmentId" class="form-select" disabled>
+                                    <option value="" selected>学年を選択してください</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="classroomId" class="form-label">教室</label>
-                            <select id="classroomId" class="form-select" required>
-                                <option value="" disabled selected>選択してください</option>
-                                <option th:each="room : ${classroomList}" th:value="${room.classroomId}" th:text="${room.classroomName}"></option>
-                            </select>
+
+                        <hr style="color: #00bdca;">
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="subjectId" class="form-label">科目</label>
+                                <select id="subjectId" class="form-select" required>
+                                    <option value="" disabled selected>選択してください</option>
+                                    <option th:each="sub : ${subjectList}" th:value="${sub.subjectId}" th:text="${sub.subjectName}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="classroomId" class="form-label">教室</label>
+                                <select id="classroomId" class="form-select" required>
+                                    <option value="" disabled selected>選択してください</option>
+                                    <option th:each="room : ${classroomList}" th:value="${room.classroomId}" th:text="${room.classroomName}"></option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="button" class="btn-secondary" onclick="fillTimetable()">時間割から反映 (任意)</button>
-                        <button type="button" class="btn-primary" onclick="startSession()">授業開始</button>
-                    </div>
-                </form>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="button" class="btn-secondary" onclick="fillTimetable()">時間割から反映 (任意)</button>
+                            <button type="button" class="btn-primary" onclick="startSession()">授業開始</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
+
     </div>
 
-    <div class="modal fade" id="conflictModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="conflictModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-warning text-dark">
@@ -117,22 +122,18 @@
                     <p>どちらの操作を行いますか？</p>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn-primary" onclick="openConflictSession()">
-                        未終了の画面を開く
-                    </button>
-                    
-                    <button type="button" class="btn-danger" onclick="forceEndSession()">
-                        強制終了して新規作成
-                    </button>
+                    <button type="button" class="btn-primary" onclick="openConflictSession()">未終了の画面を開く</button>
+                    <button type="button" class="btn-danger" onclick="forceEndSession()">強制終了して新規作成</button>
                 </div>
             </div>
         </div>
     </div>
 
-<input type="hidden" id="conflictSessionId">
-<input type="hidden" id="activeSessionId" th:value="${activeSession != null ? activeSession.sessionId : ''}">
-<input type="hidden" id="userId" th:value="${userId}">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script th:src="@{/js/session/session.js}"></script>
+    <input type="hidden" id="conflictSessionId">
+    <input type="hidden" id="activeSessionId" th:value="${activeSession != null ? activeSession.sessionId : ''}">
+    <input type="hidden" id="userId" th:value="${userId}">
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/session/session.js}"></script>
 </body>
 </html>

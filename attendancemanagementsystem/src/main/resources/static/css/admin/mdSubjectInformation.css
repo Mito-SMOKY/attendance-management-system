@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 :root {
-  --primary-color: #00bdca; /* 指定カラー */
+  --primary-color: #00bdca;
   --primary-hover: #0096a1;
   --bg-color: #f4f7f6;
   --card-bg: #ffffff;
@@ -11,28 +11,23 @@
   --success-color: #28a745;
 }
 
-/* 注意: body, .layout-wrapper, .page-title などの共通設定は削除しました。
-   parts.css の共通デザインにお任せします。
-*/
-
 /* カードデザイン */
 .subject-info-container {
   background-color: var(--card-bg);
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  padding: 30px 40px;
+  padding: 30px 40px 30px 40px;
   margin-bottom: 50px;
   border-top: 5px solid var(--primary-color);
 }
 
-/* ボタンエリア */
-.action-area {
+/* --- 上部アクションバー (編集ボタン) --- */
+.action-bar {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 15px;
 }
-
-.edit-btn {
+.action-btn {
   background-color: var(--primary-color);
   color: #fff;
   border: none;
@@ -43,20 +38,76 @@
   transition: all 0.3s ease;
   box-shadow: 0 2px 5px rgba(0, 189, 202, 0.3);
 }
-
-.edit-btn:hover {
+.action-btn:hover {
   background-color: var(--primary-hover);
   transform: translateY(-1px);
 }
 
-/* メッセージ・エラー */
+/* --- フッターエリア (行追加・保存・キャンセル) --- */
+.action-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+/* ボタン共通 */
+.btn {
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+/* 行追加ボタン */
+.btn-add {
+  background-color: #fff;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+}
+.btn-add:hover {
+  background-color: #f0fcfd;
+}
+
+/* 保存ボタン */
+.btn-save {
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 10px 40px;
+  box-shadow: 0 4px 6px rgba(0, 189, 202, 0.3);
+}
+.btn-save:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+/* キャンセルボタン */
+.btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+  margin-right: 10px;
+}
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.save-btns {
+  display: flex;
+  align-items: center;
+}
+
+/* --- メッセージ・エラー --- */
 .alert-success {
   color: var(--success-color);
   text-align: center;
   margin-bottom: 10px;
   font-weight: bold;
 }
-
 .alert-error {
   color: var(--danger-color);
   text-align: center;
@@ -74,24 +125,27 @@
   font-weight: bold;
   display: none;
 }
-.error-message-area .error-text {
-    display: none;
-}
-
 .input-error {
   border: 1px solid var(--danger-color) !important;
   background-color: #fff8f8;
 }
 
-/* テーブル */
+/* --- テーブル (角丸・改行防止対応) --- */
 .table-wrapper {
   overflow-x: auto;
+  padding: 1px;
 }
 
 .subject-info-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin-top: 10px;
+  
+  /* 角丸設定 */
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .subject-info-table th {
@@ -99,24 +153,31 @@
   color: #fff;
   padding: 12px;
   text-align: left;
-  white-space: nowrap;
+  white-space: nowrap; /* ヘッダーの改行禁止 */
 }
 
+/* 列幅の調整 */
 .th-major { width: 20%; }
-.th-class { width: 10%; }
+.th-class { width: 12%; } /* ★10% -> 12% に微増 */
 .th-grade { width: 8%; }
 
 .subject-info-table td {
   padding: 12px;
   border-bottom: 1px solid var(--border-color);
   vertical-align: middle;
+  white-space: nowrap; /* ★重要: データセルの改行を禁止 */
+}
+
+/* 最終行の下線を消す */
+.subject-info-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .subject-info-table tr:nth-child(even) {
   background-color: #f9fbfb;
 }
 
-/* フォーム部品 */
+/* --- フォーム部品 --- */
 select,
 input[type="text"],
 input[type="number"] {
@@ -127,7 +188,6 @@ input[type="number"] {
   box-sizing: border-box;
   font-size: 14px;
 }
-
 select:focus,
 input:focus {
   outline: none;
@@ -147,48 +207,22 @@ input:focus {
 .delete-btn:hover {
   color: var(--danger-color);
 }
-
 .edit-mode-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-/* 追加ボタン */
-.add-btn-wrapper {
-  margin-top: 20px;
-  text-align: center;
-  border: 2px dashed #bcebf0;
-  border-radius: 6px;
-  padding: 12px;
-  background-color: #f0fdfe;
-  display: none;
-}
-
-.add-row-btn {
-  background: none;
-  border: none;
-  color: var(--primary-color);
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 16px;
-}
-.add-row-btn:hover {
-  text-decoration: underline;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .hidden-template {
-    display: none;
+  display: none;
 }
 
-/* 編集モード切り替え */
+/* --- 編集モード表示制御 --- */
 .edit-mode { display: none; }
 .view-mode { display: block; }
 
-.editing-mode .edit-mode { display: block; }
-.editing-mode .view-mode { display: none; }
-.editing-mode .add-btn-wrapper { display: block; }
-
-.editing-mode .edit-mode-wrapper .edit-mode {
-    display: block; 
-}
+body.editing-mode .edit-mode { display: block; }
+body.editing-mode .action-footer.edit-mode { display: flex; }
+body.editing-mode .edit-mode-wrapper { display: flex; }
+body.editing-mode .view-mode { display: none; }
+body.editing-mode td { padding: 8px; }
