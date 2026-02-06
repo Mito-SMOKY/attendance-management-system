@@ -1,20 +1,25 @@
 function toggleEditMode() {
   const container = document.querySelector(".subject-info-container");
-  container.classList.toggle("is-editing");
-
   const btn = document.querySelector(".edit-btn");
-  if (container.classList.contains("is-editing")) {
-    btn.textContent = "保存せずに終了";
-    btn.classList.add("active");
 
-    const successMsg = document.querySelector(".alert-success");
-    const errorMsg = document.querySelector(".alert-error");
-    if (successMsg) successMsg.style.display = "none";
-    if (errorMsg) errorMsg.style.display = "none";
-  } else {
-    btn.textContent = "編集";
-    btn.classList.remove("active");
+  if (container.classList.contains("is-editing")) {
+    if (confirm("編集中の内容は破棄されます。よろしいですか？")) {
+      // ページをリロードして、変更前の状態（DBの値）に戻す
+      window.location.reload();
+    }
+    // キャンセルの場合は何もしない（編集モードのまま）
+    return;
   }
+
+  container.classList.add("is-editing");
+  
+  btn.textContent = "保存せずに終了";
+  btn.classList.add("active");
+
+  const successMsg = document.querySelector(".alert-success");
+  const errorMsg = document.querySelector(".alert-error");
+  if (successMsg) successMsg.style.display = "none";
+  if (errorMsg) errorMsg.style.display = "none";
 }
 
 function addTeacherField(btn) {
