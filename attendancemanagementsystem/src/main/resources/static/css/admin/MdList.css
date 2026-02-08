@@ -1,6 +1,14 @@
 @charset "UTF-8";
 
-/* --- メニュー全体エリア（ここが修正ポイント） --- */
+/* =========================================
+   基本設定
+   注意: body, .page-title 等の設定は削除しました。
+   parts.css の .main-container がレイアウトを管理します。
+   ========================================= */
+
+/* =========================================
+   メニュー全体エリア
+   ========================================= */
 .menu-group {
     /* フレックスボックスにして中身を中央に寄せる */
     display: flex;
@@ -8,7 +16,7 @@
     justify-content: center; /* 縦方向の中央寄せ */
     align-items: center;     /* 横方向の中央寄せ */
     
-    /* 画面の高さからヘッダーやタイトルの分（約250px）を引いた高さを確保 */
+    /* 画面の高さからヘッダーやタイトル等の分を引いた高さを確保 */
     min-height: calc(100vh - 250px);
     width: 100%;
 }
@@ -20,6 +28,7 @@
     flex-wrap: wrap;         /* 画面が狭ければ折り返し */
     gap: 40px;               /* ボタン間の隙間 */
     width: 100%;
+    padding: 20px;
 }
 
 /* --- ゴーストボタンのデザイン --- */
@@ -35,7 +44,7 @@
     background-color: #fff;
     color: #00bdca;
     border: 3px solid #00bdca;
-    border-radius: 15px;
+    border-radius: 12px; /* アカウント管理画面に合わせて少し調整 */
     
     text-decoration: none;
     font-weight: bold;
@@ -44,12 +53,12 @@
     cursor: pointer;
     
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* アイコン */
 .ghost-button i {
-    font-size: 50px;
+    font-size: 50px; /* バランスを見てサイズ調整 */
     margin-bottom: 20px;
     transition: transform 0.3s ease;
 }

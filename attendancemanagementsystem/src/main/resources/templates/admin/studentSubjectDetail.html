@@ -27,13 +27,14 @@
         
         <div th:replace="~{fragments/_parts :: page-title-part('受講情報')}"></div>
 
-        <div class="student-name-display">
-            <span th:text="${detail.studentName} + ' さん'"></span>
-        </div>
-
         <div class="content-wrapper">
             
             <div class="left-panel">
+                
+                <div class="student-name-display">
+                    <span th:text="${detail.studentName} + ' さん'"></span>
+                </div>
+
                 <table class="info-table">
                     <tr>
                         <th>教科名</th>

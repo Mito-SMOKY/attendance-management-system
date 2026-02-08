@@ -7,14 +7,7 @@
     box-sizing: border-box;
 }
 
-body {
-    overflow-x: hidden;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    font-size: 16px; 
-    color: #333;
-}
+/* bodyの設定は削除し、共通(parts.css)に任せます */
 
 /* =========================================
    レイアウトコンテナ
@@ -22,13 +15,18 @@ body {
 .info-container {
     width: 100%;
     max-width: 1300px;
-    margin: 0 auto;
-    padding-bottom: 50px;
     
-    /* ★修正: ヘッダーや戻るボタンと重ならないよう上部に余白を確保 */
-    /* 以前のmargin-top: 120px相当のスペースを作ります */
-    padding-top: 110px; 
+    /* 左右中央揃え */
+    margin-left: auto;
+    margin-right: auto;
+    
+    padding-bottom: 50px;
+
+    /* ★修正: 固定ヘッダーの高さ分、上を空けます。
+       隠れてしまう場合はここの数値を大きくしてください (例: 110px, 120px) */
+    padding-top: 100px;
 }
+
 
 /* =========================================
    メインコンテンツエリア
@@ -56,8 +54,6 @@ body {
     color: #333;
     padding: 20px;
     background-color: #fff;
-    
-    /* デザイン変更: カード化 */
     border-left: 6px solid #00bdca;
     border-radius: 8px; 
     box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
@@ -98,8 +94,6 @@ body {
 /* 受講教科リストボックス (カード化) */
 .subject-list-box {
     background-color: white;
-    
-    /* デザイン変更: カード化 */
     border: none;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -122,24 +116,24 @@ body {
 }
 
 .subject-list li {
-    border-bottom: 1px solid #f0f0f0; /* 非常に薄い線 */
+    border-bottom: 1px solid #f0f0f0;
 }
 .subject-list li:last-child {
     border-bottom: none;
 }
 
+/* 受講教科一覧のリンク */
 .subject-list a {
     display: block;
     padding: 12px 15px;
-    color: #333;
+    color: #00bdca;     
+    font-weight: bold;  
     text-decoration: none;
-    font-weight: normal;
     transition: background-color 0.2s, color 0.2s;
 }
 
 .subject-list a:hover {
     background-color: #f9fbfd;
-    color: #00bdca;
 }
 
 
@@ -201,8 +195,6 @@ body {
     margin-bottom: 30px;
     text-align: center;
     background-color: white;
-    
-    /* カード化 */
     border-collapse: separate; 
     border-spacing: 0;
     border: none;
@@ -217,19 +209,18 @@ body {
     font-weight: normal;
     font-size: 0.95rem;
     padding: 15px 10px;
-    border: none; /* 枠線を消す */
+    border: none;
 }
 
 .status-summary-table td {
     padding: 15px 10px;
-    border: none; /* 枠線を消す */
-    border-bottom: 1px solid #f0f0f0; /* 薄い下線 */
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
     font-weight: bold;
     font-size: 1.1rem;
     color: #333;
     vertical-align: middle;
 }
-/* 最終行の下線削除 */
 .status-summary-table tbody tr:last-child td {
     border-bottom: none;
 }
@@ -244,8 +235,6 @@ body {
     overflow-y: auto;
     overflow-x: auto;   
     background-color: white;
-    
-    /* カード化 */
     border: none;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -269,13 +258,13 @@ body {
     font-weight: normal;
     padding: 15px 5px;
     font-size: 1rem;
-    border: none; /* 枠線を消す */
+    border: none;
 }
 
 /* セル共通 */
 .schedule-table td {
-    border: none; /* 枠線を消す */
-    border-bottom: 1px solid #eee; /* 薄い下線 */
+    border: none;
+    border-bottom: 1px solid #eee;
     padding: 5px;
     vertical-align: middle;
     word-wrap: break-word;
@@ -288,7 +277,7 @@ body {
 .schedule-table th.date-col,
 .schedule-table td:first-child {
     width: 120px;
-    border-right: 1px solid #eee; /* 日付と中身の境界だけ薄く残す */
+    border-right: 1px solid #eee;
 }
 
 /* 行ホバー */
@@ -336,13 +325,13 @@ body {
 }
 
 /* ステータスごとの色 */
-.bg-present .status-icon { color: #28a745; } /* 出席 */
-.bg-sick    .status-icon { color: #dc3545; } /* 欠席 */
-.bg-late    .status-icon { color: #ffc107; } /* 遅刻 */
-.bg-early   .status-icon { color: #555; }    /* 早退 */
-.bg-suspend .status-icon { color: #555; }    /* 出停 */
-.bg-public  .status-icon { color: #555; }    /* 公欠 */
-.bg-other   .status-icon { color: #555; }    /* その他 */
+.bg-present .status-icon { color: #28a745; } 
+.bg-sick    .status-icon { color: #dc3545; } 
+.bg-late    .status-icon { color: #ffc107; } 
+.bg-early   .status-icon { color: #555; }    
+.bg-suspend .status-icon { color: #555; }    
+.bg-public  .status-icon { color: #555; }    
+.bg-other   .status-icon { color: #555; }    
 
 /* 編集モード */
 .view-mode, .edit-mode {

@@ -27,7 +27,7 @@
 
     <div class="list-container">
         
-        <h1 class="page-title">授業一覧</h1>
+        <div th:replace="~{fragments/_parts :: page-title-part('授業一覧')}"></div>
 
         <div class="controls-area">
             <form th:action="@{/admin/dailyClassList}" method="get" class="search-form-3">
