@@ -63,37 +63,42 @@ public class SuperAdminController {
         return "admin/sadminInfo";
     }
 
-    // --- 4. 更新処理 (強制ログアウト機能追加) ---
+
+
+    // --- 4. 更新処理 (パス修正版) ---
     @PostMapping("/sadmin/update")
     public String updateAdminDetail(
             @ModelAttribute SuperAdminDetailDto form,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             RedirectAttributes redirectAttributes,
-            HttpServletRequest request) { // ★追加: ログアウト処理用にRequestを受け取る
+            HttpServletRequest request,
+            Model model) { // メッセージ用Model
         
         try {
-            // ★追加: 更新前の情報を取得して、「自分自身の権限下げ」かチェックする
+            // 自分自身の権限下げチェック
             boolean isSelfDemotion = false;
-            
-            // 自分自身の更新かどうか
+            // ユーザーIDが一致するか（＝自分自身の更新か）
             if (userDetails.getUserId().equals(form.getUserId())) {
-                // 現在のDB上の情報を取得
                 SuperAdminDetailDto currentDbInfo = superAdminService.getAdminDetail(form.getUserId());
-                
                 // 「元が上位(1)」かつ「変更後が一般(0)」の場合
                 if (currentDbInfo.getAdminLevelID() == 1 && form.getAdminLevelID() == 0) {
                     isSelfDemotion = true;
                 }
             }
 
-            // 操作者IDを渡して更新実行
+            // 更新実行
             superAdminService.updateAdmin(form, userDetails.getUserId());
             
-            // ★追加: 自分で権限を下げた場合は強制ログアウト
+            // 自分で権限を下げた場合の処理
             if (isSelfDemotion) {
-                request.logout(); // ログアウト実行
-                redirectAttributes.addFlashAttribute("errorMessage", "権限が変更されたためログアウトしました。再ログインしてください。");
-                return "redirect:/login"; // ログイン画面へリダイレクト（パスは環境に合わせて調整してください）
+                // 1. セキュリティのため即座にログアウト
+                request.logout();
+                
+                // 2. 画面表示用メッセージ
+                model.addAttribute("message", "権限がないのでログアウトします。再度ログインしてください。");
+                
+                // ★修正: 保存先に合わせてパスを変更
+                return "admin/superAdmin/logout_notice";
             }
 
             redirectAttributes.addFlashAttribute("successMessage", "管理者情報を更新しました。");
@@ -103,7 +108,6 @@ public class SuperAdminController {
             redirectAttributes.addFlashAttribute("errorMessage", "更新失敗: " + e.getMessage());
         }
         
-        // 詳細画面へリダイレクト
         return "redirect:/admin/sadminInfo/" + form.getUserId();
     }
 
