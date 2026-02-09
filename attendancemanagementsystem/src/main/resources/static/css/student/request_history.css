@@ -35,7 +35,7 @@ body {
 }
 
 .history-table th {
-    background-color: #5BBEB9;
+    background-color: #00bdca;
     color: white;
     font-weight: bold;
 }
@@ -62,7 +62,7 @@ body {
 .status-approved { color: #28a745; background-color: #e8f5e9; }
 .status-rejected { color: #d9534f; background-color: #fce8e8; }
 .status-withdrawn { color: #6c757d; background-color: #f8f9fa; }
-.status-pending { color: #5BBEB9; background-color: #effaf9; }
+.status-pending { color: #00bdca; background-color: #effaf9; }
 
 /* 取り下げボタン */
 .btn-withdraw {

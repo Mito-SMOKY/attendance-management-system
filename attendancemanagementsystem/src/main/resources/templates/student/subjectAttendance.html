@@ -15,7 +15,7 @@
     </div>
 
     <div class="backbutton-container">
-        <button type="button" onclick="history.back()" class="backbutton">戻る</button>
+        <div th:replace="~{fragments/_parts :: historyBackButton}"></div>
     </div>
     
     <input type="hidden" id="currentSubjectId" th:value="${attendanceData.subjectId}">

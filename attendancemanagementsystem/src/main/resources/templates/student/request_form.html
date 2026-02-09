@@ -30,7 +30,7 @@
                         <th style="width: 30%;">申請先 (承認者)</th>
                         <td>
                             <div class="custom-select-wrapper">
-                                <select class="date-select" id="approverId" name="approverId" style="width: 100%; max-width: 300px;">
+                                <select class="data-select" id="approverId" name="approverId" style="width: 100%; max-width: 300px;">
                                     <option value="" disabled selected>承認者を選択してください</option>
                                     <option th:each="admin : ${approvers}" 
                                         th:value="${admin.userId}" 
@@ -76,7 +76,7 @@
                         <td>
                             <div style="margin-bottom: 5px;">
                                 <label class="checkbox-item" style="font-weight: bold;">
-                                    <input type="checkbox" id="selectAllPeriods"> 全選択
+                                    <input class="checkbox" type="checkbox" id="selectAllPeriods"> 全選択
                                 </label>
                             </div>
                             

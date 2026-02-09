@@ -27,20 +27,21 @@
 
             <div id="calendar-ym" class="calendar-ym"></div> 
             
-            <div class="calendar-toggle" style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+            <div class="calendar-toggle" >
                 予定表
                 <label class="toggle-button">
                     <input type="checkbox" id="viewToggleCheckbox"/>
                 </label>
                 出欠
-
-                <div class="tooltip-005">
-                    <a href="/student/timetable">
-                        <img th:src="@{/image/timetable.png}" alt="アイコン" style="width: 40px; height: 40px; vertical-align: middle;">
-                    </a>
-                    <p>時間割へ</p>
-                </div>
             </div>
+
+            <div class="tooltip-005">
+                <a href="/student/timetable">
+                    <img th:src="@{/image/timetable.png}" alt="アイコン" style="width: 40px; height: 40px; vertical-align: middle;">
+                </a>
+                <p>時間割へ</p>
+            </div>
+            
 
             
         </div>

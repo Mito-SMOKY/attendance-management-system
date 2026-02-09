@@ -12,13 +12,11 @@
 
     <div th:replace="~{fragments/_parts :: student-header}"></div>
 
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts ::  historyBackButton}"></div>
+    </div>
+
     <div class="container">
-        
-        <div class="header-nav">
-            <button th:onclick="|location.href='@{/student/main_calendar}'|" class="back-btn">
-                <i class="fas fa-chevron-left"></i> 戻る
-            </button>
-        </div>
 
         <div class="date-display-area">
             <div class="date-select-wrapper">
@@ -41,15 +39,15 @@
                     
                     <td class="td-subject">
                         <a th:href="@{/student/subject_attendance(subjectId=${item.subjectId})}" class="subject-link">
-                            <div class="subject-name" th:text="${item.subjectName}">LINUX基礎</div>
+                            <div class="subject-name" th:text="${item.subjectName}"></div>
                         </a>
-                        <div class="classroom-name" th:text="${item.classroomName}">231</div>
+                        <div class="classroom-name" th:text="${item.classroomName}"></div>
                     </td>
                     
                     <td class="td-status">
-                        <span th:if="${item.status == '〇'}" class="status-mark status-ok">〇</span>
-                        <span th:if="${item.status == '×'}" class="status-mark status-ng">×</span>
-                        <span th:if="${item.status == '△'}" class="status-mark status-late">△</span>
+                        <span th:if="${item.status == '〇'}" class="status-mark status-ok"></span>
+                        <span th:if="${item.status == '×'}" class="status-mark status-ng"></span>
+                        <span th:if="${item.status == '△'}" class="status-mark status-late"></span>
                         
                         <span th:unless="${item.status == '〇' or item.status == '×' or item.status == '△'}" 
                               th:text="${item.status}"></span>

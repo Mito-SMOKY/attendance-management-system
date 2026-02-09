@@ -3,7 +3,7 @@
     margin-top: 60px;
     width: 95%;
     max-width: 1400px;
-    margin: 20px auto;
+    margin: auto;
     padding: 15px;
 }
 
@@ -53,6 +53,7 @@
     font-size: 1.1em;
     font-weight: bold;
     justify-items: center;
+    padding-right: 80px;
 }
 
 .nav-arrow {

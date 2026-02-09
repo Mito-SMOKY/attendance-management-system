@@ -3,11 +3,6 @@ body {
     padding-top: 80px;
 }
 
-/* * 変更点: content-wrapper は request_main でも使うため、
- * ここでのグローバルな上書きは削除し、
- * フォーム専用のレイアウトクラス (.request-form-layout) を定義します。
- */
-
 /* 申請フォーム画面専用のレイアウト */
 .request-form-layout {
     padding-left: 50px;
@@ -19,8 +14,8 @@ body {
 /* フォーム全体コンテナ */
 .form-container {
     max-width: 800px;
-    margin: 0 auto; /* 中央寄せ */
-    margin-top: 50px; /* 上に少し余白 */
+    margin: 0 auto; 
+    margin-top: 50px; 
     background-color: white;
     padding: 40px;
     border-radius: 8px;
@@ -42,7 +37,7 @@ body {
 }
 
 .request-form-table th {
-    background-color: #5BBEB9;
+    background-color: #00bdca;
     color: white;
     /* font-weight: bold; */
     width: 180px;
@@ -52,11 +47,19 @@ body {
 /* 日付選択 */
 .date-selection .date-select {
     padding: 6px 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #00bdca;
     border-radius: 4px;
+    font-size: 1em;
 }
 .date-selection span {
     margin: 0 10px;
+}
+
+.data-select{
+    padding: 8px 15px;
+    font-size: 1em;
+    border: 1px solid #00bdca;
+    border-radius: 4px;
 }
 
 /* 時間選択 */
@@ -91,15 +94,15 @@ body {
  */
 .action-buttons {
     display: flex;
-    justify-content: center; /* 中央寄せ */
+    justify-content: center;
     gap: 20px;
-    margin-top: 100px; /* メニュー画面での位置調整 */
+    margin-top: 100px;
 }
 
 .ghost-button {
     background-color: white;
-    border: 2px solid #5BBEB9;
-    color: #5BBEB9;
+    border: 2px solid #00bdca;
+    color: #00bdca;
     padding: 20px 40px; /* 大きめに */
     text-align: center;
     text-decoration: none;
@@ -109,11 +112,11 @@ body {
     transition-duration: 0.4s;
     cursor: pointer;
     border-radius: 8px;
-    min-width: 200px; /* ボタンの幅を揃える */
+    min-width: 200px; 
 }
 
 .ghost-button:hover {
-    background-color: #5BBEB9;
+    background-color: #00bdca;
     color: white;
 }
 
@@ -143,7 +146,7 @@ body {
 
 .modal-content h3 {
     margin-top: 0; color: #333;
-    border-bottom: 2px solid #5BBEB9;
+    border-bottom: 2px solid #00bdca;
     padding-bottom: 10px; margin-bottom: 20px;
 }
 
@@ -152,7 +155,7 @@ body {
     padding: 20px; border-radius: 4px; margin-bottom: 25px;
 }
 .modal-body dt {
-    font-weight: bold; color: #5BBEB9; margin-top: 15px;
+    font-weight: bold; color: #00bdca; margin-top: 15px;
     border-bottom: 1px dashed #ccc; padding-bottom: 2px;
 }
 .modal-body dt:first-child { margin-top: 0; }
@@ -169,5 +172,6 @@ body {
 }
 .cancel-btn { background-color: #ccc; color: #333; }
 .cancel-btn:hover { background-color: #bbb; }
-.confirm-btn { background-color: #5BBEB9; color: white; }
-.confirm-btn:hover { background-color: #4aa8a3; }
+.confirm-btn { background-color: #00bdca; color: white; }
+.confirm-btn:hover { background-color: #00bdca; }
+
