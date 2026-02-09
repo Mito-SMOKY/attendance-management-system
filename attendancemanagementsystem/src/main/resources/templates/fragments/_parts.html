@@ -180,3 +180,10 @@
     </div>
   </header>
 </div>
+
+<!-- タイトル表示パーツ -->
+<div th:fragment="page-title-part(titleText)" class="page-title-wrap">
+    <h2 class="page-title">
+        <span th:text="${titleText}">タイトル</span>
+    </h2>
+</div>

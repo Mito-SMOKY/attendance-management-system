@@ -1,33 +1,17 @@
 @charset "UTF-8";
 
-/* --- 全体のレイアウト調整 --- */
-.main-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.page-title {
-    color: #333;
-    font-size: 1.8rem;
-    border-bottom: 2px solid #00bdca;
-    padding-bottom: 10px;
-    
-    /* ヘッダー被り防止と位置調整 */
-    margin-top: 100px; 
-    margin-bottom: 20px;
-    padding-left: 20px;
-    text-align: center;
-}
+/* 注意: .page-title, .main-container の設定は削除しました。
+   parts.css の共通デザインにお任せします。
+*/
 
 /* --- 検索・コントロールエリア --- */
 .top-controls {
     display: flex;
-    justify-content: flex-start; /* 左寄せに変更 */
+    justify-content: flex-start;
     align-items: center;
     gap: 15px;
-    padding-left: 20px; /* タイトルと左端を合わせる */
     margin-bottom: 20px;
+    /* padding-left: 20px; ← 削除（左端をコンテナと揃えるため） */
 }
 
 /* 検索フォームのデザイン */
@@ -39,7 +23,7 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #fff;
-    width: 300px; /* 幅固定 */
+    width: 300px;
 }
 
 .search-form-3 input {
@@ -168,7 +152,7 @@
 /* チェックボックスデザイン */
 .checkbox-1 {
     display: flex;
-    flex-direction: row; /* 縦並びが見やすいので変更、横並びが良い場合は row wrap へ */
+    flex-direction: row;
     gap: 10px;
     border: none;
     padding: 0;
@@ -208,13 +192,11 @@
 }
 
 .checkbox-1 input {
-    display: flex;
     display: none;
-
 }
 
 
-/* --- テーブルスクロール用コンテナ（新規追加） --- */
+/* --- テーブルスクロール用コンテナ --- */
 .table-scroll-container {
     max-height: 65vh; 
     overflow-y: auto;
@@ -224,7 +206,7 @@
     background-color: #fff;
 }
 
-/* スクロールバーのデザイン（Webkit系） */
+/* スクロールバーのデザイン */
 .table-scroll-container::-webkit-scrollbar {
     width: 8px;
 }
@@ -245,12 +227,10 @@
     width: 100%;
     border-collapse: collapse;
     background-color: #fff;
-    margin-bottom: 0; /* コンテナに入れるためマージン削除 */
-    /* box-shadowはコンテナ側に移動したので削除 */
+    margin-bottom: 0;
 }
 
 .subject-table thead th {
-    /* ヘッダー固定の設定 */
     position: sticky;
     top: 0;
     z-index: 10;
@@ -259,7 +239,7 @@
     padding: 15px;
     text-align: left;
     font-weight: normal;
-    box-shadow: 0 2px 2px rgba(0,0,0,0.1); /* スクロール時の境界線用 */
+    box-shadow: 0 2px 2px rgba(0,0,0,0.1);
 }
 
 .subject-table td {

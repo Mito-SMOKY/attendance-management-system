@@ -13,7 +13,6 @@
 
 <body>
 
-    <!-- ヘッダー -->
     <div class="header-container">
         <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
             <div th:replace="~{fragments/_parts :: admin-header}"></div>
@@ -23,17 +22,14 @@
         </div>
     </div>
     
-    <!-- 戻るボタン -->
     <div class="backbutton-container">
         <div th:replace="~{fragments/_parts :: backButton(url='/admin/timetable')}"></div>
     </div>
 
-    <!-- 生徒一覧リスト -->
-    <div class="student-list-container">
-        
-        <h1 class="page-title">生徒一覧</h1>
+    <div class="main-container">
 
-        <!-- 検索絞り込み -->
+        <div th:replace="~{fragments/_parts :: page-title-part('生徒一覧')}"></div>
+        
         <div class="top-controls">
 
             <form class="search-form-3" onsubmit="return false;">
@@ -43,12 +39,11 @@
                 <button type="button" id="searchBtn" aria-label="検索"></button>
             </form>
 
-            <!-- 絞り込みモーダル -->
             <div class="modal-2__wrap">
                 <input type="radio" id="modal-2__open" class="modal-2__open-input" name="modal-2__trigger"/>
 
                 <label for="modal-2__open" class="modal-2__open-label">
-                    <img th:src="@{/image/filter.png}" alt="絞り込み" class="label-icon" style="width: 24px; height: 24px;">
+                    <i class="fa-solid fa-filter" style="color: #00acbd; font-size: 1.2rem;"></i>
                 </label>
 
                 <input type="radio" id="modal-2__close" name="modal-2__trigger"/>
@@ -93,7 +88,6 @@
                 </div>
             </div>
         </div>
-        <!-- ------------------------------------------ -->
 
         <div class="table-wrapper">
             <table class="student-table">
@@ -120,8 +114,6 @@
 
         <div id="pagination" class="pagination"></div>
 
-    </div>
-
-    <script th:src="@{/js/admin/studentList.js}"></script>
+    </div> <script th:src="@{/js/admin/studentList.js}"></script>
 </body>
 </html>

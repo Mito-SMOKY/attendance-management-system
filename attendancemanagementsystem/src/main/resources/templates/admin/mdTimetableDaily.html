@@ -55,7 +55,7 @@
             
         </div>
 
-        <div class="page-title">日時別 時間割編集</div>
+        <div th:replace="~{fragments/_parts :: page-title-part('日別時間割編集')}"></div>
 
         <form th:action="@{/admin/mdTimetable/daily}" method="get" class="setting-area">
             <div class="setting-row">

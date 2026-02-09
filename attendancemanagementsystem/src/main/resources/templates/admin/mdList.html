@@ -21,8 +21,10 @@
         <h2 class="page-title">マスタ情報の編集</h2>
     </div>
 
-    <div class="content-wrapper">
+    <div class="main-container">
         
+        <div th:replace="~{fragments/_parts :: page-title-part('マスタ情報の編集')}"></div>
+
         <div class="menu-group fade-in">
             <div class="action-buttons">
                 
@@ -40,7 +42,11 @@
                     <i class="fa-solid fa-people-group"></i>
                     <span>所属マスタ</span>
                 </a>
+
             </div>
         </div>
-    </body>
+
+    </div>
+
+</body>
 </html>

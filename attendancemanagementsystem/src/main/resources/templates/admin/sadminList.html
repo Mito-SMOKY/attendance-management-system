@@ -20,42 +20,46 @@
       <div class="top-section">
         <div class="backbutton-container">
           <div
-            th:replace="~{fragments/_parts :: backButton(url='/admin/userManagement')}"
+            th:replace="~{fragments/_parts :: backButton(url='/admin/sadminUserManagement')}"
           ></div>
         </div>
 
-        <h2 class="page-title">管理者一覧</h2>
+    <div class="main-container">
+      
+      <div th:replace="~{fragments/_parts :: page-title-part('管理者アカウント一覧')}"></div>
+
+      <div class="search-action-area">
+        
+        <div class="search-group">
+            <div class="search-box">
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="キーワードを入力"
+                th:value="${keyword}"
+              />
+              <button type="button" id="searchBtn">
+                検索
+                <i
+                  class="fa-solid fa-magnifying-glass"
+                  style="margin-left: 5px"
+                ></i>
+              </button>
+            </div>
+    
+            <button
+              type="button"
+              id="filterBtn"
+              th:class="${authFilter == '1' ? 'filter-btn active' : 'filter-btn'}"
+              title="表示オプション"
+            >
+              <i class="fa-solid fa-filter"></i>
+            </button>
+        </div>
 
         <a th:href="@{/admin/sadminCreate}" class="btn-create-new">
           <i class="fa-solid fa-plus"></i> 新規登録
         </a>
-      </div>
-
-      <div class="search-area">
-        <div class="search-box">
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="キーワードを入力"
-            th:value="${keyword}"
-          />
-          <button type="button" id="searchBtn">
-            検索
-            <i
-              class="fa-solid fa-magnifying-glass"
-              style="margin-left: 5px"
-            ></i>
-          </button>
-        </div>
-
-        <button
-          type="button"
-          id="filterBtn"
-          th:class="${authFilter == '1' ? 'filter-btn active' : 'filter-btn'}"
-          title="表示オプション"
-        >
-          <i class="fa-solid fa-filter"></i>
-        </button>
       </div>
 
       <div class="table-area">

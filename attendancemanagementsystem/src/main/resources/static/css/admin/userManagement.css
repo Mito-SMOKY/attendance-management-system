@@ -1,31 +1,8 @@
+@charset "UTF-8";
 
-/* --- 基本設定 --- */
-body {
-    margin: 0;
-}
-
-/* --- ヘッダーエリア --- */
-.main-container{
-    width: 100%;
-    max-width: 1200px;
-    max-height: 500px;
-    margin: 0 auto;
-    padding: 20px;
-    padding-bottom: 50px;
-
-}
-
-.page-title {
-    color: #333;
-    font-size: 1.8rem;
-    border-bottom: 2px solid #00bdca;
-    padding-bottom: 10px;
-    margin-top: 100px;
-    margin-bottom: 20px;
-    padding-left: 20px;
-    text-align: center;
-    font-weight: bold;
-}
+/* 注意: body, .main-container, .page-title の設定は削除しました。
+   これらは全て parts.css の共通設定にお任せします。
+*/
 
 /* --- コンテンツエリア --- */
 .content-wrapper {
@@ -33,9 +10,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(90vh - 180px);
-    padding-bottom: 50px;
+    /* ヘッダーやタイトルを除いたエリアで縦中央にするための計算 */
+    min-height: calc(100vh - 250px);
     width: 100%;
+    padding-bottom: 20px;
 }
 
 /* --- メニューグループ（重要） --- */
@@ -125,9 +103,8 @@ body {
 /* --- ▼▼▼ 小さな戻るボタンエリア ▼▼▼ --- */
 .back-btn-row {
     width: 100%;
-    max-width: 870px;
+    max-width: 870px; /* ボタン群の幅に合わせる調整 */
     display: flex;
-    /* justify-content: flex-end; */
     padding: 0 20px;
     margin-top: 30px;
     box-sizing: border-box;

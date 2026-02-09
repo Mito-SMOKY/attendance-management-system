@@ -29,14 +29,14 @@ import jakarta.servlet.http.HttpSession;
 public class EmailResetController {
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private OtpService otpService;
     
     @Autowired
     private UsersRepository usersRepository;
     
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Autowired
     private NotificationEmailService notificationEmailService;
     
@@ -45,13 +45,22 @@ public class EmailResetController {
 
     // メールアドレス入力画面
     @GetMapping("/auth")
-    public String showAuthForm(Principal principal, Model model) {
+    public String showAuthForm(Principal principal, Model model, HttpSession session) {
 
-        //urlの設定
-        String backUrl = (principal != null) ? "/logout" : "/login";
-        
-        model.addAttribute("backUrl", backUrl);
-        
+        // ログイン中の場合、自動でユーザー情報を取得してリセット画面へ
+        if (principal != null) {
+            String loginId = principal.getName();
+            UsersEntity user = usersRepository.findByLoginId(loginId).orElse(null);
+            
+            if (user != null) {
+
+                // セッションにユーザーIDを保存してリセット画面へ
+                session.setAttribute("resetEmail_UserId", user.getUserId());
+                return "redirect:/email/reset-email";
+            }
+        }
+
+        model.addAttribute("backUrl", "/login");
         return "login/email_auth";
     }
 
@@ -63,9 +72,9 @@ public class EmailResetController {
             HttpSession session,
             Model model) {
         
-        UsersEntity user = usersRepository.findByLoginId(loginId)
-                .orElse(null);
-
+        UsersEntity user = usersRepository.findByLoginId(loginId).orElse(null);
+        
+        // 認証失敗
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             model.addAttribute("error", "IDまたはパスワードが間違っています");
             return "login/email_auth";
@@ -77,10 +86,26 @@ public class EmailResetController {
 
     // 新メールアドレス入力画面
     @GetMapping("/reset-email")
-    public String showResetEmailForm(HttpSession session) {
-        if (session.getAttribute("resetEmail_UserId") == null) {
+    public String showResetEmailForm(HttpSession session, Model model, Principal principal) {
+        Integer userId = (Integer) session.getAttribute("resetEmail_UserId");
+        if (userId == null) {
             return "redirect:/email/auth";
         }
+
+        // 初回設定かどうか判定
+        UsersEntity user = usersRepository.findById(userId).orElse(null);
+        boolean isFirstSetup = (user != null && user.getEmail() == null);
+        session.setAttribute("isFirstSetup", isFirstSetup);
+
+        // バックボタンのURL設定
+        if (principal != null) {
+            model.addAttribute("backUrl", "/logout");
+            model.addAttribute("isFirstLogin", isFirstSetup);
+        } else {
+            model.addAttribute("backUrl", "/email/auth");
+            model.addAttribute("isFirstLogin", false);
+        }
+
         return "login/reset_email";
     }
 
@@ -93,25 +118,32 @@ public class EmailResetController {
 
         Integer userId = (Integer) session.getAttribute("resetEmail_UserId");
         if (userId == null) return "redirect:/email/auth";
-
+        
+        // OTP送信処理
         try {
             UsersEntity user = usersRepository.findById(userId).orElseThrow();
-            
-            // メール重複チェック
+
+            // メールアドレスの重複チェック
             if (usersRepository.findByEmail(newEmail).isPresent()) {
                 redirectAttributes.addFlashAttribute("error", "このメールアドレスは既に使用されています");
                 return "redirect:/email/reset-email";
             }
 
-            // OTP生成・送信
+            // OTP送信
             otpService.sendOtp(user, newEmail, OtpPurpose.EMAIL_CHANGE);
             
+            // 新しいメールアドレスをセッションに保存
             session.setAttribute("resetEmail_NewEmail", newEmail);
             return "redirect:/email/verify-otp";
 
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "エラーが発生しました");
+            String msg = e.getMessage();
+            if (msg != null && msg.contains("時間を空けて")) {
+                redirectAttributes.addFlashAttribute("error", "メール送信の制限がかかっています。少し時間を空けてから再度お試しください。");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "予期せぬエラーが発生しました。");
+            }
             return "redirect:/email/reset-email";
         }
     }
@@ -138,12 +170,13 @@ public class EmailResetController {
             @RequestParam("otp") String otp,
             HttpSession session) {
         
+        // レスポンス用マップ
         Map<String, Object> response = new HashMap<>();
-        
         String newEmail = (String) session.getAttribute("resetEmail_NewEmail");
         Integer userId = (Integer) session.getAttribute("resetEmail_UserId");
-
-        // セッション切れの場合
+        Boolean isFirstSetup = (Boolean) session.getAttribute("isFirstSetup"); // ★追加
+        
+        // 必要な情報がセッションにない場合、認証画面へリダイレクト
         if (newEmail == null || userId == null) {
             response.put("success", true); 
             response.put("redirectUrl", "/email/auth");
@@ -153,16 +186,22 @@ public class EmailResetController {
         try {
             UsersEntity user = usersRepository.findById(userId).orElseThrow();
             
-            // 検証実行
             boolean isValid = otpService.verifyOtp(user, otp, OtpPurpose.EMAIL_CHANGE); 
             
+            // OTPが有効な場合、メールアドレスを更新
             if (isValid) {
+                
+                // メールアドレス更新
+                if (usersRepository.findByEmail(newEmail).isPresent()) {
+                    response.put("success", false);
+                    response.put("message", "taken");
+                    return response;
+                }
 
-                // 検証成功 -> 更新
                 user.setEmail(newEmail);
                 usersRepository.save(user);
 
-                // 通知処理 
+                // 通知メール送信
                 try {
                     notificationMessageService.createEmailChangeCompletion(user);
                     notificationEmailService.sendEmailChangeCompletion(user);
@@ -171,16 +210,22 @@ public class EmailResetController {
                 }
                 
                 otpService.clearOtp(user);
-                
                 session.removeAttribute("resetEmail_NewEmail");
-                session.removeAttribute("resetEmail_UserId");
 
-                // 成功時のレスポンス 
                 response.put("success", true);
-                response.put("redirectUrl", "/email/complete"); 
+                
+                // 初回設定ならパスワード変更へリダイレクト
+                if (isFirstSetup != null && isFirstSetup) {
+
+                    // ユーザーID
+                    response.put("redirectUrl", "/password/initial");
+                } else {
+                    session.removeAttribute("resetEmail_UserId");
+                    session.removeAttribute("isFirstSetup");
+                    response.put("redirectUrl", "/email/complete");
+                }
 
             } else {
-                // 失敗時のレスポンス 
                 response.put("success", false);
                 response.put("message", "invalid");
             }

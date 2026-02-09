@@ -7,36 +7,8 @@
     box-sizing: border-box;
 }
 
-body {
-    overflow-x: hidden;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    font-size: 16px; 
-    color: #333;
-}
-
-/* =========================================
-   レイアウトコンテナ
-   ========================================= */
-.student-list-container {
-    width: 95%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    padding-bottom: 50px;
-}
-
-.page-title {
-    color: #333;
-    font-size: 1.8rem;
-    border-bottom: 2px solid #00acbd;
-    padding-bottom: 10px;
-    margin-top: 100px;
-    margin-bottom: 20px;
-    padding-left: 20px;
-    text-align: center;
-}
+/* body, .page-title, .student-list-container の設定は削除し、
+   parts.css の .main-container に任せます。 */
 
 /* =========================================
    検索とフィルターのコントロール
@@ -105,7 +77,6 @@ body {
     display: inline-block;
 }
 
-/* ★修正: ラジオボタン（青い丸）を確実に消す設定 */
 input[type="radio"].modal-2__open-input,
 input[type="radio"]#modal-2__close,
 .modal-2__trigger {
@@ -121,15 +92,16 @@ input[type="radio"]#modal-2__close,
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8px;
+    width: 40px; /* サイズ固定 */
+    height: 40px;
     background-color: #fff;
-    border: 1px solid #ccc;
+    border: 1px solid #00acbd; /* 枠線をテーマカラーに */
     border-radius: 5px;
     transition: background-color 0.3s;
 }
 
 .modal-2__open-label:hover {
-    background-color: #f0f0f0;
+    background-color: #e0f7fa;
 }
 
 .modal-2 {
@@ -188,7 +160,6 @@ input[type="radio"]#modal-2__close,
     margin-right: 15px;
     cursor: pointer;
     font-size: 1em;
-
 }
 
 .form-select{
@@ -204,14 +175,19 @@ input[type="radio"]#modal-2__close,
 }
 
 /* =========================================
-   生徒一覧テーブル
+   生徒一覧テーブル (角丸・枠線なし対応)
    ========================================= */
 .table-wrapper {
     width: 100%;
-    border: 1px solid #999;
     margin-bottom: 30px;
     overflow-x: auto;
     background-color: white;
+    
+    /* ★修正点: 角丸と影、枠線削除 */
+    border: none; 
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    overflow: hidden; /* 角丸を適用するために必須 */
 }
 
 .student-table {
@@ -223,8 +199,10 @@ input[type="radio"]#modal-2__close,
 
 .student-table th,
 .student-table td {
-    border: 1px solid #ccc;
-    padding: 12px 10px;
+    /* ★修正点: 縦線を消す */
+    border: none;
+    border-bottom: 1px solid #eee; /* 薄い下線のみ */
+    padding: 15px 10px;
     vertical-align: middle;
 }
 
@@ -232,6 +210,17 @@ input[type="radio"]#modal-2__close,
     background-color: #00bdca;
     color: white;
     font-weight: normal;
+    padding: 15px 0;
+}
+
+/* 最後の行の下線は消す */
+.student-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* 行ホバー時の色変更 */
+.student-table tbody tr:hover {
+    background-color: #f9fbfd;
 }
 
 .student-name-link {
@@ -253,8 +242,9 @@ input[type="radio"]#modal-2__close,
 .pagination {
     display: flex;
     justify-content: center;
-    gap: 8px; /* ボタン間の隙間を少し狭く */
+    gap: 8px;
     align-items: center;
+    margin-top: 20px;
 }
 
 .page-link {
@@ -278,7 +268,6 @@ input[type="radio"]#modal-2__close,
     border-color: #00bdca;
 }
 
-/* ★追加: 省略記号(...)のスタイル */
 .page-dots {
     color: #777;
     margin: 0 4px;
