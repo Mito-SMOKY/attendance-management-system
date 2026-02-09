@@ -51,14 +51,23 @@ public class HistoryViewDto {
             periodsStr = entity.getPeriods().replace(",", "・") + "限";
         }
 
-        // 5. ステータスの判定
+        // 5. ステータスの判定 (★ここを修正しました)
         String statusStr;
         Integer statusVal = entity.getStatus() != null ? entity.getStatus() : 0;
+        
         switch (statusVal) {
-            case 1: statusStr = "承認済み"; break;
-            case 2: statusStr = "却下"; break;
-            case 3: statusStr = "取消済み"; break;
-            default: statusStr = "申請中"; break;
+            case 1: 
+                statusStr = "申請中"; 
+                break;
+            case 2: 
+                statusStr = "承認済み"; 
+                break;
+            case 3: 
+                statusStr = "却下"; // または "取消済み"
+                break;
+            default: 
+                statusStr = "その他"; // 想定外の値
+                break;
         }
 
         return new HistoryViewDto(id, dateStr, typeName, targetDateStr, periodsStr, statusStr);

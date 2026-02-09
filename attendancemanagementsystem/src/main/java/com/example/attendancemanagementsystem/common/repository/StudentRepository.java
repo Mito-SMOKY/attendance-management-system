@@ -19,6 +19,8 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Integer>
 
     // UsersEntity をもとに StudentEntity を検索するメソッド
     Optional<StudentEntity> findByUser(UsersEntity user);
+    
+    Optional<StudentEntity> findByUser_UserId(Integer userId);
 
     // 全ての生徒をページング付きで取得するメソッド（削除済み除外を追加）
     @Override

@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">申請詳細</title>
     
     <th:block th:if="${_csrf}">
         <meta name="_csrf" th:content="${_csrf.token}"/>
         <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     </th:block>
 
-    <title th:text="${pageTitle}">申請詳細</title>
-    
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/admin/requestDetail.css}">
-    <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="header-container">
@@ -26,96 +25,95 @@
     </div>
 
     <main class="main-container">
-        <div class="detail-box">
-            <div class="detail-header">
-                <h2>申請詳細</h2>
-                <span class="status-badge"
-                    th:classappend="${
-                        detail.statusCode == 1 ? 'status-pending' : 
-                        detail.statusCode == 2 ? 'status-approved' : 
-                        detail.statusCode == 3 ? 'status-rejected' : ''
-                    }"
-                    th:text="${detail.status}">
-                </span>
+
+        <h2 class="page-title">申請詳細</h2>
+
+        <div class="detail-card">
+            <h2>詳細情報</h2>
+            
+            <div class="info-group">
+                <label>申請者</label>
+                <div class="info-value" th:text="${request.requesterName} + ' (ID: ' + ${request.requesterId} + ')'"></div>
             </div>
 
-            <div class="detail-content">
-                <div class="info-group">
-                    <label>申請日時</label>
-                    <p th:text="${detail.createdAt}"></p>
-                </div>
-
-                <div class="info-group">
-                    <label>申請者 (管理者)</label>
-                    <p th:text="${detail.requesterName}"></p>
-                </div>
-
-                <div class="info-group">
-                    <label>申請種別</label>
-                    <p th:text="${detail.type}"></p>
-                </div>
-                
-                <div class="info-group" th:if="${detail.message != null and detail.message != ''}">
-                    <label>申請メッセージ</label>
-                    <p th:text="${detail.message}"></p>
-                </div>
-
-                <div class="info-group" th:if="${not #lists.isEmpty(detail.students)}">
-                    <label>対象生徒</label>
-                    <div class="student-list">
-                        <ul>
-                            <li th:each="st : ${detail.students}">
-                                <span th:text="${st.name}"></span>
-                                (<span th:text="${st.loginId}"></span>)
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="info-group" th:if="${detail.targetDetail != null}">
-                    <label>変更内容</label>
-                    <p th:text="${detail.targetDetail}"></p>
-                </div>
+            <div class="info-group">
+                <label>申請種類</label>
+                <div class="info-value" th:text="${request.typeName}"></div>
             </div>
 
-            <div class="action-buttons" th:if="${detail.statusCode == 1}">
-                <input type="hidden" id="requestId" th:value="${detail.requestId}">
-                
-                <button type="button" class="btn-approve" onclick="confirmProcess('approve')">
-                    <i class="fa-solid fa-check"></i> 承認
-                </button>
-                <button type="button" class="btn-reject" onclick="confirmProcess('reject')">
-                    <i class="fa-solid fa-xmark"></i> 却下
-                </button>
+            <div class="info-group">
+                <label>理由・メッセージ</label>
+                <div class="info-value" th:text="${request.message}"></div>
             </div>
+
+            <div class="info-group">
+                <label>申請日時</label>
+                <div class="info-value" th:text="${request.createdAt}"></div>
+            </div>
+
+            <hr class="divider">
+
+            <div th:if="${request.typeId == 1}">
+                <h3>対象日時 (公欠・欠席)</h3>
+                <table class="detail-table">
+                    <thead>
+                        <tr>
+                            <th>日付</th>
+                            <th>時限</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="d : ${request.details}">
+                            <td th:text="${d.date}">2025/01/01</td>
+                            <td th:text="${d.slot} + '限'">1限</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(request.details)}">
+                            <td colspan="2" style="text-align: center;">詳細データがありません</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${request.typeId == 4}">
+                 <h3>変更申請内容</h3>
+                 <p>変更先学科ID: <span th:text="${request.targetDeptId}"></span></p>
+            </div>
+
+
+            <div class="action-buttons" th:if="${request.status == 1}">
+                <button type="button" class="btn-reject" th:onclick="|processRequest(${request.requestId}, 'reject')|">却下</button>
+                <button type="button" class="btn-approve" th:onclick="|processRequest(${request.requestId}, 'approve')|">承認</button>
+            </div>
+            
+            <div th:if="${request.status != 1}" class="status-message">
+                <p>この申請は既に処理済みです。</p>
+            </div>
+
         </div>
+        <a th:href="@{/admin/requestList/list}" class="btn-back">一覧へ戻る</a>
     </main>
 
     <script th:inline="javascript">
-        function confirmProcess(action) {
+        function processRequest(requestId, action) {
             const actionText = (action === 'approve') ? '承認' : '却下';
-            const confirmColor = (action === 'approve') ? '#27ae60' : '#e74c3c';
-
+            
             Swal.fire({
                 title: actionText + 'しますか？',
-                text: "この操作は元に戻せません。",
+                text: "この操作は取り消せません。",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: confirmColor,
-                cancelButtonColor: '#aaa',
-                confirmButtonText: 'はい、' + actionText + 'します',
+                confirmButtonColor: '#00bdca',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'はい',
                 cancelButtonText: 'キャンセル'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    submitProcess(action);
+                    sendRequest(requestId, action);
                 }
             });
         }
 
-        function submitProcess(action) {
-            const requestId = document.getElementById('requestId').value;
-            
-            // CSRF対策: metaタグが存在する場合のみ取得
+        function sendRequest(requestId, action) {
             const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
             const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
             
@@ -126,8 +124,6 @@
             const headers = {
                 'Content-Type': 'application/x-www-form-urlencoded'
             };
-
-            // CSRFトークンがあればヘッダーに追加
             if (csrfTokenMeta && csrfHeaderMeta) {
                 headers[csrfHeaderMeta.content] = csrfTokenMeta.content;
             }
@@ -137,23 +133,25 @@
                 headers: headers,
                 body: formData
             })
-            .then(response => {
-                if (response.ok) return response.text();
-                throw new Error('Server error');
+            .then(async response => {
+                //サーバーからのメッセージ(text)を先に取得する
+                const msg = await response.text();
+                
+                // エラー(400など)の場合も、そのメッセージをエラーとして投げる
+                if (!response.ok) {
+                    throw new Error(msg || '処理に失敗しました');
+                }
+                return msg;
             })
             .then(msg => {
-                Swal.fire({
-                    icon: 'success',
-                    title: '完了',
-                    text: msg,
-                    confirmButtonColor: '#539DA4'
-                }).then(() => {
-                    // 一覧画面へ戻る、またはリロード
+                // 成功時
+                Swal.fire('完了', msg, 'success').then(() => {
                     location.href = '/admin/requestList/list';
                 });
             })
             .catch(err => {
-                Swal.fire('エラー', '処理に失敗しました。', 'error');
+                // 失敗時
+                Swal.fire('エラー', err.message, 'error');
             });
         }
     </script>

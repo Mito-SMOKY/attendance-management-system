@@ -1,10 +1,9 @@
-
-//指定された年と月の最大日数を計算して返す。
+// 月ごとの日数を取得
 function getDaysInMonth(year, month) {
     return new Date(year, month, 0).getDate();
 }
 
-//日のドロップダウンリストを現在の年と月に基づいて再構築する。
+// 日のプルダウンを更新
 function updateDayOptions(yearId, monthId, dayId) {
     const yearSelect = document.getElementById(yearId);
     const monthSelect = document.getElementById(monthId);
@@ -14,11 +13,12 @@ function updateDayOptions(yearId, monthId, dayId) {
 
     const year = parseInt(yearSelect.value, 10);
     const month = parseInt(monthSelect.value, 10);
+    
+    // 現在選択されている日を保持（日数が減った場合に備えて調整）
+    const currentDay = parseInt(daySelect.value, 10) || 1;
 
-    if (isNaN(year) || isNaN(month)) return;
-
+    // 日数を計算
     const days = getDaysInMonth(year, month);
-    const currentDay = parseInt(daySelect.value, 10);
 
     // 一旦クリア
     daySelect.innerHTML = '';
@@ -26,7 +26,7 @@ function updateDayOptions(yearId, monthId, dayId) {
     for (let d = 1; d <= days; d++) {
         const option = document.createElement('option');
         option.value = d;
-        option.text = d + '日';
+        option.text = d; // "日" はHTML側に記述しているので数字のみ
         if (d === currentDay) {
             option.selected = true;
         }
@@ -34,125 +34,139 @@ function updateDayOptions(yearId, monthId, dayId) {
     }
 }
 
-// 画面読み込み時に初期化
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // --- 日付連動ロジック ---
-    updateDayOptions('startYear', 'startMonth', 'startDay');
-    
-    const sYear = document.getElementById('startYear');
-    const sMonth = document.getElementById('startMonth');
-    if(sYear) sYear.addEventListener('change', () => updateDayOptions('startYear', 'startMonth', 'startDay'));
-    if(sMonth) sMonth.addEventListener('change', () => updateDayOptions('startYear', 'startMonth', 'startDay'));
+// プルダウンの初期化（年・月の生成）
+function initDateSelects() {
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+    const currentDay = new Date().getDate();
 
-    updateDayOptions('endYear', 'endMonth', 'endDay');
-    
-    const eYear = document.getElementById('endYear');
-    const eMonth = document.getElementById('endMonth');
-    if(eYear) eYear.addEventListener('change', () => updateDayOptions('endYear', 'endMonth', 'endDay'));
-    if(eMonth) eMonth.addEventListener('change', () => updateDayOptions('endYear', 'endMonth', 'endDay'));
+    const ids = [
+        { y: 'startYear', m: 'startMonth', d: 'startDay' },
+        { y: 'endYear', m: 'endMonth', d: 'endDay' }
+    ];
 
+    ids.forEach(obj => {
+        const ySel = document.getElementById(obj.y);
+        const mSel = document.getElementById(obj.m);
+        const dSel = document.getElementById(obj.d);
 
-    // --- 全選択チェックボックスのロジック ---
-    const selectAllCheckbox = document.getElementById('selectAllPeriods');
-    const periodCheckboxes = document.querySelectorAll('input[name="periods"]');
+        // 年 (今年〜翌年)
+        for (let y = currentYear; y <= currentYear + 1; y++) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.text = y;
+            if (y === currentYear) opt.selected = true;
+            ySel.appendChild(opt);
+        }
 
-    if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function() {
-            const isChecked = this.checked;
-            periodCheckboxes.forEach(cb => {
-                cb.checked = isChecked;
-            });
-        });
+        // 月 (1〜12)
+        for (let m = 1; m <= 12; m++) {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.text = m;
+            if (m === currentMonth) opt.selected = true;
+            mSel.appendChild(opt);
+        }
 
-        periodCheckboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
-                if (!cb.checked) {
-                    selectAllCheckbox.checked = false;
-                } else {
-                    const allChecked = Array.from(periodCheckboxes).every(p => p.checked);
-                    if (allChecked) {
-                        selectAllCheckbox.checked = true;
-                    }
-                }
-            });
-        });
-    }
+        // 初期化実行
+        updateDayOptions(obj.y, obj.m, obj.d);
+        // 今日を選択
+        dSel.value = currentDay;
 
+        // イベントリスナー登録
+        ySel.addEventListener('change', () => updateDayOptions(obj.y, obj.m, obj.d));
+        mSel.addEventListener('change', () => updateDayOptions(obj.y, obj.m, obj.d));
+    });
+}
 
-    // --- モーダル制御ロジック ---
+document.addEventListener('DOMContentLoaded', function() {
+    // 日付プルダウン初期化
+    initDateSelects();
+
     const confirmBtn = document.getElementById('confirmBtn');
     const modal = document.getElementById('confirmationModal');
     const modalCancelBtn = document.getElementById('modalCancelBtn');
     const modalSubmitBtn = document.getElementById('modalSubmitBtn');
     const form = document.getElementById('requestForm');
 
-    const modalPeriod = document.getElementById('modalPeriod');
-    const modalTime = document.getElementById('modalTime');
-    const modalReason = document.getElementById('modalReason');
-    const modalApprover = document.getElementById('modalApprover');
-
+    // 確認ボタンクリック時
     if (confirmBtn) {
-        confirmBtn.addEventListener('click', () => {
-            // 入力値の取得
-            const sY = document.getElementById('startYear').value;
-            const sM = document.getElementById('startMonth').value;
-            const sD = document.getElementById('startDay').value;
+        confirmBtn.addEventListener('click', function() {
             
-            const eY = document.getElementById('endYear').value;
-            const eM = document.getElementById('endMonth').value;
-            const eD = document.getElementById('endDay').value;
-
-            const reasonElement = document.querySelector('textarea[name="reason"]');
-            const reason = reasonElement ? reasonElement.value : "";
-
-            // 承認者取得 (新規追加)
-            const approverSelect = document.getElementById('approverId');
-            const approverOption = approverSelect.options[approverSelect.selectedIndex];
-            // optionのtext(名前)を取得。未選択(value="")ならエラーにする
-            if (!approverSelect.value) {
-                alert("承認者を選択してください。");
+            if (!form.checkValidity()) {
+                form.reportValidity();
                 return;
             }
-            const approverName = approverOption.text;
 
-            // 時限取得
+            // 承認者
+            const approverSelect = document.getElementById('approverSelect');
+            let approverText = "";
+            if (approverSelect.selectedIndex >= 0) {
+                approverText = approverSelect.options[approverSelect.selectedIndex].text;
+            }
+
+            // 日付の取得と整形
+            const sy = document.getElementById('startYear').value;
+            const sm = document.getElementById('startMonth').value.padStart(2, '0');
+            const sd = document.getElementById('startDay').value.padStart(2, '0');
+            
+            const ey = document.getElementById('endYear').value;
+            const em = document.getElementById('endMonth').value.padStart(2, '0');
+            const ed = document.getElementById('endDay').value.padStart(2, '0');
+
+            // 隠しフィールドにセット (YYYY-MM-DD形式)
+            document.getElementById('hiddenStartDate').value = `${sy}-${sm}-${sd}`;
+            document.getElementById('hiddenEndDate').value = `${ey}-${em}-${ed}`;
+
+            // 理由
+            const reason = document.getElementById('reasonText').value;
+
+            // 時限
             const checkboxes = document.querySelectorAll('input[name="periods"]:checked');
-            let selectedPeriods = [];
-            checkboxes.forEach((cb) => {
-                selectedPeriods.push(cb.value + "限");
-            });
-
-            // バリデーション
-            if (selectedPeriods.length === 0) {
-                alert("時限を選択してください。");
-                return;
-            }
-            if (!reason || reason.trim() === "") {
-                alert("理由を入力してください。");
+            let periodsText = "";
+            if (checkboxes.length > 0) {
+                const values = Array.from(checkboxes).map(cb => {
+                    const span = cb.nextElementSibling; 
+                    return span ? span.textContent : cb.value + "限";
+                });
+                periodsText = values.join("、");
+            } else {
+                alert("対象時限を少なくとも1つ選択してください。");
                 return;
             }
 
-            // モーダルにセット
-            modalApprover.textContent = approverName;
-            modalPeriod.textContent = `${sY}年${sM}月${sD}日 〜 ${eY}年${eM}月${eD}日`;
-            modalTime.textContent = selectedPeriods.join('・');
-            modalReason.textContent = reason;
+            // モーダルへセット
+            document.getElementById('modalApprover').textContent = approverText;
+            document.getElementById('modalPeriod').textContent = `${sy}/${sm}/${sd} ～ ${ey}/${em}/${ed}`;
+            document.getElementById('modalTime').textContent = periodsText;
+            document.getElementById('modalReason').textContent = reason;
 
-            // モーダルを表示
+            // モーダル表示
             modal.style.display = 'flex';
         });
     }
 
+    // キャンセルボタン
     if (modalCancelBtn) {
-        modalCancelBtn.addEventListener('click', () => {
+        modalCancelBtn.addEventListener('click', function() {
             modal.style.display = 'none';
         });
     }
 
+    // 申請実行ボタン
     if (modalSubmitBtn) {
-        modalSubmitBtn.addEventListener('click', () => {
+        modalSubmitBtn.addEventListener('click', function() {
+            // hiddenフィールドはセット済みなのでそのまま送信
             form.submit();
+        });
+    }
+
+    // 背景クリック
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
         });
     }
 });

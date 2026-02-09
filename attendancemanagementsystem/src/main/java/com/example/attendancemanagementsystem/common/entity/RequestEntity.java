@@ -5,15 +5,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType; // 追加
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -66,16 +68,19 @@ public class RequestEntity {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    // 対象ユーザー（削除申請などで使用）
-    // FetchType.EAGER に設定し、申請データを取得した際に対象者リストも確実に取得できるようにする
-    // これにより LazyInitializationException を防ぐ
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "requesttargetuser", // 中間テーブル名
-        joinColumns = @JoinColumn(name = "RequestID"), // こちら側の外部キー
-        inverseJoinColumns = @JoinColumn(name = "UserID") // あちら側(Users)の外部キー
+        name = "requesttargetuser", 
+        joinColumns = @JoinColumn(name = "RequestID"),
+        inverseJoinColumns = @JoinColumn(name = "UserID")
     )
-    private List<UsersEntity> targetUsers = new ArrayList<>();
+    private List<UsersEntity> targetUsers;
+
+    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RequestDetailEntity> requestDetails;
+
+    // --- Constructor ---
+    public RequestEntity() {}
 
     // --- Getter / Setter ---
     
@@ -125,4 +130,13 @@ public class RequestEntity {
         }
         this.targetUsers.add(user);
     }
+
+    public List<RequestDetailEntity> getRequestDetails() {
+        return requestDetails;
+    }
+
+    public void setRequestDetails(List<RequestDetailEntity> requestDetails) {
+        this.requestDetails = requestDetails;
+    }
+
 }

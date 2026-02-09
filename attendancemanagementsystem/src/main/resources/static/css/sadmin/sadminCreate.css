@@ -26,18 +26,23 @@ body {
   height: 50px;
   margin-bottom: 30px;
 }
+
 .page-title {
-  font-size: 28px;
-  font-weight: bold;
-  color: #333;
-  margin: 0;
+    text-align: center;
+    border-bottom:2px solid #00bdca;
+    padding-bottom: 10px;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
+    letter-spacing: 2px;
 }
 
 .info-container {
   background: #fff;
   padding: 35px;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border: 1px solid #eee;
 }
 
@@ -150,7 +155,7 @@ body {
   transition: all 0.3s;
 }
 .btn-register:hover {
-  background: #009bad;
+  background: #00bdca;
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(0, 189, 202, 0.4);
 }

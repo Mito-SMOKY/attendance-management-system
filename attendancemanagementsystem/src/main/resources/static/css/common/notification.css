@@ -119,7 +119,7 @@ body {
 
 /* ヘッダーのスタイル */
 .notification-table th {
-    background-color: #00acbd;
+    background-color: #00bdca;
     color: #ffffff;
     padding: 12px 15px;
     text-align: left;
@@ -185,7 +185,7 @@ body {
     padding: .8em 2em;
     border: none;
     border-radius: 5px;
-    outline: 1px solid #00acbd;
+    outline: 1px solid #00bdca;
     font-size: 1em;
     background-color: #fff;
 }
@@ -436,9 +436,9 @@ body {
 }
 
 .page-btn.active {
-    background-color: #00acbd;
+    background-color: #00bdca;
     color: #ffffff;
-    border-color: #00acbd;
+    border-color: #00bdca;
 }
 
 .page-btn:disabled {
