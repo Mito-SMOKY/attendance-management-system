@@ -4,15 +4,18 @@
 
 // --- 1. 編集モード切替 ---
 function toggleEditMode() {
+  // ★変更: :not(.no-edit) を追加して、メールアドレスなどを除外する
   const inputs = document.querySelectorAll(
-    '#detailForm input:not([type="hidden"]), #detailForm select',
+    '#detailForm input:not([type="hidden"]):not(.no-edit), #detailForm select',
   );
+
   const btnEdit = document.getElementById("btnEditMode");
   const btnSave = document.getElementById("btnSave");
   const badges = document.querySelectorAll(".badge-required");
 
   if (!inputs.length) return;
 
+  // (以下変更なし)
   let isDisabled = inputs[0].disabled;
 
   if (isDisabled) {
