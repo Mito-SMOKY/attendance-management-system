@@ -24,13 +24,23 @@ spring.profiles.active=mysql
 # ★★★ MySQL (本番用) の設定 ★★★
 # ======================================
 # 接続先DB： `attendance_db` を指定
-spring.datasource.url=jdbc:mysql://localhost:3306/attendance_db?useSSL=false&serverTimezone=Asia/Tokyo&allowPublicKeyRetrieval=true
-# MySQLの最新ドライバクラス名
+spring.datasource.url=jdbc:mysql://attendance-db.cbwcea4g0b2v.ap-southeast-2.rds.amazonaws.com:3306/attendance_db
 spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
 # MySQLに接続するユーザー名
-spring.datasource.username=smoky
+spring.datasource.username=root
 # ★★★ここはご自身のパスワードに書き換えてください★★★
-spring.datasource.password=smoky
+spring.datasource.password=mktsyTKOHK0109101314
+
+#========================================
+# MySQLローカル開発環境用の設定
+#========================================
+#接続先DB: `attendance_db` を指定
+spring.datasource.url=jdbc:mysql://localhost:3306/attendance_db?useSSL=false&serverTimezone=Asia/Tokyo&allowPublicKeyRetrieval=true
+spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
+#MySQLに接続するユーザー名
+spring.datasource.username=smoky
+#★★★ここはご自身のパスワードに書き換えてください★★★
+spring.datasource.password=Smoky
 
 # ======================================
 # JPA (DB操作) の設定
