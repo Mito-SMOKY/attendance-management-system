@@ -18,7 +18,6 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   padding: 30px 40px 30px 40px;
   margin-bottom: 50px;
-  border-top: 5px solid var(--primary-color);
 }
 
 /* --- 上部アクションバー (編集ボタン) --- */
@@ -62,6 +61,53 @@
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s;
+}
+
+.edit-btn{
+    height: 40px;
+    padding: 0 30px;
+    border: 1px solid #00bdca;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #00bdca;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    margin-bottom: 20px;
+}
+
+.save-btn{
+    height: 40px;
+    padding: 0 30px;
+    border: 1px solid #00bdca;
+    border-radius: 4px;
+    background-color: #00bdca;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.action-area{
+  justify-self: right;
+  display: flex;
+  gap:10px;
+}
+
+.add-row-btn{
+    height: 40px;
+    padding: 0 30px;
+    border: 1px dashed #00bdca;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #00bdca;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    margin-top: 10px;
 }
 
 /* 行追加ボタン */
@@ -226,3 +272,65 @@ body.editing-mode .action-footer.edit-mode { display: flex; }
 body.editing-mode .edit-mode-wrapper { display: flex; }
 body.editing-mode .view-mode { display: none; }
 body.editing-mode td { padding: 8px; }
+
+
+
+
+
+.teacher-select-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+.teacher-select-wrapper select {
+  flex-grow: 1;
+  max-width: 200px;
+}
+.remove-teacher-btn {
+  background-color: #ffe6e6;
+  border: 1px solid #ffcccc;
+  color: #d9534f;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  line-height: 22px;
+  padding: 0;
+  text-align: center;
+}
+.add-teacher-inner-btn {
+  display: block;
+  width: 100%;
+  background-color: #f0f8ff;
+  border: 1px dashed #007bff;
+  color: #007bff;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85em;
+  margin-top: 5px;
+}
+/* 編集モード切り替え用 */
+.view-mode {
+  display: block;
+}
+.edit-mode {
+  display: none;
+}
+
+/* .is-editing クラスがついた時 */
+.is-editing .view-mode {
+  display: none;
+}
+.is-editing .edit-mode {
+  display: block;
+}
+
+/* 新規追加行は常に編集モードとして扱うためのスタイル */
+tr.new-row .view-mode {
+  display: none !important;
+}
+tr.new-row .edit-mode {
+  display: block !important;
+}
