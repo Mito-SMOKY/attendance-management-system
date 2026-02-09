@@ -21,12 +21,15 @@
     </div>
     
     <div class="backbutton-container">
-        <a th:href="@{/admin/requestList/list}" class="btn-back">一覧へ戻る</a>
+        <div th:replace="~{fragments/_parts :: backButton(url='/admin/requestList/list')}"></div>
     </div>
 
     <main class="main-container">
+
+        <h2 class="page-title">申請詳細</h2>
+
         <div class="detail-card">
-            <h2>申請詳細情報</h2>
+            <h2>詳細情報</h2>
             
             <div class="info-group">
                 <label>申請者</label>
@@ -87,6 +90,7 @@
             </div>
 
         </div>
+        <a th:href="@{/admin/requestList/list}" class="btn-back">一覧へ戻る</a>
     </main>
 
     <script th:inline="javascript">
@@ -98,7 +102,7 @@
                 text: "この操作は取り消せません。",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#539DA4',
+                confirmButtonColor: '#00bdca',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'はい',
                 cancelButtonText: 'キャンセル'
@@ -130,7 +134,7 @@
                 body: formData
             })
             .then(async response => {
-                // ★修正点: サーバーからのメッセージ(text)を先に取得する
+                //サーバーからのメッセージ(text)を先に取得する
                 const msg = await response.text();
                 
                 // エラー(400など)の場合も、そのメッセージをエラーとして投げる
@@ -146,7 +150,7 @@
                 });
             })
             .catch(err => {
-                // ★ここでサーバーからの具体的なエラーメッセージを表示する
+                // 失敗時
                 Swal.fire('エラー', err.message, 'error');
             });
         }
