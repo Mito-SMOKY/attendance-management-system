@@ -24,6 +24,8 @@ import com.example.attendancemanagementsystem.user.superadmin.dto.SuperAdminCrea
 import com.example.attendancemanagementsystem.user.superadmin.dto.SuperAdminDetailDto;
 import com.example.attendancemanagementsystem.user.superadmin.service.SuperAdminService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Controller
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('SUPER_ADMIN')") 
@@ -61,17 +63,41 @@ public class SuperAdminController {
         return "admin/sadminInfo";
     }
 
-    // --- 4. 更新処理 (有効化しました) ---
+    // --- 4. 更新処理 (強制ログアウト機能追加) ---
     @PostMapping("/sadmin/update")
     public String updateAdminDetail(
             @ModelAttribute SuperAdminDetailDto form,
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            HttpServletRequest request) { // ★追加: ログアウト処理用にRequestを受け取る
         
         try {
+            // ★追加: 更新前の情報を取得して、「自分自身の権限下げ」かチェックする
+            boolean isSelfDemotion = false;
+            
+            // 自分自身の更新かどうか
+            if (userDetails.getUserId().equals(form.getUserId())) {
+                // 現在のDB上の情報を取得
+                SuperAdminDetailDto currentDbInfo = superAdminService.getAdminDetail(form.getUserId());
+                
+                // 「元が上位(1)」かつ「変更後が一般(0)」の場合
+                if (currentDbInfo.getAdminLevelID() == 1 && form.getAdminLevelID() == 0) {
+                    isSelfDemotion = true;
+                }
+            }
+
             // 操作者IDを渡して更新実行
             superAdminService.updateAdmin(form, userDetails.getUserId());
+            
+            // ★追加: 自分で権限を下げた場合は強制ログアウト
+            if (isSelfDemotion) {
+                request.logout(); // ログアウト実行
+                redirectAttributes.addFlashAttribute("errorMessage", "権限が変更されたためログアウトしました。再ログインしてください。");
+                return "redirect:/login"; // ログイン画面へリダイレクト（パスは環境に合わせて調整してください）
+            }
+
             redirectAttributes.addFlashAttribute("successMessage", "管理者情報を更新しました。");
+
         } catch (Exception e) {
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("errorMessage", "更新失敗: " + e.getMessage());

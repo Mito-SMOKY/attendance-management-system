@@ -133,7 +133,6 @@ public class SuperAdminService {
     // --- 3. 更新メソッド ---
     @Transactional
     public void updateAdmin(SuperAdminDetailDto dto, Integer operatorId) {
-        // ... (省略: 変更なし) ...
         UsersEntity operator = usersRepository.findById(operatorId)
             .orElseThrow(() -> new RuntimeException("操作ユーザーが見つかりません"));
         
@@ -148,11 +147,13 @@ public class SuperAdminService {
         UsersEntity user = admin.getUser();
         user.setName(dto.getName());
         
-        if (dto.getEmail() != null && dto.getEmail().trim().isEmpty()) {
+        // ★削除: メールアドレスの更新処理を削除（またはコメントアウト）
+        /* if (dto.getEmail() != null && dto.getEmail().trim().isEmpty()) {
             user.setEmail(null);
         } else {
             user.setEmail(dto.getEmail());
         }
+        */
         
         int dbLevel = (dto.getAdminLevelID() == 1) ? 1 : 2;
         admin.setAdminLevelId(dbLevel);
