@@ -275,6 +275,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+
+        if (data.dates && data.dates.length >= 1) {
+            // 週の水曜日あたりを基準に月を判定
+            const weekMiddleDate = parseISODateLocal(data.dates[2] || data.dates[0]);
+            
+            if (yearSelector) {
+                yearSelector.value = weekMiddleDate.getFullYear();
+            }
+            if (monthSelector) {
+                monthSelector.value = weekMiddleDate.getMonth();
+            }
+        }
+
         updateNavigationButtons();
     }
 
@@ -282,21 +295,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const displayEl = document.getElementById('currentWeekDisplay');
         if (!displayEl) return;
         
-        let displayMonth;
-        if (monthSelector && !isNaN(parseInt(monthSelector.value))) {
-            displayMonth = parseInt(monthSelector.value) + 1;
+        if (data.dates && data.dates.length >= 5) {
+            const startDate = parseISODateLocal(data.dates[0]); // 月曜日
+            const endDate = parseISODateLocal(data.dates[4]);   // 金曜日
+            
+            const startStr = `${startDate.getMonth() + 1}月${startDate.getDate()}日`;
+            const endStr = `${endDate.getMonth() + 1}月${endDate.getDate()}日`;
+            
+            displayEl.textContent = `${startStr} ～ ${endStr}`;
         } else {
-            const middleDay = new Date(currentWeekStart);
-            middleDay.setDate(middleDay.getDate() + 3);
-            displayMonth = middleDay.getMonth() + 1;
+            displayEl.textContent = '';
         }
 
-        const middleDay = new Date(currentWeekStart);
-        middleDay.setDate(middleDay.getDate() + 3);
-        
-        const weekNum = data.weekNumber || calculateWeekNumber(middleDay);
-        
-        displayEl.textContent = `${displayMonth}月 第${weekNum}週`;
     }
 
     function isWeekInSelectedMonth(weekStartDate) {
@@ -315,14 +325,12 @@ document.addEventListener('DOMContentLoaded', function() {
             nextWeekBtn.disabled = true;
             return;
         }
-        const prevDate = new Date(currentWeekStart); prevDate.setDate(prevDate.getDate() - 7);
-        const nextDate = new Date(currentWeekStart); nextDate.setDate(nextDate.getDate() + 7);
-
-        prevWeekBtn.disabled = !isWeekInSelectedMonth(prevDate);
-        nextWeekBtn.disabled = !isWeekInSelectedMonth(nextDate);
+        prevWeekBtn.disabled = false;
+        nextWeekBtn.disabled = false;
         
-        prevWeekBtn.classList.toggle('disabled-arrow', prevWeekBtn.disabled);
-        nextWeekBtn.classList.toggle('disabled-arrow', nextWeekBtn.disabled);
+        // CSSクラスの削除
+        prevWeekBtn.classList.remove('disabled-arrow');
+        nextWeekBtn.classList.remove('disabled-arrow');
     }
     
     initializeSelectors();

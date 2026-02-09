@@ -215,15 +215,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateNavigationButtons() {
         if (!prevWeekBtn || !nextWeekBtn) return;
+        
+        // 日付が無効な場合のみボタンを無効化
         if (isNaN(currentWeekStart.getTime())) {
-            prevWeekBtn.disabled = true; nextWeekBtn.disabled = true; return;
+            prevWeekBtn.disabled = true; 
+            nextWeekBtn.disabled = true; 
+            return;
         }
-        const prevWeekStart = new Date(currentWeekStart); prevWeekStart.setDate(prevWeekStart.getDate() - 7);
-        const nextWeekStart = new Date(currentWeekStart); nextWeekStart.setDate(nextWeekStart.getDate() + 7);
-        prevWeekBtn.disabled = !isWeekInSelectedMonth(prevWeekStart);
-        nextWeekBtn.disabled = !isWeekInSelectedMonth(nextWeekStart);
-        prevWeekBtn.classList.toggle('disabled-arrow', prevWeekBtn.disabled);
-        nextWeekBtn.classList.toggle('disabled-arrow', nextWeekBtn.disabled);
+        prevWeekBtn.disabled = false;
+        nextWeekBtn.disabled = false;
+        prevWeekBtn.classList.remove('disabled-arrow');
+        nextWeekBtn.classList.remove('disabled-arrow');
     }
 
     function renderTimetable(data) {
@@ -243,39 +245,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 theadRow.innerHTML += `<th>${label}</th>`;
             });
         }
-        
-        // --------------------------------------------------------------------------
-        // ★★★ 修正箇所: ナビゲーションバーの日付表示ロジック ★★★
-        // --------------------------------------------------------------------------
-        let monthToShow;
-        if (monthSelector && !isNaN(parseInt(monthSelector.value))) {
-            // 月セレクタが有効ならその値を使う
-            monthToShow = parseInt(monthSelector.value);
-        } else if (!isNaN(currentWeekStart.getTime())) {
-            // セレクタが無効だが currentWeekStart が有効なら、その日付の中央値の月を使う
-            const middleDay = new Date(currentWeekStart);
-            middleDay.setDate(middleDay.getDate() + 3); // 週の中央の日付を取得
-            monthToShow = middleDay.getMonth();
-        } else {
-            // どちらも無効な場合は現在月を使う (フォールバック)
-            monthToShow = new Date().getMonth();
-        }
-        
-        const displayMonth = monthToShow + 1; // 0-indexed から 1-indexed に変換
 
-        const weekNumber = data.weekNumber || '';
         const displayEl = document.getElementById('currentWeekDisplay');
         
-        // displayMonth が有効な数値であることを最終確認
-        if (displayEl && !isNaN(displayMonth)) { 
-            displayEl.textContent = `${displayMonth}月 第${weekNumber}週`;
-        } else if (displayEl) {
-            // 万が一まだNaNが残る場合はエラー表示
-            displayEl.textContent = `日付エラー 第${weekNumber}週`;
-        }
-        // --------------------------------------------------------------------------
+        if (displayEl && data.dates && data.dates.length >= 5) {
+            // data.dates[0] が月曜、data.dates[4] が金曜です
+            const startDate = parseISODateLocal(data.dates[0]);
+            const endDate = parseISODateLocal(data.dates[4]);
 
-        // body
+            // 「M月D日」の形式を作成
+            const startStr = `${startDate.getMonth() + 1}月${startDate.getDate()}日`;
+            const endStr = `${endDate.getMonth() + 1}月${endDate.getDate()}日`;
+
+            // 表示を更新 (例: 2月9日 ～ 2月13日)
+            displayEl.textContent = `${startStr} ～ ${endStr}`;
+        } else if (displayEl) {
+            displayEl.textContent = '日付範囲不明';
+        }
+        
+        // body: 各時間帯ごとに行を追加
         const slots = Array.isArray(data.timeSlots) ? data.timeSlots : [];
         slots.forEach((slotTime, slotIndex) => {
             const row = tbody.insertRow();
@@ -295,6 +283,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+
+        if (data.dates && data.dates.length >= 1) {
+            // 週の中日（水曜日あたり）を基準に「何月か」を判定
+            const weekMiddleDate = parseISODateLocal(data.dates[2] || data.dates[0]);
+            
+            if (yearSelector) {
+                yearSelector.value = weekMiddleDate.getFullYear();
+            }
+            if (monthSelector) {
+                monthSelector.value = weekMiddleDate.getMonth();
+            }
+        }
 
         updateNavigationButtons();
     }
