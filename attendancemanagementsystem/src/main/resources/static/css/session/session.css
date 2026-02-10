@@ -7,6 +7,17 @@
     box-sizing: border-box;
 }
 
+.hr{
+    color: #00bdca ;
+    margin-bottom: 20px;
+}
+
+.mb-3{
+    font-weight:bold; 
+    color:#555;
+    font-size: 1em;
+}
+
 body {
     width: 100%;
     min-height: 100vh;
@@ -15,27 +26,17 @@ body {
     color: #333;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* 上から詰めて配置 */
+    justify-content: flex-start; 
     align-items: center; 
     background-color: #fff;
 }
 
-/* =========================================
-   メインコンテナ
-   ★修正点: padding-top を削除しました。
-   parts.css の設定がそのまま適用され、適切な位置になります。
-   ========================================= */
 .main-container {
     width: 100%;
     max-width: 1000px;
     padding-left: 20px;
     padding-right: 20px;
     padding-bottom: 50px;
-    
-    /* もしこれでもまだ位置がずれる場合のみ、以下のコメントアウトを外して微調整してください。
-       現状は「アカウント管理画面」と同じにするため、あえて指定しません。
-    */
-    /* margin-top: 20px; */ 
 }
 
 /* =========================================

@@ -11,21 +11,17 @@ body {
     overflow-x: hidden;
     width: 100%;
     margin: 0;
-    padding: 0;
-    
+    padding: 0; 
     font-size: 16px;
     background-color: #fff;
     color: #333;
-    
-    /* コンテナがないためbody全体で配置を制御 */
     text-align: center; 
-    padding-top: 120px; /* ヘッダー回避 */
+    padding-top: 120px; 
     padding-bottom: 50px;
 }
 
 /* =========================================
    共通コンテナ幅制御
-   HTMLにラッパーがないため、各要素に幅適用
    ========================================= */
 h1, h3, .info-box, table, .success-message, .btn-container-bottom {
     width: 90%;
@@ -71,15 +67,9 @@ h1 {
    ========================================= */
 .info-box {
     background-color: #fff;
-    padding: 20px 30px;
     border-radius: 8px;
     margin-bottom: 50px;
-    
-    /* 影をつけてカード風に */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    border: 1px solid #eee;
-    
-    text-align: left; /* 中身は左寄せ */
+    text-align: left;
 }
 
 /* 情報テキストの段落調整 */

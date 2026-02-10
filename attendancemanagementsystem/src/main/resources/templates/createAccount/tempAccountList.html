@@ -14,6 +14,7 @@
     />
   </head>
   <body>
+
     <div class="header-container">
       <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
@@ -35,46 +36,13 @@
     </div>
 
     <div class="info-box">
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        "
-      >
-        <div class="info-box">
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-            "
-          >
-            <div></div>
-
-            <div>
-              <a
-                th:href="@{/admin/downloadPdf/{id}(id=${datalist.dataListId})}"
-                class="btn btn-download"
-              >
-                <i class="fas fa-file-pdf"></i> PDFダウンロード
-              </a>
-              <br />
-              <span style="font-size: 0.8em; color: red"
-                >※登録直後のみ平文パスワードで出力されます</span
-              >
-            </div>
-          </div>
-        </div>
-
-        <!-- <div>
-          <a
-            th:href="@{/admin/downloadCsv/{id}(id=${datalist.dataListId})}"
-            class="btn btn-download"
-          >
-            <i class="fas fa-file-csv"></i> CSVダウンロード
-          </a> -->
-        </div>
+      <div>
+        <a th:href="@{/admin/downloadPdf/{id}(id=${datalist.dataListId})}" class="btn btn-download" >
+          <i class="fas fa-file-pdf"></i> PDFダウンロード
+        </a>
+        <br />
+        <span style="font-size: 0.8em; color: red">
+          ※登録直後のみ平文パスワードで出力されます</span>
       </div>
     </div>
 
