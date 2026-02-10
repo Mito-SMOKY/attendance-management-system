@@ -18,7 +18,7 @@
     </div>
     
     <main class="main-container">
-        <h2 class="page-title">申請承認・履歴一覧</h2>
+        <div th:replace="~{fragments/_parts :: page-title-part('申請承認・履歴一覧')}"></div>
         
         <div th:if="${#lists.isEmpty(requestList)}" style="text-align: center; padding: 40px; color: #666;">
             <i class="fa-regular fa-folder-open" style="font-size: 3em; margin-bottom: 15px;"></i>

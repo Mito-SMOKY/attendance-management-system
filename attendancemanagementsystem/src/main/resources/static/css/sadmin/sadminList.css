@@ -6,13 +6,6 @@ body {
   padding: 0;
 }
 
-/* ヘッダー位置の調整（必要に応じて） */
-.header-container {
-  width: 100%;
-  margin-bottom: 60px; /* ヘッダー下の余白 */
-  padding-top: 80px;
-}
-
 /* =========================================
    検索・アクションエリア
    ========================================= */
@@ -22,17 +15,6 @@ body {
   align-items: center;
   height: 50px;
   margin-bottom: 30px;
-}
-
-.page-title {
-    text-align: center;
-    border-bottom:2px solid #00bdca;
-    padding-bottom: 10px;
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 30px;
-    color: #333;
-    letter-spacing: 2px;
 }
 
 /* 左側の検索グループ */
