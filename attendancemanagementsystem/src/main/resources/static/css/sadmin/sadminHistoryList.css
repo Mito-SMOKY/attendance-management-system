@@ -1,0 +1,137 @@
+@charset "UTF-8";
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+.header-container {
+  width: 100%;
+  margin-bottom: 60px;
+  padding-top: 80px;
+}
+
+.main-wrapper {
+  width: 1000px;
+  max-width: 95%;
+  margin: 0 auto;
+  padding-bottom: 50px;
+}
+
+.top-section {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* テーブルスタイル */
+.table-container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th {
+  background: #00bdca;
+  color: #fff;
+  padding: 12px;
+  font-weight: bold;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.history-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  color: #333;
+  font-size: 14px;
+}
+
+.history-table tr:hover {
+  background-color: #f0fbff;
+}
+
+.text-left {
+  text-align: left;
+}
+
+/* バッジスタイル */
+.badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff;
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+}
+
+.badge-create {
+  background-color: #28a745; /* 緑 */
+}
+
+.badge-update {
+  background-color: #00bdca; /* ティファニーブルー */
+}
+
+.badge-delete {
+  background-color: #ff4d4f; /* 赤 */
+}
+
+/* ページネーション */
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.page-link {
+  display: inline-block;
+  padding: 8px 16px;
+  margin: 0 5px;
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #00bdca;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: 0.3s;
+}
+
+.page-link:hover {
+  background: #00bdca;
+  color: #fff;
+  border-color: #00bdca;
+}
+
+.current-page {
+  margin: 0 10px;
+  font-weight: bold;
+  color: #666;
+}
+
+.back-link-area {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.btn-back {
+  color: #666;
+  text-decoration: none;
+  font-size: 14px;
+}
+.btn-back:hover {
+  text-decoration: underline;
+}
