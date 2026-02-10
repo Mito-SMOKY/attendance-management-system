@@ -164,9 +164,12 @@ body {
 .action-buttons {
   margin-top: 40px;
   display: flex;
-  justify-content: space-between; /* 削除ボタン左、確定ボタン右 */
+  /* justify-content: space-between; は削除し、margin-right: autoで制御 */
+  align-items: center;
+  gap: 15px; /* ボタン同士の間隔 */
 }
 
+/* ユーザー削除ボタン */
 .btn-delete {
   background: #fff;
   color: #ff4d4f;
@@ -176,12 +179,31 @@ body {
   cursor: pointer;
   font-weight: bold;
   transition: 0.3s;
+
+  /* これで削除ボタンより右にある要素（キャンセル・確定）を右端に押しやる */
+  margin-right: auto;
 }
 .btn-delete:hover {
   background: #ff4d4f;
   color: #fff;
 }
 
+/* キャンセルボタン（新規追加） */
+.btn-cancel-edit {
+  background: #ccc;
+  color: #333;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+.btn-cancel-edit:hover {
+  background: #bbb;
+}
+
+/* 確定ボタン */
 .btn-confirm {
   background: #00bdca;
   color: #fff;

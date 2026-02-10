@@ -17,10 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.attendancemanagementsystem.common.entity.AdministratorEntity;
 import com.example.attendancemanagementsystem.common.entity.CreationLogEntity;
 import com.example.attendancemanagementsystem.common.entity.DeleteLogEntity; // ★追加
+import com.example.attendancemanagementsystem.common.entity.UpdateLogEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.AdministratorRepository;
 import com.example.attendancemanagementsystem.common.repository.CreationLogRepository;
 import com.example.attendancemanagementsystem.common.repository.DeleteLogRepository; // ★追加
+import com.example.attendancemanagementsystem.common.repository.UpdateLogRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 import com.example.attendancemanagementsystem.common.service.SearchService;
 import com.example.attendancemanagementsystem.user.superadmin.dto.SuperAdminCreateDto;
@@ -47,12 +49,15 @@ public class SuperAdminService {
     @Autowired
     private CreationLogRepository creationLogRepository;
 
-    // ★追加: 削除ログ用リポジトリ
     @Autowired
     private DeleteLogRepository deleteLogRepository;
 
     @Autowired
     private SearchService searchService;
+
+    // ★追加: 編集ログ用リポジトリ
+    @Autowired
+    private UpdateLogRepository updateLogRepository;
     
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -130,9 +135,10 @@ public class SuperAdminService {
         return dto;
     }
 
-    // --- 3. 更新メソッド ---
+    // --- 3. 更新メソッド (★ここを修正) ---
     @Transactional
     public void updateAdmin(SuperAdminDetailDto dto, Integer operatorId) {
+        // 1. 操作ユーザーの確認
         UsersEntity operator = usersRepository.findById(operatorId)
             .orElseThrow(() -> new RuntimeException("操作ユーザーが見つかりません"));
         
@@ -141,27 +147,58 @@ public class SuperAdminService {
             throw new RuntimeException("パスワードが正しくありません。");
         }
 
+        // 2. 更新対象の取得
         AdministratorEntity admin = administratorRepository.findById(dto.getUserId())
             .orElseThrow(() -> new RuntimeException("管理者が見つかりません"));
-        
         UsersEntity user = admin.getUser();
+
+        // ★変更検知用: 更新前の値を保持
+        String oldName = user.getName();
+        // DB上のAdminLevelID (1=Super, 2=Normal)
+        Integer oldLevelId = admin.getAdminLevelId(); 
+        // 画面表示上の権限値 (1=Super, 0=Normal) に変換して保持しておくと比較しやすい
+        Integer oldAuthDisplay = (oldLevelId == 1) ? 1 : 0;
+
+        // 3. 値の更新
         user.setName(dto.getName());
         
-        // ★削除: メールアドレスの更新処理を削除（またはコメントアウト）
-        /* if (dto.getEmail() != null && dto.getEmail().trim().isEmpty()) {
-            user.setEmail(null);
-        } else {
-            user.setEmail(dto.getEmail());
-        }
-        */
+        // ※Email更新処理はコメントアウトされていたためスキップ
         
-        int dbLevel = (dto.getAdminLevelID() == 1) ? 1 : 2;
-        admin.setAdminLevelId(dbLevel);
+        int newDbLevel = (dto.getAdminLevelID() == 1) ? 1 : 2;
+        admin.setAdminLevelId(newDbLevel);
 
+        // 4. 保存
         usersRepository.save(user);
         administratorRepository.save(admin);
-    }
 
+        // ★5. 変更ログの生成と保存
+        List<String> changes = new ArrayList<>();
+
+        // 名前の変更チェック
+        if (oldName != null && !oldName.equals(dto.getName())) {
+            changes.add("名前: " + oldName + " -> " + dto.getName());
+        }
+
+        // 権限の変更チェック (画面上の値 1 or 0 で比較)
+        if (!oldAuthDisplay.equals(dto.getAdminLevelID())) {
+            String oldAuthLabel = (oldAuthDisplay == 1) ? "スーパー管理者" : "一般管理者";
+            String newAuthLabel = (dto.getAdminLevelID() == 1) ? "スーパー管理者" : "一般管理者";
+            changes.add("権限: " + oldAuthLabel + " -> " + newAuthLabel);
+        }
+
+        // 変更があった場合のみログ保存
+        if (!changes.isEmpty()) {
+            // カンマ区切りで結合 (例: "名前: 田中 -> 鈴木, 権限: 一般 -> スーパー")
+            String content = String.join(", ", changes);
+            
+            UpdateLogEntity log = new UpdateLogEntity(
+                dto.getUserId(),
+                operatorId,
+                content
+            );
+            updateLogRepository.save(log);
+        }
+    }
     // --- 4. 削除メソッド (論理削除 + ログ保存) ---
     @Transactional
     public boolean deleteAdmin(Integer targetId, String password, Integer operatorId) {
