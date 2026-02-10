@@ -13,12 +13,12 @@
         <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
     </div>
     
-    <div class="backbutton-container" style="max-width: 1000px; margin: 20px auto;">
+    <div class="backbutton-container" >
         <div th:replace="~{fragments/_parts :: backButton(url='/admin/userManagement')}"></div>
     </div>
     
     <main class="main-container">
-        <h2 class="main-title">申請承認・履歴一覧</h2>
+        <h2 class="page-title">申請承認・履歴一覧</h2>
         
         <div th:if="${#lists.isEmpty(requestList)}" style="text-align: center; padding: 40px; color: #666;">
             <i class="fa-regular fa-folder-open" style="font-size: 3em; margin-bottom: 15px;"></i>
@@ -51,7 +51,7 @@
                         </span>
                     </td>
                     <td>
-                        <a th:href="@{/admin/requestList/detail/{id}(id=${req.requestId})}" class="action-btn">
+                        <a th:href="@{/admin/requestList/detail(id=${req.requestId})}" class="action-btn">
                             確認
                         </a>
                     </td>

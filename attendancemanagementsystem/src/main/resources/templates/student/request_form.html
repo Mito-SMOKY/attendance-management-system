@@ -6,8 +6,10 @@
     <title>公欠申請フォーム</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
-        <link rel="stylesheet" th:href="@{/css/student/request_form.css}">
+    <link rel="stylesheet" th:href="@{/css/student/request_form.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script th:src="@{/js/request_form.js}" defer></script>
 </head>
 
 <body>
@@ -24,7 +26,13 @@
     
         <div class="form-container">
             <form id="requestForm" method="post" th:action="@{/student/request/form}">
-            
+                <input type="hidden" name="startDate" id="hiddenStartDate">
+                <input type="hidden" name="endDate" id="hiddenEndDate">
+
+                <div th:if="${errorMessage}" class="alert alert-danger" style="color: red; text-align: center; margin-bottom: 20px;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> <span th:text="${errorMessage}"></span>
+                </div>
+
                 <table class="request-form-table">
                     <tr>
                         <th style="width: 30%;">申請先 (承認者)</th>
@@ -32,47 +40,40 @@
                             <div class="custom-select-wrapper">
                                 <select class="data-select" id="approverId" name="approverId" style="width: 100%; max-width: 300px;">
                                     <option value="" disabled selected>承認者を選択してください</option>
-                                    <option th:each="admin : ${approvers}" 
-                                        th:value="${admin.userId}" 
-                                        th:text="${admin.name}"></option> </select>
+                                    <option th:each="admin : ${admins}" 
+                                            th:value="${admin.userId}" 
+                                            th:text="${admin.name}">
+                                    </option>
+                                </select>
+                            </div>
+                            <p th:if="${#lists.isEmpty(admins)}" style="color: red; font-size: 0.9em; margin-top: 5px;">
+                                ※申請可能な管理者がいません。
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>期間</th>
+                        <td>
+                            <div class="date-select-group">
+                                <div class="date-row">
+                                    <span class="date-label">開始：</span>
+                                    <select id="startYear" class="date-select"></select> 年
+                                    <select id="startMonth" class="date-select"></select> 月
+                                    <select id="startDay" class="date-select"></select> 日
+                                </div>
+                                <div class="date-row">
+                                    <span class="date-label">終了：</span>
+                                    <select id="endYear" class="date-select"></select> 年
+                                    <select id="endMonth" class="date-select"></select> 月
+                                    <select id="endDay" class="date-select"></select> 日
+                                </div>
                             </div>
                         </td>
                     </tr>
 
                     <tr>
-                        <th>公欠申請日 (開始)</th>
-                        <td>
-                            <div class="date-selection">
-                                <select class="date-select" id="startYear" name="startYear">
-                                    <option th:each="year : ${years}" th:value="${year}" th:text="${year} + '年'"></option>
-                                </select>
-                                <select class="date-select" id="startMonth" name="startMonth">
-                                    <option th:each="m : ${#numbers.sequence(1, 12)}" th:value="${m}" th:text="${m} + '月'"></option>
-                                </select>
-                                <select class="date-select" id="startDay" name="startDay">
-                                    </select>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>公欠申請日 (終了)</th>
-                        <td>
-                            <div class="date-selection">
-                                <select class="date-select" id="endYear" name="endYear">
-                                    <option th:each="year : ${years}" th:value="${year}" th:text="${year} + '年'"></option>
-                                </select>
-                                <select class="date-select" id="endMonth" name="endMonth">
-                                    <option th:each="m : ${#numbers.sequence(1, 12)}" th:value="${m}" th:text="${m} + '月'"></option>
-                                </select>
-                                <select class="date-select" id="endDay" name="endDay">
-                                    </select>
-                            </div>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <th>時限</th>
+                        <th>対象時限</th>
                         <td>
                             <div style="margin-bottom: 5px;">
                                 <label class="checkbox-item" style="font-weight: bold;">
@@ -85,15 +86,14 @@
                                 <label class="checkbox-item"><input type="checkbox" name="periods" value="2"> 2限</label>
                                 <label class="checkbox-item"><input type="checkbox" name="periods" value="3"> 3限</label>
                                 <label class="checkbox-item"><input type="checkbox" name="periods" value="4"> 4限</label>
-                                <label class="checkbox-item"><input type="checkbox" name="periods" value="5"> 5限</label>
                             </div>
                         </td>
                     </tr>
-                    
+
                     <tr>
-                        <th>理由</th>
+                        <th>申請理由</th>
                         <td>
-                            <textarea class="reason-textarea" name="reason" placeholder="理由を入力してください（例：会社説明会のため）"></textarea>
+                            <textarea class="reason-textarea" name="reason" id="reasonText" placeholder="理由を入力してください（例：会社説明会のため）" required></textarea>
                         </td>
                     </tr>
                 </table>
@@ -120,12 +120,10 @@
             </div>
             <div class="modal-actions">
                 <button type="button" id="modalCancelBtn" class="cancel-btn">修正する</button>
-                <button type="button" id="modalSubmitBtn" class="confirm-btn">確定する</button>
+                <button type="button" id="modalSubmitBtn" class="confirm-btn">申請する</button>
             </div>
         </div>
     </div>
-
-    <script th:src="@{/js/request_form.js}"></script>
 
 </body>
 </html>

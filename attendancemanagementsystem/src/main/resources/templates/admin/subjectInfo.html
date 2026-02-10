@@ -28,7 +28,7 @@
 
     <div class="main-container">
         
-        <h2 class="page-title"> 教科情報</h2>
+      <div th:replace="~{fragments/_parts :: page-title-part('教科情報')}"></div>
 
       <div class="control-bar">
         <div class="left-controls">
@@ -83,10 +83,6 @@
                 <th>担当教員</th>
                 <td th:text="${info.teacherName}"></td>
               </tr>
-              <!-- <tr>
-                            <th>コマ数</th>
-                            <td th:text="${info.credits} + 'コマ'"></td>
-                        </tr> -->
               <tr>
                 <th>曜日</th>
                 <td th:text="${info.schedule}"></td>

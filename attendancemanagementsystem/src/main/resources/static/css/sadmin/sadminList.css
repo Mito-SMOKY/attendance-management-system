@@ -1,10 +1,17 @@
 @charset "UTF-8";
 
-/* =========================================
-   基本設定
-   ========================================= */
-/* parts.css の .main-container を使用するため、
-   レイアウト関連の独自設定は削除しています */
+/* --- 基本設定 --- */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* ヘッダー位置の調整（必要に応じて） */
+.header-container {
+  width: 100%;
+  margin-bottom: 60px; /* ヘッダー下の余白 */
+  padding-top: 80px;
+}
 
 /* =========================================
    検索・アクションエリア
@@ -13,9 +20,19 @@
   display: flex;
   justify-content: space-between; /* 左右に配置 */
   align-items: center;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 15px;
+  height: 50px;
+  margin-bottom: 30px;
+}
+
+.page-title {
+    text-align: center;
+    border-bottom:2px solid #00bdca;
+    padding-bottom: 10px;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
+    letter-spacing: 2px;
 }
 
 /* 左側の検索グループ */
@@ -104,15 +121,9 @@
    テーブルエリア (修正箇所)
    ========================================= */
 .table-area {
-  width: 100%;
-  margin-bottom: 30px;
-  background-color: #fff;
-  
-  /* 角丸・影の設定 (枠線削除) */
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  overflow: hidden; /* 角丸適用のため */
+  width: 100%; /* 親のmain-wrapper(800px)に合わせる */
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .admin-table {

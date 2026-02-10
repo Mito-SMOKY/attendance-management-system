@@ -10,11 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const searchBtn = document.getElementById('searchBtn');
     
-    // pageModeの取得 (存在しない場合はデフォルト値を設定)
     const pageModeElem = document.getElementById('pageMode');
     const pageMode = pageModeElem ? pageModeElem.value : 'select';
     
-    // 追加要素（全選択チェックボックス、件数表示、決定ボタン）
     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
     const selectionCountLabel = document.getElementById('selectionCount');
     const submitBtn = document.getElementById('submitSelectionBtn');
@@ -23,10 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPage = 0;
     let currentKeyword = '';
     
-    // 選択されたIDを保持するSet
     const selectedIds = new Set();
-    
-    // 現在のページに表示されている「選択可能な」IDのリスト（一括選択用）
     let currentPageAvailableStudentIds = [];
 
     // --- 初期表示 ---
@@ -45,12 +40,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 「全選択」チェックボックスのイベント
     if (selectAllCheckbox) {
         selectAllCheckbox.addEventListener('change', function() {
             const isChecked = this.checked;
             
-            // 現在表示されている「選択可能な」生徒IDに対して処理
             currentPageAvailableStudentIds.forEach(id => {
                 if (isChecked) {
                     selectedIds.add(id);
@@ -59,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
     
-            // 画面上の個別チェックボックスも連動させる（disabledなものは除外）
             const checkboxes = document.querySelectorAll('.student-checkbox:not(:disabled)');
             checkboxes.forEach(cb => cb.checked = isChecked);
     
@@ -67,15 +59,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 決定ボタンのイベント
     if (submitBtn) {
         submitBtn.addEventListener('click', function() {
             if (selectedIds.size === 0) return;
             
             const idArray = Array.from(selectedIds);
+            
+            // ★NaNチェック: もしIDが取れていない場合はアラートを出す
+            if (idArray.some(id => isNaN(id))) {
+                alert('エラー: 一部の生徒IDが正しく取得できませんでした。画面を更新して再度お試しください。');
+                return;
+            }
+
             let url = '';
-    
-            // ★重要: モードごとの遷移先URLを振り分け
             if (pageMode === 'delete') {
                 url = `/admin/request/delete/confirm?ids=${idArray.join(',')}`;
             } else if (pageMode === 'status') {
@@ -83,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (pageMode === 'course') {
                 url = `/admin/request/department/confirm?ids=${idArray.join(',')}`;
             } else {
-                // デフォルト（拡張用）
                 url = `/admin/request/confirm?mode=${pageMode}&ids=${idArray.join(',')}`;
             }
     
@@ -100,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
         currentPage = 0;
         selectedIds.clear(); 
         updateSelectionUI();
-        
         fetchData(0);
     }
 
@@ -122,14 +116,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const totalPages = data.totalPages || 0;
                 const pageNum = typeof data.number !== 'undefined' ? data.number : page;
 
-                // 現在のページのIDリストを更新（申請中は除外）
+                // サーバー側で "userId" に統一したため、ここで正しくIDが取れるようになります
                 currentPageAvailableStudentIds = list
-                    .filter(s => !s.isPending) // 申請中は除外
+                    .filter(s => !s.isPending)
                     .map(s => s.userId);
 
                 renderTable(list);
                 renderPagination(pageNum, totalPages);
-                
                 updateMasterCheckboxState();
             })
             .catch(error => {
@@ -142,7 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderTable(list) {
         if (!tableBody) return;
-        
         tableBody.innerHTML = '';
 
         if (list.length === 0) {
@@ -161,37 +153,31 @@ document.addEventListener('DOMContentLoaded', function() {
         list.forEach(student => {
             const row = document.createElement('tr');
             
-            const userId = student.userId;
+            // ★サーバー修正により student.userId が確実に値を持つようになります
+            const userId = student.userId; 
+            
             const loginId = escapeHtml(student.loginId);
             const dept = escapeHtml(student.department);
             const grade = escapeHtml(student.grade);
             const cls = escapeHtml(student.classroom);
             const name = escapeHtml(student.name);
-            const status = escapeHtml(student.status);
+            const status = escapeHtml(student.status); // サーバー修正により値が入ります
             
-            // 申請中フラグ
             const isPending = student.isPending === true;
-
             const isChecked = selectedIds.has(userId) ? 'checked' : '';
-            const isDisabled = isPending ? 'disabled' : '';
-            // 申請中は背景色を変えてわかりやすく
+            
+            // 申請中は行をグレーアウト
             const rowClass = isPending ? 'style="background-color: #f9f9f9; color: #999;"' : '';
 
-            // 状態欄の表示作成
             let checkboxCellContent;
-
             if (isPending) {
-                // 申請中の場合は「申請中」という文字を表示（チェックボックスなし）
                 checkboxCellContent = '<span style="color: #ff4d4f; font-weight: bold; font-size: 0.85rem;">申請中</span>';
             } else {
-                // 通常の場合はチェックボックスを表示
                 checkboxCellContent = `<input type="checkbox" class="student-checkbox" value="${userId}" ${isChecked}>`;
             }
 
             row.innerHTML = `
-                <td ${rowClass}>
-                    ${checkboxCellContent}
-                </td>
+                <td ${rowClass}>${checkboxCellContent}</td>
                 <td ${rowClass}>${status}</td>
                 <td ${rowClass}>${loginId}</td>
                 <td ${rowClass}>${dept}</td>
@@ -202,7 +188,6 @@ document.addEventListener('DOMContentLoaded', function() {
             tableBody.appendChild(row);
         });
 
-        // 個別のチェックボックスにイベントを設定
         const checkboxes = document.querySelectorAll('.student-checkbox');
         checkboxes.forEach(cb => {
             if (!cb.disabled) {
@@ -220,10 +205,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // UI更新（件数表示、ボタン活性化）
     function updateSelectionUI() {
         if (!selectionCountLabel || !submitBtn) return;
-
         const count = selectedIds.size;
         selectionCountLabel.textContent = `${count}件選択中`;
         
@@ -236,27 +219,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 「全選択」チェックボックスの状態更新
     function updateMasterCheckboxState() {
         if (!selectAllCheckbox) return;
-
         if (currentPageAvailableStudentIds.length === 0) {
             selectAllCheckbox.checked = false;
             selectAllCheckbox.disabled = true;
             return;
         }
-        
         selectAllCheckbox.disabled = false;
-        
-        // 全ての「選択可能な」生徒が選択されているかチェック
         const allSelected = currentPageAvailableStudentIds.every(id => selectedIds.has(id));
         selectAllCheckbox.checked = allSelected;
     }
 
-    // --- ページネーション ---
     function renderPagination(current, total) {
         if (!paginationContainer) return;
-        
         paginationContainer.innerHTML = '';
         if (total <= 1) return;
 
@@ -296,7 +272,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return a;
     }
 
-    // 文字列エスケープ処理
     function escapeHtml(str) {
         if (str == null) return '';
         return String(str)

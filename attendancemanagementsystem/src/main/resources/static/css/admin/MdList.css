@@ -16,6 +16,7 @@
     flex-wrap: wrap;
     gap: 40px; 
     width: 100%;
+    padding: 20px;
 }
 
 .ghost-button {
@@ -35,12 +36,12 @@
     letter-spacing: 0.05em;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* アイコン */
 .ghost-button i {
-    font-size: 50px;
+    font-size: 50px; /* バランスを見てサイズ調整 */
     margin-bottom: 20px;
     transition: transform 0.3s ease;
 }

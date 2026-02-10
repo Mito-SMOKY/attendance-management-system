@@ -8,12 +8,12 @@
 }
 
 body {
-    overflow-x: hidden;
-    width: 100%;
+    /* 他の画面と合わせるための設定 */
+    padding-top: 100px;
+    background-color: white;
     margin: 0;
     padding: 0; 
     font-size: 16px;
-    background-color: #fff;
     color: #333;
     text-align: center; 
     padding-top: 120px; 
@@ -23,28 +23,18 @@ body {
 /* =========================================
    共通コンテナ幅制御
    ========================================= */
-h1, h3, .info-box, table, .success-message, .btn-container-bottom {
-    width: 90%;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+.main-container {
+    width: 100%;
+    max-width: 900px; /* テーブルが見やすいよう少し広めに設定 */
+    margin: 0 auto;
+    padding: 0 20px 50px 20px;
 }
 
-/* =========================================
-   ページタイトル (h1)
-   ========================================= */
-h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
-    margin-top: 0;
-    margin-bottom: 40px;
-    
-    /* 下線デザイン */
-    display: inline-block;        
-    border-bottom: 3px solid #00bdca;
-    padding-bottom: 5px;  
+/* ★タイトルの微調整（他の画面同様、少し右にずらす場合） */
+.page-title {
+    margin-left: 10px;
 }
+
 
 /* =========================================
    メッセージエリア
@@ -56,7 +46,6 @@ h1 {
     padding: 15px;
     margin-bottom: 30px;
     border-radius: 8px;
-    text-align: left; /* テキストは左寄せ */
     display: flex;
     align-items: center;
     gap: 10px;
@@ -72,19 +61,8 @@ h1 {
     text-align: left;
 }
 
-/* 情報テキストの段落調整 */
-.info-box p {
-    margin: 8px 0;
-    font-size: 1rem;
-    color: #555;
-    line-height: 1.5;
-}
-
-.info-box strong {
-    color: #333;
-    margin-right: 10px;
-    min-width: 80px;
-    display: inline-block;
+.info-box-inner {
+    width: 100%;
 }
 
 /* =========================================
@@ -96,7 +74,7 @@ h3 {
     color: #333;
     margin-bottom: 15px;
     padding-left: 10px;
-    border-left: 5px solid #00bdca; /* 左にアクセント */
+    border-left: 5px solid #00bdca;
 }
 
 /* =========================================
@@ -107,6 +85,7 @@ table {
     border-collapse: collapse;
     margin-bottom: 40px;
     background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* 少し影を追加 */
 }
 
 th, td {
@@ -115,22 +94,19 @@ th, td {
     font-size: 0.95rem;
 }
 
-/* ヘッダー */
 th {
-    background-color: #00bdca; /* テーマカラー */
+    background-color: #00bdca;
     color: #fff;
     font-weight: normal;
     text-align: center;
     white-space: nowrap;
 }
 
-/* データセル */
 td {
     color: #333;
-    text-align: center; /* 基本中央揃え */
+    text-align: center;
 }
 
-/* 偶数行の背景 */
 tr:nth-child(even) {
     background-color: #f9f9f9;
 }
@@ -138,8 +114,6 @@ tr:nth-child(even) {
 /* =========================================
    ボタンデザイン
    ========================================= */
-
-/* 基本ボタン（TOPに戻るなど） */
 .btn {
     display: inline-block;
     padding: 10px 30px;
@@ -149,8 +123,6 @@ tr:nth-child(even) {
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    
-    /* 白背景・水色枠 */
     background-color: #fff;
     color: #00bdca;
     border: 2px solid #00bdca;
@@ -163,14 +135,9 @@ tr:nth-child(even) {
 
 /* ダウンロードボタン（強調） */
 .btn-download {
-    /* HTMLに style="display: flex" があるため、親要素の影響を受けますが
-       ボタン自体のスタイルをここで上書きします */
-    
-    background-color: #00bdca !important; /* 強制適用 */
+    background-color: #00bdca !important;
     color: #fff !important;
     border: none !important;
-    margin-left: 0;
-    
     box-shadow: 0 4px 6px rgba(0, 189, 202, 0.2);
     display: inline-flex;
     align-items: center;
@@ -183,7 +150,6 @@ tr:nth-child(even) {
     box-shadow: 0 6px 8px rgba(0, 189, 202, 0.3);
 }
 
-/* アイコンと文字の間隔調整 */
 .btn-download i {
     font-size: 1.1rem;
 }

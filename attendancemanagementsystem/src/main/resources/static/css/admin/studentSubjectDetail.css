@@ -1,67 +1,33 @@
 @charset "UTF-8";
 
 /* =========================================
-   基本設定
+   基本設定・ヘッダー被り防止
    ========================================= */
 body {
-    margin: 0;
-    font-size: 16px;
-    color: #333;
-    background-color: #f9fbfd; /* 背景色（任意） */
+    /* ★修正: 90pxから10px下げて 100px にしました */
+    padding-top: 100px;
+    
+    /* ★修正: 背景色を白に変更しました */
+    background-color: white;
 }
 
 /* =========================================
-   レイアウト調整（ヘッダー被り回避）
+   メインコンテナ
    ========================================= */
-/* ★重要: 戻るボタンのエリアに上部余白を追加して、コンテンツ全体を押し下げます */
-.backbutton-container {
-    margin-top: 110px; /* 固定ヘッダーの高さ分 */
-    margin-left: 20px;
-    margin-bottom: 10px;
-}
-
-.back-btn {
-    text-decoration: none;
-    color: #555;
-    font-weight: bold;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    transition: color 0.3s;
-}
-.back-btn:hover {
-    color: #00bdca;
-}
-
-/* コンテナ全体 */
 .main-container {
+    width: 100%;
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 0 auto; /* 中央揃え */
+    
+    /* コンテンツ周りの余白 */
     padding: 0 20px 50px 20px;
 }
 
-/* 生徒名表示 (カード化) */
-.student-name-display {
-    text-align: left;
-    margin-bottom: 20px;
-    padding: 15px 20px;
-    background-color: white;
-    
-    /* デザイン: 左線・角丸・影 */
-    border-left: 6px solid #00bdca;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    
-    font-size: 1.2rem;
-    color: #333;
-}
-.student-name-display span {
-    font-weight: bold;
-    font-size: 1.4rem;
-}
-
 /* =========================================
-   左右カラムレイアウト
+   レイアウト調整
+   ========================================= */
+/* =========================================
+   左右カラムレイアウト (コンテンツの中身)
    ========================================= */
 .content-wrapper {
     display: flex;
@@ -70,25 +36,39 @@ body {
     flex-wrap: wrap;
 }
 
-/* --- 左パネル（教科情報） --- */
+/* --- 左パネル（生徒名・教科情報） --- */
 .left-panel {
-    flex: 0 0 320px; /* 幅固定 */
+    flex: 0 0 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-/* 教科情報テーブル (カード化・枠なし) */
+/* 生徒名表示 */
+.student-name-display {
+    padding: 15px 20px;
+    background-color: white;
+    border-left: 6px solid #00bdca;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 1.2rem;
+    color: #333;
+}
+.student-name-display span {
+    font-weight: bold;
+    font-size: 1.4rem;
+}
+
+/* 教科情報テーブル */
 .info-table {
     width: 100%;
     background-color: #fff;
-    
-    /* デザイン変更 */
-    border: none;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    overflow: hidden; /* 角丸用 */
+    overflow: hidden;
     border-collapse: separate; 
     border-spacing: 0;
 }
-
 .info-table th {
     background-color: #00bdca;
     color: white;
@@ -96,47 +76,37 @@ body {
     text-align: left;
     width: 35%;
     font-weight: normal;
-    border: none;
 }
-
 .info-table td {
     padding: 15px;
     text-align: left;
     color: #444;
     font-weight: bold;
-    border: none;
-    border-bottom: 1px solid #f0f0f0; /* 薄い下線のみ */
+    border-bottom: 1px solid #f0f0f0;
 }
-/* 最終行の下線を消す */
 .info-table tr:last-child td {
     border-bottom: none;
 }
-
 .info-table .subject-name a {
-    color: #00bdca !important;
+    color: #00bdca;
     font-weight: 900;
+    text-decoration: none;
 }
 
-.rate-highlight {
-    color: #d9534f;
-    font-size: 1.2rem;
-}
-
-
-/* --- 右パネル（集計・明細） --- */
+/* --- 右パネル（ボタン・集計・明細） --- */
 .right-panel {
     flex: 1;
     min-width: 600px;
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 15px;
 }
 
 /* ボタン群 */
 .button-group {
     text-align: right;
+    margin-bottom: 5px;
 }
-
 .edit-btn, .save-btn, .cancel-btn {
     height: 40px;
     padding: 0 30px;
@@ -144,7 +114,6 @@ body {
     font-size: 1rem;
     cursor: pointer;
     font-weight: bold;
-    transition: all 0.3s;
     border: none;
 }
 .edit-btn {
@@ -161,69 +130,49 @@ body {
 .cancel-btn:hover { background-color: #c94450; }
 
 
-/* 集計テーブル (カード化・枠なし) */
-.summary-area {
-    width: 100%;
-}
-
+/* 集計テーブル */
+.summary-area { width: 100%; }
 .summary-table {
     width: 100%;
     background-color: white;
-    
-    /* デザイン変更 */
-    border: none;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     overflow: hidden;
     border-collapse: separate;
     border-spacing: 0;
 }
-
 .summary-table th {
     background-color: #00bdca;
     color: white;
     padding: 12px;
-    font-size: 0.95rem;
-    text-align: center;
     font-weight: normal;
-    border: none;
+    text-align: center;
 }
-
 .summary-table td {
     padding: 15px;
     text-align: center;
     font-weight: bold;
     font-size: 1.2rem;
     color: #333;
-    border: none;
     border-bottom: 1px solid #f0f0f0;
 }
 .summary-table tr:last-child td {
     border-bottom: none;
 }
 
-
-/* 明細テーブルエリア (カード化) */
+/* 明細テーブル */
 .detail-table-wrapper {
     background-color: #fff;
-    
-    /* デザイン変更 */
-    border: none;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    overflow: hidden; /* 角丸用 */
-    
+    overflow: hidden;
     max-height: 600px;
     overflow-y: auto;
 }
-
 .schedule-table {
     width: 100%;
     border-collapse: collapse;
-    border-spacing: 0;
 }
-
-/* ヘッダー固定 */
 .schedule-table thead th {
     position: sticky;
     top: 0;
@@ -233,31 +182,24 @@ body {
     padding: 15px;
     text-align: center;
     font-weight: normal;
-    border: none;
 }
-
 .schedule-table td {
     padding: 12px;
     text-align: center;
-    color: #333;
-    font-weight: 500;
-    border: none;
     border-bottom: 1px solid #f0f0f0;
+    color: #333;
 }
 .schedule-table tbody tr:hover {
     background-color: #f9fbfd;
 }
 
-/* 編集用プルダウン */
+/* ステータス色・編集パーツ */
 .status-select {
     padding: 4px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 0.95rem;
     cursor: pointer;
 }
-
-/* ステータス色 */
 .status-present { color: #28a745 !important; font-weight: bold; font-size: 1.2em; }
 .status-absence { color: #dc3545 !important; font-weight: bold; font-size: 1.2em; }
 .status-late    { color: #ffc107 !important; font-weight: bold; font-size: 1.2em; }
