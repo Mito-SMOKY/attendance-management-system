@@ -25,7 +25,7 @@
     
     <div class="info-container">
         
-        <h1 class="page-title">授業情報</h1>
+        <div th:replace="~{fragments/_parts :: page-title-part('授業情報')}"></div>
         
         <input type="hidden" id="sessionId" th:value="${classInfo.sessionId}">
 
