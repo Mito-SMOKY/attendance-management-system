@@ -79,6 +79,9 @@ public class RequestListController {
             String msg = isApproved ? "承認しました。" : "却下しました。";
             return ResponseEntity.ok(msg);
             
+        } catch (IllegalArgumentException e) {
+            // Serviceから投げられた具体的なメッセージを返す
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("処理に失敗しました。");
