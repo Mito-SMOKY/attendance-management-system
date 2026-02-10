@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import com.example.attendancemanagementsystem.common.entity.RequestEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.RequestRepository;
@@ -39,6 +38,7 @@ public class RequestController {
     public String showRequestMenu() {
         return "admin/request/requestMain";
     }
+    
 
     /**
      * 生徒選択画面表示

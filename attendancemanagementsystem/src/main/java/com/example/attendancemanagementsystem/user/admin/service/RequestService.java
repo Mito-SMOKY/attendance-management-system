@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
 import com.example.attendancemanagementsystem.common.entity.AttendanceStatusEntity;
+import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
 import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
 import com.example.attendancemanagementsystem.common.entity.RequestDetailEntity;
 import com.example.attendancemanagementsystem.common.entity.RequestEntity;
@@ -22,6 +23,7 @@ import com.example.attendancemanagementsystem.common.entity.SessionEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.repository.AttendanceRepository;
 import com.example.attendancemanagementsystem.common.repository.AttendanceStatusRepository;
+import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
 import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository;
 import com.example.attendancemanagementsystem.common.repository.RequestRepository;
 import com.example.attendancemanagementsystem.common.repository.SessionRepository;
@@ -48,6 +50,10 @@ public class RequestService {
 
     @Autowired
     private AttendanceStatusRepository attendanceStatusRepository;
+    
+    @Autowired
+    private DepartmentRepository departmentRepository;
+    
 
     /**
      * ▼▼▼ 生徒選択画面用の検索メソッド ▼▼▼
@@ -55,7 +61,6 @@ public class RequestService {
     public Page<Map<String, Object>> searchStudentsForSelection(String mode, String keyword, Pageable pageable) {
         List<StudentEntity> allStudents = studentRepository.findAll();
         
-        // 1. キーワード検索
         List<StudentEntity> filteredStudents = allStudents;
         if (keyword != null && !keyword.isEmpty()) {
             filteredStudents = allStudents.stream()
@@ -63,9 +68,7 @@ public class RequestService {
                 .collect(Collectors.toList());
         }
 
-        // 2. モードによるフィルタリング (ここを追加)
         if ("delete".equals(mode)) {
-            // 削除モードの場合: 退学(2), 卒業(4), 除籍(5) の生徒のみ表示
             filteredStudents = filteredStudents.stream()
                 .filter(s -> {
                     Integer sid = s.getStudentStatusId();
@@ -74,7 +77,6 @@ public class RequestService {
                 .collect(Collectors.toList());
         }
 
-        // 3. ページネーション
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), filteredStudents.size());
         List<StudentEntity> pagedList = new ArrayList<>();
@@ -82,7 +84,6 @@ public class RequestService {
             pagedList = filteredStudents.subList(start, end);
         }
 
-        // 4. 表示用データの作成
         List<Map<String, Object>> content = pagedList.stream().map(student -> {
             Map<String, Object> map = new HashMap<>();
             
@@ -90,7 +91,6 @@ public class RequestService {
             map.put("name", student.getUser().getName());
             map.put("loginId", student.getUser().getLoginId());
             
-            // ステータス名のマッピング (いただいたデータに基づいて修正)
             Integer statusId = student.getStudentStatusId();
             String statusName = "-";
             if (statusId != null) {
@@ -128,7 +128,7 @@ public class RequestService {
     }
 
     /**
-     * 承認処理 (公欠のみ対応)
+     * 承認処理
      */
     public void approveRequest(Integer requestId, Integer approverId) {
         RequestEntity request = requestRepository.findById(requestId)
@@ -138,9 +138,23 @@ public class RequestService {
             throw new IllegalArgumentException("この申請は既に処理されています。");
         }
 
-        // 公欠(Type 1)のみ処理
-        if (request.getRequestTypeId() == 1) {
-            processPublicAbsence(request);
+        // 申請種別に応じた処理を実行
+        Integer typeId = request.getRequestTypeId();
+        if (typeId != null) {
+            switch (typeId) {
+                case 1: // 公欠申請
+                    processPublicAbsence(request);
+                    break;
+                case 3: // ステータス変更申請
+                    processStatusChange(request);
+                    break;
+                case 4: // 学科コース変更申請
+                    processDepartmentChange(request);
+                    break;
+                default:
+                    // その他の申請（アカウント削除など）は現状ステータス更新のみ
+                    break;
+            }
         }
 
         request.setStatus(2);
@@ -148,6 +162,9 @@ public class RequestService {
         requestRepository.save(request);
     }
 
+    /**
+     * 公欠申請の処理
+     */
     private void processPublicAbsence(RequestEntity request) {
         Integer studentId = request.getRequesterUserId();
         StudentEntity student = studentRepository.findById(studentId)
@@ -167,7 +184,7 @@ public class RequestService {
 
         List<RequestDetailEntity> details = request.getRequestDetails();
         if (details == null || details.isEmpty()) {
-            throw new IllegalStateException("申請の詳細情報（日付・時限）がありません。");
+             throw new IllegalArgumentException("申請の詳細情報（日付・時限）がありません。");
         }
 
         for (RequestDetailEntity detail : details) {
@@ -177,18 +194,75 @@ public class RequestService {
                 deptId,
                 grade
             ).orElseThrow(() -> new IllegalArgumentException(
-                "承認エラー: 指定された日時（" + detail.getTargetDate() + " / " + detail.getSlotId() + "限）の授業データがまだ確定していない、または存在しないため承認できません。"
+                "授業がまだ実施されていません (日付: " + detail.getTargetDate() + ", " + detail.getSlotId() + "限)。実施後に承認してください。"
             ));
 
             AttendanceEntity attendance = attendanceRepository.findBySessionIdAndUserId(
                 session.getSessionId(), 
                 studentId
-            ).orElseThrow(() -> new IllegalArgumentException(
-                "承認エラー: 授業データは確定されていますが、対象学生の出席記録が存在しません。"
-            ));
+            ).orElse(null);
 
-            attendance.setStatusId(publicAbsenceStatus);
-            attendanceRepository.save(attendance);
+            if (attendance != null) {
+                attendance.setStatusId(publicAbsenceStatus);
+                attendanceRepository.save(attendance);
+            } else {
+                throw new IllegalArgumentException(
+                    "対象授業の出席データが見つかりません (日付: " + detail.getTargetDate() + ")。出席簿が作成されているか確認してください。"
+                );
+            }
         }
+    }
+
+    /**
+     * 学科・コース変更申請の処理 (Type 4)
+     */
+    private void processDepartmentChange(RequestEntity request) {
+        Integer targetDeptId = request.getTargetDepartmentId();
+        if (targetDeptId == null) {
+            throw new IllegalArgumentException("変更後の学科IDが指定されていません。");
+        }
+
+        // 変更後の学科存在チェック
+        DepartmentEntity newDept = departmentRepository.findById(targetDeptId)
+            .orElseThrow(() -> new IllegalArgumentException("指定された学科ID (" + targetDeptId + ") が見つかりません。"));
+
+        Integer studentId = request.getRequesterUserId();
+        StudentEntity student = studentRepository.findById(studentId)
+            .orElseThrow(() -> new IllegalArgumentException("生徒情報が見つかりません (ID: " + studentId + ")"));
+
+        // 現在の所属情報を取得して更新
+        List<EnrollmentsEntity> enrollments = enrollmentsRepository.findByStudent(student);
+        if (enrollments.isEmpty()) {
+            throw new IllegalArgumentException("生徒の在籍情報(Enrollments)が存在しないため更新できません。");
+        }
+
+        // 最新の所属（または全て）を更新する運用と仮定
+        // 通常は IsActive=true のレコードが1つあるはず
+        EnrollmentsEntity activeEnrollment = enrollments.get(0);
+        
+        // 学科を更新
+        activeEnrollment.setDepartment(newDept);
+        enrollmentsRepository.save(activeEnrollment);
+    }
+
+    /**
+     * ステータス変更申請の処理 (Type 3)
+     */
+    private void processStatusChange(RequestEntity request) {
+        Integer targetStatusId = request.getTargetStatusId();
+        if (targetStatusId == null) {
+            throw new IllegalArgumentException("変更後のステータスIDが指定されていません。");
+        }
+
+        // マスタ存在チェック（任意）
+        // studentStatusRepository.findById(targetStatusId)...
+
+        Integer studentId = request.getRequesterUserId();
+        StudentEntity student = studentRepository.findById(studentId)
+            .orElseThrow(() -> new IllegalArgumentException("生徒情報が見つかりません (ID: " + studentId + ")"));
+
+        // 生徒のステータスを更新
+        student.setStudentStatusId(targetStatusId);
+        studentRepository.save(student);
     }
 }

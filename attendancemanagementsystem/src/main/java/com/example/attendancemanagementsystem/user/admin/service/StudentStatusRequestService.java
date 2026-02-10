@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -222,5 +223,22 @@ public class StudentStatusRequestService {
             student.setStudentStatusId(targetStatusId);
         }
         studentRepository.saveAll(students);
+
+        RequestEntity history = new RequestEntity();
+        history.setRequestTypeId(TYPE_CHANGE_STATUS);
+        history.setRequesterUserId(user.getUserId());
+        history.setTargetStatusId(targetStatusId);
+        history.setStatus(2); 
+
+        String remarks = (String) requestData.get("remarks");
+        history.setRequestMessage(remarks != null ? remarks : "上位管理者による即時変更");
+
+        // 対象ユーザーをRequestTargetUserに登録
+        List<UsersEntity> targetUsers = students.stream()
+                .map(StudentEntity::getUser)
+                .collect(Collectors.toList());
+        history.setTargetUsers(targetUsers);
+
+        requestRepository.save(history);
     }
 }
