@@ -14,6 +14,7 @@
     />
   </head>
   <body>
+
     <div class="header-container">
       <div th:if="${#authorization.expr('hasRole(''ADMIN'')')}">
         <div th:replace="~{fragments/_parts :: admin-header}"></div>
@@ -31,37 +32,14 @@
     
       <div th:replace="~{fragments/_parts :: page-title-part('仮アカウント一覧')}"></div>
 
-      <div th:if="${successMessage}" class="success-message">
-        <i class="fas fa-check-circle"></i>
-        <span th:text="${successMessage}"></span>
-      </div>
-
-      <div class="info-box">
-        <div
-          style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          "
-        >
-          <div class="info-box-inner">
-             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <div></div>
-                <div>
-                  <a
-                    th:href="@{/admin/downloadPdf/{id}(id=${datalist.dataListId})}"
-                    class="btn btn-download"
-                  >
-                    <i class="fas fa-file-pdf"></i> PDFダウンロード
-                  </a>
-                  <br />
-                  <span style="font-size: 0.8em; color: red"
-                    >※登録直後のみ平文パスワードで出力されます</span
-                  >
-                </div>
-             </div>
-          </div>
-        </div>
+    <div class="info-box">
+      <div>
+        <a th:href="@{/admin/downloadPdf/{id}(id=${datalist.dataListId})}" class="btn btn-download" >
+          <i class="fas fa-file-pdf"></i> PDFダウンロード
+        </a>
+        <br />
+        <span style="font-size: 0.8em; color: red">
+          ※登録直後のみ平文パスワードで出力されます</span>
       </div>
 
       <h3>登録アカウント一覧（保存履歴）</h3>

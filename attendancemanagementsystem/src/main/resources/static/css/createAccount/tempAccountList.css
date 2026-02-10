@@ -12,13 +12,16 @@ body {
     padding-top: 100px;
     background-color: white;
     margin: 0;
+    padding: 0; 
     font-size: 16px;
     color: #333;
+    text-align: center; 
+    padding-top: 120px; 
+    padding-bottom: 50px;
 }
 
 /* =========================================
-   メインコンテナ
-   他画面と同様に、ここで幅や中央揃えを制御します
+   共通コンテナ幅制御
    ========================================= */
 .main-container {
     width: 100%;
@@ -53,11 +56,9 @@ body {
    ========================================= */
 .info-box {
     background-color: #fff;
-    padding: 20px 30px;
     border-radius: 8px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    border: 1px solid #eee;
+    margin-bottom: 50px;
+    text-align: left;
 }
 
 .info-box-inner {

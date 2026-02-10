@@ -6,20 +6,16 @@ body {
 }
 
 .container {
+    margin: 150px auto;
     max-width: none; 
-    width: 90%; 
-    margin: 50px auto; 
+    width: 90%;
     padding: 30px;
     background-color: #fff;
     border-radius: 8px; 
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
     min-height: 80vh;
 }
 
 /* 戻るボタンエリア */
-.header-nav {
-    margin-bottom: 20px;
-}
 
 .back-btn {
     background-color: #fff;
@@ -31,7 +27,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #58aab8;
+    color: #00bdca;
     font-weight: bold;
     transition: background-color 0.2s;
 }
@@ -68,7 +64,7 @@ body {
 }
 
 .date-select:focus {
-    outline: 2px solid #58aab8;
+    outline: 2px solid #00bdca;
 }
 
 /* カスタム矢印アイコン */
@@ -101,7 +97,7 @@ body {
 
 /* ヘッダー行 */
 .detail-table thead th {
-    background-color: #58aab8; 
+    background-color: #00bdca; 
     color: #fff;
     font-weight: normal;
     padding: 12px;
@@ -167,7 +163,7 @@ body {
     display: inline-block;
     width: 22px;
     height: 22px;
-    background-color: #58aab8;
+    background-color: #00bdca;
     color: #fff;
     border-radius: 50%;
     text-align: center;

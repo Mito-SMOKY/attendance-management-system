@@ -12,7 +12,6 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
-    font-size: 16px; 
     color: #333;
 }
 
@@ -27,16 +26,13 @@ body {
    レイアウトコンテナ
    ========================================= */
 .info-container {
-    width: 80%;
+    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding-top: 120px; 
+    margin-top: 100px; 
     padding-bottom: 50px;
     position: relative;
 }
-
-/* ★修正: .page-title の記述をすべて削除しました */
-
 
 /* =========================================
    コントロールエリア (ボタン群)
@@ -110,6 +106,10 @@ button {
     overflow: hidden;
     min-width: 150px; 
     box-shadow: none;
+}
+
+.session-info-card{
+    width: 400px;
 }
 
 /* 左側の青いラベル部分（縦書き） */

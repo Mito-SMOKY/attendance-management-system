@@ -37,8 +37,8 @@
                     <tr>
                         <th style="width: 30%;">申請先 (承認者)</th>
                         <td>
-                            <div class="select-wrapper">
-                                <select name="approverId" id="approverSelect" class="standard-select" required>
+                            <div class="custom-select-wrapper">
+                                <select class="data-select" id="approverId" name="approverId" style="width: 100%; max-width: 300px;">
                                     <option value="" disabled selected>承認者を選択してください</option>
                                     <option th:each="admin : ${admins}" 
                                             th:value="${admin.userId}" 
@@ -75,11 +75,17 @@
                     <tr>
                         <th>対象時限</th>
                         <td>
-                            <div class="checkbox-group">
-                                <label class="checkbox-item"><input type="checkbox" name="periods" value="1"> <span>1限</span></label>
-                                <label class="checkbox-item"><input type="checkbox" name="periods" value="2"> <span>2限</span></label>
-                                <label class="checkbox-item"><input type="checkbox" name="periods" value="3"> <span>3限</span></label>
-                                <label class="checkbox-item"><input type="checkbox" name="periods" value="4"> <span>4限</span></label>
+                            <div style="margin-bottom: 5px;">
+                                <label class="checkbox-item" style="font-weight: bold;">
+                                    <input class="checkbox" type="checkbox" id="selectAllPeriods"> 全選択
+                                </label>
+                            </div>
+                            
+                            <div class="time-checkboxes">
+                                <label class="checkbox-item"><input type="checkbox" name="periods" value="1"> 1限</label>
+                                <label class="checkbox-item"><input type="checkbox" name="periods" value="2"> 2限</label>
+                                <label class="checkbox-item"><input type="checkbox" name="periods" value="3"> 3限</label>
+                                <label class="checkbox-item"><input type="checkbox" name="periods" value="4"> 4限</label>
                             </div>
                         </td>
                     </tr>
