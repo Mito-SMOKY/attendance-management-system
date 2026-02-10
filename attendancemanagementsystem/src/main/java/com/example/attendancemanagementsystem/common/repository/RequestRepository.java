@@ -1,7 +1,7 @@
 package com.example.attendancemanagementsystem.common.repository;
 
 import java.util.List;
-
+import java.util.Collection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -21,4 +21,8 @@ public interface RequestRepository extends JpaRepository<RequestEntity, Integer>
 
     // 特定のユーザーが申請者であり、かつ特定のステータスの申請データが存在するか確認する
     boolean existsByRequesterUserIdAndStatus(Integer requesterUserId, Integer status);
+
+    List<RequestEntity> findByRequesterUserIdInOrderByCreatedAtDesc(Collection<Integer> requesterUserIds);
+
+    List<RequestEntity> findByRequesterUserIdNotInOrderByCreatedAtDesc(Collection<Integer> excludeUserIds);
 }

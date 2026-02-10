@@ -178,5 +178,18 @@ public class StudentDeleteRequestService {
             u.setDeleteFlag(true); // DeleteFlagをtrueに設定
         }
         usersRepository.saveAll(users);
+
+        RequestEntity history = new RequestEntity();
+        history.setRequestTypeId(TYPE_DELETE_ACCOUNT);
+        history.setRequesterUserId(user.getUserId());
+        history.setStatus(2); 
+
+        String remarks = (String) requestData.get("remarks");
+        history.setRequestMessage(remarks != null ? remarks : "上位管理者による即時削除");
+
+        // 対象ユーザーは既存処理の users リストをそのまま利用
+        history.setTargetUsers(users);
+
+        requestRepository.save(history);
     }
 }

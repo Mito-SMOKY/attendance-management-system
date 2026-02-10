@@ -74,7 +74,7 @@
                 <div class="student-list-box">
                     <div th:each="st : ${detail.students}" class="student-list-item">
                         <span th:text="${st.loginId}" style="font-family: monospace; margin-right: 10px;">st001</span>
-                        <span th:text="${st.name}">山田 太郎</span>
+                        <span th:text="${st.name}"></span>
                     </div>
                     <div th:if="${#lists.isEmpty(detail.students)}" style="color:#999;">
                         対象ユーザーなし
