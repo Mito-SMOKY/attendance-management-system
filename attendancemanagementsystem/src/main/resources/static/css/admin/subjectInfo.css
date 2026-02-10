@@ -1,35 +1,33 @@
 @charset "UTF-8";
 
-/* --- 共通レイアウト --- */
-.main-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
-}
-.backbutton-container {
-    max-width: 1000px; margin: 0 auto; padding: 20px 20px 0;
-}
+/* ★修正: 参照頂いたコード同様、bodyやcontainerの指定は全削除しました。
+   これによりparts.cssの設定が適用され、全体の位置が合います。 */
 
+
+/* =========================================
+   ★追加: タイトル位置調整
+   ========================================= */
+/* ページタイトルを右に10pxずらします */
 .page-title {
-    color: #333; 
-    font-size: 1.8rem;
-    border-bottom: 2px solid #00bdca;
-    padding-bottom: 10px; 
-    margin-bottom: 20px; 
-    padding-left: 10px;
-    margin-top: 100px;
-    text-align: center;
+    margin-left: 10px;
 }
 
-/* --- コントロールバー --- */
+
+/* --- コントロールバー（タイトル下の検索エリアなど） --- */
+/* 他画面の .top-controls に相当する部分です */
 .control-bar {
-    display: flex; justify-content: flex-start;
-    align-items: center; margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 20px;
+    /* padding等は削除し、親要素に任せます */
 }
+
+/* --- ここから下は中身のパーツのスタイルなので残します --- */
 
 /* ★検索ボックス周りのスタイル */
 .search-wrapper {
-    position: relative; /* 候補リストの基準位置 */
+    position: relative;
     width: 300px;
 }
 
@@ -40,10 +38,10 @@
 
 .search-input {
     width: 100%;
-    padding: 10px 10px 10px 35px; /* アイコン分の左余白 */
+    padding: 10px 10px 10px 35px;
     font-size: 1rem;
     border: 1px solid #ccc;
-    border-radius: 5px; /* 角丸に */
+    border-radius: 5px;
     outline: none;
     transition: border-color 0.3s;
 }
@@ -122,6 +120,7 @@
     font-size: 0.9rem;
 }
 
+/* レイアウトグリッド */
 .info-grid {
     display: grid; 
     grid-template-columns: 1.5fr 1fr;
@@ -230,16 +229,3 @@
     color: inherit; 
     cursor: pointer;
 }
-
-.suggest-name {
-    font-weight: bold;
-    color: #333;
-    font-size: 0.95rem;
-}
-
-.suggest-meta {
-    font-size: 0.8rem;
-    color: #888;
-    margin-top: 2px;
-}
-
