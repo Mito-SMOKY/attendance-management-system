@@ -9,15 +9,15 @@ import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.attendancemanagementsystem.common.entity.RequestDetailEntity;
+import com.example.attendancemanagementsystem.common.entity.AdministratorEntity;
 import com.example.attendancemanagementsystem.common.entity.RequestEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
+import com.example.attendancemanagementsystem.common.repository.AdministratorRepository;
 import com.example.attendancemanagementsystem.common.repository.RequestRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 
@@ -32,6 +32,9 @@ public class RequestListService {
     private UsersRepository usersRepository;
     
     @Autowired
+    private AdministratorRepository administratorRepository;
+    
+    @Autowired
     private RequestService requestService;
     
     @PersistenceContext
@@ -41,98 +44,118 @@ public class RequestListService {
     private final DateTimeFormatter dateOnly = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 
     /**
-     * 未承認の申請一覧を取得
+     * 申請一覧を取得する
      */
-    public List<Map<String, Object>> getApprovalList(Integer adminId) {
-        // ステータス1(未承認)を取得
-        List<RequestEntity> entities = requestRepository.findByStatus(1);
+    public List<Map<String, Object>> getRequestList() {
         
-        return entities.stream().map(req -> {
+        List<AdministratorEntity> superAdmins = administratorRepository.findByAdminLevelId(1);
+        List<RequestEntity> requests;
+
+        if (superAdmins.isEmpty()) {
+            requests = requestRepository.findAll(); 
+        } else {
+            List<Integer> superAdminIds = superAdmins.stream()
+                    .map(AdministratorEntity::getUserId)
+                    .collect(Collectors.toList());
+            requests = requestRepository.findByRequesterUserIdNotInOrderByCreatedAtDesc(superAdminIds);
+        }
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        for (RequestEntity req : requests) {
             Map<String, Object> m = new HashMap<>();
+            
             m.put("requestId", req.getRequestId());
-            m.put("type", getRequestTypeName(req.getRequestTypeId())); // ★ここで正しい名前になります
-            m.put("createdAt", req.getCreatedAt().format(dtf));
-            m.put("status", "未承認");
-            m.put("statusCode", req.getStatus());
+            m.put("requestTypeId", req.getRequestTypeId());
             
-            // 申請者名の取得
-            String userName = usersRepository.findById(req.getRequesterUserId())
-                    .map(UsersEntity::getName)
-                    .orElse("不明なユーザー");
-            m.put("requesterName", userName);
+            String typeName = getRequestTypeName(req.getRequestTypeId());
+            m.put("type", typeName);
+            m.put("typeName", typeName);
             
-            return m;
-        }).collect(Collectors.toList());
+            m.put("statusCode", req.getStatus()); 
+            m.put("status", getStatusText(req.getStatus())); 
+
+            m.put("createdAt", req.getCreatedAt() != null ? req.getCreatedAt().format(dtf) : "");
+            
+            String requesterName = "不明";
+            if (req.getRequesterUserId() != null) {
+                 UsersEntity user = usersRepository.findById(req.getRequesterUserId()).orElse(null);
+                 if (user != null) {
+                     requesterName = user.getName();
+                 }
+            }
+            m.put("requesterName", requesterName);
+            m.put("requestMessage", req.getRequestMessage());
+            
+            if (req.getStartDate() != null) m.put("startDate", req.getStartDate().format(dateOnly));
+            if (req.getEndDate() != null) m.put("endDate", req.getEndDate().format(dateOnly));
+            if (req.getPeriods() != null) m.put("periods", req.getPeriods());
+            
+            resultList.add(m);
+        }
+
+        return resultList;
     }
 
     /**
-     * 申請詳細を取得
+     * 申請詳細を取得する
      */
     public Map<String, Object> getRequestDetail(Integer requestId) {
         RequestEntity req = requestRepository.findById(requestId).orElse(null);
         if (req == null) return null;
-
+        
         Map<String, Object> m = new HashMap<>();
+        
+        // --- 必須項目の設定 ---
         m.put("requestId", req.getRequestId());
+        m.put("requesterId", req.getRequesterUserId()); 
+        m.put("requestTypeId", req.getRequestTypeId());
+        
+        String typeName = getRequestTypeName(req.getRequestTypeId());
+        m.put("type", typeName);
+        m.put("typeName", typeName);
         m.put("typeId", req.getRequestTypeId());
-        m.put("typeName", getRequestTypeName(req.getRequestTypeId()));
-        m.put("status", req.getStatus());
+
+        m.put("statusCode", req.getStatus());
+        m.put("status", getStatusText(req.getStatus()));
+        
+        m.put("createdAt", req.getCreatedAt() != null ? req.getCreatedAt().format(dtf) : "");
+        
+        String requesterName = "不明";
+        if (req.getRequesterUserId() != null) {
+             UsersEntity user = usersRepository.findById(req.getRequesterUserId()).orElse(null);
+             if (user != null) {
+                 requesterName = user.getName();
+             }
+        }
+        m.put("requesterName", requesterName);
+        
+        m.put("requestMessage", req.getRequestMessage());
         m.put("message", req.getRequestMessage());
-        m.put("createdAt", req.getCreatedAt().format(dtf));
-
-        UsersEntity user = usersRepository.findById(req.getRequesterUserId()).orElse(null);
-        if (user != null) {
-            m.put("requesterName", user.getName());
-            m.put("requesterId", user.getUserId());
-        } else {
-            m.put("requesterName", "不明");
-            m.put("requesterId", "");
-        }
-
-        // ▼ タイプ別の詳細情報作成 ▼
         
-        // Type 1: 公欠・欠席
-        if (req.getRequestTypeId() == 1) {
-            List<Map<String, Object>> detailList = new ArrayList<>();
-            List<RequestDetailEntity> details = req.getRequestDetails();
-            
-            if (details != null) {
-                for (RequestDetailEntity rd : details) {
-                    Map<String, Object> d = new HashMap<>();
-                    d.put("date", rd.getTargetDate().format(dateOnly));
-                    d.put("slot", rd.getSlotId());
-                    detailList.add(d);
-                }
-            }
-            m.put("details", detailList);
-        }
+        // --- オプション項目（nullでもキーを必ず登録する） ---
+        // これらがMapに含まれていないとHTML側でアクセスエラーになるため、明示的にputする
         
-        // Type 4: 学科・コース変更 (詳細な学科名を取得して表示)
-        else if (req.getRequestTypeId() == 4 && req.getTargetDepartmentId() != null) {
-            m.put("targetDeptId", req.getTargetDepartmentId());
-            try {
-                // 学科IDから学科名・コース名・クラス名を結合して取得するSQL
-                String sql = """
-                    SELECT CONCAT(m.MajorName, IFNULL(CONCAT('・', c.CourseName), ''), ' (', d.Class, ')')
-                    FROM department d
-                    LEFT JOIN major m ON d.MajorID = m.MajorID
-                    LEFT JOIN course c ON m.CourseID = c.CourseID
-                    WHERE d.DepartmentID = :id
-                """;
-                Query query = entityManager.createNativeQuery(sql);
-                query.setParameter("id", req.getTargetDepartmentId());
-                Object result = query.getSingleResult();
-                m.put("targetDeptName", result != null ? result.toString() : "不明な学科");
-            } catch (Exception e) {
-                m.put("targetDeptName", "学科情報の取得失敗");
-            }
-        }
+        m.put("startDate", req.getStartDate() != null ? req.getStartDate().format(dateOnly) : null);
+        m.put("endDate", req.getEndDate() != null ? req.getEndDate().format(dateOnly) : null);
+        m.put("periods", req.getPeriods());
         
-        // Type 3: ステータス変更
-        else if (req.getRequestTypeId() == 3 && req.getTargetStatusId() != null) {
-             m.put("targetStatusId", req.getTargetStatusId());
-             // 必要ならステータス名を取得する処理を追加
+        // 【修正点】条件分岐せず、必ずキーを登録する
+        m.put("targetStatusId", req.getTargetStatusId());
+        m.put("targetDepartmentId", req.getTargetDepartmentId());
+        
+        // 詳細情報（日付・時限）の変換
+        List<Map<String, Object>> detailsList = null;
+        if (req.getRequestDetails() != null && !req.getRequestDetails().isEmpty()) {
+            detailsList = req.getRequestDetails().stream().map(d -> {
+                Map<String, Object> dm = new HashMap<>();
+                dm.put("date", d.getTargetDate() != null ? d.getTargetDate().format(dateOnly) : "");
+                dm.put("slot", d.getSlotId());
+                return dm;
+            }).collect(Collectors.toList());
         }
+        // 【修正点】nullまたはリストを必ず登録する
+        m.put("details", detailsList);
 
         return m;
     }
@@ -142,30 +165,35 @@ public class RequestListService {
      */
     public void processRequest(Integer requestId, boolean isApproved, Integer approverId) {
         if (isApproved) {
-            // 承認: 公欠(Type1)ならRequestServiceへ。それ以外はここで更新処理が必要かもしれません。
-            // ※現状はすべてのタイプで requestService.approveRequest を呼んでいますが、
-            // Type 2,3,4 の承認ロジックが RequestService に無い場合は、ここに個別の処理を書く必要があります。
-            // (今回は「一覧に出す」ことが目的なので、承認ロジックは既存のままにしています)
             requestService.approveRequest(requestId, approverId);
         } else {
-            // 却下
             RequestEntity req = requestRepository.findById(requestId)
                     .orElseThrow(() -> new IllegalArgumentException("申請が見つかりません"));
-            req.setStatus(3);
+            
+            req.setStatus(3); // 3: 却下
             req.setApproverId(approverId);
             requestRepository.save(req);
         }
     }
 
-    // ★★★ ここを修正しました ★★★
     private String getRequestTypeName(Integer typeId) {
         if (typeId == null) return "-";
         switch (typeId) {
-            case 1: return "公欠・欠席";
-            case 2: return "アカウント削除";      // 修正: 元の定義に戻しました
-            case 3: return "ステータス変更";      // 修正: 元の定義に戻しました
-            case 4: return "学科・コース変更";    // 修正: 元の定義に戻しました
-            default: return "その他";
+            case 1: return "公欠申請";
+            case 2: return "アカウント削除申請";
+            case 3: return "ステータス変更申請";
+            case 4: return "学科コース変更申請";
+            default: return "その他(" + typeId + ")";
+        }
+    }
+
+    private String getStatusText(Integer status) {
+        if (status == null) return "-";
+        switch (status) {
+            case 1: return "承認待ち";
+            case 2: return "承認済み";
+            case 3: return "却下";
+            default: return String.valueOf(status);
         }
     }
 }

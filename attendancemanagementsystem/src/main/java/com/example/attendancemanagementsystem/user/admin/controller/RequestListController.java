@@ -28,25 +28,27 @@ public class RequestListController {
 
     // 一覧画面 (GET /admin/requestList/list)
     @GetMapping("/list")
-    public String list(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            Model model) {
+    public String list(Model model) {
         
-        // 未承認(1)などのリストを取得
-        List<Map<String, Object>> requestList = requestListService.getApprovalList(userDetails.getUsersEntity().getUserId());
-        model.addAttribute("requestList", requestList);
-        model.addAttribute("pageTitle", "申請一覧");
+        // 1. Serviceからリストを取得
+        List<Map<String, Object>> requests = requestListService.getRequestList();
         
-        return "admin/superAdmin/requestList"; // スーパー管理者用の一覧へ
+        // 2. 画面に渡す
+        model.addAttribute("requestList", requests);
+        
+        model.addAttribute("pageTitle", "申請承認・履歴一覧");
+        
+        // 3. テンプレートを返す
+        // 【修正】実際のファイル配置に合わせてパスを変更
+        return "admin/superAdmin/requestList"; 
     }
 
-    // 詳細画面 (GET /admin/requestList/detail?id=...)
+    // 詳細画面 (GET /admin/requestList/detail)
     @GetMapping("/detail")
     public String detail(
             @RequestParam("id") Integer requestId,
             Model model) {
         
-        // Serviceから詳細情報をMap形式で取得
         Map<String, Object> detail = requestListService.getRequestDetail(requestId);
         
         if (detail == null) {
@@ -54,10 +56,8 @@ public class RequestListController {
         }
 
         model.addAttribute("pageTitle", "申請詳細");
-        // HTML側では ${request} でデータにアクセスします
         model.addAttribute("request", detail);
         
-        // ★修正箇所: 正しいスーパー管理者用テンプレートを指定
         return "admin/superAdmin/requestDetail"; 
     }
 
@@ -81,7 +81,7 @@ public class RequestListController {
             
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("処理に失敗しました: " + e.getMessage());
+            return ResponseEntity.badRequest().body("処理に失敗しました。");
         }
     }
 }
