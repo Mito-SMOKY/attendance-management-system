@@ -10,7 +10,7 @@ body {
 
 /* ヘッダー */
 .header-bar {
-    background: linear-gradient(90deg, #6CC0C8 0%, #539DA4 100%);
+    background: linear-gradient(90deg, #00bdca 0%, #00bdca 100%);
     height: 70px;
     width: 100%;
     margin-bottom: 50px;
@@ -19,7 +19,7 @@ body {
 /* コンテナ */
 .container {
     max-width: 800px;
-    margin: 0 auto;
+    margin: 100px  auto;
     padding: 0 40px;
     text-align: center;
 }
@@ -36,11 +36,11 @@ body {
 
 /* メインタイトル */
 .main-title {
-    color: #539DA4;
+    color: #00bdca;
     font-size: 1.8rem;
     font-weight: bold;
     display: inline-block;
-    border-bottom: 3px solid #539DA4;
+    border-bottom: 3px solid #00bdca;
     padding-bottom: 10px;
     margin-top: 40px;
     margin-bottom: 60px;
@@ -61,7 +61,7 @@ body {
 }
 
 .otp-input:focus {
-    border-color: #539DA4;
+    border-color: #00bdca;
     box-shadow: 0 0 6px rgba(83, 157, 164, 0.4);
 }
 
@@ -74,9 +74,9 @@ body {
 
 /* 確定ボタン */
 .confirm-btn {
-    background-color: #539DA4;
+    background-color: #00bdca;
     color: white;
-    border: 1px solid #539DA4;
+    border: 1px solid #00bdca;
     padding: 10px 30px;
     font-size: 1.2rem;
     border-radius: 8px;
@@ -88,8 +88,8 @@ body {
 }
 
 .confirm-btn:hover {
-    background-color: #428288;
-    border-color: #428288;
+    background-color: #00bdca;
+    border-color: #00bdca;
 }
 
 .confirm-btn:disabled {
@@ -146,4 +146,8 @@ body {
     background-color: #f0f0f0;
     border-color: #333;
     color: #333;
+}
+
+.otpForm{
+    margin-top: 50px;
 }
