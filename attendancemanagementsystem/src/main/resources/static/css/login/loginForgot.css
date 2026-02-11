@@ -15,20 +15,9 @@ body {
 
 .container {
     max-width: 600px;
-    margin: 0 auto;
+    margin: 100px auto;
     padding: 40px 20px;
     text-align: center;
-}
-
-/* 戻るボタン */
-.back-btn {
-    display: inline-block;
-    padding: 5px 15px;
-    border: 1px solid #333;
-    border-radius: 5px;
-    text-decoration: none;
-    color: #333;
-    float: left;
 }
 
 .back-btn:hover {
@@ -72,11 +61,13 @@ body {
 
 .submit-btn {
     background-color: white;
-    border: 1px solid #333;
+    border: 1px solid #00bdca;
     padding: 10px 40px;
     font-size: 16px;
     border-radius: 5px;
     cursor: pointer;
+    color: #00bdca;
+    font-weight: bold;
 }
 
 .submit-btn:hover {
