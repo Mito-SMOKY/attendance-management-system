@@ -40,7 +40,7 @@ spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
 #MySQLに接続するユーザー名
 spring.datasource.username=smoky
 #★★★ここはご自身のパスワードに書き換えてください★★★
-spring.datasource.password=Smoky
+spring.datasource.password=smoky
 
 # ======================================
 # JPA (DB操作) の設定
