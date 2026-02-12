@@ -75,4 +75,14 @@ public interface SessionRepository extends JpaRepository<SessionEntity, Integer>
         @Param("deptId") Integer deptId,
         @Param("grade") Integer grade
     );
+
+    // 指定された科目と日付範囲に一致するセッションの取得（週単位）
+    List<SessionEntity> findBySubject_SubjectIdAndSessionDateBetweenOrderBySessionDateAscTimeSlot_SlotIdAsc(
+    Integer subjectId, 
+    LocalDate startDate, 
+    LocalDate endDate
+    );
+
+    // 指定された学科と日付に一致する実施済みセッションの取得（日単位）
+    List<SessionEntity> findByDepartment_DepartmentIdAndSessionDateAndSessionFlagTrue(Integer departmentId, LocalDate sessionDate);
 }

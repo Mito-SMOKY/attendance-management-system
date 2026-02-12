@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.attendancemanagementsystem.attendance.display.dto.DailyAttendanceDto;
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
+import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
 import com.example.attendancemanagementsystem.common.entity.SessionEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.entity.TimetableEntity;
@@ -26,7 +27,6 @@ import com.example.attendancemanagementsystem.common.repository.UsersRepository;
 
 @Service
 @Transactional(readOnly = true)
-//日次出席詳細データを提供するサービスクラス
 public class AttendanceDisplayService {
 
     private final UsersRepository usersRepository;
@@ -35,7 +35,6 @@ public class AttendanceDisplayService {
     private final AttendanceRepository attendanceRepository;
     private final SubjectRepository subjectRepository;
     private final ClassroomRepository classroomRepository;
-    // セッションリポジトリを追加
     private final SessionRepository sessionRepository;
 
     public AttendanceDisplayService(
@@ -55,60 +54,87 @@ public class AttendanceDisplayService {
         this.sessionRepository = sessionRepository;
     }
 
-    //  * 指定した日付の日次詳細データを取得する
+    // 指定した日付の日次詳細データを取得する
     public List<DailyAttendanceDto> getDailyAttendanceDetails(String loginId, LocalDate date) {
         List<DailyAttendanceDto> result = new ArrayList<>();
 
         // 1. ユーザー・生徒情報取得
-        UsersEntity user = usersRepository.findByLoginId(loginId).orElseThrow();
-        StudentEntity student = studentRepository.findByUser(user).orElseThrow();
+        UsersEntity user = usersRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + loginId));
+        StudentEntity student = studentRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Student not found for user: " + loginId));
 
-        // 2. 所属学科IDを特定 (今回は仮で1固定)
-        Integer deptId = 1; 
+        // 2. 所属学科IDと学年を特定 (ActiveなEnrollmentを取得)
+        EnrollmentsEntity activeEnrollment = student.getEnrollments().stream()
+                .filter(e -> Boolean.TRUE.equals(e.getIsActive()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Active enrollment not found for student: " + student.getUserId()));
 
-        // 3. その日の基本時間割を取得
-        List<TimetableEntity> timetables = timetableRepository.findByDateAndDepartment_DepartmentIdOrderBySlotId(date, deptId);
+        Integer deptId = activeEnrollment.getDepartmentId();
+        Integer grade = activeEnrollment.getGrade();
 
-        // ★追加: その日のセッション(実施授業)を取得
-        List<SessionEntity> sessions = sessionRepository.findByDepartment_DepartmentIdAndSessionDate(deptId, date);
+        // 3. データの取得
         
-        // SlotIDをキーにしてMap化
+        // (A) 予定: その日の学科・学年の基本時間割を取得
+        List<TimetableEntity> timetables = timetableRepository.findByDepartment_DepartmentIdAndGradeAndDateOrderBySlotIdAsc(
+                deptId, grade, date);
+
+        // (B) 実績: その日の学科の実施セッションを取得し、対象学年でフィルタリング
+        // ★修正点: SessionFlag が true のものだけを取得するように変更
+        List<SessionEntity> sessions = sessionRepository.findByDepartment_DepartmentIdAndSessionDateAndSessionFlagTrue(deptId, date);
+        
+        // データアクセスの効率化のためにMap化 (Key: SlotID)
+        Map<Integer, TimetableEntity> timetableMap = new HashMap<>();
+        for (TimetableEntity tt : timetables) {
+            if (tt.getSlotId() != null) {
+                timetableMap.put(tt.getSlotId(), tt);
+            }
+        }
+
         Map<Integer, SessionEntity> sessionMap = new HashMap<>();
         for (SessionEntity s : sessions) {
-            if (s.getTimeSlot() != null) {
+            // 学年が一致、かつ時限が設定されているものを抽出
+            if (s.getTimeSlot() != null && s.getTargetGrade() != null && s.getTargetGrade().equals(grade)) {
                 sessionMap.put(s.getTimeSlot().getSlotId(), s);
             }
         }
 
-        // 4. 時間割ごとにループしてDTOを作成
-        for (TimetableEntity tt : timetables) {
+        // 4. 1限〜4限までループしてDTOを作成
+        for (int i = 1; i <= 4; i++) {
+            Integer currentSlot = i;
             
-            String subjectName;
-            String classroomName;
-            String statusSymbol = "-"; 
-            
-            Integer displaySubjectId = tt.getSubjectId();
+            TimetableEntity tt = timetableMap.get(currentSlot);
+            SessionEntity session = sessionMap.get(currentSlot);
 
-            // ★対応するセッションがあるか確認
-            SessionEntity session = sessionMap.get(tt.getSlotId());
+            // 予定も実績もない場合はスキップ（または空表示）
+            if (tt == null && session == null) {
+                result.add(new DailyAttendanceDto(null, currentSlot, "-", "-", "-"));
+                continue;
+            }
+
+            String subjectName = "-";
+            String classroomName = "-";
+            String statusSymbol = "-";
+            Integer displaySubjectId = null;
 
             if (session != null) {
-                // --- セッション(実施後)の場合 ---
-                // 科目名・教室名をセッションから取得
-                subjectName = (session.getSubject() != null) 
-                        ? session.getSubject().getSubjectName() 
-                        : "科目ID:" + tt.getSubjectId(); // フォールバック
+                // --- 優先度高: Session (実績) が存在する場合 ---
+                // ※SessionFlag=trueのものしか取ってきていないので、ここは確定情報の授業
                 
                 if (session.getSubject() != null) {
+                    subjectName = session.getSubject().getSubjectName();
                     displaySubjectId = session.getSubject().getSubjectId();
+                } else {
+                    subjectName = "科目ID:" + (tt != null ? tt.getSubjectId() : "?");
                 }
 
-                classroomName = (session.getClassroom() != null) 
-                        ? session.getClassroom().getClassroomName() 
-                        : "教室ID:" + tt.getClassroomId();
+                if (session.getClassroom() != null) {
+                    classroomName = session.getClassroom().getClassroomName();
+                } else {
+                     classroomName = "未定";
+                }
 
-                // 出席情報を取得 (StudentとSessionで検索)
-                // ※AttendanceRepositoryに findByStudentAndSession メソッドが必要です
+                // 出席情報を取得
                 Optional<AttendanceEntity> attOpt = attendanceRepository.findByStudentAndSession(student, session);
 
                 if (attOpt.isPresent()) {
@@ -116,28 +142,38 @@ public class AttendanceDisplayService {
                     if ("出席".equals(statusName)) statusSymbol = "〇";
                     else if ("欠席".equals(statusName)) statusSymbol = "×";
                     else if ("遅刻".equals(statusName)) statusSymbol = "△";
+                    else if ("早退".equals(statusName)) statusSymbol = "△";
+                    else if ("公欠".equals(statusName)) statusSymbol = "〇";
                     else statusSymbol = statusName; 
                 } else {
-                    // セッションはあるが生徒の出席レコードがない場合（未スキャンなど）
-                    statusSymbol = "-"; 
+                    // Sessionはあるが生徒の出席レコードがない
+                    statusSymbol = "-";
                 }
 
             } else {
-                // --- セッションなし(実施前/予定)の場合 ---
-                subjectName = subjectRepository.findById(tt.getSubjectId())
-                        .map(s -> s.getSubjectName()).orElse("科目ID:" + tt.getSubjectId());
+                // --- 優先度低: Sessionはないが Timetable (予定) がある場合 ---
                 
-                classroomName = classroomRepository.findById(tt.getClassroomId())
-                        .map(c -> c.getClassroomName()).orElse("教室ID:" + tt.getClassroomId());
+                if (tt.getSubject() != null) {
+                    subjectName = tt.getSubject().getSubjectName();
+                } else {
+                     subjectName = subjectRepository.findById(tt.getSubjectId())
+                            .map(s -> s.getSubjectName()).orElse("科目ID:" + tt.getSubjectId());
+                }
+                displaySubjectId = tt.getSubjectId();
+
+                if (tt.getClassroom() != null) {
+                    classroomName = tt.getClassroom().getClassroomName();
+                } else {
+                    classroomName = classroomRepository.findById(tt.getClassroomId())
+                            .map(c -> c.getClassroomName()).orElse("教室ID:" + tt.getClassroomId());
+                }
                 
-                // 実施前なのでステータスは "-"
                 statusSymbol = "-";
             }
 
-            // DTOに追加
             result.add(new DailyAttendanceDto(
                 displaySubjectId,
-                tt.getSlotId(),
+                currentSlot,
                 subjectName,
                 classroomName,
                 statusSymbol
