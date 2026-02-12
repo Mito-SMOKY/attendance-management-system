@@ -50,11 +50,16 @@ public class StudentEntity {
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AttendanceEntity> attendances;
 
-    // ★こちらが DataListID の管理（保存・更新）を担当する
     @ManyToOne
     @JoinColumn(name = "DataListID", nullable = false)
     @JsonIgnore
     private Datalist datalist;
+
+    // ★追加箇所 1: ステータス名を参照するためのリレーション
+    // insertable/updatable = false にすることで、上の studentStatusId カラムとの競合を防ぎます
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "StudentStatusID", insertable = false, updatable = false)
+    private StudentStatusEntity studentStatus;
 
     // --- constructor ---
     public StudentEntity() {
@@ -123,5 +128,14 @@ public class StudentEntity {
 
     public void setDatalist(Datalist datalist) {
         this.datalist = datalist;
+    }
+
+    // ★追加箇所 2: Getter/Setter
+    public StudentStatusEntity getStudentStatus() {
+        return studentStatus;
+    }
+
+    public void setStudentStatus(StudentStatusEntity studentStatus) {
+        this.studentStatus = studentStatus;
     }
 }
