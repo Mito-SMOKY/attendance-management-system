@@ -9,7 +9,7 @@
 
 body {
     width: 100%;
-    min-height: 100vh; /* height:100vhだと切れることがあるのでmin-height推奨 */
+    min-height: 100vh;
     margin: 0;
     padding: 0;
     color: #333;
@@ -18,29 +18,23 @@ body {
     justify-content: flex-start; 
     align-items: center; 
     background-color: #fff;
-    /* overflow: hidden; は削除推奨ですが、仕様上必要なら戻してください */
 }
 
-/* ★修正: ヘッダー被りを防ぎ、全体の位置調整 */
 .writer-container {
     width: 90%;
     max-width: 1200px;
     margin: 0 auto;
-    padding-top: 100px; /* タイトルを表示させるための余白 */
+    padding-top: 100px;
     padding-bottom: 50px;
-    text-align: center;
-    /* フレックス設定は解除して自然な積み上げレイアウトにします */
+    text-align: center; 
 }
 
-/* ★追加: 入力フォーム部分全体を中央寄せ */
 #view-input {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
-
-/* .title は削除しました */
 
 .instruction-text {
     text-align: center;
@@ -118,7 +112,6 @@ body {
 }
 
 .text-input:focus {
-    /* ★色変更 */
     border-color: #00bdca;
     box-shadow: 0 0 0 3px rgba(0, 189, 202, 0.2);
 }
@@ -148,7 +141,6 @@ body {
     font-size: 1.1rem;
     font-weight: bold;
     color: white;
-    /* ★色変更 */
     background-color: #00bdca;
     border: none;
     border-radius: 50px;
@@ -158,7 +150,6 @@ body {
 }
 
 .auth-btn:hover {
-    /* ★色変更（少し濃く） */
     background-color: #009aa5;
     transform: translateY(-2px);
 }
@@ -179,7 +170,6 @@ body {
 .hidden { display: none !important; }
 
 .spinner-container {
-    /* 中央寄せを強化 */
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -191,7 +181,6 @@ body {
     width: 60px;
     height: 60px;
     border: 6px solid #f3f3f3;
-    /* ★色変更 */
     border-top: 6px solid #00bdca;
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -205,12 +194,29 @@ body {
 
 .spinner-container p { display: none; }
 
+/* =========================================
+   ★修正: 結果エリアのアニメーション設定
+   ========================================= */
 .result-area {
     width: 100%;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* 親コンテナは常に表示状態にしておく */
+}
+
+/* ★修正: 画像と文字を最初は透明(opacity:0)にする */
+.result-image,
+.result-area .instruction-text,
+.result-area .result-message {
+    opacity: 0;
+    transition: opacity 0.8s ease; /* ふわっと表示する時間 */
+}
+
+/* ★追加: JSで付与する「表示」クラス */
+.fade-in {
+    opacity: 1 !important;
 }
 
 .result-message {
