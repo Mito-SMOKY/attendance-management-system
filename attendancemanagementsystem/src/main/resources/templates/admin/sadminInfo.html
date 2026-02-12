@@ -71,9 +71,7 @@
             </div>
 
             <div class="detail-row">
-              <div class="detail-label">
-                氏名
-              </div>
+              <div class="detail-label">氏名</div>
               <div class="detail-value">
                 <input
                   type="text"
@@ -114,6 +112,7 @@
                   type="text"
                   id="userEmail"
                   name="email"
+                  class="no-edit"
                   th:value="*{email}"
                   disabled
                 />
@@ -128,6 +127,16 @@
               onclick="openDeleteModal()"
             >
               ユーザー削除
+            </button>
+
+            <button
+              class="btn-cancel-edit"
+              id="btnCancel"
+              type="button"
+              onclick="cancelEdit()"
+              style="display: none"
+            >
+              キャンセル
             </button>
 
             <button

@@ -24,6 +24,8 @@ import com.example.attendancemanagementsystem.user.superadmin.dto.SuperAdminCrea
 import com.example.attendancemanagementsystem.user.superadmin.dto.SuperAdminDetailDto;
 import com.example.attendancemanagementsystem.user.superadmin.service.SuperAdminService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Controller
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('SUPER_ADMIN')") 
@@ -61,23 +63,51 @@ public class SuperAdminController {
         return "admin/sadminInfo";
     }
 
-    // --- 4. 更新処理 (有効化しました) ---
+
+
+    // --- 4. 更新処理 (パス修正版) ---
     @PostMapping("/sadmin/update")
     public String updateAdminDetail(
             @ModelAttribute SuperAdminDetailDto form,
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            HttpServletRequest request,
+            Model model) { // メッセージ用Model
         
         try {
-            // 操作者IDを渡して更新実行
+            // 自分自身の権限下げチェック
+            boolean isSelfDemotion = false;
+            // ユーザーIDが一致するか（＝自分自身の更新か）
+            if (userDetails.getUserId().equals(form.getUserId())) {
+                SuperAdminDetailDto currentDbInfo = superAdminService.getAdminDetail(form.getUserId());
+                // 「元が上位(1)」かつ「変更後が一般(0)」の場合
+                if (currentDbInfo.getAdminLevelID() == 1 && form.getAdminLevelID() == 0) {
+                    isSelfDemotion = true;
+                }
+            }
+
+            // 更新実行
             superAdminService.updateAdmin(form, userDetails.getUserId());
+            
+            // 自分で権限を下げた場合の処理
+            if (isSelfDemotion) {
+                // 1. セキュリティのため即座にログアウト
+                request.logout();
+                
+                // 2. 画面表示用メッセージ
+                model.addAttribute("message", "権限がないのでログアウトします。再度ログインしてください。");
+                
+                // ★修正: 保存先に合わせてパスを変更
+                return "admin/superAdmin/logout_notice";
+            }
+
             redirectAttributes.addFlashAttribute("successMessage", "管理者情報を更新しました。");
+
         } catch (Exception e) {
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("errorMessage", "更新失敗: " + e.getMessage());
         }
         
-        // 詳細画面へリダイレクト
         return "redirect:/admin/sadminInfo/" + form.getUserId();
     }
 
