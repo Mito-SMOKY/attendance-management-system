@@ -61,13 +61,19 @@ public class RequestService {
     public Page<Map<String, Object>> searchStudentsForSelection(String mode, String keyword, Pageable pageable) {
         List<StudentEntity> allStudents = studentRepository.findAll();
         
-        List<StudentEntity> filteredStudents = allStudents;
+        // ★修正箇所: DeleteFlagがtrue(1)のユーザーを除外するフィルタを最初に追加
+        List<StudentEntity> filteredStudents = allStudents.stream()
+                .filter(s -> s.getUser() != null && !Boolean.TRUE.equals(s.getUser().getDeleteFlag()))
+                .collect(Collectors.toList());
+
+        // キーワード検索
         if (keyword != null && !keyword.isEmpty()) {
-            filteredStudents = allStudents.stream()
+            filteredStudents = filteredStudents.stream()
                 .filter(s -> s.getUser().getName().contains(keyword))
                 .collect(Collectors.toList());
         }
 
+        // 削除申請モードの場合のフィルタリング
         if ("delete".equals(mode)) {
             filteredStudents = filteredStudents.stream()
                 .filter(s -> {
