@@ -3,7 +3,6 @@
 body {
     margin: 0;
     padding-top: 80px;
-    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
 }
 
 /* メインコンテンツのコンテナ */
@@ -30,8 +29,8 @@ body {
     width: 250px;
     height: 180px;
     background-color: white;
-    color: #5BBEB9; /* テーマカラー */
-    border: 3px solid #5BBEB9;
+    color: #00bdca; /* テーマカラー */
+    border: 3px solid #00bdca;
     border-radius: 12px;
     text-decoration: none;
     font-size: 24px;
@@ -42,7 +41,7 @@ body {
 
 /* ホバー時の挙動 */
 .ghost-button:hover {
-    background-color: #5BBEB9;
+    background-color: #00bdca;
     color: white;
     transform: translateY(-5px);
     box-shadow: 0 8px 15px rgba(0,0,0,0.2);

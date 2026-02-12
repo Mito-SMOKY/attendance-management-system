@@ -1,10 +1,10 @@
 
 .month-select-form{
     margin-top: 100px;
-    margin-right: 600px;
+    margin-left:400px ;
     margin-bottom: 20px;
     display: flex;
-    justify-content: center;
+    justify-content: left;
     gap: 10px;
 }
 
@@ -23,7 +23,10 @@
     display: flex;
     gap: 20px;
     align-items: flex-start;
+    
 }
+
+
 
 /* --- 左側：情報サイドバー --- */
 .info-sidebar {
@@ -41,7 +44,7 @@
 }
 
 .info-table tr:first-child .info-label {
-    background-color: #00bcd4;
+    background-color: #00bdca;
     color: white;
     font-weight: 600;
 }
@@ -118,7 +121,7 @@
 
 .status-label {
     grid-column: 1 / span 5;
-    background-color: #00bcd4;
+    background-color: #00bdca;
     color: white;
     font-weight: 600;
     border-bottom: none;
@@ -151,6 +154,16 @@
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     overflow: auto;
+    max-height: calc(85vh - 250px); 
+    overflow-y: auto;
+}
+
+.calendar-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #00bdca;
+    box-shadow: 0 1px 0 #ccc; 
 }
 
 .calendar-table {
@@ -165,7 +178,7 @@
 }
 
 .calendar-table th {
-    background-color: #00bcd4; 
+    background-color: #00bdca; 
     color: white;
     font-weight: 600;
 }
@@ -183,7 +196,7 @@
 }
 
 .present {
-    color:  #00BDCA; 
+    color:  #00bdca; 
 }
 
 .absent {

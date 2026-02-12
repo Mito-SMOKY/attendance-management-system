@@ -267,6 +267,19 @@ public class StudentDepartmentRequestService {
                 enrollment.setDepartment(newDepartment);
                 enrollmentsRepository.save(enrollment);
             }
+            RequestEntity history = new RequestEntity();
+            history.setRequestTypeId(TYPE_CHANGE_DEPARTMENT);
+            history.setRequesterUserId(user.getUserId());
+            history.setTargetDepartmentId(finalDeptId); 
+            history.setStatus(2); 
+
+            String remarks = (String) requestData.get("remarks");
+            history.setRequestMessage(remarks != null ? remarks : "上位管理者による即時変更");
+
+            // 対象ユーザーを取得してセット
+            List<UsersEntity> targetUsers = usersRepository.findAllById(targetIds);
+            history.setTargetUsers(targetUsers);
+            requestRepository.save(history);
         }
     }
 }

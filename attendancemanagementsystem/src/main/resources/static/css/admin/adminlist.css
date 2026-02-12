@@ -2,12 +2,18 @@
 
 /* 基本設定 */
 *, *::before, *::after { box-sizing: border-box; }
+
 body {
     overflow-x: hidden; 
     width: 100%; 
     margin: 0; 
-    padding: 0;
-    font-size: 16px;  color: #333;
+    
+    /* ★修正: 他の画面と高さを合わせるため 100px に統一 */
+    padding-top: 100px; 
+    
+    font-size: 16px;
+    color: #333;
+    background-color: white; /* 明示的に白を指定 */
 }
 
 /* コンテナ */
@@ -15,28 +21,27 @@ body {
     width: 95%; 
     max-width: 800px; 
     margin: 0 auto;
-    padding-top: 120px; 
+    
+    /* ★修正: bodyで余白を取っているため、ここのpadding-topは削除 */
     padding-bottom: 50px;
 }
 
-/* タイトル */
+/* =========================================
+   ★追加: タイトル位置調整
+   共通パーツのクラス(.page-title)に対して適用されます
+   ========================================= */
 .page-title {
-    text-align: center; 
-    font-size: 2rem; 
-    font-weight: normal;
-    margin-bottom: 30px; 
-    color: #333; 
-    letter-spacing: 2px;
+    margin-left: 10px;
+    /* 以前の独自スタイル(text-align:center等)は削除しました */
 }
 
-/* --- コントロールエリア（戻るボタン + 検索フォーム） --- */
-/* ここが「2024...」の上に来るエリアです */
+/* --- コントロールエリア（検索フォームなど） --- */
 .controls-area {
-    position: relative; /* 戻るボタンの基準位置 */
+    position: relative; 
     display: flex;
-    justify-content: left; /* 検索フォームを中央に */
-    align-items: flex-start;
-    margin-bottom: 20px; /* 日付との間隔 */
+    justify-content: flex-start; /* 左寄せに変更 */
+    align-items: center;
+    margin-bottom: 20px; 
     min-height: 40px;
 }
 
@@ -60,7 +65,6 @@ body {
 }
 
 .search-form-3{
-
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -69,7 +73,6 @@ body {
     border-radius: 5px;
     cursor: pointer;
     font-size: 1rem;
-    
 }
 
 .search-form-3 input {

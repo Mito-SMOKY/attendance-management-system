@@ -67,15 +67,14 @@
 
         <div id="history-menu-group" class="menu-group fade-in hidden">
             <div class="action-buttons">
-                
-                <a th:href="@{/admin/history}" class="ghost-button">
-                    <i class="fa-solid fa-user-slash"></i>
+                <a th:href="@{/admin/history/adminOperation}" class="ghost-button">
+                    <i class="fa-solid fa-user-gear"></i>
                     <span>管理者操作履歴</span>
                 </a>
 
-                <a th:href="@{/admin/history/adminCreate}" class="ghost-button">
-                    <i class="fa-solid fa-user-plus"></i>
-                    <span>任意</span>
+                <a th:href="@{/admin/history/studentOperation}" class="ghost-button">
+                    <i class="fa-solid fa-users-viewfinder"></i>
+                    <span>生徒操作履歴</span>
                 </a>
 
                 <a th:href="@{/admin/requestList/list}" class="ghost-button">

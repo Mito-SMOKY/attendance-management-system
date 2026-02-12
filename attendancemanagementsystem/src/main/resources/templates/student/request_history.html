@@ -17,7 +17,7 @@
     </div>
 
     <main class="content-wrapper">
-        <h2 class="page-title">申請履歴</h2>
+        <div th:replace="~{fragments/_parts :: page-title-part('申請履歴')}"></div>
 
         <div th:if="${successMessage}" class="alert-success" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="alert-error" th:text="${errorMessage}"></div>

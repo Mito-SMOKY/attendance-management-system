@@ -15,24 +15,24 @@
         <div th:replace="~{fragments/_parts :: main-header}"></div>
     </div>
 
-    <div class="container">
+    <div class="backbutton-container">
+        <div th:replace="~{fragments/_parts :: backButton(url='/email/reset-email')}"></div>
+    </div>
 
-        <div class="backbutton-container">
-            <div th:replace="~{fragments/_parts :: backButton(url='/email/reset-email')}"></div>
-        </div>
+    <div class="container">
         
         <div style="clear: both;"></div>
 
-        <h2 class="main-title">ワンタイムパスワードを入力してください</h2>
+        <div th:replace="~{fragments/_parts :: page-title-part('ワンタイムパスワード入力')}"></div>
 
         <div th:if="${message == 'sent'}" class="success-msg">
             認証コードを再送信しました。メールをご確認ください。
         </div>
 
-        <form th:action="@{/email/verify-otp}" method="post" id="otpForm">
-            <input type="hidden" name="newEmail" th:value="${session.resetEmail_NewEmail}">
+        <form th:action="@{/email/verify-otp}" method="post" id="otpForm" >
+            <input type="hidden" name="newEmail"  th:value="${session.resetEmail_NewEmail}">
 
-            <div style="display: inline-block;">
+            <div style="display: inline-block;" class="otpForm">
                 <input type="text" name="otp" id="otpInput" class="otp-input" 
                     maxlength="6" placeholder="______" required 
                     autocomplete="one-time-code" inputmode="numeric">

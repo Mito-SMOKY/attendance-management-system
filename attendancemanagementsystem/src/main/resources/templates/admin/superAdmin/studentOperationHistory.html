@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生徒操作履歴</title>
+    
+    <link rel="stylesheet" th:href="@{/css/parts.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/requestList.css}">
+    
+    <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
+    
+    <style>
+        /* この画面固有の簡易スタイル（必要に応じてCSSファイルに移動してください） */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .history-table th, .history-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .history-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: #fff;
+            background-color: #28a745; /* 完了(緑) */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div th:replace="~{fragments/_parts :: superadmin-header}"></div>
+    </div>
+    
+    <div class="main-container">
+        <div th:replace="~{fragments/_parts :: page-title-part('生徒操作履歴')}"></div>
+
+        <div class="content-wrapper">
+            
+            <div class="action-bar" style="margin-bottom: 20px;">
+                <a th:href="@{/admin/userManagement}" class="small-back-btn">
+                    <i class="fa-solid fa-reply"></i> ユーザー管理に戻る
+                </a>
+            </div>
+
+            <div class="table-container">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>操作日時</th>
+                            <th>実行者</th>
+                            <th>操作タイプ</th>
+                            <th>操作内容</th>
+                            <th>ステータス</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(historyList)}">
+                            <td colspan="5" style="text-align: center; padding: 20px;">
+                                履歴が存在しません
+                            </td>
+                        </tr>
+
+                        <tr th:each="history : ${historyList}">
+                            <td th:text="${history.createdAt}"></td>
+                            <td th:text="${history.requesterName}"></td>
+                            <td th:text="${history.requestTypeName}"></td>
+                            <td>
+                                <span th:text="${history.requestMessage != null ? history.requestMessage : 'ID: ' + history.requestId}"></span>
+                            </td>
+                            <td>
+                                <span class="status-badge">完了</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    </body>
+</html>

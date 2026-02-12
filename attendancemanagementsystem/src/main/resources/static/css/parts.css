@@ -264,13 +264,11 @@ a {
     padding-bottom: 5px; 
 }
 
-/* --- ★ここが抜けていました：画面全体の枠組み --- */
 .main-container {
     width: 95%;              /* 横幅（スマホでも端まで行かないように） */
     max-width: 1000px;       /* PCで広がりすぎないように制限 */
     margin: 0 auto;          /* 左右中央寄せ */
     margin-top: 100px;       /* ヘッダーに隠れないように上に隙間を空ける */
-    padding-bottom: 50px;    /* 下の隙間 */
 }
 
 /* --- タイトルエリア全体 --- */

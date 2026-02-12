@@ -1,55 +1,47 @@
 @charset "UTF-8";
 
-/* --- メニュー全体エリア（ここが修正ポイント） --- */
+/* --- メニュー全体エリア --- */
 .menu-group {
-    /* フレックスボックスにして中身を中央に寄せる */
     display: flex;
-    flex-direction: column; /* 縦並びのルールで */
-    justify-content: center; /* 縦方向の中央寄せ */
-    align-items: center;     /* 横方向の中央寄せ */
-    
-    /* 画面の高さからヘッダーやタイトルの分（約250px）を引いた高さを確保 */
-    min-height: calc(100vh - 250px);
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    min-height: calc(90vh - 250px);
     width: 100%;
 }
 
-/* --- ボタンの並び --- */
 .action-buttons {
     display: flex;
-    justify-content: center; /* 横並びの中央寄せ */
-    flex-wrap: wrap;         /* 画面が狭ければ折り返し */
-    gap: 40px;               /* ボタン間の隙間 */
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 40px; 
     width: 100%;
+    padding: 20px;
 }
 
-/* --- ゴーストボタンのデザイン --- */
 .ghost-button {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    
     width: 250px;
     height: 180px;
-    
     background-color: #fff;
     color: #00bdca;
     border: 3px solid #00bdca;
     border-radius: 15px;
-    
     text-decoration: none;
     font-weight: bold;
     font-size: 18px;
     letter-spacing: 0.05em;
     cursor: pointer;
-    
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* アイコン */
 .ghost-button i {
-    font-size: 50px;
+    font-size: 50px; /* バランスを見てサイズ調整 */
     margin-bottom: 20px;
     transition: transform 0.3s ease;
 }

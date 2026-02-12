@@ -2,7 +2,7 @@
 
 .calendar-header {
     width: 95%; 
-    margin: 0 auto 20px auto;
+    margin: auto;
     display: flex;
     font-size: 1.2rem;
     color: #001f22;
@@ -12,6 +12,7 @@
 }
 
 .student-calendar-header{
+    width: 100%;
     margin-top: 100px;
     display: flex;
     justify-content: space-between;
@@ -20,7 +21,7 @@
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    font-size: 1.5em;
+    font-size: 1em;
 }
 
 .timetable-icon{
@@ -70,36 +71,46 @@
 
 .calendar-ym {
     text-align: center;
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
-    color:#008b95;
+    color:#333;
+    padding-left: 250px;
+}
+
+.admin-calendar-ym{
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color:#333;
+    padding-right: 100px;
+    
 }
 
 
 .calendar {
-    max-width: 100%; /* 制限解除 */
-    width: 95%;      /* 画面いっぱい使う */
+    max-width: 1400px;
+    width: 100%;
     margin: 0 auto 50px auto;
     border-collapse: collapse;
     table-layout: fixed;
-    font-size: 1.2rem; /* カレンダー内の文字サイズUP */
+    font-size: 1.2rem;
 }
 
 .calendar th,
 .calendar td {
     border: 1px solid #ccc;
     text-align: center;
-    vertical-align: top; /* 数字を左上に */
+    vertical-align: top; 
     padding: 5px;
 }
 
 .calendar th {
-    padding: 15px 0; /* ヘッダーの高さUP */
+    padding: 15px 0; 
     color: #fff;
 }
 
 .calendar td {
-    height: 120px; /* ★マス目の高さを50px -> 120pxに倍増 */
+    height: 120px;
     position: relative;
 }
 
@@ -188,12 +199,16 @@
 .calendar-toggle {
     flex-shrink: 0; 
     font-size: 1.2rem; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 8px;
 }
 
 .calendar-table-container {
-    margin: auto;
+    margin: 20px auto;
     align-items: center;
-    width: 100%; 
+    width: 100%;
     display: flex;
     justify-content: center;
 }
@@ -206,7 +221,7 @@
     width: 60px; /* 少し大きく */
     height: 30px;
     border-radius: 30px;
-    border: 3px solid #4defed;
+    border: 3px solid #00bdca;
     box-sizing: content-box;
     cursor: pointer;
     transition: border-color .4s;
@@ -214,7 +229,7 @@
 }
 
 .toggle-button:has(:checked) {
-    border-color: #2ee2e5;
+    border-color: #00bdca;
 }
 
 .toggle-button::after {
@@ -225,14 +240,14 @@
     width: 26px; /* 中の丸も大きく */
     height: 26px;
     border-radius: 50%;
-    background-color: #4defed;
+    background-color: #00bdca;
     content: '';
     transition: left .4s;
 }
 
 .toggle-button:has(:checked)::after {
     left: 32px;
-    background-color: #2ee2e5;
+    background-color: #00bdca;
 }
 
 .toggle-button input {

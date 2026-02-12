@@ -23,7 +23,7 @@
         
         <div style="clear: both;"></div>
 
-        <h2 class="main-title">ワンタイムパスワードを入力してください</h2>
+        <div th:replace="~{fragments/_parts :: page-title-part('ワンタイムパスワード入力')}"></div>
 
         <div th:if="${message == 'sent'}" class="success-msg">
             認証コードを再送信しました。メールをご確認ください。
