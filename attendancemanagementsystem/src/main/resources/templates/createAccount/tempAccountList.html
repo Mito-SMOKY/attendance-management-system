@@ -34,8 +34,11 @@
 
     <div class="info-box">
       <div>
-        <a th:href="@{/admin/downloadPdf/{id}(id=${datalist.dataListId})}" class="btn btn-download" >
-          <i class="fas fa-file-pdf"></i> PDFダウンロード
+        <a href="javascript:void(0)" 
+            id="downloadPdfBtn"
+            th:data-id="${datalist.dataListId}" 
+            class="btn btn-download">
+            <i class="fas fa-file-pdf"></i> PDFダウンロード
         </a>
         <br />
         <span style="font-size: 0.8em; color: red">

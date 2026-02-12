@@ -46,22 +46,27 @@ public class MdClassroomService {
         }
 
         // 更新・新規登録処理
-        for (int i = 0; i < classroomNames.size(); i++) {
-            String name = classroomNames.get(i);
-            Integer currentId = (classroomIds != null && classroomIds.size() > i) ? classroomIds.get(i) : null;
-            String mac = (macAddresses != null && macAddresses.size() > i) ? macAddresses.get(i) : null;
+for (int i = 0; i < classroomNames.size(); i++) {
+    String name = classroomNames.get(i);
+    Integer currentId = (classroomIds != null && classroomIds.size() > i) ? classroomIds.get(i) : null;
+    String mac = (macAddresses != null && macAddresses.size() > i) ? macAddresses.get(i) : null;
 
-            ClassroomEntity entity;
-            if (currentId != null) {
-                entity = classroomRepository.findById(currentId).orElse(new ClassroomEntity());
-            } else {
-                entity = new ClassroomEntity();
-            }
+    // フォームから送られてきた値が空文字 "" だったら null に変換する
+    if (mac != null && mac.isEmpty()) {
+        mac = null;
+    }
 
-            entity.setClassroomName(name);
-            entity.setMacAddress(mac); 
-            
-            classroomRepository.save(entity);
-        }
+    ClassroomEntity entity;
+    if (currentId != null) {
+        entity = classroomRepository.findById(currentId).orElse(new ClassroomEntity());
+    } else {
+        entity = new ClassroomEntity();
+    }
+
+    entity.setClassroomName(name);
+    entity.setMacAddress(mac); // ここで null がセット
+    
+    classroomRepository.save(entity);
+}
     }
 }
