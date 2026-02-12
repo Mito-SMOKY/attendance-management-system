@@ -9,7 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping; // 追加
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes; // 追加
 
 import com.example.attendancemanagementsystem.user.admin.service.RequestHistoryService;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
@@ -52,5 +54,23 @@ public class RequestHistoryController {
         model.addAttribute("detail", requestDetail);
         
         return "admin/request/requestDetail";
+    }
+
+    // ★追加: 申請取り下げ処理
+    @PostMapping("/{id}/withdraw")
+    public String withdraw(
+            @PathVariable("id") Integer requestId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            // サービス側の取り下げメソッドを呼び出し
+            historyService.withdrawRequest(requestId, userDetails.getUserId());
+            redirectAttributes.addFlashAttribute("successMessage", "申請を取り下げました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "取り下げに失敗しました: " + e.getMessage());
+        }
+        
+        return "redirect:/admin/request/history";
     }
 }

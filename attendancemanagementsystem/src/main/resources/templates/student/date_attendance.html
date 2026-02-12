@@ -45,13 +45,23 @@
                     </td>
                     
                     <td class="td-status">
-                        <span th:if="${item.status == '〇'}" class="status-mark status-ok"></span>
-                        <span th:if="${item.status == '×'}" class="status-mark status-ng"></span>
-                        <span th:if="${item.status == '△'}" class="status-mark status-late"></span>
-                        
-                        <span th:unless="${item.status == '〇' or item.status == '×' or item.status == '△'}" 
-                              th:text="${item.status}"></span>
-                    </td>
+                        <span th:if="${item.status == '◎' or item.status == '〇'}" 
+                        th:text="${item.status}" 
+                        class="status-mark status-ok"></span>
+    
+                    <span th:if="${item.status == '×'}" 
+                    th:text="${item.status}" 
+                    class="status-mark status-ng"></span>
+    
+                    <span th:if="${item.status == '△'}" 
+                    th:text="${item.status}" 
+                    class="status-mark status-late"></span>
+
+                    <span th:unless="${item.status == '◎' or item.status == '〇' or item.status == '×' or item.status == '△'}" 
+                    th:text="${item.status}"
+                    class="status-mark"></span>
+                </td>
+                
                 </tr>
 
                 <tr th:if="${#lists.isEmpty(dailyList)}">

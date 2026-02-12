@@ -23,6 +23,13 @@
         
         <div th:replace="~{fragments/_parts :: page-title-part('申請履歴')}"></div>
         
+        <div th:if="${successMessage}" class="message-box success">
+            <i class="fa-solid fa-check-circle"></i> <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="message-box error">
+            <i class="fa-solid fa-triangle-exclamation"></i> <span th:text="${errorMessage}"></span>
+        </div>
+
         <div th:if="${#lists.isEmpty(historyList)}" style="text-align: center; padding: 40px; color: #666;">
             <i class="fa-regular fa-folder-open" style="font-size: 3em; margin-bottom: 15px;"></i>
             <p>申請履歴はありません。</p>
@@ -58,6 +65,16 @@
                         <a th:href="@{/admin/request/history/{id}(id=${req.requestId})}" class="detail-btn">
                             詳細
                         </a>
+
+                        <form th:if="${req.statusCode == 1}" 
+                            th:action="@{/admin/request/history/{id}/withdraw(id=${req.requestId})}" 
+                            method="post" 
+                            style="display:inline; margin-left: 5px;"
+                            onsubmit="return confirm('本当にこの申請を取り下げますか？');">
+                            <button type="submit" class="withdraw-btn">
+                                取り下げ
+                            </button>
+                        </form>
                     </td>
                 </tr>
             </tbody>
