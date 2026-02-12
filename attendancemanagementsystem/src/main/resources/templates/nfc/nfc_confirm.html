@@ -22,9 +22,11 @@
     </div>
 
     <div class="writer-container">
+        <div th:replace="~{fragments/_parts :: page-title-part('NFC登録')}"></div>
+
         <div id="view-input">
             <div class="instruction-text">
-                書き込むデータを入力<br>してください
+                書き込むデータを<br>入力してください
             </div>
 
             <div class="form-area">
@@ -35,7 +37,7 @@
 
                 <div class="input-group">
                     <label class="input-label">学籍番号</label>
-                    <input type="text" id="input-user-id" class="text-input" placeholder="例: 2321001" th:value="${userId}"autocomplete="off">
+                    <input type="text" id="input-user-id" class="text-input" placeholder="例: 2321001" th:value="${userId}" autocomplete="off">
                 </div>
 
                 <div class="input-group">

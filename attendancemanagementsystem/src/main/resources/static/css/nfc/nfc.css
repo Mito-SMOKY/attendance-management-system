@@ -9,30 +9,38 @@
 
 body {
     width: 100%;
-    height: 100vh;
+    min-height: 100vh; /* height:100vhだと切れることがあるのでmin-height推奨 */
     margin: 0;
     padding: 0;
-    overflow: hidden;
     color: #333;
     display: flex;
     flex-direction: column;
     justify-content: flex-start; 
     align-items: center; 
     background-color: #fff;
+    /* overflow: hidden; は削除推奨ですが、仕様上必要なら戻してください */
 }
 
-/* ★修正済み★
-   .writer-container や .page-title の設定は全て削除しました。
-   これにより、parts.css (main-container) の共通レイアウトが適用され、
-   他の画面と全く同じ配置・サイズになります。
-*/
-
-.title {
+/* ★修正: ヘッダー被りを防ぎ、全体の位置調整 */
+.writer-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 100px; /* タイトルを表示させるための余白 */
+    padding-bottom: 50px;
     text-align: center;
-    font-size: 50px;
-    font-weight: bold;
-    margin-bottom: 20px;
+    /* フレックス設定は解除して自然な積み上げレイアウトにします */
 }
+
+/* ★追加: 入力フォーム部分全体を中央寄せ */
+#view-input {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* .title は削除しました */
 
 .instruction-text {
     text-align: center;
@@ -110,8 +118,9 @@ body {
 }
 
 .text-input:focus {
-    border-color: #539DA4;
-    box-shadow: 0 0 0 3px rgba(83, 157, 164, 0.2);
+    /* ★色変更 */
+    border-color: #00bdca;
+    box-shadow: 0 0 0 3px rgba(0, 189, 202, 0.2);
 }
 
 .text-input[readonly] {
@@ -139,16 +148,18 @@ body {
     font-size: 1.1rem;
     font-weight: bold;
     color: white;
-    background-color: #539DA4;
+    /* ★色変更 */
+    background-color: #00bdca;
     border: none;
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(83, 157, 164, 0.3);
+    box-shadow: 0 4px 10px rgba(0, 189, 202, 0.3);
 }
 
 .auth-btn:hover {
-    background-color: #3D7E84;
+    /* ★色変更（少し濃く） */
+    background-color: #009aa5;
     transform: translateY(-2px);
 }
 
@@ -168,7 +179,11 @@ body {
 .hidden { display: none !important; }
 
 .spinner-container {
-    text-align: center;
+    /* 中央寄せを強化 */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-top: 30px;
 }
 
@@ -176,7 +191,8 @@ body {
     width: 60px;
     height: 60px;
     border: 6px solid #f3f3f3;
-    border-top: 6px solid #539DA4;
+    /* ★色変更 */
+    border-top: 6px solid #00bdca;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto;
