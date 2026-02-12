@@ -64,7 +64,7 @@ public class AttendanceDisplayService {
         StudentEntity student = studentRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Student not found for user: " + loginId));
 
-        // 2. 所属学科IDと学年を特定 (ActiveなEnrollmentを取得)
+        // 2. 所属学科IDと学年を特定
         EnrollmentsEntity activeEnrollment = student.getEnrollments().stream()
                 .filter(e -> Boolean.TRUE.equals(e.getIsActive()))
                 .findFirst()
@@ -79,11 +79,10 @@ public class AttendanceDisplayService {
         List<TimetableEntity> timetables = timetableRepository.findByDepartment_DepartmentIdAndGradeAndDateOrderBySlotIdAsc(
                 deptId, grade, date);
 
-        // (B) 実績: その日の学科の実施セッションを取得し、対象学年でフィルタリング
-        // ★修正点: SessionFlag が true のものだけを取得するように変更
+        // (B) 実績: その日の学科の実施セッション(SessionFlag=true)のみを取得
         List<SessionEntity> sessions = sessionRepository.findByDepartment_DepartmentIdAndSessionDateAndSessionFlagTrue(deptId, date);
         
-        // データアクセスの効率化のためにMap化 (Key: SlotID)
+        // Map化
         Map<Integer, TimetableEntity> timetableMap = new HashMap<>();
         for (TimetableEntity tt : timetables) {
             if (tt.getSlotId() != null) {
@@ -93,20 +92,18 @@ public class AttendanceDisplayService {
 
         Map<Integer, SessionEntity> sessionMap = new HashMap<>();
         for (SessionEntity s : sessions) {
-            // 学年が一致、かつ時限が設定されているものを抽出
             if (s.getTimeSlot() != null && s.getTargetGrade() != null && s.getTargetGrade().equals(grade)) {
                 sessionMap.put(s.getTimeSlot().getSlotId(), s);
             }
         }
 
-        // 4. 1限〜4限までループしてDTOを作成
+        // 4. ループ処理
         for (int i = 1; i <= 4; i++) {
             Integer currentSlot = i;
             
             TimetableEntity tt = timetableMap.get(currentSlot);
             SessionEntity session = sessionMap.get(currentSlot);
 
-            // 予定も実績もない場合はスキップ（または空表示）
             if (tt == null && session == null) {
                 result.add(new DailyAttendanceDto(null, currentSlot, "-", "-", "-"));
                 continue;
@@ -118,8 +115,7 @@ public class AttendanceDisplayService {
             Integer displaySubjectId = null;
 
             if (session != null) {
-                // --- 優先度高: Session (実績) が存在する場合 ---
-                // ※SessionFlag=trueのものしか取ってきていないので、ここは確定情報の授業
+                // --- Session (実績) がある場合 ---
                 
                 if (session.getSubject() != null) {
                     subjectName = session.getSubject().getSubjectName();
@@ -137,21 +133,38 @@ public class AttendanceDisplayService {
                 // 出席情報を取得
                 Optional<AttendanceEntity> attOpt = attendanceRepository.findByStudentAndSession(student, session);
 
-                if (attOpt.isPresent()) {
+                if (attOpt.isPresent() && attOpt.get().getStatus() != null) {
                     String statusName = attOpt.get().getStatus().getStatusName();
-                    if ("出席".equals(statusName)) statusSymbol = "〇";
-                    else if ("欠席".equals(statusName)) statusSymbol = "×";
-                    else if ("遅刻".equals(statusName)) statusSymbol = "△";
-                    else if ("早退".equals(statusName)) statusSymbol = "△";
-                    else if ("公欠".equals(statusName)) statusSymbol = "〇";
-                    else statusSymbol = statusName; 
+                    
+                    // ★ここを修正: DBから取得した文字列の空白を除去して判定する
+                    if (statusName != null) {
+                        statusName = statusName.trim();
+                    } else {
+                        statusName = "";
+                    }
+                    
+                    if ("出席".equals(statusName)) {
+                        statusSymbol = "◎";
+                    } else if ("公欠".equals(statusName)) {
+                        statusSymbol = "〇";
+                    } else if ("欠席".equals(statusName)) {
+                        statusSymbol = "×";
+                    } else if ("遅刻".equals(statusName) || "早退".equals(statusName)) {
+                        statusSymbol = "△";
+                    } else if ("出席停止".equals(statusName)) {
+                        statusSymbol = "停";
+                    } else {
+                        // その他はそのまま表示
+                        statusSymbol = statusName;
+                    }
+                    
                 } else {
-                    // Sessionはあるが生徒の出席レコードがない
+                    // SessionはあるがAttendanceがない場合
                     statusSymbol = "-";
                 }
 
             } else {
-                // --- 優先度低: Sessionはないが Timetable (予定) がある場合 ---
+                // --- Sessionがなく Timetable (予定) のみの場合 ---
                 
                 if (tt.getSubject() != null) {
                     subjectName = tt.getSubject().getSubjectName();
