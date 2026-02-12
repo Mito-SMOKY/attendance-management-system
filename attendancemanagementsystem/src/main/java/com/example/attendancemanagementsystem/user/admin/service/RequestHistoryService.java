@@ -145,6 +145,30 @@ public class RequestHistoryService {
         return map;
     }
 
+    // 【追加】申請の取り下げ処理
+    @Transactional
+    public void withdrawRequest(Integer requestId, Integer userId) {
+        RequestEntity request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("指定された申請が見つかりません (ID: " + requestId + ")"));
+
+        // 本人の申請かチェック
+        if (!request.getRequesterUserId().equals(userId)) {
+            throw new SecurityException("他人の申請を取り下げることはできません。");
+        }
+
+        // ステータスチェック (承認待ち(1) 以外は取り下げ不可)
+        // ※StatusがNULLの場合は0(未処理)として扱うなど、運用に合わせて調整してください
+        Integer currentStatus = request.getStatus() != null ? request.getStatus() : 0;
+        if (currentStatus != 1) { 
+            throw new IllegalStateException("既に処理済み（または取り下げ済み）のため、取り下げできません。");
+        }
+
+        // ステータスを「3: 取り下げ」に更新
+        // ※getStatusNameメソッドでは3を「拒 否」としていますが、システム上のステータスコードとして3を使用します
+        request.setStatus(3);
+        requestRepository.save(request);
+    }
+
     // --- ヘルパーメソッド ---
 
     private String getRequestTypeName(Integer typeId) {
@@ -162,8 +186,8 @@ public class RequestHistoryService {
         if (status == null) return "-";
         switch (status) {
             case 1: return "承認待ち";
-            case 2: return "承 認";
-            case 3: return "拒 否";
+            case 2: return "承認";
+            case 3: return "却下";
             default: return "その他";
         }
     }
