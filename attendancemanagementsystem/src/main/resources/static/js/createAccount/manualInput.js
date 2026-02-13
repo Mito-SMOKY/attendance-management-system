@@ -13,7 +13,8 @@ const DANGEROUS_CHARS = /[<>"'/\\;|:*?＜＞”’“‘／￥＼；：＊？]/g
  */
 function sanitizeListName(input) {
     // 1. 危険記号を削除 (半角・全角すべて)
-    input.value = input.value.replace(DANGEROUS_CHARS, "");
+    input.value = input.value
+        .replace(DANGEROUS_CHARS, ""); // 既存の危険記号削除
 
     // 2. 文字数制限 (255文字)
     if (input.value.length > 255) {
@@ -60,6 +61,7 @@ function sanitizeName(input) {
     // ※半角記号、全角記号の範囲を指定して削除
     const invalidNameChars = /[0-9０-９!#$%&()+,\-.\=@\[\]^_`{|}~！-／：-＠［-｀｛-～]/g;
     val = val.replace(invalidNameChars, "");
+    val = val.replace(/[ 　]+/g, "");
 
     // 3. 文字数制限 (255文字)
     if (val.length > 255) {

@@ -21,10 +21,10 @@
         <div class="backbutton-container">
             <div th:replace="~{fragments/_parts :: backButton(url=${backUrl})}"></div>
         </div>
-        <h2 class="main-title">本人確認</h2>
+        <div th:replace="~{fragments/_parts :: page-title-part('メールアドレス再設定')}"></div>
         
         <p class="description">
-            メールアドレスを変更するために、<br>ログインIDとパスワードを入力してください。<br>
+            メールアドレスを変更します。<br>ログインIDとパスワードを入力してください。<br>
         </p>
 
         <div id="jsErrorMsg" class="js-error-msg"></div>

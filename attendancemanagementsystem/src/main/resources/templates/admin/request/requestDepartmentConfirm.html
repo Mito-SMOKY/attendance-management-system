@@ -40,11 +40,11 @@
     <main class="confirm-container">
         
         <div sec:authorize="hasRole('SUPER_ADMIN')">
-            <h2 class="main-title">学科・コース変更</h2>
+            <div th:replace="~{fragments/_parts :: page-title-part('学科・コース変更')}"></div>
         </div>
 
         <div sec:authorize="hasRole('ADMIN')">
-            <h2 class="main-title">学科・コース変更申請</h2>
+            <div th:replace="~{fragments/_parts :: page-title-part('学科・コース変更申請')}"></div>
         </div>
         
         <div class="content-box">
@@ -144,13 +144,22 @@
     </main>
 
     <div id="passwordModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3>管理者認証</h3>
-            <p>操作を実行するためにパスワードを入力してください。</p>
-            <input type="password" id="actionPassword" placeholder="パスワード" class="password-input">
-            <div class="modal-actions">
-                <button type="button" id="cancelModalBtn" class="modal-btn cancel">キャンセル</button>
-                <button type="button" id="submitModalBtn" class="modal-btn submit">実 行</button>
+        <div class="modal-box">
+            <div class="modal-icon" style="color: #00bdca">
+                <i class="fa-solid fa-file-pen"></i>
+            </div>
+            <h2 class="modal-title">学科・コース変更</h2>
+            <p class="modal-desc" style="margin-bottom: 20px">操作を実行するために<br>あなたのパスワードを入力してください。</p>
+
+            <p class="modal-input-label">パスワード</p>
+            <div class="password-wrapper">
+                <input type="password" id="actionPassword" placeholder="パスワードを入力" />
+                <i class="fa-solid fa-eye-slash toggle-eye" id="togglePasswordEye"></i>
+            </div>
+
+            <div class="modal-buttons">
+                <button type="button" class="btn-modal-cancel" id="cancelModalBtn">キャンセル</button>
+                <button type="button" class="btn-confirm-modal" id="submitModalBtn">実 行</button>
             </div>
         </div>
     </div>

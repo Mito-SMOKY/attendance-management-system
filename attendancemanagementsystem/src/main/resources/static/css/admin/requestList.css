@@ -136,3 +136,29 @@
     align-items: flex-end;
     height: 30px;
 }
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.history-table th, .history-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+.history-table th {
+    background-color: #00bdca;
+    font-weight: bold;
+    color: #fff;
+}
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    color: #fff;
+    background-color: #28a745; /* 完了(緑) */
+}

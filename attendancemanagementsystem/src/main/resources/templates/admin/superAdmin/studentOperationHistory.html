@@ -8,37 +8,8 @@
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/admin/requestList.css}">
-    
     <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
     
-    <style>
-        /* この画面固有の簡易スタイル（必要に応じてCSSファイルに移動してください） */
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .history-table th, .history-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        .history-table th {
-            background-color: #f8f9fa;
-            font-weight: bold;
-            color: #333;
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            color: #fff;
-            background-color: #28a745; /* 完了(緑) */
-        }
-    </style>
 </head>
 <body>
 
@@ -51,16 +22,14 @@
 
         <div class="content-wrapper">
             
-            <div class="action-bar" style="margin-bottom: 20px;">
-                <a th:href="@{/admin/userManagement}" class="small-back-btn">
-                    <i class="fa-solid fa-reply"></i> ユーザー管理に戻る
-                </a>
-            </div>
+        <div class="backbutton-container" >
+            <div th:replace="~{fragments/_parts :: backButton(url='/admin/userManagement')}"></div>
+        </div>
 
             <div class="table-container">
                 <table class="history-table">
                     <thead>
-                        <tr>
+                        <tr class="history-tr">
                             <th>操作日時</th>
                             <th>実行者</th>
                             <th>操作タイプ</th>

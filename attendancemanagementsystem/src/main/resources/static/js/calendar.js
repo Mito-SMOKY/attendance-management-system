@@ -258,6 +258,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('scheduleForm')?.addEventListener('submit', (event) => {
         event.preventDefault();
+
+        const submitButton = event.target.querySelector('button[type="submit"]');
+        if (submitButton.disabled) return; 
+
+        // ボタンを無効化
+        submitButton.disabled = true;
+        const originalButtonText = submitButton.textContent;
+        submitButton.textContent = '保存中...';
+
         const title = document.getElementById('scheduleTitle').value;
         const date = document.getElementById('modalDate').dataset.rawDate;
 
@@ -272,12 +281,21 @@ document.addEventListener('DOMContentLoaded', () => {
             body: formData
         }).then(res => {
             if(res.ok) {
+                // 成功時はリロード
                 window.location.reload();
             } else {
                 alert("保存失敗: " + res.status);
+                // ▼ 失敗時はボタンを戻す
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
             }
         })
-        .catch(err => console.error("Error:", err));
+        .catch(err => {
+            console.error("Error:", err);
+            // ▼ エラー時はボタンを戻す
+            submitButton.disabled = false;
+            submitButton.textContent = originalButtonText;
+        });
     });
 });
 

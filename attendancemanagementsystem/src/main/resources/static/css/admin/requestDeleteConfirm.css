@@ -4,7 +4,7 @@
     width: 90%;
     max-width: 1000px;
     margin: 0 auto;
-    margin-top: 180px; 
+    margin-top: 100px; 
     padding-bottom: 50px;
 }
 
@@ -12,7 +12,6 @@
     text-align: center;
     border-bottom:2px solid #00bdca;
     padding-bottom: 10px;
-    font-size: 2rem;
     font-weight: bold;
     margin-bottom: 30px;
     color: #333;
@@ -20,6 +19,7 @@
 }
 
 .content-box {
+    margin-top: 100px;
     background-color: white;
     padding: 30px;
     border-radius: 8px;
@@ -146,75 +146,118 @@
     color: white;
 }
 
-/* ★追加: モーダル */
+/* --- モーダル共通スタイル --- */
 .modal-overlay {
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s;
 }
 
 .modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
+    display: flex;
 }
 
-.modal-content {
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 400px;
+.modal-box {
+    background: #fff;
+    padding: 30px;
+    width: 450px;
+    max-width: 90%;
+    border-radius: 12px;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    transform: translateY(-20px);
-    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-.modal-overlay.active .modal-content {
-    transform: translateY(0);
+.modal-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
 }
 
-.password-input {
+.modal-title {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 20px;
+}
+
+.modal-desc {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.modal-input-label {
+    text-align: left;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    color: #333;
+}
+
+.password-wrapper {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.password-wrapper input {
     width: 100%;
-    padding: 10px;
-    margin: 15px 0;
-    border: 1px solid #ddd;
+    padding: 10px 40px 10px 10px;
+    box-sizing: border-box;
     border-radius: 4px;
+    border: 1px solid #ccc;
     font-size: 16px;
 }
 
-.modal-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    margin-top: 10px;
+.toggle-eye {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #aaa;
+    font-size: 18px;
 }
 
-.modal-btn {
-    flex: 1;
-    padding: 10px;
+.toggle-eye:hover {
+    color: #333;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-modal-cancel {
+    background: #ccc;
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 5px;
     border: none;
-    border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
 }
 
-.modal-btn.cancel {
-    background: #eee;
-    color: #333;
+.btn-modal-cancel:hover {
+    background: #bbb;
 }
 
-.modal-btn.submit {
-    background: #e74c3c; /* 削除実行ボタンは赤 */
-    color: white;
+.btn-confirm-modal {
+    background: #e74c3c; /* 削除用なので赤色 */
+    color: #fff;
+    padding: 10px 30px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-confirm-modal:hover {
+    background: #c0392b; /* ホバー時は少し濃い赤 */
 }

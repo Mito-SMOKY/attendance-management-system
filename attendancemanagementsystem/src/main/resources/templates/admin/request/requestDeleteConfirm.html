@@ -38,7 +38,13 @@
 
     <main class="confirm-container">
         
-        <h2 class="page-title" th:text="${pageTitle}">生徒削除</h2>
+        <div sec:authorize="hasRole('SUPER_ADMIN')">
+            <div th:replace="~{fragments/_parts :: page-title-part('生徒削除')}"></div>
+        </div>
+
+        <div sec:authorize="hasRole('ADMIN')">
+            <div th:replace="~{fragments/_parts :: page-title-part('生徒削除申請')}"></div>
+        </div>
         
         <div class="content-box">
             <h3 class="sub-title">以下の生徒のアカウントを削除しますか？</h3>
@@ -115,13 +121,22 @@
     </main>
 
     <div id="passwordModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3>管理者認証</h3>
-            <p>削除処理を実行するためにパスワードを入力してください。<br><span style="color:red; font-size:0.9em;">※この操作は取り消せません</span></p>
-            <input type="password" id="actionPassword" placeholder="パスワード" class="password-input">
-            <div class="modal-actions">
-                <button type="button" id="cancelModalBtn" class="modal-btn cancel">キャンセル</button>
-                <button type="button" id="submitModalBtn" class="modal-btn submit">実行（削除）</button>
+        <div class="modal-box">
+            <div class="modal-icon" style="color: #e74c3c">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h2 class="modal-title">生徒削除</h2>
+            <p class="modal-desc" style="margin-bottom: 20px">削除処理を実行するために<br>あなたのパスワードを入力してください。<br><span style="color:red; font-size:0.9em;">※この操作は取り消せません</span></p>
+
+            <p class="modal-input-label">パスワード</p>
+            <div class="password-wrapper">
+                <input type="password" id="actionPassword" placeholder="パスワードを入力" />
+                <i class="fa-solid fa-eye-slash toggle-eye" id="togglePasswordEye"></i>
+            </div>
+
+            <div class="modal-buttons">
+                <button type="button" class="btn-modal-cancel" id="cancelModalBtn">キャンセル</button>
+                <button type="button" class="btn-confirm-modal" id="submitModalBtn">削除</button>
             </div>
         </div>
     </div>

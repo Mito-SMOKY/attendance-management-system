@@ -13,9 +13,9 @@ body {
 
 .container {
     max-width: 600px;
-    margin: 0 auto;     /* 左右中央寄せ */
-    margin-top: 100px;  /* ★修正：上部に100pxの余白を追加して位置を下げる */
-    padding: 30px;      /* 内部の余白はログイン画面に合わせて調整 */
+    margin: 0 auto;
+    margin-top: 100px;  
+    padding: 30px;   
     text-align: center;
 }
 
@@ -26,7 +26,7 @@ body {
     color: #333;
     margin-bottom: 40px;
     display: inline-block;
-    border-bottom: 2px solid #6CC0C8;
+    border-bottom: 2px solid #00bdca;
     padding-bottom: 10px;
 }
 
@@ -62,7 +62,7 @@ body {
 
 .input-text:focus {
     outline: none;
-    border-color: #6CC0C8;
+    border-color: #00bdca;
 }
 
 /* ボタン：統一デザイン */
@@ -72,7 +72,7 @@ body {
     max-width: 250px;
     margin: 40px auto 0;
     padding: 12px;
-    background-color: #6CC0C8;
+    background-color: #00bdca;
     color: white;
     border: none;
     border-radius: 5px;
@@ -123,10 +123,20 @@ body {
     display: block;
     margin-top: 30px;
     text-align: center;
-    color: #6CC0C8;
+    color: #00bdca;
     text-decoration: none;
     font-size: 14px;
 }
 .back-link:hover {
     text-decoration: underline;
+}
+
+.FirstLogin{
+    background-color: #f0feff; 
+    padding: 15px; 
+    border-radius: 5px; 
+    margin-bottom: 20px; 
+    color: #005258 ;
+    font-size: 0.95rem; 
+    line-height: 1.6;
 }

@@ -89,13 +89,53 @@ document.addEventListener('DOMContentLoaded', function() {
     function openPasswordModal() {
         if(modal) {
             passwordInput.value = ''; // 入力欄クリア
+            passwordInput.type = 'password'; // タイプを初期化
+            
+            const toggleEye = document.getElementById('togglePasswordEye');
+            if (toggleEye) {
+                toggleEye.classList.remove("fa-eye");
+                toggleEye.classList.add("fa-eye-slash");
+            }
+            
             modal.classList.add('active'); // 表示
+            
+            setTimeout(() => {
+                passwordInput.focus();
+            }, 100);
+        }
+    }
+
+    function closePasswordModal() {
+        if (modal) {
+            modal.classList.remove('active');
+            passwordInput.value = '';
         }
     }
 
     if (modalCancelBtn) {
-        modalCancelBtn.addEventListener('click', function() {
-            modal.classList.remove('active'); // 非表示
+        modalCancelBtn.addEventListener('click', closePasswordModal);
+    }
+
+    // モーダル外クリックで閉じる処理
+    window.addEventListener("click", function (e) {
+        if (modal && e.target === modal) {
+            closePasswordModal();
+        }
+    });
+
+    // 目玉アイコンでのパスワード表示/非表示切替
+    const togglePasswordEye = document.getElementById('togglePasswordEye');
+    if (togglePasswordEye) {
+        togglePasswordEye.addEventListener('click', function() {
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                togglePasswordEye.classList.remove("fa-eye-slash");
+                togglePasswordEye.classList.add("fa-eye");
+            } else {
+                passwordInput.type = "password";
+                togglePasswordEye.classList.remove("fa-eye");
+                togglePasswordEye.classList.add("fa-eye-slash");
+            }
         });
     }
 
@@ -110,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
             pendingRequestData.password = password;
             
             // モーダルを閉じて実行処理へ
-            modal.classList.remove('active');
+            closePasswordModal();
             submitExecute(pendingRequestData);
         });
     }

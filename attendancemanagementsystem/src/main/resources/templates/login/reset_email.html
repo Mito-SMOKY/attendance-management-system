@@ -21,12 +21,12 @@
             <div th:replace="~{fragments/_parts :: backButton(url=${backUrl})}"></div>
         </div>
 
-        <h2 class="main-title">新しいメールアドレスを入力してください</h2>
+        <div th:replace="~{fragments/_parts :: page-title-part('新しいメールアドレスを入力してください')}"></div>
         
-        <div th:if="${isFirstLogin}" style="background-color: #e3f2fd; padding: 15px; border-radius: 5px; margin-bottom: 20px; color: #0d47a1; font-size: 0.95rem; line-height: 1.6;">
+        <div th:if="${isFirstLogin}" class="FirstLogin" >
             <p style="margin: 0; font-weight: bold;">【重要】初回設定のお知らせ</p>
             <p style="margin: 5px 0 0;">初回ログインのため、メールアドレスの登録が必須となっております。<br>
-            パスワード再設定や重要なお知らせで使用するため、利用可能なアドレスを入力してください。</p>
+            利用可能なアドレスを入力してください。</p>
         </div>
 
         <div id="jsErrorMsg" class="js-error-msg"></div>

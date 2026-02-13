@@ -8,28 +8,17 @@ body {
 }
 
 .header-bar {
-    background-color: #6CC0C8;
+    background-color: #00bdca;
     height: 60px;
     width: 100%;
 }
 
 .container {
     max-width: 600px;
-    margin: 0 auto;
-    padding: 60px 20px;
+    margin:100px auto;
     text-align: center;
 }
 
-/* タイトル：文字色は黒、下線は水色 */
-.main-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333; /* ★ここを黒に変更しました */
-    margin-bottom: 30px;
-    display: inline-block;
-    border-bottom: 2px solid #6CC0C8; /* 下線 */
-    padding-bottom: 10px;
-}
 
 .description {
     font-size: 14px;
@@ -69,7 +58,7 @@ body {
 
 .input-text:focus {
     outline: none;
-    border-color: #6CC0C8;
+    border-color: #00bdca;
 }
 
 /* パスワード表示切り替え（目のアイコン）用ラッパー */
@@ -87,7 +76,7 @@ body {
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #6CC0C8;
+    color: #00bdca;
     cursor: pointer;
     font-size: 18px;
 }
@@ -99,7 +88,7 @@ body {
     max-width: 250px;
     margin: 40px auto 0;
     padding: 12px;
-    background-color: #6CC0C8;
+    background-color: #00bdca;
     color: white;
     border: none;
     border-radius: 5px;
@@ -133,7 +122,7 @@ body {
     display: block;
     margin-top: 30px;
     text-align: center;
-    color: #6CC0C8;
+    color: #00bdca;
     text-decoration: none;
     font-size: 14px;
 }
