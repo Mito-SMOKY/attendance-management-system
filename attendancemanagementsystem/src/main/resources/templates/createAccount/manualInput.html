@@ -84,16 +84,16 @@
                         <tr>
                             <td class="row-num">1</td>
                             <td>
-                                <input type="text" name="accounts[0].studentNumber" placeholder="ST001" 
+                                <input type="text" name="accounts[0].studentNumber" placeholder="ID(50文字)" 
                                        required oninput="sanitizeId(this)" />
                             </td>
                             <td>
-                                <input type="text" name="accounts[0].name" placeholder="例: 山田太郎" 
+                                <input type="text" name="accounts[0].name" placeholder="氏名(255文字)" 
                                        required oninput="sanitizeName(this)" />
                             </td>
                             <td>
                                 <input type="text" name="accounts[0].password" 
-                                       placeholder="パスワード" required autocomplete="off"
+                                       placeholder="パスワード(255文字)" required autocomplete="off"
                                        oninput="sanitizePassword(this)" />
                             </td>
                             <td class="action-cell">
