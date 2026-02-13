@@ -70,6 +70,7 @@ public class SuperAdminService {
     public List<Map<String, Object>> getAdminList(String keyword, String authFilter) {
         // ... (省略: 変更なし) ...
         // ファイルの内容と同じ実装のままでOKです
+
         Specification<AdministratorEntity> spec = Specification.where(null);
         
         spec = spec.and((root, query, cb) -> {
@@ -87,15 +88,6 @@ public class SuperAdminService {
             List<String> targetColumns = Arrays.asList("user.name", "user.loginId");
             Specification<AdministratorEntity> textSpec = searchService.createKeywordSpec(cleanKeyword, targetColumns);
             Specification<AdministratorEntity> finalKeywordSpec = textSpec;
-
-            if (cleanKeyword.matches("\\d+")) {
-                try {
-                    int searchId = Integer.parseInt(cleanKeyword);
-                    Specification<AdministratorEntity> idSpec = (root, query, cb) -> 
-                        cb.equal(root.get("userId"), searchId);
-                    finalKeywordSpec = Specification.where(textSpec).or(idSpec);
-                } catch (NumberFormatException e) {}
-            }
             spec = spec.and(finalKeywordSpec);
         }
 
