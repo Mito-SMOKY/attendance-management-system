@@ -40,7 +40,7 @@ public class StudentDeleteRequestController {
         }
         
         model.addAttribute("pageTitle", "生徒削除確認");
-        model.addAttribute("confirmMessage", "削除理由を入力してください（必須）");
+        model.addAttribute("confirmMessage", "変更内容を入力してください（必須）");
         model.addAttribute("studentList", studentList);
         model.addAttribute("approverList", deleteService.getApproverList()); 
         

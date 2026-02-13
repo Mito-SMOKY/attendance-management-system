@@ -12,6 +12,7 @@
 
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/admin/requestDetail.css}">
+    <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -26,26 +27,27 @@
 
     <main class="main-container">
 
-        <h2 class="page-title">申請詳細</h2>
+        <div th:replace="~{fragments/_parts :: page-title-part('申請詳細')}"></div>
 
         <div class="detail-card">
-            <h2>詳細情報</h2>
+            
+            <h2 >詳細情報</h2>
             
             <div class="info-group">
                 <div class="detail-item">
-                    <label>申請ID</label>
+                    <label class="label">申請ID</label>
                     <div class="value-box" th:text="${request.requestId}"></div>
                 </div>
                 
                 <div class="detail-item">
-                    <label>申請日時</label>
+                    <label class="label">申請日時</label>
                     <div class="value-box" th:text="${request.createdAt}"></div>
                 </div>
             </div>
 
             <div class="info-group">
                 <div class="detail-item">
-                    <label>申請者</label>
+                    <label class="label">申請者</label>
                     <div class="value-box">
                         <a th:href="@{/admin/studentInfo(id=${request.requesterId})}" 
                            th:text="${request.requesterName}" 
@@ -55,14 +57,14 @@
                 </div>
                 
                 <div class="detail-item">
-                    <label>申請種別</label>
+                    <label class="label">申請種別</label>
                     <div class="value-box" th:text="${request.typeName}"></div>
                 </div>
             </div>
 
             <div class="info-group">
                 <div class="detail-item">
-                    <label>ステータス</label>
+                    <label class="label">ステータス</label>
                     <span class="status-badge" 
                           th:classappend="'status-' + ${request.statusCode}"
                           th:text="${request.status}">
@@ -72,7 +74,7 @@
 
             <div class="info-group full-width" th:if="${request.details != null && !request.details.empty}">
                 <div class="detail-item full-width">
-                    <label>対象授業（公欠）</label>
+                    <label class="label">対象授業（公欠）</label>
                     <div class="table-container">
                         <table class="details-table">
                             <thead>
@@ -94,21 +96,21 @@
 
             <div class="info-group" th:if="${request.targetStatusId != null}">
                 <div class="detail-item">
-                    <label>変更後ステータスID</label>
+                    <label class="label">変更後ステータスID</label>
                     <div class="value-box" th:text="${request.targetStatusId}"></div>
                 </div>
             </div>
 
             <div class="info-group" th:if="${request.targetDepartmentId != null}">
                 <div class="detail-item">
-                    <label>変更後学科ID</label>
+                    <label class="label">変更後学科ID</label>
                     <div class="value-box" th:text="${request.targetDepartmentId}"></div>
                 </div>
             </div>
 
             <div class="info-group full-width">
                 <div class="detail-item full-width">
-                    <label>変更内容</label>
+                    <label class="label">変更内容</label>
                     <div class="value-box reason-box" th:text="${request.requestMessage}"></div>
                 </div>
             </div>

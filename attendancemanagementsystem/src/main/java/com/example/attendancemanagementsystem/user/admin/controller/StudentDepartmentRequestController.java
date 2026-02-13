@@ -42,7 +42,7 @@ public class StudentDepartmentRequestController {
 
         model.addAttribute("mode", "course");
         model.addAttribute("pageTitle", "学科・コース変更申請");
-        model.addAttribute("confirmMessage", "変更理由を入力してください（任意）");
+        model.addAttribute("confirmMessage", "変更内容を入力してください（任意）");
         
         model.addAttribute("studentList", studentList);
         model.addAttribute("departmentList", departmentService.getDepartmentList());
