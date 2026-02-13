@@ -166,21 +166,33 @@ public class AdminStudentSubjectService {
         // 明細行をDTOにセット
         dto.setDailyRecords(new ArrayList<>(recordMap.values()));
 
-        // 最終計算 
-        int total = list.size();
-        dto.setTotalClasses(total);
+        // 各ステータスのカウント値を取得
+        int totalPresent    = dto.getAttendanceCount();       // 出席
+        int totalAbsent     = dto.getAbsenceCount();          // 欠席
+        int totalLate       = dto.getLateCount();             // 遅刻
+        int totalOfficial   = dto.getPublicAbsenceCount();    // 公欠(公欠候補含む)
+        int totalEarlyLeave = dto.getEarlyLeaveCount();       // 早退
 
-        // 完了数計算に公欠と出席停止を含める
-        int effectiveAttendance = dto.getAttendanceCount() 
-                                + dto.getLateCount() 
-                                + dto.getEarlyLeaveCount() 
-                                + dto.getPublicAbsenceCount()
-                                + dto.getSuspensionCount(); 
+        // 実施回数の計算
+        int totalConducted = totalPresent + totalAbsent + totalLate + totalOfficial + totalEarlyLeave;
 
-        // 出席率計算
-        dto.setCompletedCount(effectiveAttendance + " / " + total);
-        double rate = (total > 0) ? (double) effectiveAttendance / total * 100 : 0.0;
+        // 出席率の計算
+        int numerator = totalPresent + totalOfficial;
+
+        double rate = 0.0;
+        if (totalConducted > 0) {
+            rate = (double) numerator / totalConducted * 100;
+        }
+
+        // 授業総数は参考情報としてセッ
+        dto.setTotalClasses(list.size());
+
+        // 完了数表示: 「出席+公欠 / 実施回数」の形式に変更
+        dto.setCompletedCount(numerator + " / " + totalConducted);
+
+        // 出席率セット
         dto.setAttendanceRate(String.format("%.1f%%", rate));
+
         return dto;
     }
 

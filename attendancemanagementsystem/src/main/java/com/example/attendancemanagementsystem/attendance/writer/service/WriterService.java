@@ -36,7 +36,7 @@ public class WriterService {
         //パス指定
         String projectDir = System.getProperty("user.dir");
         String scriptPath = Paths.get(projectDir, "attendancemanagementsystem", "python_scripts", "nfc_writer_json.py").toString();
-        String pythonExe = "C:/Users/Student/AppData/Local/Programs/Python/Python313/python.exe";
+        String pythonExe = "C:/Users/Student/AppData/Local/Programs/Python/Python312/python.exe";
 
         try {
             // Pythonスクリプトを実行

@@ -1,0 +1,89 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>操作履歴一覧</title>
+    <link rel="stylesheet" th:href="@{/css/parts.css}" />
+    <link rel="stylesheet" th:href="@{/css/sadmin/sadminHistoryList.css}" />
+    <link
+      href="https://use.fontawesome.com/releases/v6.2.0/css/all.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="header-container">
+      <div th:replace="~{fragments/_parts :: header}"></div>
+    </div>
+
+    <div class="main-wrapper">
+      <div class="top-section">
+        <h2 class="page-title">管理者操作履歴</h2>
+      </div>
+
+      <div class="table-container">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th width="15%">日時</th>
+              <th width="10%">操作</th>
+              <th width="15%">実行者</th>
+              <th width="15%">対象者</th>
+              <th width="45%">詳細内容</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="log : ${historyPage}">
+              <td
+                th:text="${#temporals.format(log.occurredAt, 'yyyy/MM/dd HH:mm')}"
+              ></td>
+
+              <td>
+                <span
+                  class="badge"
+                  th:classappend="${log.actionType == '新規作成' ? 'badge-create' : (log.actionType == '削除' ? 'badge-delete' : 'badge-update')}"
+                  th:text="${log.actionType}"
+                >
+                </span>
+              </td>
+
+              <td th:text="${log.operatorName}"></td>
+              <td th:text="${log.targetName}"></td>
+              <td class="text-left" th:text="${log.detail}"></td>
+            </tr>
+
+            <tr th:if="${historyPage.totalElements == 0}">
+              <td colspan="5" style="text-align: center; padding: 20px">
+                履歴はありません
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" th:if="${historyPage.totalPages > 1}">
+        <a
+          th:if="${historyPage.hasPrevious()}"
+          th:href="@{/admin/history(page=${historyPage.number - 1})}"
+          class="page-link"
+          >&laquo; 前へ</a
+        >
+
+        <span class="current-page">
+          Page <span th:text="${historyPage.number + 1}"></span> /
+          <span th:text="${historyPage.totalPages}"></span>
+        </span>
+
+        <a
+          th:if="${historyPage.hasNext()}"
+          th:href="@{/admin/history(page=${historyPage.number + 1})}"
+          class="page-link"
+          >次へ &raquo;</a
+        >
+      </div>
+
+      <div class="back-link-area">
+        <a th:href="@{/admin/sadminList}" class="btn-back">管理者一覧へ戻る</a>
+      </div>
+    </div>
+  </body>
+</html>

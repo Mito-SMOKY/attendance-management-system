@@ -9,10 +9,9 @@
 
 body {
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
     padding: 0;
-    overflow: hidden;
     color: #333;
     display: flex;
     flex-direction: column;
@@ -21,17 +20,20 @@ body {
     background-color: #fff;
 }
 
-/* ★修正済み★
-   .writer-container や .page-title の設定は全て削除しました。
-   これにより、parts.css (main-container) の共通レイアウトが適用され、
-   他の画面と全く同じ配置・サイズになります。
-*/
+.writer-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 100px;
+    padding-bottom: 50px;
+    text-align: center; 
+}
 
-.title {
-    text-align: center;
-    font-size: 50px;
-    font-weight: bold;
-    margin-bottom: 20px;
+#view-input {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .instruction-text {
@@ -110,8 +112,8 @@ body {
 }
 
 .text-input:focus {
-    border-color: #539DA4;
-    box-shadow: 0 0 0 3px rgba(83, 157, 164, 0.2);
+    border-color: #00bdca;
+    box-shadow: 0 0 0 3px rgba(0, 189, 202, 0.2);
 }
 
 .text-input[readonly] {
@@ -139,16 +141,16 @@ body {
     font-size: 1.1rem;
     font-weight: bold;
     color: white;
-    background-color: #539DA4;
+    background-color: #00bdca;
     border: none;
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(83, 157, 164, 0.3);
+    box-shadow: 0 4px 10px rgba(0, 189, 202, 0.3);
 }
 
 .auth-btn:hover {
-    background-color: #3D7E84;
+    background-color: #009aa5;
     transform: translateY(-2px);
 }
 
@@ -168,7 +170,10 @@ body {
 .hidden { display: none !important; }
 
 .spinner-container {
-    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-top: 30px;
 }
 
@@ -176,7 +181,7 @@ body {
     width: 60px;
     height: 60px;
     border: 6px solid #f3f3f3;
-    border-top: 6px solid #539DA4;
+    border-top: 6px solid #00bdca;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto;
@@ -189,12 +194,29 @@ body {
 
 .spinner-container p { display: none; }
 
+/* =========================================
+   ★修正: 結果エリアのアニメーション設定
+   ========================================= */
 .result-area {
     width: 100%;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* 親コンテナは常に表示状態にしておく */
+}
+
+/* ★修正: 画像と文字を最初は透明(opacity:0)にする */
+.result-image,
+.result-area .instruction-text,
+.result-area .result-message {
+    opacity: 0;
+    transition: opacity 0.8s ease; /* ふわっと表示する時間 */
+}
+
+/* ★追加: JSで付与する「表示」クラス */
+.fade-in {
+    opacity: 1 !important;
 }
 
 .result-message {

@@ -4,10 +4,13 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import com.example.attendancemanagementsystem.attendance.display.dto.SubjectAtte
 import com.example.attendancemanagementsystem.common.dto.AttendanceMetricsDto;
 import com.example.attendancemanagementsystem.common.entity.AttendanceEntity;
 import com.example.attendancemanagementsystem.common.entity.EnrollmentsEntity;
+import com.example.attendancemanagementsystem.common.entity.SessionEntity;
 import com.example.attendancemanagementsystem.common.entity.StudentEntity;
 import com.example.attendancemanagementsystem.common.entity.SubjectFaculty;
 import com.example.attendancemanagementsystem.common.entity.TimetableEntity;
@@ -24,6 +28,7 @@ import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.AttendanceRepository;
 import com.example.attendancemanagementsystem.common.repository.ClassroomRepository;
 import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository;
+import com.example.attendancemanagementsystem.common.repository.SessionRepository;
 import com.example.attendancemanagementsystem.common.repository.StudentRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectFacultyRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
@@ -44,6 +49,8 @@ public class SubjectAttendanceService {
     private final EnrollmentsRepository enrollmentsRepository;
     private final SubjectFacultyRepository subjectFacultyRepository;
     private final AttendanceCalculationService attendanceCalculationService;
+    // 追加: SessionRepository
+    private final SessionRepository sessionRepository;
 
     public SubjectAttendanceService(
             UsersRepository usersRepository,
@@ -54,7 +61,8 @@ public class SubjectAttendanceService {
             ClassroomRepository classroomRepository,
             EnrollmentsRepository enrollmentsRepository,
             SubjectFacultyRepository subjectFacultyRepository,
-            AttendanceCalculationService attendanceCalculationService) {
+            AttendanceCalculationService attendanceCalculationService,
+            SessionRepository sessionRepository) {
         this.usersRepository = usersRepository;
         this.studentRepository = studentRepository;
         this.timetableRepository = timetableRepository;
@@ -64,6 +72,7 @@ public class SubjectAttendanceService {
         this.enrollmentsRepository = enrollmentsRepository;
         this.subjectFacultyRepository = subjectFacultyRepository;
         this.attendanceCalculationService = attendanceCalculationService;
+        this.sessionRepository = sessionRepository;
     }
 
     public SubjectAttendanceDto getAttendanceDetails(String loginId, Integer subjectId, Integer year, Integer month) {
@@ -107,7 +116,6 @@ public class SubjectAttendanceService {
         String teacherNames = "未定";
         if (!facultyList.isEmpty()) {
             teacherNames = facultyList.stream()
-                // 修正箇所: sf.getUserId() -> sf.getId().getUserId()
                 .map(sf -> usersRepository.findById(sf.getId().getUserId()).map(UsersEntity::getName).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(", "));
@@ -119,8 +127,13 @@ public class SubjectAttendanceService {
 
 
         // 4. データ取得
+        // 予定（Timetable）
         List<TimetableEntity> timetables = timetableRepository.findBySubjectIdAndDateBetweenOrderByDateAscSlotIdAsc(
                 subjectId, startDate, endDate);
+        // 実績（Session）
+        List<SessionEntity> sessions = sessionRepository.findBySubject_SubjectIdAndSessionDateBetweenOrderBySessionDateAscTimeSlot_SlotIdAsc(
+                subjectId, startDate, endDate);
+        // 出席情報
         List<AttendanceEntity> attendances = attendanceRepository.findByStudentAndDateRangeAndSubject(
                 userId, startDate, endDate, subjectId);
 
@@ -136,62 +149,119 @@ public class SubjectAttendanceService {
         List<SubjectAttendanceDto.DailyDetail> dailyList = new ArrayList<>();
         DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("MM/dd(E)", Locale.JAPANESE);
 
-        // 日付ごとにグルーピング
-        Map<LocalDate, List<TimetableEntity>> dailyMap = timetables.stream()
-                .collect(Collectors.groupingBy(TimetableEntity::getDate));
-        List<Map.Entry<LocalDate, List<TimetableEntity>>> sortedEntries = new ArrayList<>(dailyMap.entrySet());
-        sortedEntries.sort(Map.Entry.comparingByKey());
+        // データ処理用のマップ作成
+        // 日付 -> (時限 -> SessionEntity)
+        Map<LocalDate, Map<Integer, SessionEntity>> sessionMap = sessions.stream()
+                .filter(s -> s.getTimeSlot() != null)
+                .collect(Collectors.groupingBy(
+                        SessionEntity::getSessionDate,
+                        Collectors.toMap(
+                                s -> s.getTimeSlot().getSlotId(),
+                                s -> s,
+                                (existing, replacement) -> replacement // 万が一重複があった場合は後勝ち
+                        )
+                ));
+
+        // 日付 -> (時限 -> TimetableEntity)
+        Map<LocalDate, Map<Integer, TimetableEntity>> timetableMap = timetables.stream()
+                .filter(t -> t.getSlotId() != null)
+                .collect(Collectors.groupingBy(
+                        TimetableEntity::getDate,
+                        Collectors.toMap(
+                                TimetableEntity::getSlotId,
+                                t -> t,
+                                (existing, replacement) -> replacement
+                        )
+                ));
+
+        // 出席情報マップ (SessionID -> AttendanceEntity)
+        Map<Integer, AttendanceEntity> attendanceMap = attendances.stream()
+                .filter(a -> a.getSession() != null)
+                .collect(Collectors.toMap(
+                        a -> a.getSession().getSessionId(),
+                        a -> a,
+                        (e, r) -> e
+                ));
+
+        // 表示すべき全日付のセットを作成 (予定と実績の和集合)
+        Set<LocalDate> allDates = new HashSet<>();
+        allDates.addAll(timetableMap.keySet());
+        allDates.addAll(sessionMap.keySet());
+
+        List<LocalDate> sortedDates = new ArrayList<>(allDates);
+        sortedDates.sort(LocalDate::compareTo);
 
         // 日別ループ
-        for (Map.Entry<LocalDate, List<TimetableEntity>> entry : sortedEntries) {
-            LocalDate date = entry.getKey();
-            List<TimetableEntity> tts = entry.getValue();
-
+        for (LocalDate date : sortedDates) {
             List<String> statuses = new ArrayList<>();
+            // 初期化 (4コマ分)
             for (int i = 0; i < 4; i++) statuses.add("-");
-            String classroomName = "-";
+            
+            String classroomName = "-"; // その日の代表教室（最後に見つかったものをセットする簡易ロジック）
 
-            for (TimetableEntity tt : tts) {
-                if (tt.getClassroomId() != null) {
-                    classroomName = classroomRepository.findById(tt.getClassroomId())
-                            .map(c -> c.getClassroomName()).orElse("-");
-                } else {
-                    classroomName = "未定";
-                }
+            // 1限から4限までループ
+            for (int slot = 1; slot <= 4; slot++) {
+                int listIndex = slot - 1;
 
-                String statusSymbol = "-";
-                AttendanceEntity att = attendances.stream()
-                        .filter(a -> a.getSession() != null 
-                                && a.getSession().getTimeTable() != null 
-                                && a.getSession().getTimeTable().getTimeTableId().equals(tt.getTimeTableId()))
-                        .findFirst().orElse(null);
-
-                if (att != null && att.getStatus() != null) {
-                    String sName = att.getStatus().getStatusName();
-                    
-                    if ("出席".equals(sName)) { statusSymbol = "○"; monthlyPresent++; }
-                    else if ("欠席".equals(sName)) { statusSymbol = "✕"; monthlyAbsent++; }
-                    else if ("遅刻".equals(sName)) { statusSymbol = "△"; monthlyLate++; }
-                    else if ("早退".equals(sName)) { statusSymbol = "△"; monthlyEarlyLeave++; }
-                    else if ("公欠".equals(sName)) { statusSymbol = "○"; monthlyOfficial++; }
-                    else { statusSymbol = sName; }
-                }
+                // 優先順位1: Session (実績)
+                SessionEntity session = sessionMap.getOrDefault(date, new HashMap<>()).get(slot);
                 
-                if (tt.getSlotId() != null) {
-                    int slotIndex = tt.getSlotId() - 1; 
-                    if (slotIndex >= 0 && slotIndex < 4) {
-                        statuses.set(slotIndex, statusSymbol);
+                // 優先順位2: Timetable (予定)
+                TimetableEntity timetable = timetableMap.getOrDefault(date, new HashMap<>()).get(slot);
+
+                if (session != null) {
+                    // --- 実績データがある場合 ---
+                    
+                    // 教室名の取得 (Session優先)
+                    if (session.getClassroom() != null) {
+                        classroomName = session.getClassroom().getClassroomName();
                     }
+
+                    // 出席ステータスの取得 (SessionIDで紐付け)
+                    AttendanceEntity att = attendanceMap.get(session.getSessionId());
+                    String statusSymbol = "-";
+
+                    if (att != null && att.getStatus() != null) {
+                        String sName = att.getStatus().getStatusName();
+                        
+                        if ("出席".equals(sName)) { statusSymbol = "○"; monthlyPresent++; }
+                        else if ("欠席".equals(sName)) { statusSymbol = "✕"; monthlyAbsent++; }
+                        else if ("遅刻".equals(sName)) { statusSymbol = "△"; monthlyLate++; }
+                        else if ("早退".equals(sName)) { statusSymbol = "△"; monthlyEarlyLeave++; }
+                        else if ("公欠".equals(sName)) { statusSymbol = "○"; monthlyOfficial++; }
+                        else { statusSymbol = sName; }
+                    } else if (session.getSessionFlag()) {
+                         // Sessionはあるが出席レコードがない場合 (かつ実施済みフラグがtrueなら欠席扱いなどの仕様によるが、ここでは"-"または適宜調整)
+                         // 今回は既存ロジックに合わせてレコードがなければ "-" とします
+                    }
+                    
+                    statuses.set(listIndex, statusSymbol);
+
+                } else if (timetable != null) {
+                    // --- 実績はないが予定がある場合 ---
+                    
+                    // 教室名の取得 (Timetableから)
+                    if ("-".equals(classroomName) && timetable.getClassroomId() != null) {
+                        // Repository経由ではなくEntity経由で取得するか、IDから取得
+                         classroomName = classroomRepository.findById(timetable.getClassroomId())
+                                .map(c -> c.getClassroomName()).orElse("-");
+                    }
+                    
+                    // ステータスは予定段階なので "-"
+                    statuses.set(listIndex, "-");
                 }
             }
-
+            
+            // 日毎のデータとして追加
             dailyList.add(new SubjectAttendanceDto.DailyDetail(
                     date.format(dayFormatter),
                     statuses,
                     classroomName
             ));
         }
+
         dto.setDailyAttendanceList(dailyList);
+        // 代表教室のセット (リストが空でなければ最初の要素など、既存ロジックに準拠)
         dto.setClassroom(dailyList.isEmpty() ? "-" : dailyList.get(0).getClassroom());
 
         dto.setPresentClasses(monthlyPresent);
