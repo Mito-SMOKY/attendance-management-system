@@ -13,11 +13,11 @@
 .main-container{
     width: 100%;
     display: flex;
-    justify-self: center;
+    justify-self: left;
     gap: 10px;
     border-top: 1px dashed #ccc;
     padding-top: 15px;
-    margin-top: 15px;
+    margin: 15px 0px !important;
 }
 
 .container-1{

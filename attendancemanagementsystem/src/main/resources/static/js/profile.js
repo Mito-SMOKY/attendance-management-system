@@ -8,6 +8,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const displayName = document.getElementById('display-value');
     const nameInput = document.getElementById('username-input');
 
+    if (nameInput) {
+        nameInput.addEventListener('input', function() {
+            // \s は半角スペースやタブなど。「　」は全角スペース。
+            this.value = this.value.replace(/[\s　]+/g, '');
+        });
+    }
+
     // 初期状態の保存（キャンセル時に戻すため）
     let originalName = "";
 
