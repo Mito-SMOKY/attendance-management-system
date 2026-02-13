@@ -137,8 +137,8 @@ body {
     line-height: 1;
 }
 
-.status-ok { color: #333; }
-.status-ng { color: #333; }
+.status-ok { color: #00bdca; }
+.status-ng { color: #FF6F65; }
 .status-late { color: #f39c12; }
 
 .no-data {
