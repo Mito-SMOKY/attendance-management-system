@@ -19,11 +19,12 @@
         <div th:replace="~{fragments/_parts :: backButton(url='/admin/request/history')}"></div>
     </div>
 
-    <main class="main-container" style="padding: 20px;">
+    <main class="main-detail-container">
+
+        <div th:replace="~{fragments/_parts :: page-title-part('申請詳細')}"></div>
         
-        <div class="detail-box">
+        <div class="detail-container">
             <div class="detail-header">
-                <h2 class="page-title" style="margin:0; color:#00bdca;">申請詳細情報</h2>
                 
                 <span class="status-badge"
                     style="font-size: 1.1em; padding: 8px 15px;"
@@ -65,7 +66,7 @@
 
             <div class="detail-row">
                 <div class="detail-label">備考・変更内容</div>
-                <div class="detail-value" style="white-space: pre-wrap;" th:text="${detail.message}">ここに変更内容が表示されます。</div>
+                <div class="detail-value" style="white-space: pre-wrap;" th:text="${detail.message}"></div>
             </div>
 
             <div class="detail-row" style="border-bottom: none; display: block;">

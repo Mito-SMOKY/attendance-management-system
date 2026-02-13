@@ -3,13 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <title>管理者詳細</title>
-
     <link rel="stylesheet" th:href="@{/css/parts.css}" />
     <link rel="stylesheet" th:href="@{/css/sadmin/sadminInfo.css}" />
-    <link
-      href="https://use.fontawesome.com/releases/v6.2.0/css/all.css"
-      rel="stylesheet"
-    />
+    <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet" />
+
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
   </head>
   <body>
     <div class="header-container">
@@ -19,48 +18,22 @@
     <div class="main-wrapper">
       <div class="top-section">
         <div class="backbutton-container">
-          <div
-            th:replace="~{fragments/_parts :: backButton(url='/admin/sadminList')}"
-          ></div>
+          <div th:replace="~{fragments/_parts :: backButton(url='/admin/sadminList')}"></div>
         </div>
-
         <h2 class="page-title">管理者詳細</h2>
       </div>
 
       <div class="info-container">
-        <div
-          th:if="${errorMessage}"
-          style="color: red; margin-bottom: 15px; text-align: center"
-        >
-          <i class="fa-solid fa-circle-exclamation"></i>
-          <span th:text="${errorMessage}"></span>
-        </div>
-        <div
-          th:if="${successMessage}"
-          style="color: green; margin-bottom: 15px; text-align: center"
-        >
-          <i class="fa-solid fa-check"></i>
-          <span th:text="${successMessage}"></span>
-        </div>
+        <div class="info-container">
+        <input type="hidden" id="serverErrorMessage" th:if="${errorMessage}" th:value="${errorMessage}" />
+        <input type="hidden" id="serverSuccessMessage" th:if="${successMessage}" th:value="${successMessage}" />
 
         <div class="info-header">
           <h3>登録情報</h3>
-          <button
-            type="button"
-            id="btnEditMode"
-            class="btn-edit-mode"
-            onclick="toggleEditMode()"
-          >
-            編集
-          </button>
+          <button type="button" id="btnEditMode" class="btn-edit-mode">編集</button>
         </div>
 
-        <form
-          id="detailForm"
-          th:action="@{/admin/sadmin/update}"
-          method="post"
-          th:object="${sadminInfo}"
-        >
+        <form id="detailForm" th:action="@{/admin/sadmin/update}" method="post" th:object="${sadminInfo}">
           <input type="hidden" id="userId" name="userId" th:value="*{userId}" />
 
           <div class="detail-box">
@@ -73,32 +46,16 @@
             <div class="detail-row">
               <div class="detail-label">氏名</div>
               <div class="detail-value">
-                <input
-                  type="text"
-                  id="userName"
-                  name="name"
-                  th:value="*{name}"
-                  disabled
-                  required
-                />
+                <input type="text" id="userName" name="name" th:value="*{name}" disabled required />
               </div>
             </div>
 
             <div class="detail-row">
               <div class="detail-label">上位権限</div>
               <div class="detail-value">
-                <select
-                  id="userAuth"
-                  name="adminLevelID"
-                  class="auth-select"
-                  disabled
-                >
-                  <option value="1" th:selected="*{adminLevelID == 1}">
-                    〇 (上位権限)
-                  </option>
-                  <option value="0" th:selected="*{adminLevelID == 0}">
-                    ✕ (一般権限)
-                  </option>
+                <select id="userAuth" name="adminLevelID" class="auth-select" disabled>
+                  <option value="1" th:selected="*{adminLevelID == 1}">〇 (上位権限)</option>
+                  <option value="0" th:selected="*{adminLevelID == 0}">✕ (一般権限)</option>
                 </select>
               </div>
             </div>
@@ -108,46 +65,15 @@
             <div class="detail-row">
               <div class="detail-label">メールアドレス</div>
               <div class="detail-value">
-                <input
-                  type="text"
-                  id="userEmail"
-                  name="email"
-                  class="no-edit"
-                  th:value="*{email}"
-                  disabled
-                />
+                <input type="text" id="userEmail" name="email" class="no-edit" th:value="*{email}" disabled />
               </div>
             </div>
           </div>
 
           <div class="action-buttons">
-            <button
-              class="btn-delete"
-              type="button"
-              onclick="openDeleteModal()"
-            >
-              ユーザー削除
-            </button>
-
-            <button
-              class="btn-cancel-edit"
-              id="btnCancel"
-              type="button"
-              onclick="cancelEdit()"
-              style="display: none"
-            >
-              キャンセル
-            </button>
-
-            <button
-              class="btn-confirm"
-              id="btnSave"
-              type="button"
-              onclick="openUpdateModal()"
-              style="display: none"
-            >
-              確定
-            </button>
+            <button class="btn-delete" type="button" id="btnOpenDeleteModal">ユーザー削除</button>
+            <button class="btn-cancel-edit" id="btnCancel" type="button" style="display: none">キャンセル</button>
+            <button class="btn-confirm" id="btnSave" type="button" style="display: none">確定</button>
           </div>
 
           <div id="updateModal" class="modal-overlay">
@@ -155,41 +81,18 @@
               <div class="modal-icon" style="color: #00bdca">
                 <i class="fa-solid fa-file-pen"></i>
               </div>
-
               <h2 class="modal-title">変更内容を保存しますか？</h2>
-              <p class="modal-desc" style="margin-bottom: 20px">
-                セキュリティ保護のため、<br />あなたのパスワードを入力してください。
-              </p>
+              <p class="modal-desc" style="margin-bottom: 20px">セキュリティ保護のため、<br />あなたのパスワードを入力してください。</p>
 
               <p class="modal-input-label">操作者パスワード</p>
               <div class="password-wrapper">
-                <input
-                  type="password"
-                  id="updatePassword"
-                  name="currentAdminPassword"
-                  placeholder="パスワードを入力"
-                />
-                <i
-                  class="fa-solid fa-eye-slash toggle-eye"
-                  onclick="toggleUpdatePasswordVisibility()"
-                ></i>
+                <input type="password" id="updatePassword" name="currentAdminPassword" placeholder="パスワードを入力" />
+                <i class="fa-solid fa-eye-slash toggle-eye" id="toggleUpdateEye"></i>
               </div>
 
               <div class="modal-buttons">
-                <button
-                  type="button"
-                  class="btn-modal-cancel"
-                  onclick="closeUpdateModal()"
-                >
-                  キャンセル
-                </button>
-                <button
-                  type="button"
-                  class="btn-confirm"
-                  onclick="submitUpdate()"
-                >
-                  保存する
-                </button>
+                <button type="button" class="btn-modal-cancel" id="btnUpdateCancel">キャンセル</button>
+                <button type="button" class="btn-confirm" id="btnUpdateSubmit">保存する</button>
               </div>
             </div>
           </div>
@@ -202,50 +105,24 @@
         <div class="modal-icon">
           <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
-
         <h2 class="modal-title">このユーザーを削除しますか？</h2>
         <p class="modal-warning">※この操作は取り消せません</p>
 
         <div class="modal-user-info">
-          <p>
-            ログインID：<span
-              id="modalLoginIdDisplay"
-              style="font-weight: bold"
-            ></span>
-          </p>
-          <p>
-            氏名：<span
-              id="modalUserNameDisplay"
-              style="font-weight: bold"
-            ></span>
-          </p>
+          <p>ログインID：<span id="modalLoginIdDisplay" style="font-weight: bold"></span></p>
+          <p>氏名：<span id="modalUserNameDisplay" style="font-weight: bold"></span></p>
         </div>
 
         <form id="deleteForm" th:action="@{/admin/sadmin/delete}" method="post">
           <input type="hidden" id="deleteTargetId" name="targetID" />
           <p class="modal-input-label">あなたのパスワードを入力してください</p>
           <div class="password-wrapper">
-            <input
-              type="password"
-              id="deletePassword"
-              name="password"
-              placeholder="*******"
-              required
-            />
-            <i
-              class="fa-solid fa-eye-slash toggle-eye"
-              onclick="togglePasswordVisibility()"
-            ></i>
+            <input type="password" id="deletePassword" name="password" placeholder="*******" required />
+            <i class="fa-solid fa-eye-slash toggle-eye" id="toggleDeleteEye"></i>
           </div>
 
           <div class="modal-buttons">
-            <button
-              type="button"
-              class="btn-modal-cancel"
-              onclick="closeDeleteModal()"
-            >
-              キャンセル
-            </button>
+            <button type="button" class="btn-modal-cancel" id="btnDeleteCancel">キャンセル</button>
             <button type="submit" class="btn-modal-delete">削除</button>
           </div>
         </form>

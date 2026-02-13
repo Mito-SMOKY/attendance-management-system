@@ -114,6 +114,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const em = document.getElementById('endMonth').value.padStart(2, '0');
             const ed = document.getElementById('endDay').value.padStart(2, '0');
 
+            const startDateStr = `${sy}-${sm}-${sd}`;
+            const endDateStr = `${ey}-${em}-${ed}`;
+
+            if (startDateStr > endDateStr) {
+                alert("正しい日付を入力してください。");
+                return; // ここで処理を中断し、モーダルを開かせない
+            }
+
+
             // 隠しフィールドにセット (YYYY-MM-DD形式)
             document.getElementById('hiddenStartDate').value = `${sy}-${sm}-${sd}`;
             document.getElementById('hiddenEndDate').value = `${ey}-${em}-${ed}`;
