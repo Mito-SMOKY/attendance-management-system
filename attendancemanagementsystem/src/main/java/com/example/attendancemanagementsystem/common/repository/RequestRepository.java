@@ -25,4 +25,6 @@ public interface RequestRepository extends JpaRepository<RequestEntity, Integer>
     List<RequestEntity> findByRequesterUserIdInOrderByCreatedAtDesc(Collection<Integer> requesterUserIds);
 
     List<RequestEntity> findByRequesterUserIdNotInOrderByCreatedAtDesc(Collection<Integer> excludeUserIds);
+
+    List<RequestEntity> findByStatusAndRequesterUserIdInOrderByCreatedAtAsc(Integer status, Collection<Integer> requesterUserIds);
 }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,14 +29,52 @@ public class RequestHistoryService {
     @Autowired
     private UsersRepository usersRepository;
 
+    @Autowired
+    private com.example.attendancemanagementsystem.user.admin.service.RequestService adminRequestService;
+
     @PersistenceContext
     private EntityManager entityManager;
 
-    // 自分の申請履歴一覧の取得
+    /**
+     * 【自身の申請履歴】 (Outbox)
+     * 自分が申請者(Requester)であるデータを取得
+     */
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getMyRequestHistory(Integer userId) {
+        // 自分が申請したものを取得
         List<RequestEntity> requests = requestRepository.findByRequesterUserIdOrderByCreatedAtDesc(userId);
-        List<Map<String, Object>> historyList = new ArrayList<>();
+        return convertRequestsToMapList(requests, false);
+    }
+
+    /**
+     * 【生徒からの未承認申請】 (Inbox)
+     * ステータスが1(承認待ち) かつ 申請者が生徒(UserTypeId=2) のデータを取得
+     */
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getPendingStudentRequests() {
+        // 1. 生徒(UserTypeId=2)のユーザー一覧を取得
+        List<UsersEntity> students = usersRepository.findByUserTypeId(1);
+        
+        // 生徒がいない場合は空リストを返す（これを行わないと次の検索でエラーになる可能性があるため）
+        if (students.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 2. 生徒のIDリストを抽出
+        List<Integer> studentIds = students.stream()
+                .map(UsersEntity::getUserId)
+                .collect(Collectors.toList());
+
+        // 3. ステータスが1(承認待ち)かつ、申請者が生徒IDリストに含まれるものを検索
+        // 追加したRepositoryメソッドを使用
+        List<RequestEntity> requests = requestRepository.findByStatusAndRequesterUserIdInOrderByCreatedAtAsc(1, studentIds);
+
+        return convertRequestsToMapList(requests, true);
+    }
+
+    // --- 共通変換ロジック ---
+    private List<Map<String, Object>> convertRequestsToMapList(List<RequestEntity> requests, boolean showRequesterName) {
+        List<Map<String, Object>> list = new ArrayList<>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 
         for (RequestEntity req : requests) {
@@ -47,20 +85,26 @@ public class RequestHistoryService {
             map.put("status", getStatusName(req.getStatus()));
             map.put("statusCode", req.getStatus());
             
-            String approverName = "不明";
-            if (req.getApproverId() != null) {
-                Optional<UsersEntity> approver = usersRepository.findById(req.getApproverId());
-                if (approver.isPresent()) {
-                    approverName = approver.get().getName();
+            String targetName = "-";
+            if (showRequesterName) {
+                // 生徒の名前を表示
+                targetName = usersRepository.findById(req.getRequesterUserId())
+                        .map(UsersEntity::getName).orElse("不明");
+            } else {
+                // 承認者の名前を表示
+                if (req.getApproverId() != null) {
+                    targetName = usersRepository.findById(req.getApproverId())
+                            .map(UsersEntity::getName).orElse("-");
                 }
             }
-            map.put("approverName", approverName);
-            historyList.add(map);
+            map.put("targetName", targetName);
+            
+            list.add(map);
         }
-        return historyList;
+        return list;
     }
 
-    // 申請詳細情報の取得
+    // --- 詳細取得 ---
     @Transactional(readOnly = true)
     public Map<String, Object> getRequestDetail(Integer requestId) {
         RequestEntity req = requestRepository.findById(requestId).orElse(null);
@@ -71,27 +115,26 @@ public class RequestHistoryService {
 
         map.put("requestId", req.getRequestId());
         map.put("createdAt", (req.getCreatedAt() != null) ? req.getCreatedAt().format(dtf) : "-");
-        
-        Integer typeId = req.getRequestTypeId(); // null対策のため一度変数へ
+        Integer typeId = req.getRequestTypeId();
         map.put("type", getRequestTypeName(typeId));
         map.put("typeId", typeId);
-        
         map.put("status", getStatusName(req.getStatus()));
         map.put("statusCode", req.getStatus());
         map.put("message", (req.getRequestMessage() != null) ? req.getRequestMessage() : "");
 
-        // 承認者名
+        String requesterName = usersRepository.findById(req.getRequesterUserId())
+                .map(UsersEntity::getName).orElse("不明");
+        map.put("requesterName", requesterName);
+
         String approverName = "-";
         if (req.getApproverId() != null) {
-            Optional<UsersEntity> u = usersRepository.findById(req.getApproverId());
-            if (u.isPresent()) approverName = u.get().getName();
+            approverName = usersRepository.findById(req.getApproverId())
+                    .map(UsersEntity::getName).orElse("-");
         }
         map.put("approverName", approverName);
 
-        // 対象生徒リスト (LazyInit対策として、List取得時のnullチェックとループを安全に)
         List<Map<String, String>> students = new ArrayList<>();
-        List<UsersEntity> targets = req.getTargetUsers(); // ここで取得
-        
+        List<UsersEntity> targets = req.getTargetUsers();
         if (targets != null && !targets.isEmpty()) {
             for (UsersEntity u : targets) {
                 if (u != null) {
@@ -104,11 +147,8 @@ public class RequestHistoryService {
         }
         map.put("students", students);
 
-        // 追加情報の取得 (申請種別ごと)
         map.put("targetDetail", null);
-
         if (typeId != null) {
-            // ステータス変更申請(3)
             if (typeId == 3 && req.getTargetStatusId() != null) {
                 try {
                     String sql = "SELECT StudentStatusName FROM studentstatus WHERE StudentStatusID = :id";
@@ -116,11 +156,8 @@ public class RequestHistoryService {
                     query.setParameter("id", req.getTargetStatusId());
                     String statusName = (String) query.getSingleResult();
                     map.put("targetDetail", "変更後: " + statusName);
-                } catch (Exception e) {
-                    map.put("targetDetail", "変更後: 不明");
-                }
+                } catch (Exception e) { map.put("targetDetail", "変更後: 不明"); }
             }
-            // 学科変更申請(4)
             else if (typeId == 4 && req.getTargetDepartmentId() != null) {
                 try {
                     String sql = """
@@ -133,44 +170,50 @@ public class RequestHistoryService {
                     Query query = entityManager.createNativeQuery(sql);
                     query.setParameter("id", req.getTargetDepartmentId());
                     String deptName = (String) query.getSingleResult();
-                    // 表示名から「クラス」のような重複文字を削除する処理が必要ならここで行う
-                    // 今回はSQLで整形済み
                     map.put("targetDetail", "変更後: " + deptName);
-                } catch (Exception e) {
-                    map.put("targetDetail", "変更後: 不明");
-                }
+                } catch (Exception e) { map.put("targetDetail", "変更後: 不明"); }
             }
         }
-
         return map;
     }
 
-    // 【追加】申請の取り下げ処理
+    // --- アクション処理 ---
+
+    // 1. 自身の申請取り下げ
     @Transactional
     public void withdrawRequest(Integer requestId, Integer userId) {
         RequestEntity request = requestRepository.findById(requestId)
-                .orElseThrow(() -> new IllegalArgumentException("指定された申請が見つかりません (ID: " + requestId + ")"));
-
-        // 本人の申請かチェック
+                .orElseThrow(() -> new IllegalArgumentException("指定された申請が見つかりません"));
         if (!request.getRequesterUserId().equals(userId)) {
             throw new SecurityException("他人の申請を取り下げることはできません。");
         }
-
-        // ステータスチェック (承認待ち(1) 以外は取り下げ不可)
-        // ※StatusがNULLの場合は0(未処理)として扱うなど、運用に合わせて調整してください
-        Integer currentStatus = request.getStatus() != null ? request.getStatus() : 0;
-        if (currentStatus != 1) { 
-            throw new IllegalStateException("既に処理済み（または取り下げ済み）のため、取り下げできません。");
+        if ((request.getStatus() != null ? request.getStatus() : 0) != 1) { 
+            throw new IllegalStateException("既に処理済みのため、取り下げできません。");
         }
-
-        // ステータスを「3: 取り下げ」に更新
-        // ※getStatusNameメソッドでは3を「拒 否」としていますが、システム上のステータスコードとして3を使用します
-        request.setStatus(3);
+        request.setStatus(3); // 3: 取り下げ
         requestRepository.save(request);
     }
 
-    // --- ヘルパーメソッド ---
+    // 2. 生徒の申請を承認
+    @Transactional
+    public void approveRequest(Integer requestId, Integer approverId) {
+        adminRequestService.approveRequest(requestId, approverId);
+    }
 
+    // 3. 生徒の申請を却下
+    @Transactional
+    public void rejectRequest(Integer requestId, Integer approverId) {
+        RequestEntity request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("申請が見つかりません"));
+        if (request.getStatus() != 1) {
+            throw new IllegalStateException("既に処理済みの申請です");
+        }
+        request.setStatus(3); // 3: 却下
+        request.setApproverId(approverId);
+        requestRepository.save(request);
+    }
+
+    // --- ヘルパー ---
     private String getRequestTypeName(Integer typeId) {
         if (typeId == null) return "-";
         switch (typeId) {
@@ -186,8 +229,8 @@ public class RequestHistoryService {
         if (status == null) return "-";
         switch (status) {
             case 1: return "承認待ち";
-            case 2: return "承認";
-            case 3: return "却下";
+            case 2: return "承 認";
+            case 3: return "拒 否"; 
             default: return "その他";
         }
     }

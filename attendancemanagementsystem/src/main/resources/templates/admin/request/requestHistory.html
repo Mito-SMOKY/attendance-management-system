@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${pageTitle}">申請履歴</title>
+    <title th:text="${pageTitle}">申請管理</title>
     
     <link rel="stylesheet" th:href="@{/css/parts.css}">
     <link rel="stylesheet" th:href="@{/css/admin/requestHistory.css}">
@@ -21,7 +21,7 @@
 
     <main class="main-container">
         
-        <div th:replace="~{fragments/_parts :: page-title-part('申請履歴')}"></div>
+        <div th:replace="~{fragments/_parts :: page-title-part('申請管理・履歴')}"></div>
         
         <div th:if="${successMessage}" class="message-box success">
             <i class="fa-solid fa-check-circle"></i> <span th:text="${successMessage}"></span>
@@ -30,8 +30,50 @@
             <i class="fa-solid fa-triangle-exclamation"></i> <span th:text="${errorMessage}"></span>
         </div>
 
-        <div th:if="${#lists.isEmpty(historyList)}" style="text-align: center; padding: 40px; color: #666;">
-            <i class="fa-regular fa-folder-open" style="font-size: 3em; margin-bottom: 15px;"></i>
+        <h2 class="section-title">【承認待ち】生徒からの申請</h2>
+        
+        <div th:if="${#lists.isEmpty(studentRequests)}" class="empty-message">
+            <p>承認待ちの申請はありません。</p>
+        </div>
+
+        <table class="history-table" th:unless="${#lists.isEmpty(studentRequests)}">
+            <thead>
+                <tr>
+                    <th>申請日</th>
+                    <th>申請者 (生徒)</th>
+                    <th>申請種別</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="req : ${studentRequests}">
+                    <td th:text="${req.createdAt}">2026/02/15 10:00</td>
+                    <td th:text="${req.targetName}">生徒 太郎</td>
+                    <td th:text="${req.type}">公欠申請</td>
+                    <td>
+                        <a th:href="@{/admin/request/history/{id}(id=${req.requestId})}" class="detail-btn">
+                            詳細
+                        </a>
+                        
+                        <form th:action="@{/admin/request/history/{id}/approve(id=${req.requestId})}" 
+                            method="post" class="action-form"
+                            onsubmit="return confirm('この申請を承認しますか？');">
+                            <button type="submit" class="approve-btn">承諾</button>
+                        </form>
+
+                        <form th:action="@{/admin/request/history/{id}/reject(id=${req.requestId})}" 
+                            method="post" class="action-form"
+                            onsubmit="return confirm('この申請を却下しますか？');">
+                            <button type="submit" class="reject-btn">却下</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2 class="section-title">【申請履歴】自身の申請</h2>
+
+        <div th:if="${#lists.isEmpty(historyList)}" class="empty-message">
             <p>申請履歴はありません。</p>
         </div>
 
@@ -49,7 +91,7 @@
                 <tr th:each="req : ${historyList}">
                     <td th:text="${req.createdAt}">2026/01/23 10:00</td>
                     <td th:text="${req.type}">生徒削除</td>
-                    <td th:text="${req.approverName}">管理者 太郎</td>
+                    <td th:text="${req.targetName}">管理者 太郎</td>
                     <td>
                         <span class="status-badge"
                             th:classappend="${
@@ -68,8 +110,7 @@
 
                         <form th:if="${req.statusCode == 1}" 
                             th:action="@{/admin/request/history/{id}/withdraw(id=${req.requestId})}" 
-                            method="post" 
-                            style="display:inline; margin-left: 5px;"
+                            method="post" class="action-form"
                             onsubmit="return confirm('本当にこの申請を取り下げますか？');">
                             <button type="submit" class="withdraw-btn">
                                 取り下げ

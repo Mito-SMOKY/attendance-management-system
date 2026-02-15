@@ -9,9 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping; // 追加
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes; // 追加
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.attendancemanagementsystem.user.admin.service.RequestHistoryService;
 import com.example.attendancemanagementsystem.user.loginandprofile.service.CustomUserDetails;
@@ -29,11 +29,15 @@ public class RequestHistoryController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             Model model) {
         
-        // ログインユーザーのIDで履歴を取得
+        // 1. 生徒からの未承認申請 (Inbox)
+        List<Map<String, Object>> studentRequests = historyService.getPendingStudentRequests();
+        model.addAttribute("studentRequests", studentRequests);
+
+        // 2. 自分の申請履歴 (Outbox)
         List<Map<String, Object>> historyList = historyService.getMyRequestHistory(userDetails.getUserId());
-        
-        model.addAttribute("pageTitle", "申請履歴");
         model.addAttribute("historyList", historyList);
+        
+        model.addAttribute("pageTitle", "申請管理・履歴");
         
         return "admin/request/requestHistory";
     }
@@ -56,21 +60,48 @@ public class RequestHistoryController {
         return "admin/request/requestDetail";
     }
 
-    // ★追加: 申請取り下げ処理
+    // 自分の申請を取り下げ
     @PostMapping("/{id}/withdraw")
     public String withdraw(
             @PathVariable("id") Integer requestId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             RedirectAttributes redirectAttributes) {
-        
         try {
-            // サービス側の取り下げメソッドを呼び出し
             historyService.withdrawRequest(requestId, userDetails.getUserId());
             redirectAttributes.addFlashAttribute("successMessage", "申請を取り下げました。");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "取り下げに失敗しました: " + e.getMessage());
         }
-        
+        return "redirect:/admin/request/history";
+    }
+
+    // 生徒の申請を承認
+    @PostMapping("/{id}/approve")
+    public String approve(
+            @PathVariable("id") Integer requestId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+        try {
+            historyService.approveRequest(requestId, userDetails.getUserId());
+            redirectAttributes.addFlashAttribute("successMessage", "申請を承認しました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "承認に失敗しました: " + e.getMessage());
+        }
+        return "redirect:/admin/request/history";
+    }
+
+    // 生徒の申請を却下
+    @PostMapping("/{id}/reject")
+    public String reject(
+            @PathVariable("id") Integer requestId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+        try {
+            historyService.rejectRequest(requestId, userDetails.getUserId());
+            redirectAttributes.addFlashAttribute("successMessage", "申請を却下しました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "却下に失敗しました: " + e.getMessage());
+        }
         return "redirect:/admin/request/history";
     }
 }
