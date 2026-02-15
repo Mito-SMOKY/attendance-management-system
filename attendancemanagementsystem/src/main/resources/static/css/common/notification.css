@@ -158,7 +158,7 @@ body {
 
 /* リンクスタイル */
 .notification-table a {
-    color: #007bff;
+    color: #00bdca;
     text-decoration: none;
 }
 .notification-table a:hover {
@@ -197,8 +197,8 @@ body {
 
 .modal-2__open-label:hover {
     background-color: #fff;
-    color: #2589d0;
-    outline: 1px solid #2589d0;
+    color: #00bdca;
+    outline: 1px solid #00bdca;
 }
 
 .modal-2 {
@@ -314,7 +314,7 @@ body {
 }
 
 .checkbox-1 label:has(:checked)::before {
-    background-color: #2589d0;
+    background-color: #00bdca;
 }
 
 .checkbox-1 label:has(:checked)::after {
@@ -366,7 +366,7 @@ body {
 
 /* 選択された時の背景色 */
 .radio-1 label:has(:checked)::before {
-    background-color: #2589d0;
+    background-color: #00bdca;
 }
 
 /* 選択された時の中心の白い点 */

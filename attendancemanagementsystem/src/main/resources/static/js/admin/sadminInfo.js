@@ -6,6 +6,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const successMsg = document.getElementById("serverSuccessMessage");
   const errorMsg = document.getElementById("serverErrorMessage");
 
+// 氏名の入力制限 (スペースを削除)
+  const userNameInputForSanitize = document.getElementById("userName");
+  if (userNameInputForSanitize) {
+    userNameInputForSanitize.addEventListener("input", function () {
+      // 半角スペース・全角スペースを空文字に置換
+      this.value = this.value.replace(/[ 　]+/g, "");
+    });
+  }
+
   // 成功メッセージがあれば完了モーダルを表示
   if (successMsg && successMsg.value) {
     Swal.fire({

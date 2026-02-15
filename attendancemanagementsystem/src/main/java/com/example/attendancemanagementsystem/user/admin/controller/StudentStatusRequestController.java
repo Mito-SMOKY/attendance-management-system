@@ -40,7 +40,7 @@ public class StudentStatusRequestController {
 
         // 画面表示に必要なデータをModelにセット
         model.addAttribute("pageTitle", "ステータス変更申請");
-        model.addAttribute("confirmMessage", "変更理由を入力してください（必須）");
+        model.addAttribute("confirmMessage", "変更内容を入力してください（必須）");
         model.addAttribute("studentList", studentList);
         model.addAttribute("approverList", statusService.getApproverList());
         model.addAttribute("statusList", statusService.getStatusList());

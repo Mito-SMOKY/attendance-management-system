@@ -63,6 +63,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // 氏名の入力制限 
+  const nameInput = document.getElementById("userName"); 
+  if (nameInput) {
+    nameInput.addEventListener("input", function () {
+      // 半角スペース・全角スペースを空文字に置換
+      this.value = this.value.replace(/[ 　]+/g, "");
+    });
+  }
+
   // モーダル外クリックで閉じる
   const modal = document.getElementById("confirmModal");
   if (modal) {
