@@ -43,4 +43,15 @@ public interface SubjectRepository extends JpaRepository<SubjectEntity, Integer>
         JOIN major m ON d.MajorID = m.MajorID
         """, nativeQuery = true)
     List<Object[]> findAllSubjectsWithContext();
+
+    // 学科IDに紐付く教科だけを検索する
+    @Query(value = "SELECT s.* FROM subject s " +
+                "INNER JOIN departmentsubject ds ON s.SubjectID = ds.SubjectID " +
+                "WHERE ds.DepartmentID = :departmentId " +
+                "AND ds.Grade = :grade " +  
+                "ORDER BY s.SubjectName", nativeQuery = true)
+    List<SubjectEntity> findByDepartmentIdAndGrade(
+        @Param("departmentId") Integer departmentId, 
+        @Param("grade") Integer grade
+    );
 }

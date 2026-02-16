@@ -74,10 +74,11 @@
                         </select>
                     </div>
                     
-                    <div  class="form-group">
+                    <div class="form-group">
                         <label>学年:</label>
-                        <input type="number" id="targetGrade" th:field="*{targetGrade}" min="1" max="4" value="1" class="select-box"
-                            placeholder="1">
+                        <select th:field="*{targetGrade}" id="targetGrade" class="select-box">
+                            <option value="">(学科を選択)</option>
+                        </select>
                     </div>
                     
 

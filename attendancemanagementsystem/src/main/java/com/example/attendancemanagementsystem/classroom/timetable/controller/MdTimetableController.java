@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.attendancemanagementsystem.classroom.timetable.dto.MdTimetableDto;
 import com.example.attendancemanagementsystem.classroom.timetable.service.MdTimetableService;
+import com.example.attendancemanagementsystem.common.entity.SubjectEntity;
 import com.example.attendancemanagementsystem.common.repository.ClassroomRepository;
 import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
@@ -297,5 +298,18 @@ public class MdTimetableController {
         model.addAttribute("subjectList", subjectRepository.findAll());
         model.addAttribute("classroomList", classroomRepository.findAll());
         model.addAttribute("timeSlots", timeSlotRepository.findAllByOrderBySlotIdAsc());
+    }
+
+    // 学科と学年を受け取って教科を返す
+    @GetMapping("/api/getSubjects")
+    @ResponseBody
+    public ResponseEntity<List<SubjectEntity>> getSubjects(
+            @RequestParam("departmentId") Integer departmentId,
+            @RequestParam("targetGrade") Integer targetGrade) { 
+        
+        // 学科と学年で絞り込み
+        List<SubjectEntity> subjects = subjectRepository.findByDepartmentIdAndGrade(departmentId, targetGrade);
+        
+        return ResponseEntity.ok(subjects);
     }
 }

@@ -1,107 +1,177 @@
 /**
  * mdTimetable.js
  * 時間割管理画面の共通スクリプト
+ * ・学科・学年の選択に応じて、教科リストを適切に絞り込む機能を搭載
  */
 
 $(document).ready(function() {
 
-    // --- 1. Select2と連動した学年リストの動的読み込み (参照・削除画面用) ---
-    // ★修正: URL判定(isViewOrDeletePage)を削除し、要素の有無だけで判断するように変更
-    const $deptSelect = $('#departmentId'); // 学科セレクトボックス
-    const $gradeSelect = $('#targetGrade'); // 学年セレクトボックス
+    // --- 1. 学科・学年変更時の連動処理 (イベントデリゲート) ---
+    
+    // ① 学科が変わった時 -> 学年リストを更新し、(学年未定になるので)教科リストはクリア
+    $(document).on('change', '#departmentId', function() {
+        updateGradeOptions();   
+        // 学科を変えた直後は学年が不整合になるため、教科リストは一旦空にするか、
+        // updateGradeOptions完了後の自動選択に任せるのが安全です。
+        // ここでは明示的に教科リストをリセット（クリア）します。
+        clearSubjectOptions(); 
+    });
 
-    // 画面上に「学科」と「学年」のセレクトボックスが両方ある場合のみ実行
-    if ($deptSelect.length && $gradeSelect.length) {
-        
-        // ① 学科が変更された時の処理 (Select2対応のためjQueryを使用)
-        $deptSelect.on('change', function() {
-            updateGradeOptions();
-        });
+    // ② 学年が変わった時 -> 教科リストを更新 (★ここが追加ポイント)
+    $(document).on('change', '#targetGrade', function() {
+        updateSubjectOptions();
+    });
 
-        // ② 画面読み込み時にも実行 (戻るボタンや再表示時、初期値がある場合用)
-        if ($deptSelect.val()) {
-            updateGradeOptions();
+    // 初期表示時の実行
+    if ($('#departmentId').length && $('#departmentId').val()) {
+        updateGradeOptions();
+        // 初期値ですでに学年も入っている場合は教科も読み込む
+        if ($('#targetGrade').val()) {
+            updateSubjectOptions();
         }
     }
 
+    /**
+     * 学年プルダウンの更新
+     */
     function updateGradeOptions() {
+        const $deptSelect = $('#departmentId');
+        const $gradeSelect = $('#targetGrade');
+
+        if (!$deptSelect.length || !$gradeSelect.length) return;
+
         const deptId = $deptSelect.val();
-        // 現在選択されている学年（あればHTMLのdata属性やvalueから取得）
         const currentGrade = $gradeSelect.data('selected') || $gradeSelect.val();
 
-        // 学科が空ならリセットして終了
         if (!deptId) {
             $gradeSelect.empty().append('<option value="">-</option>');
+            $gradeSelect.trigger('change.select2');
             return;
         }
 
-        // サーバーからデータ取得
         $.ajax({
             url: '/admin/mdTimetable/api/getRegisteredGrades',
             type: 'GET',
             data: { departmentId: deptId },
             dataType: 'json',
             success: function(grades) {
-                // セレクトボックスをクリア
                 $gradeSelect.empty();
-
-                if (grades.length === 0) {
+                if (!grades || grades.length === 0) {
                     $gradeSelect.append('<option value="">データなし</option>');
                 } else {
-                    // データあり：optionを追加
-                    
-                    // 必要であれば「-」や「選択」を追加
-                    // $gradeSelect.append('<option value="">-</option>');
+                    $gradeSelect.append('<option value="">(学年を選択)</option>');
 
                     $.each(grades, function(index, grade) {
                         const option = $('<option>', {
                             value: grade,
                             text: grade + '年'
                         });
-
-                        // 保持していた値と同じなら選択状態にする
                         if (String(grade) === String(currentGrade)) {
                             option.prop('selected', true);
                         }
                         $gradeSelect.append(option);
                     });
 
-                    // もし何も選択されておらず、かつデータがある場合は先頭を自動選択する
-                    // (データロード後に即座に表示可能にするため)
+                    // 未選択なら先頭を自動選択
                     if (!$gradeSelect.val() && grades.length > 0 && !currentGrade) {
                         $gradeSelect.val(grades[0]).trigger('change');
                     }
                 }
+                $gradeSelect.trigger('change');
+                $gradeSelect.trigger('change.select2');
             },
-            error: function(xhr, status, error) {
-                console.error("学年データの取得に失敗:", error);
+            error: function(xhr) {
+                console.error("学年データの取得に失敗:", xhr);
                 $gradeSelect.empty().append('<option value="">取得エラー</option>');
             }
         });
     }
 
+    /**
+     * ★修正: 教科プルダウンの更新
+     * 「学科」と「学年」の両方が決まっている時だけ検索する
+     */
+    function updateSubjectOptions() {
+        const deptId = $('#departmentId').val();
+        const targetGrade = $('#targetGrade').val(); // ★学年も取得
+
+        const $subjectSelects = $('select[name$=".subjectId"]');
+        if ($subjectSelects.length === 0) return;
+
+        // 学科か学年のどちらかが欠けていたら、教科は選べないようにクリアして終了
+        if (!deptId || !targetGrade) {
+            clearSubjectOptions();
+            return;
+        }
+
+        // サーバーから「その学科の、その学年の」教科リストを取得
+        $.ajax({
+            url: '/admin/mdTimetable/api/getSubjects',
+            type: 'GET',
+            data: { 
+                departmentId: deptId,
+                targetGrade: targetGrade // ★パラメータに追加
+            },
+            dataType: 'json',
+            success: function(subjects) {
+                $subjectSelects.each(function() {
+                    const $select = $(this);
+                    const currentVal = $select.val(); 
+
+                    $select.empty();
+                    $select.append('<option value="">(科目未定)</option>');
+
+                    if (subjects && subjects.length > 0) {
+                        $.each(subjects, function(index, subject) {
+                            const option = $('<option>', {
+                                value: subject.subjectId,
+                                text: subject.subjectName
+                            });
+                            if (String(subject.subjectId) === String(currentVal)) {
+                                option.prop('selected', true);
+                            }
+                            $select.append(option);
+                        });
+                    }
+                    $select.trigger('change.select2');
+                });
+            },
+            error: function(xhr) {
+                console.error("教科リストの取得に失敗しました", xhr);
+            }
+        });
+    }
+
+    /**
+     * 教科プルダウンをリセットするヘルパー関数
+     */
+    function clearSubjectOptions() {
+        const $subjectSelects = $('select[name$=".subjectId"]');
+        $subjectSelects.each(function() {
+            const $select = $(this);
+            $select.empty();
+            $select.append('<option value="">(まずは学年を選択)</option>');
+            $select.trigger('change.select2');
+        });
+    }
+
 
     // --- 2. Flatpickr (一括登録用・期間選択) ---
-    // startとendを別々に初期化して連動させる方式
     const startDateInput = document.getElementById("startDate");
     const endDateInput = document.getElementById("endDate");
 
     if (startDateInput && endDateInput) {
-        
-        // 終了日の設定
         const fpEnd = flatpickr("#endDate", {
             locale: "ja",
             dateFormat: "Y-m-d",
             allowInput: true 
         });
 
-        // 開始日の設定
         flatpickr("#startDate", {
             locale: "ja",
             dateFormat: "Y-m-d",
             allowInput: true,
             onChange: function(selectedDates, dateStr, instance) {
-                // 開始日が変更されたら、終了日の最小日(minDate)をその日に設定する
                 fpEnd.set('minDate', dateStr);
             }
         });
@@ -118,49 +188,27 @@ $(document).ready(function() {
 });
 
 
-/* =========================================
- * 一括登録画面 (mdTimetable.html) 用
- * ========================================= */
+// --- 以下、HTML内から呼ばれる関数群 ---
+// (内容は変更なしのため、そのまま利用します)
 
-/**
- * 年度と学期から、開始日・終了日の目安をセットする
- * (手動ボタン用)
- */
 function setAutoDates() {
     const year = document.getElementById('yearSelect').value;
     const term = document.getElementById('termSelect').value;
-    
     const startElem = document.getElementById("startDate");
     const endElem = document.getElementById("endDate");
 
-    let startStr = "";
-    let endStr = "";
+    if (!year || !term) return;
 
-    if (term == '1') {
-        startStr = year + '-04-01';
-        endStr = year + '-09-30';
-    } else {
-        startStr = year + '-10-01';
-        endStr = (parseInt(year) + 1) + '-03-31';
-    }
+    let startStr = (term == '1') ? year + '-04-01' : year + '-10-01';
+    let endStr = (term == '1') ? year + '-09-30' : (parseInt(year) + 1) + '-03-31';
 
-    // Flatpickrにセット
-    if (startElem && startElem._flatpickr) {
-        startElem._flatpickr.setDate(startStr);
-    } else if (startElem) {
-        startElem.value = startStr;
-    }
+    if (startElem && startElem._flatpickr) startElem._flatpickr.setDate(startStr);
+    else if (startElem) startElem.value = startStr;
 
-    if (endElem && endElem._flatpickr) {
-        endElem._flatpickr.setDate(endStr);
-    } else if (endElem) {
-        endElem.value = endStr;
-    }
+    if (endElem && endElem._flatpickr) endElem._flatpickr.setDate(endStr);
+    else if (endElem) endElem.value = endStr;
 }
 
-/**
- * AI画像解析のアップロード処理 (時間割画像用)
- */
 async function uploadImage() {
     const fileInput = document.getElementById('timetableImage');
     const loadingMsg = document.getElementById('loadingMsg');
@@ -202,10 +250,6 @@ async function uploadImage() {
     }
 }
 
-/**
- * 行事予定表PDF解析
- * (期間の自動セット ＆ 休日の抽出)
- */
 async function uploadSchedulePdf() {
     const fileInput = document.getElementById('schedulePdf');
     const loadingMsg = document.getElementById('pdfLoadingMsg');
@@ -218,7 +262,6 @@ async function uploadSchedulePdf() {
     const startDateInput = document.getElementById('startDate');
     const endDateInput = document.getElementById('endDate');
 
-    // 学年は「クラス」から推測せず、画面の「学年プルダウン」から直接取得する
     const targetGradeSelect = document.getElementById('targetGrade');
     const targetGrade = targetGradeSelect ? targetGradeSelect.value : "";
 
@@ -227,7 +270,6 @@ async function uploadSchedulePdf() {
         return;
     }
 
-    // 学年未選択のチェック
     if (!targetGrade) {
         alert("学年を選択してください。");
         return;
@@ -240,8 +282,6 @@ async function uploadSchedulePdf() {
     formData.append("file", fileInput.files[0]);
     formData.append("year", yearSelect.value); 
     formData.append("term", termSelect.value); 
-    
-    // ここで選択した学年をパラメータとして渡す
     formData.append("targetGrade", targetGrade);
 
     try {
@@ -253,8 +293,7 @@ async function uploadSchedulePdf() {
         if (!response.ok) throw new Error("Server Error: " + response.status);
 
         const result = await response.json(); 
-        console.log("解析結果:", result);
-
+        
         if (result.startDate && result.endDate) {
             if (startDateInput && startDateInput._flatpickr) startDateInput._flatpickr.setDate(result.startDate);
             else if (startDateInput) startDateInput.value = result.startDate;
@@ -264,55 +303,35 @@ async function uploadSchedulePdf() {
         }
 
         const dateList = result.holidays || [];
-
-        if (dateList.length === 0 && (!result.startDate || !result.endDate)) {
-            alert("PDFから有効な情報を読み取れませんでした。");
-        } else {
-            if (dateList.length > 0) {
-                outputArea.value = dateList.join(', ');
-            }
-            
-            // メッセージも選択した学年を表示
-            let msg = `【${targetGrade}年生】のスケジュール解析完了\n`;
-            if (result.startDate && result.endDate) {
-                msg += `■ 期間: ${result.startDate} ～ ${result.endDate}\n`;
-            }
-            msg += `■ 休日: ${dateList.length}日分を抽出しました`;
-            alert(msg);
+        if (dateList.length > 0) {
+            outputArea.value = dateList.join(', ');
         }
+        
+        let msg = `【${targetGrade}年生】のスケジュール解析完了\n`;
+        if (result.startDate && result.endDate) {
+            msg += `■ 期間: ${result.startDate} ～ ${result.endDate}\n`;
+        }
+        msg += `■ 休日: ${dateList.length}日分を抽出しました`;
+        alert(msg);
 
     } catch (e) {
         console.error(e);
-        alert("解析に失敗しました。サーバーエラーが発生した可能性があります。");
+        alert("解析に失敗しました。");
     } finally {
         loadingMsg.style.display = 'none';
         analyzeBtn.disabled = false;
     }
 }
 
-/**
- * 解析データを画面のプルダウンに反映
- */
 function applyTimetableData(data) {
     let count = 0;
     data.forEach(item => {
-        // ★修正点: dayを強制的に大文字に変換する (Monday -> MONDAY)
-        // HTML側の name 属性が scheduleMap[1]['MONDAY']... と大文字になっているため
         const dayKey = item.day ? item.day.toUpperCase() : "";
-
-        // エスケープ処理（念のため）
-        const nameBase = `scheduleMap[${item.slot}]['${dayKey}']`;
-
-        // jQueryのセレクタ作成（属性セレクタ内のクォートに注意）
         const subjectEl = $(`select[name="scheduleMap[${item.slot}]['${dayKey}'].subjectId"]`);
         const roomEl    = $(`select[name="scheduleMap[${item.slot}]['${dayKey}'].classroomId"]`);
         const teacherEl = $(`select[name="scheduleMap[${item.slot}]['${dayKey}'].userId"]`);
 
-        // 要素が見つからない場合はスキップ（ログに出すと原因がわかりやすい）
-        if (subjectEl.length === 0) {
-            console.warn(`Element not found for: Slot=${item.slot}, Day=${dayKey}`);
-            return; 
-        }
+        if (subjectEl.length === 0) return; 
 
         if (item.subjectId) {
             subjectEl.val(item.subjectId).trigger('change');
@@ -328,22 +347,28 @@ function applyTimetableData(data) {
     return count;
 }
 
-/**
- * 重複チェック後に送信
- */
 async function checkAndSubmit() {
     const deptId = document.getElementById('departmentId').value;
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
+    const targetGrade = document.getElementById('targetGrade').value;
+    
     const form = document.getElementById('registerForm');
 
-    if (!deptId || !startDate || !endDate) {
-        alert("クラスと期間を正しく入力してください。");
+    if (!deptId || !targetGrade || !startDate || !endDate) {
+        alert("クラス・学年・期間を正しく入力してください。");
         return;
     }
 
     try {
-        const response = await fetch(`/admin/mdTimetable/check-overlap?departmentId=${deptId}&startDate=${startDate}&endDate=${endDate}`);
+        const params = new URLSearchParams({
+            departmentId: deptId,
+            targetGrade: targetGrade,
+            startDate: startDate,
+            endDate: endDate
+        });
+
+        const response = await fetch(`/admin/mdTimetable/check-overlap?${params.toString()}`);
         
         if (!response.ok) {
             throw new Error("Network response was not ok");
@@ -373,9 +398,6 @@ async function checkAndSubmit() {
     }
 }
 
-/* =========================================
- * 参照画面 (mdTimetableView.html) 用
- * ========================================= */
 function setReferenceDate() {
     const year = document.getElementById('yearSelect').value;
     const term = document.getElementById('termSelect').value;

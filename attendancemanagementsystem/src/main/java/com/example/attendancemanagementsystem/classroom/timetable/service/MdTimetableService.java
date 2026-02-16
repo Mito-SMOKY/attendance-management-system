@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors; 
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.attendancemanagementsystem.classroom.timetable.dto.MdTimetableDto;
 import com.example.attendancemanagementsystem.classroom.timetable.dto.MdTimetableDto.Cell;
 import com.example.attendancemanagementsystem.common.entity.DepartmentEntity;
+import com.example.attendancemanagementsystem.common.entity.SubjectEntity; 
 import com.example.attendancemanagementsystem.common.entity.TimeSlotEntity;
 import com.example.attendancemanagementsystem.common.entity.TimetableEntity;
 import com.example.attendancemanagementsystem.common.entity.UsersEntity;
 import com.example.attendancemanagementsystem.common.repository.DepartmentRepository;
+import com.example.attendancemanagementsystem.common.repository.SubjectRepository; 
 import com.example.attendancemanagementsystem.common.repository.TimeSlotRepository;
 import com.example.attendancemanagementsystem.common.repository.TimetableRepository;
 import com.example.attendancemanagementsystem.common.repository.UsersRepository;
@@ -36,6 +39,7 @@ public class MdTimetableService {
     @Autowired private DepartmentRepository departmentRepository;
     @Autowired private UsersRepository usersRepository;
     @Autowired private TimeSlotRepository timeSlotRepository;
+    @Autowired private SubjectRepository subjectRepository; // ★追加
 
     // 学科の選択肢リスト作成
     public Map<Integer, String> getDepartmentOptions() {
@@ -88,6 +92,32 @@ public class MdTimetableService {
         // 学年が指定されていない場合のデフォルト処理 
         if (targetGrade == null) targetGrade = 1; 
 
+        // 不正なデータによる登録を防ぐ
+        List<SubjectEntity> allowedSubjects = subjectRepository.findByDepartmentIdAndGrade(deptId, targetGrade);
+        Set<Integer> allowedSubjectIds = allowedSubjects.stream()
+            .map(SubjectEntity::getSubjectId)
+            .collect(Collectors.toSet());
+
+        // 入力データのマップを取得
+        Map<Integer, Map<String, Cell>> scheduleMap = dto.getScheduleMap();
+        
+        if (scheduleMap != null) {
+            for (Integer slot : scheduleMap.keySet()) {
+                Map<String, Cell> dayMap = scheduleMap.get(slot);
+                for (String day : dayMap.keySet()) {
+                    Cell cell = dayMap.get(day);
+                    
+                    // 教科が選択されている場合、許可リストにあるか確認
+                    if (cell != null && cell.getSubjectId() != null) {
+                        if (!allowedSubjectIds.contains(cell.getSubjectId())) {
+                            throw new RuntimeException("不正な教科が選択されました。時限:" + slot + ", 曜日:" + day + 
+                                " (この学科・学年では履修できない教科です)");
+                        }
+                    }
+                }
+            }
+        }
+
         // 除外日リストの作成 
         Set<LocalDate> skipDates = new HashSet<>();
         String excludedStr = dto.getExcludedDates();
@@ -137,9 +167,6 @@ public class MdTimetableService {
         LocalDate current = dto.getStartDate();
         LocalDate end = dto.getEndDate();
         
-        // 入力データのマップを取得
-        Map<Integer, Map<String, Cell>> scheduleMap = dto.getScheduleMap();
-
         if (scheduleMap == null || scheduleMap.isEmpty()) return;
 
         List<TimeSlotEntity> allSlots = timeSlotRepository.findAllByOrderBySlotIdAsc();
