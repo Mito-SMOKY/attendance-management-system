@@ -118,4 +118,12 @@ public interface EnrollmentsRepository extends JpaRepository<EnrollmentsEntity, 
     List<Object[]> findStudentIdAndNamesByClass(
             @Param("departmentId") Integer departmentId, 
             @Param("grade") Integer grade);
+
+    // 指定した学科に在籍している学生の学年リストを取得（削除済み・非アクティブを除外）
+    @Query("SELECT DISTINCT e.grade FROM EnrollmentsEntity e " +
+        "WHERE e.department.departmentId = :departmentId " +
+        "AND e.isActive = true " +
+        "AND e.student.user.deleteFlag = false " +
+        "ORDER BY e.grade ASC")
+    List<Integer> findGradesByDepartmentId(@Param("departmentId") Integer departmentId);
 }

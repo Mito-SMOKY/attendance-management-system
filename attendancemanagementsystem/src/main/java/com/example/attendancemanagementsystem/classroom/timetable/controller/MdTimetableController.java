@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.attendancemanagementsystem.classroom.timetable.dto.MdTimetableDto;
 import com.example.attendancemanagementsystem.classroom.timetable.service.MdTimetableService;
 import com.example.attendancemanagementsystem.common.repository.ClassroomRepository;
+import com.example.attendancemanagementsystem.common.repository.EnrollmentsRepository;
 import com.example.attendancemanagementsystem.common.repository.SubjectRepository;
 import com.example.attendancemanagementsystem.common.repository.TimeSlotRepository;
 import com.example.attendancemanagementsystem.common.repository.TimetableRepository;
@@ -38,6 +39,7 @@ public class MdTimetableController {
     @Autowired private ClassroomRepository classroomRepository;
     @Autowired private TimetableRepository timetableRepository;
     @Autowired private TimeSlotRepository timeSlotRepository;
+    @Autowired private EnrollmentsRepository enrollmentsRepository;
     @Autowired private GeminiService geminiService;
 
     // 時間割画像を解析するAPI
@@ -202,7 +204,7 @@ public class MdTimetableController {
     public ResponseEntity<List<Integer>> getRegisteredGrades(@RequestParam("departmentId") Integer departmentId) {
 
         // 存在する学年だけを返す
-        List<Integer> grades = timetableRepository.findGradesByDepartmentId(departmentId);
+        List<Integer> grades = enrollmentsRepository.findGradesByDepartmentId(departmentId);
         return ResponseEntity.ok(grades);
     }
 
