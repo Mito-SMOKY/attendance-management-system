@@ -46,9 +46,17 @@ public class GeminiService {
             List<SubjectEntity> subjects = subjectRepository.findAll();
             List<UsersEntity> teachers = usersRepository.findByUserTypeId(2);
             List<ClassroomEntity> classrooms = classroomRepository.findAll();
+            List<Object[]> subjectContextData = subjectRepository.findAllSubjectsWithContext();
 
             // プロンプトに含めるためのマスタデータリストを作成
-            String subjectListStr = subjects.stream().map(SubjectEntity::getSubjectName).collect(Collectors.joining(", "));
+            String subjectListStr = subjectContextData.stream()
+                    .map(row -> {
+                        String name = (String) row[0];    
+                        String major = (String) row[1];   
+                        Integer grade = (Integer) row[2]; 
+                        return String.format("%s(対象:%s %d年)", name, major, grade);
+                    })
+                    .collect(Collectors.joining(", "));
             String teacherListStr = teachers.stream().map(UsersEntity::getName).collect(Collectors.joining(", "));
 
             // 画像データを取得してBase64形式にエンコード
@@ -63,10 +71,16 @@ public class GeminiService {
                 "内容を読み取り、以下のJSON形式のリストで出力してください。\n" +
                 "JSONフォーマット: \n" +
                 "[{\"day\": \"MONDAY\", \"slot\": 1, \"subject\": \"科目名\", \"teacher\": \"教員名\", \"room\": \"教室名\"}, ...]\n\n" +
+                
                 "【重要: マッチング指示】\n" +
-                "1. 科目名は、リスト: [" + subjectListStr + "] に最も近いものを選んでください。\n" +
-                "2. 教員名は、リスト: [" + teacherListStr + "] にある名前を含んでいれば、そのフルネームを優先してください（例: '上野' -> '上野 太郎'）。\n" +
-                "3. Markdown記法は不要です。生データのJSONのみを返してください。";
+                "1. 画像のヘッダー情報（タイトルや枠外の記載）から「学科名」と「学年」を必ず読み取ってください。（例: '情報システム科 3A' など）\n" +
+                "2. 科目名は、以下のリストから選択してください。\n" +
+                "   リスト: [" + subjectListStr + "]\n" +
+                "   ※リストは「{クラスコード}科目名(対象:学科名 学年)」の形式です。\n" +
+                "   ※手順1で読み取った学科・学年と、リスト内の(対象:...)が一致する科目を優先的に選んでください。\n" +
+                "   (例: 画像が『情報システム科3年』の場合 → リストの『(対象:情報システム学科 3年)』が付いている『{SE3A}...』を選択)\n" +
+                "3. 教員名は、リスト: [" + teacherListStr + "] にある名前を含んでいれば、そのフルネームを優先してください。\n" +
+                "4. Markdown記法は不要です。生データのJSONのみを返してください。";
 
             // APIリクエストボディのJSONを作成
             ObjectMapper mapper = new ObjectMapper();

@@ -31,4 +31,16 @@ public interface SubjectRepository extends JpaRepository<SubjectEntity, Integer>
         "WHERE m.CourseID = :courseId", nativeQuery = true)
     List<SubjectEntity> findByCourseId(@Param("courseId") Integer courseId);
 
+    // 科目名と、それが対象とする「学科名」「学年」をセットで取得するクエリ
+    @Query(value = """
+        SELECT 
+            s.SubjectName, 
+            m.MajorName, 
+            ds.Grade 
+        FROM subject s
+        JOIN departmentsubject ds ON s.SubjectID = ds.SubjectID
+        JOIN department d ON ds.DepartmentID = d.DepartmentID
+        JOIN major m ON d.MajorID = m.MajorID
+        """, nativeQuery = true)
+    List<Object[]> findAllSubjectsWithContext();
 }
