@@ -39,7 +39,7 @@ public class MdTimetableService {
     @Autowired private DepartmentRepository departmentRepository;
     @Autowired private UsersRepository usersRepository;
     @Autowired private TimeSlotRepository timeSlotRepository;
-    @Autowired private SubjectRepository subjectRepository; // ★追加
+    @Autowired private SubjectRepository subjectRepository; 
 
     // 学科の選択肢リスト作成
     public Map<Integer, String> getDepartmentOptions() {

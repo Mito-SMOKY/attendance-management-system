@@ -54,4 +54,15 @@ public interface SubjectRepository extends JpaRepository<SubjectEntity, Integer>
         @Param("departmentId") Integer departmentId, 
         @Param("grade") Integer grade
     );
+
+    // 学科IDと学年、コースIDに紐付く教科を検索するクエリ
+    @Query("SELECT ds.subject FROM DepartmentSubject ds " +
+        "WHERE ds.department.departmentId = :departmentId " +
+        "AND ds.grade = :grade " +
+        "AND ds.department.major.course.courseId = :courseId")
+    List<SubjectEntity> findSubjectsByDeptGradeAndCourse(
+        @Param("departmentId") Integer deptId, 
+        @Param("grade") Integer grade,
+        @Param("courseId") Integer courseId
+    );
 }

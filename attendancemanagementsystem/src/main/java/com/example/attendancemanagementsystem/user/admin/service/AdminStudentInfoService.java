@@ -118,16 +118,19 @@ public class AdminStudentInfoService {
         // 受講教科リストの取得
         List<SubjectSimpleDto> displaySubjects = new ArrayList<>();
         Integer targetDeptId = null;
+        Integer targetGrade = null; 
         
         Specification<SubjectEntity> keywordSpec = searchService.createKeywordSpec(searchSubject, List.of("subjectName"));
         boolean filterSuccess = false;
 
         // 学科・学年による絞り込み
         if (activeEnrollment != null && activeEnrollment.getDepartment() != null) {
+            
             targetDeptId = activeEnrollment.getDepartment().getDepartmentId();
-            Integer grade = activeEnrollment.getGrade();
+            targetGrade = activeEnrollment.getGrade(); 
 
-            List<SubjectEntity> allowedSubjects = departmentSubjectRepository.findSubjectsByDepartmentIdAndGrade(targetDeptId, grade);
+            List<SubjectEntity> allowedSubjects = departmentSubjectRepository.findSubjectsByDepartmentIdAndGrade(targetDeptId, targetGrade);
+            
             List<Integer> allowedSubjectIds = allowedSubjects.stream()
                     .map(SubjectEntity::getSubjectId)
                     .collect(Collectors.toList());
@@ -150,8 +153,8 @@ public class AdminStudentInfoService {
             }
         }
 
-        // 絞り込めない場合は全教科検索
-        if (!filterSuccess) {
+        // 絞り込めない場合（在籍情報がない場合のみ救済措置として全検索）
+        if (!filterSuccess && activeEnrollment == null) {
             List<SubjectEntity> allSubjects = subjectRepository.findAll(keywordSpec);
             displaySubjects = allSubjects.stream().map(s -> {
                 SubjectSimpleDto sd = new SubjectSimpleDto();
@@ -174,73 +177,66 @@ public class AdminStudentInfoService {
         // 出席サマリー集計 
         AttendanceSummaryDto summary = new AttendanceSummaryDto();
 
-        // 日付ごとにデータをグループ化
         Map<LocalDate, List<AttendanceEntity>> groupedByDate = attendances.stream()
             .filter(a -> a.getSession() != null)
             .collect(Collectors.groupingBy(a -> a.getSession().getSessionDate()));
 
-    // 日付ごとに「1日の扱い」を判定
-    for (List<AttendanceEntity> dailyAtts : groupedByDate.values()) {
+        // 日付ごとに「1日の扱い」を判定
+        for (List<AttendanceEntity> dailyAtts : groupedByDate.values()) {
+            
+            dailyAtts.sort((a, b) -> {
+                Integer slotA = a.getSession().getTimeSlot().getSlotId();
+                Integer slotB = b.getSession().getTimeSlot().getSlotId();
+                return slotA.compareTo(slotB);
+            });
+
+            List<String> statusList = dailyAtts.stream()
+                    .map(a -> a.getStatus() != null ? a.getStatus().getStatusName() : "")
+                    .collect(Collectors.toList());
+
+            if (statusList.stream().allMatch(s -> "欠席".equals(s))) {
+                summary.setAbsenceCount(summary.getAbsenceCount() + 1);
+                continue;
+            }
+            if (statusList.stream().allMatch(s -> "公欠".equals(s) || "公欠候補".equals(s))) {
+                summary.setPublicAbsenceCount(summary.getPublicAbsenceCount() + 1);
+                continue;
+            }
+            if (statusList.stream().allMatch(s -> "出席停止".equals(s))) {
+                summary.setSuspensionCount(summary.getSuspensionCount() + 1);
+                continue;
+            }
+
+            String firstStatus = statusList.get(0);
+            String lastStatus = statusList.get(statusList.size() - 1);
+
+            if ("欠席".equals(firstStatus) || "遅刻".equals(firstStatus)) {
+                summary.setLateCount(summary.getLateCount() + 1);
+                continue;
+            }
+            if ("欠席".equals(lastStatus) || "早退".equals(lastStatus)) {
+                summary.setEarlyLeaveCount(summary.getEarlyLeaveCount() + 1);
+                continue;
+            }
+
+            summary.setAttendanceCount(summary.getAttendanceCount() + 1);
+        }
         
-        // 時系列順に並べ替える
-        dailyAtts.sort((a, b) -> {
-            Integer slotA = a.getSession().getTimeSlot().getSlotId();
-            Integer slotB = b.getSession().getTimeSlot().getSlotId();
-            return slotA.compareTo(slotB);
-        });
-
-        // 判定用のステータスリストを作成
-        List<String> statusList = dailyAtts.stream()
-                .map(a -> a.getStatus() != null ? a.getStatus().getStatusName() : "")
-                .collect(Collectors.toList());
-
-
-        // 全欠席
-        if (statusList.stream().allMatch(s -> "欠席".equals(s))) {
-            summary.setAbsenceCount(summary.getAbsenceCount() + 1);
-            continue;
-        }
-
-        // 全公欠 (公欠 または 公欠候補)
-        if (statusList.stream().allMatch(s -> "公欠".equals(s) || "公欠候補".equals(s))) {
-            summary.setPublicAbsenceCount(summary.getPublicAbsenceCount() + 1);
-            continue;
-        }
-
-        // 全出席停止
-        if (statusList.stream().allMatch(s -> "出席停止".equals(s))) {
-            summary.setSuspensionCount(summary.getSuspensionCount() + 1);
-            continue;
-        }
-
-        String firstStatus = statusList.get(0); // 1限目の状態
-        String lastStatus = statusList.get(statusList.size() - 1); // 最後の授業の状態
-
-        // 遅刻判定
-        // ルール: 1限目が「欠席」または「遅刻」の場合
-        if ("欠席".equals(firstStatus) || "遅刻".equals(firstStatus)) {
-            summary.setLateCount(summary.getLateCount() + 1);
-            continue;
-        }
-
-        // 早退判定
-        // ルール: 1限目はOKだったが、最後の授業が「欠席」または「早退」の場合
-        if ("欠席".equals(lastStatus) || "早退".equals(lastStatus)) {
-            summary.setEarlyLeaveCount(summary.getEarlyLeaveCount() + 1);
-            continue;
-        }
-
-        // 出席
-        // 上記のいずれにも当てはまらない（朝から最後まで出席している）
-        summary.setAttendanceCount(summary.getAttendanceCount() + 1);
-    }
-    
-    dto.setSummary(summary);
+        dto.setSummary(summary);
 
         // スケジュール表の作成
         final Integer deptIdFilter = targetDeptId;
+        final Integer gradeFilter = targetGrade; 
+
+        // 対象月の授業日を抽出（学科・学年フィルターを適用）
         List<LocalDate> activeDates = allSessions.stream()
-            .filter(s -> deptIdFilter == null || (s.getDepartment() != null && s.getDepartment().getDepartmentId().equals(deptIdFilter)))
+            .filter(s -> 
+                // 学科のチェック
+                (deptIdFilter == null || (s.getDepartment() != null && s.getDepartment().getDepartmentId().equals(deptIdFilter)))
+                &&
+                // 学年のチェック 
+                (gradeFilter == null || (s.getTargetGrade() != null && s.getTargetGrade().equals(gradeFilter)))
+            )
             .map(SessionEntity::getSessionDate)
             .distinct()
             .sorted()
@@ -249,6 +245,7 @@ public class AdminStudentInfoService {
         List<DailyScheduleDto> scheduleList = new ArrayList<>();
         DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("yyyy / MM / dd (E)", Locale.JAPANESE);
 
+        // 日付ごとにスケジュールを作成
         for (LocalDate date : activeDates) {
             DailyScheduleDto dailyDto = new DailyScheduleDto();
             dailyDto.setDateStr(date.format(dateFmt));
@@ -256,13 +253,14 @@ public class AdminStudentInfoService {
             List<PeriodDetailDto> periodList = new ArrayList<>();
             boolean hasAnyClass = false; 
 
+            // 時限ごとに授業と出席情報をセット
             for (TimeSlotEntity timeSlot : allTimeSlots) {
                 int slotId = timeSlot.getSlotId();
                 PeriodDetailDto pDto = new PeriodDetailDto();
                 pDto.setPeriod(slotId);
+                SessionEntity session = findSession(allSessions, date, slotId, deptIdFilter, gradeFilter);
 
-                SessionEntity session = findSession(allSessions, date, slotId, deptIdFilter);
-
+                // セッションが存在する場合は授業があるとみなし、教科名と出席情報をセット
                 if (session != null) {
                     hasAnyClass = true;
                     pDto.setHasClass(true);
@@ -275,6 +273,7 @@ public class AdminStudentInfoService {
 
                     AttendanceEntity att = findAttendanceBySessionId(attendances, session.getSessionId());
                     
+                    // 出席情報がある場合はステータスをセット、ない場合は「-」を表示
                     if (att != null) {
                         String statusName = att.getStatus() != null ? att.getStatus().getStatusName() : "-";
                         pDto.setStatusIcon(convertStatusToIcon(statusName));
@@ -305,25 +304,29 @@ public class AdminStudentInfoService {
         StudentEntity student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found: " + studentId));
 
+        // フォームからの更新情報をもとに出席情報を更新
         for (StudentAttendanceUpdateDto.DailyUpdateDto update : form.getUpdates()) {
             LocalDate date = update.getDate();
             Integer period = update.getPeriod();
             String statusName = update.getStatus();
-
             SessionEntity session = sessionRepository.findBySessionDateAndTimeSlotSlotId(date, period);
             
+            // セッションが見つからない場合はスキップ
             if (session == null) {
                 continue; 
             }
 
+            // ステータスマスタからステータスエンティティを取得
             AttendanceStatusEntity statusEntity = attendanceStatusRepository.findByStatusName(statusName);
             if (statusEntity == null) {
                 continue; 
             }
 
+            // 既存の出席情報を検索
             AttendanceEntity attendance = attendanceRepository.findBySessionIdAndStudent_UserId(session.getSessionId(), studentId)
                     .orElse(new AttendanceEntity());
 
+            // 新規作成の場合はセッションと生徒をセット
             if (attendance.getAttendanceId() == null) {
                 attendance.setStudent(student);
                 attendance.setSession(session);
@@ -334,13 +337,15 @@ public class AdminStudentInfoService {
         }
     }
 
-    //セッションの検索
-    private SessionEntity findSession(List<SessionEntity> list, LocalDate date, int slotId, Integer deptId) {
+    // セッションの検索
+    private SessionEntity findSession(List<SessionEntity> list, LocalDate date, int slotId, Integer deptId, Integer grade) {
         return list.stream()
             .filter(s -> s.getSessionDate().equals(date) 
                     && s.getTimeSlot() != null 
                     && s.getTimeSlot().getSlotId() == slotId
-                    && (deptId == null || (s.getDepartment() != null && s.getDepartment().getDepartmentId().equals(deptId))))
+                    && (deptId == null || (s.getDepartment() != null && s.getDepartment().getDepartmentId().equals(deptId)))
+                    && (grade == null || (s.getTargetGrade() != null && s.getTargetGrade().equals(grade)))
+            )
             .findFirst()
             .orElse(null);
     }
