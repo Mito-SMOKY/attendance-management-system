@@ -97,14 +97,14 @@ window.addEventListener('load', () => {
     const splashLogoContainer = document.querySelector('.splash-logo-container');
     const staticLogo = document.querySelector('.static-logo');
 
-    const hasPlayed = sessionStorage.getItem('animationPlayed');
+    // const hasPlayed = sessionStorage.getItem('animationPlayed');
 
-    if (hasPlayed) {
-        if (splash) splash.style.display = 'none';
-        body.classList.remove('loading');
-        body.classList.add('header-active', 'loaded', 'show-static', 'animation-done');
+    // if (hasPlayed) {
+    //     if (splash) splash.style.display = 'none';
+    //     body.classList.remove('loading');
+    //     body.classList.add('header-active', 'loaded', 'show-static', 'animation-done');
         
-    } else {
+    // } else {
         // 1. ヘッダー表示
         setTimeout(() => body.classList.add('header-active'), 100); 
 
@@ -147,4 +147,4 @@ window.addEventListener('load', () => {
             }, 1300); // 移動にかかる時間（CSSの1.5sと合わせる）
         }, 2500); // 最初の波紋待機
     }
-});
+);
